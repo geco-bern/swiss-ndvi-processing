@@ -98,3 +98,33 @@ print(subset_ds)
 
 for i in range(1,len(all_pixel)):
     subset_ds["ndvi"][i,-1] = all_ndvi[i] 
+
+# gapfilling
+
+for pixel in range(0,99): 
+
+    ndvi_vals = ndvi[pixel].cpu().numpy()
+    lower = double_logistic_function(t[[pixel]], params_lower[[pixel]]).squeeze().cpu().numpy()
+    upper = double_logistic_function(t[[pixel]], params_upper[[pixel]]).squeeze().cpu().numpy()
+
+    delta_up = (ndvi_vals - upper)
+    delta_down = (ndvi_vals - lower)
+
+    len_arr = len(ndvi_vals)
+
+    valid_idx = np.where(np.isfinite(ndvi_vals))
+    distances = valid_idx[0][1:] - valid_idx[0][:-1]
+    # first and last need to gapfill in other way
+    valid_deltas =  delta_up[np.where(np.isfinite(delta_up))]
+
+
+    slopes = (valid_deltas[1:] - valid_deltas[:-1]) /distances
+
+    for i in range(0,len(valid_idx[0])-1):
+        idx_to_gapfill = range(valid_idx[0][i]+1,valid_idx[0][i+1])
+        idx_to_gapfill = np.array(idx_to_gapfill)
+
+        if len(idx_to_gapfill) != 0: # if len == 0 means 2 contigous obs data
+            multiplier = range(1,len(idx_to_gapfill)+1)
+            multiplier = np.array(multiplier)
+            ds["ndvi"][pixel,idx_to_gapfill] = slopes[i] * multiplier + float(ds["ndvi"][pixel,valid_idx[0][i]])
