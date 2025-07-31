@@ -1,0 +1,218 @@
+import xarray as xr
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+import rioxarray
+import zarr
+import pandas as pd
+
+outlier = zarr.open("outliers.zarr", mode='r')
+store = zarr.open("sample.zarr", mode='r')
+quantile_up = zarr.open("quantiles_up.zarr", mode='r')
+quantile_down = zarr.open("quantiles_down.zarr", mode='r')
+ds = xr.open_zarr("/data_2/scratch/sbiegel/processed/seasonal_cycle_sample_full.zarr")
+
+params_lower = torch.tensor(ds["params_lower"].values)
+params_upper = torch.tensor(ds["params_upper"].values)
+
+dates = store["dates"][:]
+
+# convert dates to doy
+dates_pd = pd.to_datetime(dates)
+
+df = pd.DataFrame({
+    'date': dates_pd
+    })
+
+# Sort by date
+df_sorted = df.sort_values(by='date')
+
+# Extract the sorted arrays if needed
+dates_sorted = df_sorted['date'].values
+dates_pd_sorted = pd.to_datetime(dates_sorted)
+doy = dates_pd_sorted.dayofyear.values
+
+doy = torch.tensor(doy, dtype=torch.float32)
+T_SCALE = 1.0 / 365.0
+t = doy.unsqueeze(0).repeat(params_lower.shape[0], 1) * T_SCALE
+
+# Define the double logistic function
+def double_logistic_function(t, params):
+    sos, mat_minus_sos, sen, eos_minus_sen, M, m = torch.split(params, 1, dim=1)
+    mat_minus_sos = torch.nn.functional.softplus(mat_minus_sos)
+    eos_minus_sen = torch.nn.functional.softplus(eos_minus_sen)
+    sigmoid_sos_mat = torch.nn.functional.sigmoid(
+        -2 * (2 * sos + mat_minus_sos - 2 * t) / (mat_minus_sos + 1e-10)
+    )
+    sigmoid_sen_eos = torch.nn.functional.sigmoid(
+        -2 * (2 * sen + eos_minus_sen - 2 * t) / (eos_minus_sen + 1e-10)
+    )
+    return (M - m) * (sigmoid_sos_mat - sigmoid_sen_eos) + m
+
+lower = double_logistic_function(t[[0]], params_lower[[91]]).squeeze().cpu().numpy()
+upper = double_logistic_function(t[[0]], params_upper[[91]]).squeeze().cpu().numpy()
+iqr = upper - lower
+
+# select a random layer to mimic incoming data
+# param_iqr and qualitle are the same as the previous notebook
+
+param_iqr = 1.5
+layer = 789
+ndvi = store['ndvi']
+
+layer_ndvi = ndvi[:, layer]
+# normalize and filtering
+layer_ndvi = layer_ndvi / 100000
+
+valid_entry =  np.where((layer_ndvi >= 0) & (layer_ndvi <= 1))
+
+def gapfill():
+    pass
+
+if len(valid_entry) > 0: # checl if any data incoming is not na
+
+    """logic behind continous integration
+
+    a non-outlier can be flagged as potential outlier or "true value"
+    if the last non outlier is "true value" 
+
+        if the new data is in the iqr or the delta compared the previous value is small = "true value" -> gapfilling
+        else = potential outlier
+
+    if the previous value IS a potential outlier, this means that the previous point is outside the IQR and the delta is high
+
+        do as above
+
+            if the new data is true value, so the previous one it is -> gapfilling
+            if the new data is potential outlier, the previous is outlier -> no gapfilling
+
+    the gapfilling will be done as the previous notebook
+    artificially select potential outlier (the for cycle will be removed)"""
+    
+
+
+    potential_arr = []
+    
+
+    for entry in valid_entry[0]:
+
+        true_indices = np.flatnonzero(outlier[entry,0:layer])[-2:]
+
+        if len(true_indices) == 2:
+
+            if (ndvi[entry, true_indices[1]]> upper[layer] + param_iqr * iqr[layer]) or (ndvi[entry, true_indices[1]] < lower[layer] - param_iqr * iqr[layer]):
+
+                # calculate deltas
+                if ndvi[entry, true_indices[0]] > upper[layer] + param_iqr * iqr[layer]:
+                    delta_1 = ndvi[entry, true_indices[0]] -  upper[layer]
+                else: 
+                    delta_1 = ndvi[entry, true_indices[0]] -  lower[layer]
+
+                if ndvi[entry, true_indices[1]] > upper[layer] + param_iqr * iqr[layer]:
+                    delta_2 = ndvi[entry, true_indices[1]]-  upper[layer]
+                else: 
+                    delta_2 = ndvi[entry, true_indices[1]] -  lower[layer]
+
+                delta = delta_2 - delta_1
+
+                if delta > quantile_up[entry, true_indices[1]] or delta < quantile_down[entry, true_indices[1]]:
+                    potential_arr.append(True)
+            
+            else:
+                potential_arr.append(False)
+        else:
+            potential_arr.append(False)
+
+    potential_arr = np.array(potential_arr, dtype=bool)
+
+print(len(potential_arr))
+        
+# for now on the true aprt
+
+for entry in valid_entry[0]:
+
+    true_indices = np.flatnonzero(outlier[entry,0:layer])[-2:]
+    # first: check if lies in the iqr or not
+
+    if (ndvi[entry,layer] > upper[layer] + param_iqr * iqr[layer]) or (ndvi[entry,layer] < lower[layer] - param_iqr * iqr[layer]):
+     
+        true_indices = np.flatnonzero(outlier[entry,0:layer])[-2:]
+            
+        if len(true_indices) == 2:
+
+            if potential_arr[entry] == True:
+
+                # calculate deltas
+                if ndvi[true_indices[0],layer] > upper[layer] + param_iqr * iqr[layer]:
+                    delta_1 = ndvi[true_indices[0],layer] -  upper[layer]
+                else: 
+                    delta_1 = ndvi[true_indices[0],layer] -  lower[layer]
+
+                if ndvi[entry,layer] > upper[layer] + param_iqr * iqr[layer]:
+                    delta_2 = ndvi[entry,layer] -  upper[layer]
+                else: 
+                    delta_2 = ndvi[entry,layer] -  lower[layer]
+
+                delta = delta2 - delta_1
+
+                if delta > quantile_up[entry,layer] or delta < quantile_down[entry,layer]:
+                    outlier[true_indices[1],layer] = True
+                    # new data = "potential outlier"
+                else:
+                    outlier[true_indices[1],layer] = False
+                    # new data = "true value"
+                    gapfill()
+
+            else:
+
+                # calculate deltas
+                if ndvi[true_indices[1],layer] > upper[layer] + param_iqr * iqr[layer]:
+                    delta_1 = ndvi[true_indices[1],layer] -  upper[layer]
+                else: 
+                    delta_1 = ndvi[true_indices[1],layer] -  lower[layer]
+
+                if ndvi[entry,layer] > upper[layer] + param_iqr * iqr[layer]:
+                    delta_2 = ndvi[entry,layer] -  upper[layer]
+                else: 
+                    delta_2 = ndvi[entry,layer] -  lower[layer]
+
+                delta = delta2 - delta_1
+
+                if delta > quantile_up[entry,layer] or delta < quantile_down[entry,layer]:
+                    pass
+                    # new data = "potential outlier"
+                else:
+                    # new data = "true value"
+                    gapfill()
+            
+
+                
+
+    else:
+
+        if potential_arr[entry] == False:
+            outlier[true_indices[1],layer] = False
+            gapfill()
+
+        else:
+
+            if ndvi[true_indices[1],layer] > upper[layer] + param_iqr * iqr[layer]:
+                delta_1 = ndvi[true_indices[1],layer] -  upper[layer]
+            else: 
+                delta_1 = ndvi[true_indices[1],layer] -  lower[layer]
+
+            if ndvi[entry,layer] > upper[layer]:
+                delta2 = ndvi[entry,layer] - upper[layer]
+            else: 
+                delta2 = ndvi[entry,layer] - lower[layer]
+
+            if delta > quantile_up[entry,layer] or delta < quantile_down[entry,layer]:
+                outlier[true_indices[1],layer] = True
+                # new data = "true value"
+                gapfill()
+            else:
+                outlier[true_indices[1],layer] = False
+                # new data = "true value"
+                gapfill()
