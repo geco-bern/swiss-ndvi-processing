@@ -68,10 +68,11 @@ layer_ndvi = layer_ndvi / 100000
 
 valid_entry =  np.where((layer_ndvi >= 0) & (layer_ndvi <= 1))
 
-def gapfill():
-    pass
+def gapfill(delta_1, delta_2, iqr_1, iqr_2, distance):
 
-if len(valid_entry) > 0: # checl if any data incoming is not na
+    iqr_1 + ((delta_1- iqr_1) - (delta_2 - iqr_2)) / distance
+
+if len(valid_entry) > 0: # check if any data incoming is not na
 
     """logic behind continous integration
 
@@ -91,11 +92,8 @@ if len(valid_entry) > 0: # checl if any data incoming is not na
     the gapfilling will be done as the previous notebook
     artificially select potential outlier (the for cycle will be removed)"""
     
-
-
     potential_arr = []
     
-
     for entry in valid_entry[0]:
 
         true_indices = np.flatnonzero(outlier[entry,0:layer])[-2:]
@@ -129,7 +127,7 @@ if len(valid_entry) > 0: # checl if any data incoming is not na
 
 print(len(potential_arr))
         
-# for now on the true aprt
+# for now on the true gapfilling process
 
 for entry in valid_entry[0]:
 
@@ -145,15 +143,19 @@ for entry in valid_entry[0]:
             if potential_arr[entry] == True:
 
                 # calculate deltas
-                if ndvi[true_indices[0],layer] > upper[layer] + param_iqr * iqr[layer]:
+                if ndvi[true_indices[0],layer] > upper[layer]:
                     delta_1 = ndvi[true_indices[0],layer] -  upper[layer]
+                    iqr_1 = upper[true_indices[0]]
                 else: 
                     delta_1 = ndvi[true_indices[0],layer] -  lower[layer]
+                    iqr_1 = lower[true_indices[0]]
 
-                if ndvi[entry,layer] > upper[layer] + param_iqr * iqr[layer]:
+                if ndvi[entry,layer] > upper[layer]:
                     delta_2 = ndvi[entry,layer] -  upper[layer]
+                    iqr_2 = upper[entry]
                 else: 
                     delta_2 = ndvi[entry,layer] -  lower[layer]
+                    iqr_2 = lower[entry]
 
                 delta = delta2 - delta_1
 
@@ -163,17 +165,20 @@ for entry in valid_entry[0]:
                 else:
                     outlier[true_indices[1],layer] = False
                     # new data = "true value"
-                    gapfill()
+
+                    distance = np.range(1,(true_indices[1] - true_indices[0]) +1)
+                    distance = np.array(distance)
+                    gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
 
             else:
 
                 # calculate deltas
-                if ndvi[true_indices[1],layer] > upper[layer] + param_iqr * iqr[layer]:
+                if ndvi[true_indices[1],layer] > upper[layer]:
                     delta_1 = ndvi[true_indices[1],layer] -  upper[layer]
                 else: 
                     delta_1 = ndvi[true_indices[1],layer] -  lower[layer]
 
-                if ndvi[entry,layer] > upper[layer] + param_iqr * iqr[layer]:
+                if ndvi[entry,layer] > upper[layer]:
                     delta_2 = ndvi[entry,layer] -  upper[layer]
                 else: 
                     delta_2 = ndvi[entry,layer] -  lower[layer]
@@ -185,20 +190,17 @@ for entry in valid_entry[0]:
                     # new data = "potential outlier"
                 else:
                     # new data = "true value"
-                    gapfill()
-            
-
-                
+                    gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
 
     else:
 
         if potential_arr[entry] == False:
             outlier[true_indices[1],layer] = False
-            gapfill()
+            gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
 
         else:
 
-            if ndvi[true_indices[1],layer] > upper[layer] + param_iqr * iqr[layer]:
+            if ndvi[true_indices[1],layer] > upper[layer]:
                 delta_1 = ndvi[true_indices[1],layer] -  upper[layer]
             else: 
                 delta_1 = ndvi[true_indices[1],layer] -  lower[layer]
@@ -211,8 +213,8 @@ for entry in valid_entry[0]:
             if delta > quantile_up[entry,layer] or delta < quantile_down[entry,layer]:
                 outlier[true_indices[1],layer] = True
                 # new data = "true value"
-                gapfill()
+                gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
             else:
                 outlier[true_indices[1],layer] = False
                 # new data = "true value"
-                gapfill()
+                gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
