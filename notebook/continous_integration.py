@@ -51,9 +51,7 @@ def double_logistic_function(t, params):
     )
     return (M - m) * (sigmoid_sos_mat - sigmoid_sen_eos) + m
 
-lower = double_logistic_function(t[[0]], params_lower[[91]]).squeeze().cpu().numpy()
-upper = double_logistic_function(t[[0]], params_upper[[91]]).squeeze().cpu().numpy()
-iqr = upper - lower
+
 
 # select a random layer to mimic incoming data
 # param_iqr and qualitle are the same as the previous notebook
@@ -98,20 +96,28 @@ if len(valid_entry) > 0: # check if any data incoming is not na
 
         true_indices = np.flatnonzero(outlier[entry,0:layer])[-2:]
 
+        # calculate bounds and iqr
+
+        lower = double_logistic_function(t[[0]], params_lower[[entry]]).squeeze().cpu().numpy()
+        upper = double_logistic_function(t[[0]], params_upper[[entry]]).squeeze().cpu().numpy()
+        iqr = upper - lower
+
+        ndvi_timeseries = ndvi[entry, :]
+
         if len(true_indices) == 2:
 
-            if (ndvi[entry, true_indices[1]]> upper[layer] + param_iqr * iqr[layer]) or (ndvi[entry, true_indices[1]] < lower[layer] - param_iqr * iqr[layer]):
+            if (ndvi_timeseries[ true_indices[1]]> upper[layer] + param_iqr * iqr[layer]) or (ndvi_timeseries[ true_indices[1]] < lower[layer] - param_iqr * iqr[layer]):
 
                 # calculate deltas
-                if ndvi[entry, true_indices[0]] > upper[layer] + param_iqr * iqr[layer]:
-                    delta_1 = ndvi[entry, true_indices[0]] -  upper[layer]
+                if ndvi_timeseries[true_indices[0]] > upper[layer] + param_iqr * iqr[layer]:
+                    delta_1 = ndvi_timeseries[true_indices[0]] -  upper[layer]
                 else: 
-                    delta_1 = ndvi[entry, true_indices[0]] -  lower[layer]
+                    delta_1 = ndvi_timeseries[ true_indices[0]] -  lower[layer]
 
-                if ndvi[entry, true_indices[1]] > upper[layer] + param_iqr * iqr[layer]:
-                    delta_2 = ndvi[entry, true_indices[1]]-  upper[layer]
+                if ndvi_timeseries[true_indices[1]] > upper[layer] + param_iqr * iqr[layer]:
+                    delta_2 = ndvi_timeseries[true_indices[1]]-  upper[layer]
                 else: 
-                    delta_2 = ndvi[entry, true_indices[1]] -  lower[layer]
+                    delta_2 = ndvi_timeseries[true_indices[1]] -  lower[layer]
 
                 delta = delta_2 - delta_1
 
@@ -131,10 +137,14 @@ print(len(potential_arr))
 
 for entry in valid_entry[0]:
 
+    lower = double_logistic_function(t[[0]], params_lower[[entry]]).squeeze().cpu().numpy()
+    upper = double_logistic_function(t[[0]], params_upper[[entry]]).squeeze().cpu().numpy()
+    iqr = upper - lower
+
     true_indices = np.flatnonzero(outlier[entry,0:layer])[-2:]
     # first: check if lies in the iqr or not
 
-    if (ndvi[entry,layer] > upper[layer] + param_iqr * iqr[layer]) or (ndvi[entry,layer] < lower[layer] - param_iqr * iqr[layer]):
+    if (ndvi_timeseries[layer] > upper[layer] + param_iqr * iqr[layer]) or (ndvi_timeseries[layer] < lower[layer] - param_iqr * iqr[layer]):
      
         true_indices = np.flatnonzero(outlier[entry,0:layer])[-2:]
             
@@ -143,18 +153,18 @@ for entry in valid_entry[0]:
             if potential_arr[entry] == True:
 
                 # calculate deltas
-                if ndvi[true_indices[0],layer] > upper[layer]:
-                    delta_1 = ndvi[true_indices[0],layer] -  upper[layer]
+                if ndvi_timeseries[true_indices[0]] > upper[layer]:
+                    delta_1 = ndvi_timeseries[true_indices[0]] -  upper[layer]
                     iqr_1 = upper[true_indices[0]]
                 else: 
-                    delta_1 = ndvi[true_indices[0],layer] -  lower[layer]
+                    delta_1 = ndvi_timeseries[true_indices[0]] -  lower[layer]
                     iqr_1 = lower[true_indices[0]]
 
-                if ndvi[entry,layer] > upper[layer]:
-                    delta_2 = ndvi[entry,layer] -  upper[layer]
+                if ndvi_timeseries[layer] > upper[layer]:
+                    delta_2 = ndvi_timeseries[layer] -  upper[layer]
                     iqr_2 = upper[entry]
                 else: 
-                    delta_2 = ndvi[entry,layer] -  lower[layer]
+                    delta_2 = ndvi_timeseries[layer] -  lower[layer]
                     iqr_2 = lower[entry]
 
                 delta = delta2 - delta_1
@@ -162,59 +172,66 @@ for entry in valid_entry[0]:
                 if delta > quantile_up[entry,layer] or delta < quantile_down[entry,layer]:
                     outlier[true_indices[1],layer] = True
                     # new data = "potential outlier"
+                    potential_arr.append(False)
                 else:
                     outlier[true_indices[1],layer] = False
                     # new data = "true value"
+                    potential_arr.append(True)
 
                     distance = np.range(1,(true_indices[1] - true_indices[0]) +1)
                     distance = np.array(distance)
-                    gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
+                    ndvi_timeseries[(true_indices[0]+1):true_indices[1]] = gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
 
             else:
 
                 # calculate deltas
-                if ndvi[true_indices[1],layer] > upper[layer]:
-                    delta_1 = ndvi[true_indices[1],layer] -  upper[layer]
+                if ndvi_timeseries[true_indices[1]] > upper[layer]:
+                    delta_1 = ndvi_timeseries[true_indices[1]] -  upper[layer]
                 else: 
-                    delta_1 = ndvi[true_indices[1],layer] -  lower[layer]
+                    delta_1 = ndvi_timeseries[true_indices[1]] -  lower[layer]
 
-                if ndvi[entry,layer] > upper[layer]:
-                    delta_2 = ndvi[entry,layer] -  upper[layer]
+                if ndvi_timeseries[layer] > upper[layer]:
+                    delta_2 = ndvi_timeseries[layer] -  upper[layer]
                 else: 
-                    delta_2 = ndvi[entry,layer] -  lower[layer]
+                    delta_2 = ndvi_timeseries[layer] -  lower[layer]
 
                 delta = delta2 - delta_1
 
                 if delta > quantile_up[entry,layer] or delta < quantile_down[entry,layer]:
                     pass
                     # new data = "potential outlier"
+                    potential_arr.append(True)
                 else:
                     # new data = "true value"
-                    gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
+                    potential_arr.append(False)
+
+                    ndvi_timeseries[(true_indices[0]+1):true_indices[1]] = gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
 
     else:
 
         if potential_arr[entry] == False:
             outlier[true_indices[1],layer] = False
-            gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
+            ndvi_timeseries[(true_indices[1]+1):layer] = gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
 
         else:
 
-            if ndvi[true_indices[1],layer] > upper[layer]:
-                delta_1 = ndvi[true_indices[1],layer] -  upper[layer]
+            if ndvi_timeseries[true_indices[1]] > upper[layer]:
+                delta_1 = ndvi_timeseries[true_indices[1]] -  upper[layer]
             else: 
                 delta_1 = ndvi[true_indices[1],layer] -  lower[layer]
 
-            if ndvi[entry,layer] > upper[layer]:
-                delta2 = ndvi[entry,layer] - upper[layer]
+            if ndvi_timeseries[layer] > upper[layer]:
+                delta2 = ndvi_timeseries[layer] - upper[layer]
             else: 
-                delta2 = ndvi[entry,layer] - lower[layer]
+                delta2 = ndvi_timeseries[layer] - lower[layer]
 
             if delta > quantile_up[entry,layer] or delta < quantile_down[entry,layer]:
                 outlier[true_indices[1],layer] = True
                 # new data = "true value"
-                gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
+                potential_arr.append(False)
+                ndvi_timeseries[(true_indices[1]+1):layer] =gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
             else:
                 outlier[true_indices[1],layer] = False
                 # new data = "true value"
-                gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
+                potential_arr.append(False)
+                ndvi_timeseries[(true_indices[1]+1):layer] = gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
