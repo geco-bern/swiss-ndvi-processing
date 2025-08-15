@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import xarray as xr
 import matplotlib.pyplot as plt
 import numpy as np
@@ -7,24 +9,25 @@ import torch.nn as nn
 import rioxarray
 import zarr
 import pandas as pd
+import imageio
+from io import BytesIO
 
-outlier = zarr.open("outliers.zarr", mode='r')
-store = zarr.open("sample.zarr", mode='r')
-quantile_up = zarr.open("quantiles_up.zarr", mode='r')
-quantile_down = zarr.open("quantiles_down.zarr", mode='r')
-ds = xr.open_zarr("/data_2/scratch/sbiegel/processed/seasonal_cycle_sample_full.zarr")
+ds = xr.open_zarr("/home/francesco/data_scratch/swiss-ndvi-processing/sample_seasonal_cycle_parameter_preds.zarr")
+ndvi = ds['ndvi']
+dates = ds['dates']
 
 params_lower = torch.tensor(ds["params_lower"].values)
 params_upper = torch.tensor(ds["params_upper"].values)
 
-dates = store["dates"][:]
+params_lower = torch.tensor(ds["params_lower"].values)
+params_upper = torch.tensor(ds["params_upper"].values)
 
 # convert dates to doy
 dates_pd = pd.to_datetime(dates)
 
 df = pd.DataFrame({
     'date': dates_pd
-    })
+})
 
 # Sort by date
 df_sorted = df.sort_values(by='date')
@@ -51,187 +54,174 @@ def double_logistic_function(t, params):
     )
     return (M - m) * (sigmoid_sos_mat - sigmoid_sen_eos) + m
 
+param_iqr = 1.2
+
+pixel = 32
+
+# this whole part will be skipped in future
+
+lower = double_logistic_function(t[[0]], params_lower[[pixel]]).squeeze().cpu().numpy()
+upper = double_logistic_function(t[[0]], params_upper[[pixel]]).squeeze().cpu().numpy()
+
+iqr = upper - lower
+
+# extract ndvi 
+ndvi_timeseries = ndvi[pixel, :]
+
+# normalization
+ndvi_timeseries = ndvi_timeseries / 10000
+
+    # assign cloud mask as nan
+ndvi_timeseries = np.where((ndvi_timeseries > 1) | (ndvi_timeseries < 0), np.nan, ndvi_timeseries)
+dates_pd = pd.to_datetime(dates)
+
+# proper sorting
+
+df = pd.DataFrame({
+    'date': dates_pd,
+    'ndvi': ndvi_timeseries
+    })
+
+df_sorted = df.sort_values(by='date')
+
+dates_sorted = df_sorted['date'].values
+ndvi_sorted = df_sorted['ndvi'].values
+
+valid_idx = np.where(np.isfinite(ndvi_sorted))
+
+previuos_data = ndvi_sorted[0:100]
+previuos_data_valid = previuos_data[np.isfinite(ndvi_sorted)[0:100]]
+
+valid_idx = np.where(np.isfinite(previuos_data))
 
 
-# select a random layer to mimic incoming data
-# param_iqr and qualitle are the same as the previous notebook
+last_three_points = valid_idx[0][-3:]
 
-param_iqr = 1.5
-layer = 789
-ndvi = store['ndvi']
+last_two_points_mask = np.array([0,0])
 
-layer_ndvi = ndvi[:, layer]
-# normalize and filtering
-layer_ndvi = layer_ndvi / 100000
 
-valid_entry =  np.where((layer_ndvi >= 0) & (layer_ndvi <= 1))
+if (ndvi_sorted[last_three_points[-1]] > upper[last_three_points[-1]] + iqr[last_three_points[-1]] * param_iqr) or ndvi_sorted[last_three_points[-1]] < lower[last_three_points[-1]] - iqr[last_three_points[-1]] * param_iqr:
 
-def gapfill(delta_1, delta_2, iqr_1, iqr_2, distance):
+    delta = ((ndvi_sorted[last_three_points[-1]]- ( upper[last_three_points[-1]] - iqr[last_three_points[-1]])) - ((ndvi_sorted[last_three_points[-2]] - ( upper[last_three_points[-2]] - iqr[last_three_points[-2]])))) / (last_three_points[-2] - last_three_points[-1])
 
-    iqr_1 + ((delta_1- iqr_1) - (delta_2 - iqr_2)) / distance
+    if delta > 0.2:
 
-if len(valid_entry) > 0: # check if any data incoming is not na
+        last_two_points_mask[1] = 2
 
-    """logic behind continous integration
 
-    a non-outlier can be flagged as potential outlier or "true value"
-    if the last non outlier is "true value" 
+if (ndvi_sorted[last_three_points[-2]] > upper[last_three_points[-2]] + iqr[last_three_points[-2]] * param_iqr) or ndvi_sorted[last_three_points[-2]] < lower[last_three_points[-2]] - iqr[last_three_points[-2]] * param_iqr:
 
-        if the new data is in the iqr or the delta compared the previous value is small = "true value" -> gapfilling
-        else = potential outlier
 
-    if the previous value IS a potential outlier, this means that the previous point is outside the IQR and the delta is high
+    delta_1 = ((ndvi_sorted[last_three_points[-2]]- ( upper[last_three_points[-2]] - iqr[last_three_points[-2]])) - ((ndvi_sorted[last_three_points[-3]] - ( upper[last_three_points[-3]] - iqr[last_three_points[-3]])))) / (last_three_points[-3] - last_three_points[-2])
 
-        do as above
+    delta_2 = ((ndvi_sorted[last_three_points[-1]]- ( upper[last_three_points[-1]] - iqr[last_three_points[-1]])) - ((ndvi_sorted[last_three_points[-2]] - ( upper[last_three_points[-2]] - iqr[last_three_points[-2]])))) / (last_three_points[-2] - last_three_points[-1])
 
-            if the new data is true value, so the previous one it is -> gapfilling
-            if the new data is potential outlier, the previous is outlier -> no gapfilling
 
-    the gapfilling will be done as the previous notebook
-    artificially select potential outlier (the for cycle will be removed)"""
-    
-    potential_arr = []
-    
-    for entry in valid_entry[0]:
+    if (delta_1 > 0.2) and (delta_2 > 0.2):
 
-        true_indices = np.flatnonzero(outlier[entry,0:layer])[-2:]
+        last_two_points_mask[0] = 1
 
-        # calculate bounds and iqr
 
-        lower = double_logistic_function(t[[0]], params_lower[[entry]]).squeeze().cpu().numpy()
-        upper = double_logistic_function(t[[0]], params_upper[[entry]]).squeeze().cpu().numpy()
-        iqr = upper - lower
+# to mimick the contnous integration wee need an initial set of data (for example the first 100)
 
-        ndvi_timeseries = ndvi[entry, :]
+gapfilled_data = np.copy(previuos_data)
+outlier_mask = np.copy(last_two_points_mask)
 
-        if len(true_indices) == 2:
+last_known_position = 100 - last_three_points[-1]
 
-            if (ndvi_timeseries[ true_indices[1]]> upper[layer] + param_iqr * iqr[layer]) or (ndvi_timeseries[ true_indices[1]] < lower[layer] - param_iqr * iqr[layer]):
 
-                # calculate deltas
-                if ndvi_timeseries[true_indices[0]] > upper[layer] + param_iqr * iqr[layer]:
-                    delta_1 = ndvi_timeseries[true_indices[0]] -  upper[layer]
-                else: 
-                    delta_1 = ndvi_timeseries[ true_indices[0]] -  lower[layer]
+def mimick_continous_integration(pixel, layer):
+    global last_known_position
+    global gapfilled_data
+    global outlier_mask
 
-                if ndvi_timeseries[true_indices[1]] > upper[layer] + param_iqr * iqr[layer]:
-                    delta_2 = ndvi_timeseries[true_indices[1]]-  upper[layer]
-                else: 
-                    delta_2 = ndvi_timeseries[true_indices[1]] -  lower[layer]
+    last_known_position += 1
 
-                delta = delta_2 - delta_1
-
-                if delta > quantile_up[entry, true_indices[1]] or delta < quantile_down[entry, true_indices[1]]:
-                    potential_arr.append(True)
-            
-            else:
-                potential_arr.append(False)
-        else:
-            potential_arr.append(False)
-
-    potential_arr = np.array(potential_arr, dtype=bool)
-
-print(len(potential_arr))
-        
-# for now on the true gapfilling process
-
-for entry in valid_entry[0]:
-
-    lower = double_logistic_function(t[[0]], params_lower[[entry]]).squeeze().cpu().numpy()
-    upper = double_logistic_function(t[[0]], params_upper[[entry]]).squeeze().cpu().numpy()
+    # Calculate bounds
+    lower = double_logistic_function(t[[0]], params_lower[[pixel]]).squeeze().cpu().numpy()
+    upper = double_logistic_function(t[[0]], params_upper[[pixel]]).squeeze().cpu().numpy()
     iqr = upper - lower
 
-    true_indices = np.flatnonzero(outlier[entry,0:layer])[-2:]
-    # first: check if lies in the iqr or not
+    # Extract NDVI and normalize
+    ndvi_timeseries = ndvi[pixel, :] / 10000
+    ndvi_timeseries = np.where((ndvi_timeseries > 1) | (ndvi_timeseries < 0), np.nan, ndvi_timeseries)
 
-    if (ndvi_timeseries[layer] > upper[layer] + param_iqr * iqr[layer]) or (ndvi_timeseries[layer] < lower[layer] - param_iqr * iqr[layer]):
-     
-        true_indices = np.flatnonzero(outlier[entry,0:layer])[-2:]
-            
-        if len(true_indices) == 2:
+    # Sort by date
+    df_sorted = pd.DataFrame({'date': pd.to_datetime(dates), 'ndvi': ndvi_timeseries}).sort_values(by='date')
+    ndvi_sorted = df_sorted['ndvi'].values
 
-            if potential_arr[entry] == True:
+    new_data = ndvi_sorted[100 + layer]
 
-                # calculate deltas
-                if ndvi_timeseries[true_indices[0]] > upper[layer]:
-                    delta_1 = ndvi_timeseries[true_indices[0]] -  upper[layer]
-                    iqr_1 = upper[true_indices[0]]
-                else: 
-                    delta_1 = ndvi_timeseries[true_indices[0]] -  lower[layer]
-                    iqr_1 = lower[true_indices[0]]
+    outlier_new_data = 0  # default assume valid
 
-                if ndvi_timeseries[layer] > upper[layer]:
-                    delta_2 = ndvi_timeseries[layer] -  upper[layer]
-                    iqr_2 = upper[entry]
-                else: 
-                    delta_2 = ndvi_timeseries[layer] -  lower[layer]
-                    iqr_2 = lower[entry]
+    if np.isfinite(new_data):
 
-                delta = delta2 - delta_1
+        # Check outlier
+        is_outlier = (new_data > upper[100 + layer] + iqr[100 + layer] * param_iqr) or \
+                     (new_data < lower[100 + layer] - iqr[100 + layer] * param_iqr)
 
-                if delta > quantile_up[entry,layer] or delta < quantile_down[entry,layer]:
-                    outlier[true_indices[1],layer] = True
-                    # new data = "potential outlier"
-                    potential_arr.append(False)
-                else:
-                    outlier[true_indices[1],layer] = False
-                    # new data = "true value"
-                    potential_arr.append(True)
+        if is_outlier:
+            # Compare with last known valid value
+            previous_data_1 = ndvi_sorted[100 + layer - last_known_position]
+            delta = abs(
+                (new_data - (upper[100 + layer] - iqr[100 + layer])) -
+                (previous_data_1 - (upper[100 + layer - last_known_position] - iqr[100 + layer - last_known_position]))
+            ) / last_known_position
 
-                    distance = np.range(1,(true_indices[1] - true_indices[0]) +1)
-                    distance = np.array(distance)
-                    ndvi_timeseries[(true_indices[0]+1):true_indices[1]] = gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
+            if delta > 0.05:
+                outlier_new_data = 2  # mark as outlier, skip gapfill
 
-            else:
+        if outlier_new_data == 0:
+            # gapfill from last valid value
+            last_true_value = ndvi_sorted[100 + layer - last_known_position]
 
-                # calculate deltas
-                if ndvi_timeseries[true_indices[1]] > upper[layer]:
-                    delta_1 = ndvi_timeseries[true_indices[1]] -  upper[layer]
-                else: 
-                    delta_1 = ndvi_timeseries[true_indices[1]] -  lower[layer]
+            delta_1 = last_true_value - (upper[100 + layer - last_known_position] - iqr[100 + layer - last_known_position])
+            delta_2 = new_data - (upper[100 + layer] - iqr[100 + layer])
+            slope = (delta_2 - delta_1) / last_known_position
 
-                if ndvi_timeseries[layer] > upper[layer]:
-                    delta_2 = ndvi_timeseries[layer] -  upper[layer]
-                else: 
-                    delta_2 = ndvi_timeseries[layer] -  lower[layer]
+            multiplier = np.arange(1, last_known_position + 1)  # include last position
+            new_gapfilled_data = (upper[101 + layer - last_known_position:101 + layer] - 
+                                  iqr[101 + layer - last_known_position:101 + layer] + slope * multiplier)
 
-                delta = delta2 - delta_1
+            gapfilled_data = np.concatenate((gapfilled_data, new_gapfilled_data))
 
-                if delta > quantile_up[entry,layer] or delta < quantile_down[entry,layer]:
-                    pass
-                    # new data = "potential outlier"
-                    potential_arr.append(True)
-                else:
-                    # new data = "true value"
-                    potential_arr.append(False)
+            # If previous last_known_position was marked as outlier, correct it
+            if len(outlier_mask) > 0 and outlier_mask[-1] == 2:
+                outlier_mask[-1] = 0
 
-                    ndvi_timeseries[(true_indices[0]+1):true_indices[1]] = gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
+            last_known_position = 0
 
-    else:
+    outlier_mask = np.append(outlier_mask, outlier_new_data)
 
-        if potential_arr[entry] == False:
-            outlier[true_indices[1],layer] = False
-            ndvi_timeseries[(true_indices[1]+1):layer] = gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
 
-        else:
+frames = []
 
-            if ndvi_timeseries[true_indices[1]] > upper[layer]:
-                delta_1 = ndvi_timeseries[true_indices[1]] -  upper[layer]
-            else: 
-                delta_1 = ndvi[true_indices[1],layer] -  lower[layer]
+# Run the function for the first N layers and capture each frame
+for i in range(0, 500):
+    mimick_continous_integration(pixel, i)
 
-            if ndvi_timeseries[layer] > upper[layer]:
-                delta2 = ndvi_timeseries[layer] - upper[layer]
-            else: 
-                delta2 = ndvi_timeseries[layer] - lower[layer]
+    fig, ax = plt.subplots(figsize=(12, 6))
+    
+    # Only plot data up to current layer
+    current_len = len(gapfilled_data)
+    ax.plot(dates_sorted[100:current_len], lower[100:current_len], label="Lower Bound")
+    ax.plot(dates_sorted[100:current_len], upper[100:current_len], label="Upper Bound")
+    ax.fill_between(dates_sorted[100:current_len], lower[100:current_len], upper[100:current_len], alpha=0.2, color="red")
+    ax.plot(dates_sorted[100:current_len], gapfilled_data[100:current_len], color="black", label="NDVI gapfilled")
+    ax.set_title(f"Pixel {pixel} - Step {i}")
+    ax.set_ylim(-0.1, 1)
+    ax.set_xlabel("DOY")
+    ax.set_ylabel("NDVI")
+    ax.legend()
+    plt.tight_layout()
 
-            if delta > quantile_up[entry,layer] or delta < quantile_down[entry,layer]:
-                outlier[true_indices[1],layer] = True
-                # new data = "true value"
-                potential_arr.append(False)
-                ndvi_timeseries[(true_indices[1]+1):layer] =gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
-            else:
-                outlier[true_indices[1],layer] = False
-                # new data = "true value"
-                potential_arr.append(False)
-                ndvi_timeseries[(true_indices[1]+1):layer] = gapfill(delta_1, delta_2, iqr_1, iqr_2, distance)
+    # Save the plot to a buffer
+    buf = BytesIO()
+    plt.savefig(buf, format='png', dpi=100)
+    buf.seek(0)
+    frames.append(imageio.v2.imread(buf))
+    plt.close()
+
+# Save all frames as GIF
+imageio.mimsave(f'pixel_{pixel}_ndvi_animation.gif', frames, duration=0.1)
+print(f"GIF saved to pixel_{pixel}_ndvi_animation.gif")
