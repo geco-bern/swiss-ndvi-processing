@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# python /home/francesco/data_scratch/swiss-ndvi-processing/notebook/continous_integration.py
+
 
 import xarray as xr
 import matplotlib.pyplot as plt
@@ -93,9 +95,14 @@ previuos_data = ndvi_sorted[0:100]
 previuos_data_valid = previuos_data[np.isfinite(ndvi_sorted)[0:100]]
 
 valid_idx = np.where(np.isfinite(previuos_data))
-
-
 last_three_points = valid_idx[0][-3:]
+
+valid_ndvi = ndvi_sorted[valid_idx[0][-2]:]
+valid_data = dates_sorted[valid_idx[0][-2]:]
+
+ndvi_valid_plot = valid_ndvi[np.isfinite(ndvi_sorted[valid_idx[0][-2]:])]
+data_valid_plot = valid_data[np.isfinite(ndvi_sorted[valid_idx[0][-2]:])]
+
 
 last_two_points_mask = np.array([0,0])
 
@@ -129,11 +136,15 @@ outlier_mask = np.copy(last_two_points_mask)
 
 last_known_position = 100 - last_three_points[-1]
 
+days_difference = dates_sorted[last_known_position] - dates_sorted[100 - last_three_points[-2]]
+
 
 def mimick_continous_integration(pixel, layer):
+
     global last_known_position
     global gapfilled_data
     global outlier_mask
+    global days_difference
 
     last_known_position += 1
 
@@ -169,14 +180,31 @@ def mimick_continous_integration(pixel, layer):
             ) / last_known_position
 
             if delta > 0.05:
-                outlier_new_data = 2  # mark as outlier, skip gapfill
+                outlier_new_data = 2  # mark as potential outlier, skip gapfill
 
         if outlier_new_data == 0:
             # gapfill from last valid value
             last_true_value = ndvi_sorted[100 + layer - last_known_position]
 
-            delta_1 = last_true_value - (upper[100 + layer - last_known_position] - iqr[100 + layer - last_known_position])
-            delta_2 = new_data - (upper[100 + layer] - iqr[100 + layer])
+            if last_true_value > upper[100 + layer - last_known_position] and new_data > upper[100 + layer]:
+
+                delta_1 = last_true_value - upper[100 + layer - last_known_position]
+                delta_2 = new_data - upper[100 + layer]
+
+            elif last_true_value > upper[100 + layer - last_known_position] and new_data < upper[100 + layer]:
+
+                delta_1 = last_true_value - upper[100 + layer - last_known_position]
+                delta_2 = new_data - lower[100 + layer]
+            
+            elif last_true_value < upper[100 + layer - last_known_position] and new_data > upper[100 + layer]:
+
+                delta_1 = last_true_value - lower[100 + layer - last_known_position]
+                delta_2 = new_data - upper[100 + layer]
+
+            else:
+                delta_1 = last_true_value - lower[100 + layer - last_known_position]
+                delta_2 = new_data - lower[100 + layer]
+
             slope = (delta_2 - delta_1) / last_known_position
 
             multiplier = np.arange(1, last_known_position + 1)  # include last position
@@ -187,12 +215,17 @@ def mimick_continous_integration(pixel, layer):
 
             # If previous last_known_position was marked as outlier, correct it
             if len(outlier_mask) > 0 and outlier_mask[-1] == 2:
-                outlier_mask[-1] = 0
+
+                if slope > 0.05:
+                    outlier_mask[-1] = 1
+                else:
+                    outlier_mask[-1] = 0
 
             last_known_position = 0
+            
+        outlier_mask = np.append(outlier_mask, outlier_new_data)
 
-    outlier_mask = np.append(outlier_mask, outlier_new_data)
-
+    days_difference = dates_sorted[100 +layer] - dates_sorted[100 + layer -last_known_position]
 
 frames = []
 
@@ -201,6 +234,9 @@ for i in range(0, 500):
     mimick_continous_integration(pixel, i)
 
     fig, ax = plt.subplots(figsize=(12, 6))
+
+    # point obs for plot
+
     
     # Only plot data up to current layer
     current_len = len(gapfilled_data)
@@ -208,7 +244,7 @@ for i in range(0, 500):
     ax.plot(dates_sorted[100:current_len], upper[100:current_len], label="Upper Bound")
     ax.fill_between(dates_sorted[100:current_len], lower[100:current_len], upper[100:current_len], alpha=0.2, color="red")
     ax.plot(dates_sorted[100:current_len], gapfilled_data[100:current_len], color="black", label="NDVI gapfilled")
-    ax.set_title(f"Pixel {pixel} - Step {i}")
+    ax.set_title(f"Pixel {pixel} - Step {i} - waiting time {days_difference.astype('timedelta64[D]').astype(int)} - step wating time {last_known_position}")
     ax.set_ylim(-0.1, 1)
     ax.set_xlabel("DOY")
     ax.set_ylabel("NDVI")
@@ -223,5 +259,5 @@ for i in range(0, 500):
     plt.close()
 
 # Save all frames as GIF
-imageio.mimsave(f'pixel_{pixel}_ndvi_animation.gif', frames, duration=0.1)
+imageio.mimsave(f'pixel_{pixel}_ndvi_animation2.gif', frames, duration=0.5)
 print(f"GIF saved to pixel_{pixel}_ndvi_animation.gif")
