@@ -1,4 +1,4 @@
-# python /home/francesco/data_scratch/swiss-ndvi-processing/notebook/update_gapfilling.py
+# python /home/francesco/data_scratch/swiss-ndvi-processing/demo/script/gapfilling.py
 
 
 import xarray as xr
@@ -51,30 +51,30 @@ def double_logistic_function(t, params):
     )
     return (M - m) * (sigmoid_sos_mat - sigmoid_sen_eos) + m
 
+
+
 pixel = 32
 param_iqr = 1.5
 upper_iqr = 0.6
 bottom_iqr = 0.4
-window_length = 15
-polyorder = 2
 
-    # caclulate lower and upper bonds
+# caclulate lower and upper bonds
 lower = double_logistic_function(t[[0]], params_lower[[pixel]]).squeeze().cpu().numpy()
 upper = double_logistic_function(t[[0]], params_upper[[pixel]]).squeeze().cpu().numpy()
 # initialize outlier flag
 outlier_arr = np.repeat(False,len(dates))
 
-    # extract ndvi 
+# extract ndvi 
 ndvi_timeseries = ndvi[pixel, :]
 
-    # normalization
+# normalization
 ndvi_timeseries = ndvi_timeseries / 10000
 
-    # assign cloud mask as nan
+# assign cloud mask as nan
 ndvi_timeseries = np.where((ndvi_timeseries > 1) | (ndvi_timeseries < 0), np.nan, ndvi_timeseries)
 dates_pd = pd.to_datetime(dates)
 
-    # proper sorting
+# proper sorting
 
 df = pd.DataFrame({
     'date': dates_pd,
@@ -86,7 +86,7 @@ df_sorted = df.sort_values(by='date')
 dates_sorted = df_sorted['date'].values
 ndvi_sorted = df_sorted['ndvi'].values
 
-    # initialize ndvi gapfilled
+# initialize ndvi gapfilled
 ndvi_gapfilled = np.copy(ndvi_sorted)
 
 valid_idx = np.where(np.isfinite(ndvi_sorted))
@@ -229,21 +229,8 @@ for i in range(0,len(valid_idx)-1):
 
         values = (median[idx_to_gapfill] + delta_1 + slope * multiplier ) 
 
-            
-        # ensure valid window length for savgol
-        win_len = min(window_length, len(values))
-        if win_len % 2 == 0:   # must be odd
-            win_len = max(1, win_len - 1)
 
-        if win_len > 1:  # smoothing only if enough points
-            smoothed = savgol_filter(values, window_length=win_len, polyorder=min(polyorder, win_len - 1))
-        else:
-            smoothed = values  # not enough points, keep raw
-
-        ndvi_gapfilled[idx_to_gapfill] = smoothed
-
-
-
+        ndvi_gapfilled[idx_to_gapfill] = values
 
 
 def plot_results(pixel, outlier_arr, ndvi_gapfilled, ndvi_sorted, lower, upper, save_path=None):
@@ -272,28 +259,5 @@ def plot_results(pixel, outlier_arr, ndvi_gapfilled, ndvi_sorted, lower, upper, 
     plt.show()
 
 plot_results(pixel, outlier_arr, ndvi_gapfilled, ndvi_sorted, lower, upper,
-             save_path=f"pixel_{pixel}_ndvi2.png")
+             save_path=f"demo/figures/pixel_{pixel}_gapfilled.png")
 
-
-smoothed_data = np.copy(ndvi_gapfilled)
-
-smoothed_data = savgol_filter(smoothed_data, window_length=14, polyorder=2, mode = "mirror")
-
-fig, ax = plt.subplots(figsize=(12, 6)) 
-
-colors = np.where(outlier_arr, 'red', 'green')
-
-ax.plot(dates_sorted, lower, label="Lower Bound")
-ax.plot(dates_sorted, upper, label="Upper Bound")
-ax.fill_between(dates_sorted, lower, upper, alpha=0.2, color="red")
-ax.scatter(dates_sorted, ndvi_sorted, s=10, color=colors, label="NDVI", zorder=3)
-ax.plot(dates_sorted, smoothed_data, color="black", label="NDVI gapfilled")
-ax.set_title(f"Pixel {pixel}")
-ax.set_ylim(-0.1, 1)
-ax.set_xlabel("DOY")
-ax.set_ylabel("NDVI")
-ax.legend()
-
-plt.tight_layout()
-
-plt.savefig("prova_{pixel}.png", dpi=300, bbox_inches="tight")
