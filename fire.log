@@ -1,9 +1,22 @@
 nohup: ignoring input
-/home/francesco/data_scratch/swiss-ndvi-processing/demo/area_visulization/fire.py:33: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+/home/francesco/data_scratch/swiss-ndvi-processing/demo/script/area_extraction_gif_creation/fire.py:35: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
   polygon = gdf.geometry.unary_union
 Window cols 12401..17010 (4610), rows 10832..17692 (6861)
 Mask has 105715396 True pixels.
 Pixels in window: 31629210, masked pixels in polygon: 2649
 /home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:44: UserWarning: The codec `vlen-utf8` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
   return cls(**configuration_parsed)
-done
+Gapfilling pixel 0/2649
+Gapfilling pixel 1000/2649
+Gapfilling pixel 2000/2649
+Step: 0
+Step: 100
+Step: 200
+Step: 300
+Step: 400
+Step: 500
+Step: 600
+Step: 700
+Step: 800
+Step: 900
+All GIFs saved.
