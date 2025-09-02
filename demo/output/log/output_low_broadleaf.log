@@ -1,0 +1,21 @@
+nohup: ignoring input
+Window cols 21291..21391 (101), rows 6453..6553 (101)
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 2172
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:44: UserWarning: The codec `vlen-utf8` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
+done
+Gapfilling pixel 0/2172
+Gapfilling pixel 1000/2172
+Gapfilling pixel 2000/2172
+Step: 0
+Step: 100
+Step: 200
+Step: 300
+Step: 400
+Step: 500
+Step: 600
+Step: 700
+Step: 800
+Step: 900
+All GIFs saved.
