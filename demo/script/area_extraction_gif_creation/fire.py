@@ -196,13 +196,12 @@ for i, pixel_sel in enumerate(sel):
     outlier_matrix[i, :] = outlier_arr
 
 
-    ndvi_filled, outlier_mask, forecast_only = gapfill_ndvi(ndvi_series, lower, upper, forecasting=True)
+    ndvi_filled, outlier_mask = gapfill_ndvi(ndvi_series, lower, upper, forecasting=False)
 
-    ndvi_continous_L1[i, :] = forecast_only
     ndvi_continous_L2[i, :] = ndvi_filled
 
 
-out_gif_combined_1 = "/home/francesco/data_scratch/swiss-ndvi-processing/demo/output/gif/ndvi_highand_broadleaf_combined_1.gif"
+out_gif_combined_1 = "/home/francesco/data_scratch/swiss-ndvi-processing/demo/output/gif/fire.gif"
 out_gif_combined_2 = "/home/francesco/data_scratch/swiss-ndvi-processing/demo/output/gif/ndvi_highand_broadleaf_combined_2.gif"
 out_gif_combined_3 = "/home/francesco/data_scratch/swiss-ndvi-processing/demo/output/gif/ndvi_continous_highand_broadleaf_combined.gif"
 

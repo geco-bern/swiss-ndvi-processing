@@ -201,8 +201,6 @@ def gapfill_ndvi(
 
     return ndvi_filled, outlier_mask, forecast_only, smoothed
 
-
-
 def plot_results(title,pixel_idx, ndvi_series, ndvi_gapfilled, outlier_arr, lower, upper, dates, save_path=None):
     """
     Plot NDVI time series for a pixel:
