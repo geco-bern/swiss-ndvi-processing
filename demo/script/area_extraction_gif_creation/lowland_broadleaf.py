@@ -1,4 +1,4 @@
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/demo/area_visulization/lowland_broadleaf.py > /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/output_low_broadleaf.log 2>&1 &
+# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/demo/script/area_extraction_gif_creation/lowland_broadleaf.py > /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/output_low_broadleaf.log 2>&1 &
 
 import numpy as np
 import math
@@ -26,6 +26,8 @@ px = 10.0
 top = bottom + height * px
 
 # Rectangle corners (UL and BR)
+
+#2'683'907.72, 1'235'614.46
 UL_x, UL_y = 2687000.0, 1246000.0
 BR_x, BR_y = 2688000.0, 1245000.0
 
@@ -147,6 +149,7 @@ smoothed_data = savgol_filter(ndvi_gapfilled, window_length=window_length, polyo
 
 
 plot_results(
+        title= "low_broad.png",
         pixel_idx=random_pixels,
         ndvi_series=ndvi_series / 10000.0,
         ndvi_gapfilled=ndvi_gapfilled,
@@ -158,6 +161,7 @@ plot_results(
     )
 
 plot_results(
+        title= "low_broad_2.png",
         pixel_idx=random_pixels,
         ndvi_series=ndvi_series / 10000.0, 
         ndvi_gapfilled=smoothed_data,
@@ -199,7 +203,7 @@ for i, pixel_sel in enumerate(sel):
     outlier_matrix[i, :] = outlier_arr
 
 
-    ndvi_filled, outlier_mask, forecast_only = gapfill_ndvi(ndvi_series, lower, upper, forecasting=True)
+    ndvi_filled, outlier_mask, forecast_only, smoothed = gapfill_ndvi(ndvi_series, lower, upper, forecasting=True)
 
     ndvi_continous_L1[i, :] = forecast_only
     ndvi_continous_L2[i, :] = ndvi_filled
@@ -212,7 +216,7 @@ out_gif_combined_3 = "/home/francesco/data_scratch/swiss-ndvi-processing/demo/ou
 # Prepare writers (stream to disk instead of keeping frames in memory)
 writer1 = imageio.get_writer(out_gif_combined_1, fps=10)
 writer2 = imageio.get_writer(out_gif_combined_2, fps=10)
-writer3 = imageio.get_writer(out_gif_combined_3, fps=10)
+#writer3 = imageio.get_writer(out_gif_combined_3, fps=10)
 
 for t in range(d_frames):
 
@@ -272,7 +276,7 @@ for t in range(d_frames):
     plt.close(fig)
 
     # --- Continuous ingestion GIF (only from step 14 onward) ---
-    if t >= 14:
+    """if t >= 14:
         window_gapfilled_c1 = np.full(win_rows * win_cols, np.nan, dtype=float)
         window_gapfilled_c1[is_masked] = ndvi_continous_L1[:, t].astype(float)
         window_gapfilled_c1 = window_gapfilled_c1.reshape((win_rows, win_cols))
@@ -291,7 +295,7 @@ for t in range(d_frames):
         fig.canvas.draw()
         buf = np.asarray(fig.canvas.buffer_rgba())
         writer3.append_data(buf[:, :, :3].copy())
-        plt.close(fig)
+        plt.close(fig)"""
 
     # --- free memory explicitly ---
     del values_non_gapfilled, window_non_gapfilled
@@ -301,6 +305,6 @@ for t in range(d_frames):
 # Close writers
 writer1.close()
 writer2.close()
-writer3.close()
+#writer3.close()
 
 print("All GIFs saved.")

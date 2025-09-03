@@ -1,0 +1,16 @@
+nohup: ignoring input
+Zarr shape: (105715396, 1084)
+Window cols 21893..21993 (101), rows 18729..18829 (101)
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 9238
+Window cols 21893..21993 (101), rows 18729..18829 (101)
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 9238
+Window cols 13793..13893 (101), rows 18275..18375 (101)
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 5726
+Window cols 30794..30894 (101), rows 12605..12705 (101)
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 6409
+Copying timesteps 0:1084 ...
+✅ Saved new Zarr with 100 pixels: /home/francesco/data_scratch/swiss-ndvi-processing/demo/pixel_biomes.zarr shape: (100, 1084)
