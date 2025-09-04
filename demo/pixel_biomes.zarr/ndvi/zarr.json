@@ -1,6 +1,6 @@
 {
   "shape": [
-    11325,
+    11688,
     1084
   ],
   "data_type": "int16",
@@ -8,7 +8,7 @@
     "name": "regular",
     "configuration": {
       "chunk_shape": [
-        11325,
+        11688,
         1084
       ]
     }

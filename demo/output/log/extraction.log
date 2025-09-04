@@ -19,13 +19,18 @@ Mask has 105715396 True pixels.
 Pixels in window: 31629210, masked pixels in polygon: 2649
 /home/francesco/data_scratch/swiss-ndvi-processing/demo/script/area_extraction_gif_creation/extract_pixel_biomes.py:187: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
   polygon = gdf.geometry.unary_union
+Window cols 17021..17042 (22), rows 17602..17638 (37)
+Mask has 105715396 True pixels.
+Pixels in window: 814, masked pixels in polygon: 363
+/home/francesco/data_scratch/swiss-ndvi-processing/demo/script/area_extraction_gif_creation/extract_pixel_biomes.py:268: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  polygon = gdf.geometry.unary_union
 Window cols 21591..21625 (35), rows 2270..2336 (67)
 Mask has 105715396 True pixels.
 Pixels in window: 2345, masked pixels in polygon: 1058
-/home/francesco/data_scratch/swiss-ndvi-processing/demo/script/area_extraction_gif_creation/extract_pixel_biomes.py:271: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+/home/francesco/data_scratch/swiss-ndvi-processing/demo/script/area_extraction_gif_creation/extract_pixel_biomes.py:352: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
   polygon = gdf.geometry.unary_union
 Window cols 14860..15467 (608), rows 7321..7625 (305)
 Mask has 105715396 True pixels.
 Pixels in window: 185440, masked pixels in polygon: 7518
 Copying timesteps 0:1084 ...
-✅ Saved new Zarr with 175 pixels: /home/francesco/data_scratch/swiss-ndvi-processing/demo/pixel_biomes.zarr shape: (11325, 1084)
+✅ Saved new Zarr with 175 pixels: /home/francesco/data_scratch/swiss-ndvi-processing/demo/pixel_biomes.zarr shape: (11688, 1084)
