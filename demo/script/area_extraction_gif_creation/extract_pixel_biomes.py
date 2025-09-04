@@ -93,7 +93,7 @@ def extract_pixel(UL_x, UL_y,BR_x, BR_y ):
     return(sel_window)
 
 # lowland broadleaf
-sel_1 = extract_pixel( UL_x = 2694027.49, UL_y = 1123239.84, BR_x = 2693027.49, BR_y = 1122239.84) # to fix
+sel_1 = extract_pixel( UL_x = 2694027.49, UL_y = 1123239.84, BR_x = 2693027.49, BR_y = 1122239.84) 
 # hihgland broadleaf
 sel_2 = extract_pixel( UL_x = 2694027.49, UL_y = 1123239.84, BR_x = 2693027.49, BR_y = 1122239.84)
 # lowland evergreen
