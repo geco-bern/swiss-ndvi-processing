@@ -14,6 +14,7 @@ def gapfill_ndvi(
     param_iqr=1.5,
     bottom_q=0.3,
     top_q=0.7,
+    weight_median = 0.5,
     window_smoothing = 14
 ):
     """
@@ -101,7 +102,7 @@ def gapfill_ndvi(
                     # bias toward median, max at center
                     diff = median_val - obs_interp
                     weight = frac * (1 - frac)
-                    ndvi_gapfilled[idx] = obs_interp + 0.5 * weight * diff
+                    ndvi_gapfilled[idx] = obs_interp + weight_median * weight * diff
 
         return ndvi_gapfilled, outlier_mask
 
@@ -139,31 +140,53 @@ def gapfill_ndvi(
                         potential_last_idx = t
                         outlier = True
                     
-
             if not outlier:
-                
+                # accept current observation
                 ndvi_filled[t] = obs
                 forecast_only[t] = obs
-                last_idx = t
 
-                if potential_previous == True:
-                    
-                    delta_previous =  (ndvi_filled[potential_last_idx] - upper[potential_last_idx] - (upper[potential_last_idx] - lower[potential_last_idx]) / 2)
-                    delta_current = (ndvi_filled[t] - upper[t] - (upper[t] - lower[t]) / 2)
+                if potential_previous:
+                    # check if the earlier potential outlier should be kept or rejected
+                    delta_previous = (
+                        ndvi_filled[potential_last_idx]
+                        - upper[potential_last_idx]
+                        - (upper[potential_last_idx] - lower[potential_last_idx]) / 2
+                    )
+                    delta_current = (
+                        ndvi_filled[t]
+                        - upper[t]
+                        - (upper[t] - lower[t]) / 2
+                    )
                     delta_delta = delta_current - delta_previous
 
                     if delta_delta > 0.05 or delta_delta < -0.05:
+                        # confirm it was an outlier
                         outlier_mask[potential_last_idx] = True
-
                     else:
-
+                        # accept it, fill its value by interpolation
                         outlier_mask[potential_last_idx] = False
+                        if last_idx is not None:
+                            frac = (potential_last_idx - last_idx) / (t - last_idx)
+                            obs_interp = (
+                                ndvi_filled[last_idx]
+                                + (ndvi_filled[t] - ndvi_filled[last_idx]) * frac
+                            )
+                            median_val = upper[potential_last_idx] - (upper[potential_last_idx] - lower[potential_last_idx]) / 2
+                            diff = median_val - obs_interp
+                            weight = frac * (1 - frac)
+                            val_retro = obs_interp + weight_median * weight * diff
+                            ndvi_filled[potential_last_idx] = val_retro
+                            forecast_only[potential_last_idx] = val_retro
+                        # move last_idx forward
                         last_idx = potential_last_idx
+                else:
+                    last_idx = t
 
-
+                # retroactive interpolation for missing values between last_idx and t
                 if last_idx is not None and t - last_idx > 1:
-                    # retroactively interpolate between last_idx and t
                     for j, idx in enumerate(range(last_idx + 1, t)):
+                        if not np.isnan(ndvi_filled[idx]):  # skip if already filled
+                            continue
                         frac = (j + 1) / (t - last_idx)
                         obs_interp = (
                             ndvi_filled[last_idx]
@@ -172,33 +195,32 @@ def gapfill_ndvi(
                         median_val = upper[idx] - (upper[idx] - lower[idx]) / 2
                         diff = median_val - obs_interp
                         weight = frac * (1 - frac)
-                        val_retro = obs_interp + 0.5 * weight * diff
+                        val_retro = obs_interp + weight_median * weight * diff
                         ndvi_filled[idx] = val_retro
-                        
-                
 
-            outlier_mask[t] = outlier
+                outlier_mask[t] = outlier
+
         else:
-            if last_idx is not None:
-                # simple flat forecast relative to median
-                med_t = upper[t] - (upper[t] - lower[t]) / 2
-                delta_last = ndvi_filled[last_idx] - (
-                    upper[last_idx] - (upper[last_idx] - lower[last_idx]) / 2
+                # missing obs -> forecast only
+                if last_idx is not None and not np.isnan(ndvi_filled[last_idx]):
+                    med_t = upper[t] - (upper[t] - lower[t]) / 2
+                    delta_last = ndvi_filled[last_idx] - (
+                        upper[last_idx] - (upper[last_idx] - lower[last_idx]) / 2
+                    )
+                    forecast_val = med_t + delta_last
+                    forecast_only[t] = forecast_val
+                # if last_idx is None or NaN, do nothing (stay NaN)
+
+            # smoothing stage
+        if t > window_smoothing * 2:
+                data_ndvi = ndvi_filled[t - window_smoothing * 2 : t - window_smoothing]
+                data_forecast = forecast_only[t - window_smoothing * 2 : t - window_smoothing]
+                data_to_smooth = np.where(np.isnan(data_ndvi), data_forecast, data_ndvi)
+
+                smoothed[t - window_smoothing * 2 : t - window_smoothing] = savgol_filter(
+                    data_to_smooth, window_length=window_smoothing, polyorder=2
                 )
-                forecast_val = med_t + delta_last
-                forecast_only[t] = forecast_val
-
-        if t > window_smoothing *2:
-
-            # takes where it is possible corrected data
-
-            data_ndvi = ndvi_filled[t - window_smoothing*2 : t - window_smoothing]
-            data_forecast = forecast_only[t - window_smoothing*2 : t - window_smoothing]
-            data_to_smooth = np.where(np.isnan(data_ndvi), data_forecast, data_ndvi)
-
-            smoothed[t - window_smoothing*2:t - window_smoothing] = savgol_filter(data_to_smooth, window_length=window_smoothing, polyorder=2)
-
-
+    
     return ndvi_filled, outlier_mask, forecast_only, smoothed
 
 
@@ -246,3 +268,58 @@ def double_logistic_function(t, params):
         -2 * (2 * sen + eos_minus_sen - 2 * t) / (eos_minus_sen + 1e-10)
     )
     return (M - m) * (sigmoid_sos_mat - sigmoid_sen_eos) + m
+
+
+"""
+            if not outlier:
+                
+                ndvi_filled[t] = obs
+                forecast_only[t] = obs
+                last_idx = t
+
+                if potential_previous == True:
+                    
+                    delta_previous =  (ndvi_filled[potential_last_idx] - upper[potential_last_idx] - (upper[potential_last_idx] - lower[potential_last_idx]) / 2)
+                    delta_current = (ndvi_filled[t] - upper[t] - (upper[t] - lower[t]) / 2)
+                    delta_delta = delta_current - delta_previous
+
+                    if delta_delta > 0.05 or delta_delta < -0.05:
+                        outlier_mask[potential_last_idx] = True
+
+                    else:
+
+                        outlier_mask[potential_last_idx] = False
+                        last_idx = potential_last_idx
+
+                    # Fill the potential outlier with interpolation between last valid and current obs
+                    if last_idx is not None:
+                        frac = (potential_last_idx - last_idx) / (t - last_idx)
+                        obs_interp = (
+                            ndvi_filled[last_idx]
+                            + (ndvi_filled[t] - ndvi_filled[last_idx]) * frac
+                        )
+                        median_val = upper[potential_last_idx] - (upper[potential_last_idx] - lower[potential_last_idx]) / 2
+                        diff = median_val - obs_interp
+                        weight = frac * (1 - frac)
+                        val_retro = obs_interp + weight_median * weight * diff
+                        ndvi_filled[potential_last_idx] = val_retro
+                    
+                    # now safe to update last_idx
+                    last_idx = potential_last_idx
+
+
+                if last_idx is not None and t - last_idx > 1:
+                    # retroactively interpolate between last_idx and t
+                    for j, idx in enumerate(range(last_idx + 1, t)):
+                        frac = (j + 1) / (t - last_idx)
+                        obs_interp = (
+                            ndvi_filled[last_idx]
+                            + (ndvi_filled[t] - ndvi_filled[last_idx]) * frac
+                        )
+                        median_val = upper[idx] - (upper[idx] - lower[idx]) / 2
+                        diff = median_val - obs_interp
+                        weight = frac * (1 - frac)
+                        val_retro = obs_interp + weight_median * weight * diff
+                        ndvi_filled[idx] = val_retro
+                        
+                """
