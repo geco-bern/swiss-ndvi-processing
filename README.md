@@ -34,7 +34,7 @@ We select **25 pixels** for each of the following biomes in this specific order:
 | Biscth fire affected area             | 2644008.20, 1133794.76    | 100–124     |
 | Biscth fire nearby non-affected area  | 2644328.07, 1134342.81    | 125–149     |
 | Drought-affected area                 | 2690025.48, 1287413.03    | 150–174     |
-| Burlgim storm                         | —                         | 175–199     |
+| Burlgim storm affected area           | —                         | 175–199     |
 
 ---
 
@@ -45,6 +45,9 @@ The areas of interest can be visualized directly in the notebook by inserting th
 The data is stored here: `demo/pixel_biomes.zarr`  
 
 To select any biome, choose the pixels accordingly in the given order.
+
+The areas affected by Burglind storm area are generously sended by Marius Rüetschi, which collects the area with  almost 100% of damage. You can find the area affected [here](https://www.sturmarchiv.ch/index.php?title=20180103_01_Storm_Alpennordseite
+)
 
 ---
 
