@@ -4,6 +4,9 @@ import torch
 import torch.nn as nn
 import math
 from scipy.signal import savgol_filter
+from scipy.ndimage import gaussian_filter1d
+import statsmodels.api as sm
+
 
 
 def gapfill_ndvi(
@@ -15,7 +18,13 @@ def gapfill_ndvi(
     bottom_q=0.3,
     top_q=0.7,
     weight_median = 0.5,
-    window_smoothing = 14
+    smoothing_method = "savgol",
+    window_smoothing = 14,
+    sigma = 4,
+    frac = 0.2,
+    lag_forecast = 14,
+    use_tau = False,
+    tau = 9999
 ):
     """
     NDVI gapfilling.
@@ -40,7 +49,7 @@ def gapfill_ndvi(
     outlier_mask = np.zeros(n, dtype=bool)
 
     # --------------------
-    # Common outlier detection
+    #  outlier detection
     # --------------------
     valid_idx = np.where(np.isfinite(ndvi_series))[0]
     if len(valid_idx) < 2:
@@ -78,9 +87,9 @@ def gapfill_ndvi(
     outlier_mask[valid_idx] = is_outlier
     ndvi_series[valid_idx[is_outlier]] = np.nan
 
-    # =========================================================
-    # Non-sequential mode (batch interpolation like gapfill_timeseries)
-    # =========================================================
+    # --------------------------
+    # Continous integration mode
+    # --------------------------
     if not forecasting:
         ndvi_gapfilled = ndvi_series.copy()
         valid_idx = np.where(np.isfinite(ndvi_gapfilled))[0]
@@ -207,25 +216,38 @@ def gapfill_ndvi(
                     delta_last = ndvi_filled[last_idx] - (
                         upper[last_idx] - (upper[last_idx] - lower[last_idx]) / 2
                     )
-                    forecast_val = med_t + delta_last
+                    if use_tau:
+                        multiplicative_factor = math.exp(-math.log(2) * (t - last_idx) / tau)
+                    else:
+                        multiplicative_factor = 1
+                    forecast_val = med_t + multiplicative_factor * delta_last
                     forecast_only[t] = forecast_val
                 # if last_idx is None or NaN, do nothing (stay NaN)
 
             # smoothing stage
-        if t > window_smoothing * 2:
-                data_ndvi = ndvi_filled[t - window_smoothing * 2 : t - window_smoothing]
-                data_forecast = forecast_only[t - window_smoothing * 2 : t - window_smoothing]
+        if t >  1+lag_forecast + window_smoothing:
+                data_ndvi = ndvi_filled[t - lag_forecast - window_smoothing: t - lag_forecast +1]
+                data_forecast = forecast_only[t - lag_forecast - window_smoothing: t - lag_forecast+1]
                 data_to_smooth = np.where(np.isnan(data_ndvi), data_forecast, data_ndvi)
 
-                smoothed[t - window_smoothing * 2 : t - window_smoothing] = savgol_filter(
+                if smoothing_method == "savgol":
+
+                    smoothed[t - lag_forecast - window_smoothing : t - lag_forecast +1] = savgol_filter(
                     data_to_smooth, window_length=window_smoothing, polyorder=2
-                )
-    
+                    )
+                elif smoothing_method == "low_pass":
+                    smoothed[t - lag_forecast - window_smoothing : t - lag_forecast +1] = gaussian_filter1d(
+                    data_to_smooth, sigma = sigma
+                    ) 
+                elif smoothing_method == "loess":
+                    index = np.arange(len(data_to_smooth))
+                    loess_smooth = sm.nonparametric.lowess(data_to_smooth, index, frac=frac)
+                    smoothed[t - lag_forecast - window_smoothing : t - lag_forecast +1] = loess_smooth[:, 1]
+
     return ndvi_filled, outlier_mask, forecast_only, smoothed
 
 
-
-def plot_results(title, ndvi_series, ndvi_gapfilled, outlier_arr, lower, upper, dates, save_path=None):
+def plot_results(title, ndvi_series, ndvi_gapfilled, outlier_arr, lower, upper, dates, plot_points = False, save_path=None):
     """
     Plot NDVI time series for a pixel:
       - raw NDVI with outliers highlighted
@@ -245,7 +267,10 @@ def plot_results(title, ndvi_series, ndvi_gapfilled, outlier_arr, lower, upper, 
     ax.scatter(dates, ndvi_series, s=10, color=colors, label="Raw NDVI", zorder=3)
 
     # gapfilled NDVI
-    ax.plot(dates, ndvi_gapfilled, color="black", label="Gapfilled NDVI")
+    if not plot_points:
+        ax.plot(dates, ndvi_gapfilled, color="black", label="Gapfilled NDVI")
+    else:
+        ax.scatter(dates, ndvi_gapfilled, color="black", label="Gapfilled NDVI")
 
     ax.set_title(title)
     ax.set_ylim(-0.1, 1.0)
