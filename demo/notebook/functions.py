@@ -7,8 +7,6 @@ from scipy.signal import savgol_filter
 from scipy.ndimage import gaussian_filter1d
 import statsmodels.api as sm
 
-
-
 def gapfill_ndvi(
     ndvi_series,
     lower,
@@ -19,8 +17,12 @@ def gapfill_ndvi(
     top_q=0.7,
     return_quantiles = False,
     weight_median = 0.5,
-    q_hi = 0.05,
-    q_low = -0.05,
+    y_delta_l = 0,
+    y_delta_h = 0,
+    y_iqr = 0,
+    r_delta_l = 0,
+    r_delta_h = 0,
+    r_iqr = 0,
     smoothing_method = "savgol",
     window_smoothing = 14,
     sigma = 4,
@@ -50,9 +52,43 @@ def gapfill_ndvi(
 
     n = len(ndvi_series)
     outlier_mask = np.zeros(n, dtype=bool)
-    ndvi_filled = np.full(n, np.nan)
+    iqr_param = np.full(n, np.nan)
     forecast_only = np.full(n, np.nan)
     smoothed = np.full(n, np.nan)
+    original_obs = ndvi_series.copy()
+
+
+    def fill_segment(start, end):
+        # Only fill if there is a gap larger than 1
+        if end - start > 1:
+
+            if end - start > 30:
+
+                medians =  upper[start + 1: end] - (upper[start + 1: end] - lower[start + 1: end]) / 2
+                median_end = upper[end] - (upper[end] - lower[end]) / 2
+                median_start = upper[start] - (upper[start] - lower[start]) / 2
+
+                deltas = (ndvi_gapfilled[end]-median_end) - (ndvi_gapfilled[start]-median_start)
+                ndvi_gapfilled[start + 1: end] = medians + deltas
+
+            else:
+
+                for j, idx in enumerate(range(start + 1, end)):
+                    frac = (j + 1) / (end - start)
+
+                    
+                    # plain linear interpolation between observations
+                    obs_interp = ndvi_gapfilled[start] + (ndvi_gapfilled[end] - ndvi_gapfilled[start]) * frac
+                    
+                    # logistic model median
+                    median_val = upper[idx] - (upper[idx] - lower[idx]) / 2
+                    
+                    # bias toward median, max at center
+                    diff = median_val - obs_interp
+                    weight = frac * (1 - frac)
+                    
+                    ndvi_gapfilled[idx] = obs_interp + weight_median * weight * diff
+
 
     # --------------------
     #  outlier detection
@@ -64,19 +100,21 @@ def gapfill_ndvi(
         else:
             return ndvi_series.copy(), outlier_mask
     # window_size = odd integer for local thresholds (use 5 or 7)
-    window_size = 5
+    window_size = 21
 
     valid_ndvi = ndvi_series[valid_idx]
     valid_upper = upper[valid_idx]
     valid_lower = lower[valid_idx]
     valid_iqr = valid_upper - valid_lower
-    median_valid = (valid_upper + valid_lower) / 2.0   # equivalent to your formula
+    median_valid = (valid_upper + valid_lower) / 2.0  
 
     # -----------------------
     # Global threshold band
     # -----------------------
-    th_hi = valid_upper + param_iqr * valid_iqr
-    th_lo = valid_lower - param_iqr * valid_iqr
+    iqr_param = np.where(valid_ndvi / median_valid < 1, median_valid / valid_ndvi, valid_ndvi / median_valid)
+
+    th_hi = valid_upper + np.quantile(iqr_param,0.7) * valid_iqr
+    th_lo = valid_lower - np.quantile(iqr_param,0.7) * valid_iqr
     is_outlier_global = (valid_ndvi > th_hi) | (valid_ndvi < th_lo)
 
     # -----------------------
@@ -110,8 +148,9 @@ def gapfill_ndvi(
     delta_diff = np.diff(deltas)                      # shape (n-1,)
     slope_outlier = np.zeros(n, dtype=bool)
 
+
     if delta_diff.size >= 2:
-        q_low, q_hi = np.quantile(delta_diff, [bottom_q, top_q])
+        q_low, q_hi = np.quantile(delta_diff, [0.2, 0.8])
 
         # same-direction extremes: both previous and next step extreme (same sign allowed)
         same_dir = (
@@ -125,29 +164,50 @@ def gapfill_ndvi(
             | ((delta_diff[1:] < q_low) & (delta_diff[:-1] > q_hi))
         )  # shape (n-2,)
 
-        # single-step *very* extreme: use more extreme quantiles (e.g. 1%/99%)
-        q_low_ext, q_hi_ext = np.quantile(delta_diff, [0.01, 0.99])
+        # single-step *very* extreme:
+        q_low_ext, q_hi_ext = np.quantile(delta_diff, [0.1, 0.9])
         single_step = (delta_diff > q_hi_ext) | (delta_diff < q_low_ext)  # shape (n-1,)
 
         # For a point i (1..n-2) we consider:
         # - same_dir or vshape involving delta_diff[i-1] and delta_diff[i]
         # - OR if either neighboring step is a single very-extreme step
         slope_outlier[1:-1] = (
-            same_dir | vshape | (single_step[:-1] | single_step[1:])
+            same_dir | vshape | single_step[:-1] 
         )
-
-        # Optionally check the first/last positions using the single-step rule:
-        slope_outlier[0] = single_step[0]  # change from 0->1
-        slope_outlier[-1] = single_step[-1]  # change from n-2->n-1
-    else:
-        # not enough points for 2-step logic; fall back to single-step extremes
-        if delta_diff.size == 1:
-            slope_outlier[0] = slope_outlier[1] = ((delta_diff[0] > q_hi) | (delta_diff[0] < q_low))
+        
+        #  check the first/last positions using the single-step rule:
+        slope_outlier[0] = single_step[0] 
+        slope_outlier[-1] = single_step[-1]  
 
     # -----------------------
     # Final outlier mask (must be slope-outlier AND (global OR local threshold outlier))
     # -----------------------
     is_outlier = slope_outlier & (is_outlier_global | is_outlier_local)
+    # -----------------------
+    # Extra extreme-value research
+    # -----------------------
+
+    if delta_diff.size >= 2:
+        q_low_dd, q_hi_dd = np.quantile(delta_diff, [0.05, 0.95])
+        extreme_delta = (delta_diff < q_low_dd) | (delta_diff > q_hi_dd)
+
+        # expand extreme_delta to point indices
+        extra_outlier = np.zeros_like(slope_outlier)
+        extra_outlier[1:] |= extreme_delta
+        extra_outlier[:-1] |= extreme_delta
+    else:
+        extra_outlier = np.zeros_like(slope_outlier)
+
+    ratio = np.minimum(valid_ndvi, median_valid) / np.maximum(valid_ndvi, median_valid)
+    q_hi_ratio = np.quantile(ratio, 0.95)
+    extreme_ratio = ratio > q_hi_ratio
+
+    # Combine
+    extreme_outlier = extra_outlier | extreme_ratio
+
+    # Merge into final outlier mask
+    is_outlier = is_outlier | extreme_outlier
+
 
     inside_band = (valid_ndvi >= valid_lower) & (valid_ndvi <= valid_upper)
     is_outlier = is_outlier & ~inside_band
@@ -159,6 +219,7 @@ def gapfill_ndvi(
     # Gapfilling on full time serie
     # --------------------------
     if not forecasting:
+        
         ndvi_gapfilled = ndvi_series.copy()
         valid_idx = np.where(np.isfinite(ndvi_gapfilled))[0]
         if len(valid_idx) < 2:
@@ -166,222 +227,157 @@ def gapfill_ndvi(
 
         for i in range(len(valid_idx) - 1):
             start, end = valid_idx[i], valid_idx[i + 1]
-            if end - start > 1:
-                for j, idx in enumerate(range(start + 1, end)):
-                    frac = (j + 1) / (end - start)
-                    # plain linear interpolation between obs
-                    obs_interp = (
-                        ndvi_gapfilled[start]
-                        + (ndvi_gapfilled[end] - ndvi_gapfilled[start]) * frac
-                    )
-                    # logistic model median
-                    median_val = upper[idx] - (upper[idx] - lower[idx]) / 2
-                    # bias toward median, max at center
-                    diff = median_val - obs_interp
-                    weight = frac * (1 - frac)
-                    ndvi_gapfilled[idx] = obs_interp + weight_median * weight * diff
+            fill_segment(start,end)
+
 
         if not return_quantiles:
             return ndvi_gapfilled, outlier_mask
         else:
-            return ndvi_gapfilled, outlier_mask, q_hi, q_low
+            return ndvi_gapfilled, outlier_mask, q_hi, q_low, delta_diff, iqr_param, 
+    else:  
 
-    else:
-        # --- initialization ---
-        n = len(ndvi_series)
-        outlier_mask = np.zeros(n, dtype=bool)      # final confirmed outliers
-        potential_mask = np.zeros(n, dtype=bool)    # tentative potentials
-        potential_obs = np.full(n, np.nan)          # store raw obs for potentials
-        potential_last_idx = None
-        last_idx = None
+        n = len(original_obs)
 
-        ndvi_filled = np.full(n, np.nan)
+        # outputs (reset for comparison)
+        outlier_mask = np.zeros(n, dtype=bool)
+        ndvi_gapfilled = original_obs.copy()
         forecast_only = np.full(n, np.nan)
         smoothed = np.full(n, np.nan)
 
-        # helper: fill values strictly between start and end (start < end)
-        def _fill_segment(start, end):
-            if start is None or end is None:
-                return
-            span = end - start
-            if span <= 1:
-                return
-            # fill indices start+1 .. end-1
-            for j, idx in enumerate(range(start + 1, end)):
-                frac = (j + 1) / span
-                # require endpoints exist
-                if not (np.isfinite(ndvi_filled[start]) and np.isfinite(ndvi_filled[end])):
-                    continue
-                obs_interp = ndvi_filled[start] + (ndvi_filled[end] - ndvi_filled[start]) * frac
-                median_val = 0.5 * (upper[idx] + lower[idx])
-                diff = median_val - obs_interp
-                weight = frac * (1 - frac)
-                ndvi_filled[idx] = obs_interp + weight_median * weight * diff
-                forecast_only[idx] = ndvi_filled[idx]
+        last_idx = None             # last confirmed observation
+        last_potential_idx = None   # last potential outlier
 
-        # main loop
         for t in range(n):
-            obs = ndvi_series[t]
+            obs = original_obs[t]
 
-            if not np.isnan(obs):
-                # reset flags for this t
-                is_outlier_now = False    # immediate final outlier for t
-                local_outlier = False
-
-                # --- model/global band check ---
+            if np.isfinite(obs):
+                # thresholds
                 median_iqr = param_iqr * ((upper[t] - lower[t]) / 2)
                 th_hi = upper[t] + median_iqr
                 th_lo = lower[t] - median_iqr
 
-                # --- local backward check (last 5 accepted values) ---
-                recent = ndvi_filled[max(0, t - 5):t]
+                # local rolling check (5-step)
+                recent = ndvi_gapfilled[max(0, t - 5):t]
                 recent = recent[np.isfinite(recent)]
+                local_outlier = False
                 if recent.size >= 3:
-                    q1, q3 = np.quantile(recent, [0.25, 0.75])
+                    q1, q3 = np.quantile(recent, [0.1, 0.9])
                     iqr_local = q3 - q1
                     local_th_hi = q3 + param_iqr * iqr_local
                     local_th_lo = q1 - param_iqr * iqr_local
                     if obs > local_th_hi or obs < local_th_lo:
                         local_outlier = True
 
-                # inside strict logistic band => always valid
                 inside_band = (obs >= lower[t]) and (obs <= upper[t])
+                potential_now = ((obs > th_hi) or (obs < th_lo) or local_outlier) and (not inside_band)
 
-                # define whether this obs is a potential (outside bands OR local outlier)
-                potential_now = (obs > th_hi or obs < th_lo) or local_outlier
-                if inside_band:
-                    potential_now = False
+                # slope check (delta-delta)
+                delta_delta = 0
+                if last_idx is not None and np.isfinite(ndvi_gapfilled[last_idx]):
+                    median_last = 0.5 * (upper[last_idx] + lower[last_idx])
+                    median_curr = 0.5 * (upper[t] + lower[t])
+                    delta_prev = ndvi_gapfilled[last_idx] - median_last
+                    delta_curr = obs - median_curr
+                    delta_delta = (delta_curr - delta_prev) / (t - last_idx)
 
-                # If it's a potential, do slope test vs last accepted
-                if potential_now:
-                    # if we have a last accepted point, compare slope dynamics
-                    if last_idx is not None and np.isfinite(ndvi_filled[last_idx]):
-                        median_last = 0.5 * (upper[last_idx] + lower[last_idx])
-                        median_curr = 0.5 * (upper[t] + lower[t])
-                        delta_previous = ndvi_filled[last_idx] - median_last
-                        delta_current = obs - median_curr          # raw obs here
-                        delta_delta = delta_current - delta_previous
+                # ratio check
+                median_curr = 0.5 * (upper[t] + lower[t])
+                ratio = np.minimum(obs, median_curr) / np.maximum(obs, median_curr)
 
-                        # immediate slope extreme -> mark as potential (tentative)
-                        slope_thresh = 0.5   # you used 0.5 in earlier code; tune if needed
-                        if delta_delta > slope_thresh or delta_delta < -slope_thresh:
-                            # store as potential; do NOT mark final outlier yet
-                            potential_mask[t] = True
-                            potential_obs[t] = obs
-                            potential_last_idx = t
-                            # do NOT write to outlier_mask yet (leave final decision to future)
-                        else:
-                            # slope not extreme -> accept as normal
-                            potential_now = False
-                    else:
-                        # no last accepted point: keep as potential (can't slope-test)
-                        potential_mask[t] = True
-                        potential_obs[t] = obs
-                        potential_last_idx = t
+                # -----------------------
+                # Decision rules
+                # -----------------------
 
-                # If not potential (or slope didn't trigger), accept the obs now
-                if not potential_mask[t]:
-                    # accept current observation as final
-                    ndvi_filled[t] = obs
+                # Strict outlier (extreme values)
+                extreme_outlier = (
+                    (delta_delta > r_delta_h) or (delta_delta < r_delta_l)
+                    or (ratio > r_iqr)
+                )
+
+                # Potential outlier
+                potential_outlier = (
+                    ((delta_delta > y_delta_h) or (delta_delta < y_delta_l))
+                    and (ratio > y_iqr)
+                ) or potential_now
+
+                if extreme_outlier:
+                    outlier_mask[t] = True
+                    ndvi_gapfilled[t] = np.nan
+                    forecast_only[t] = np.nan
+
+                elif potential_outlier:
+                    last_potential_idx = t
+
+                else:
+                    # confirmed observation
+                    ndvi_gapfilled[t] = obs
                     forecast_only[t] = obs
                     outlier_mask[t] = False
 
-                    # If we have a pending potential candidate, evaluate it now retroactively
-                    if potential_last_idx is not None and potential_last_idx > (last_idx if last_idx is not None else -1):
-                        p = potential_last_idx
-                        # use raw observation at p (from potential_obs or ndvi_series)
-                        raw_p = potential_obs[p] if np.isfinite(potential_obs[p]) else ndvi_series[p]
+                    # resolve pending potential
+                    if last_potential_idx is not None and last_potential_idx > (last_idx or -1):
+                        p = last_potential_idx
+                        raw_p = ndvi_series[p]
                         median_p = 0.5 * (upper[p] + lower[p])
                         median_t = 0.5 * (upper[t] + lower[t])
-                        delta_prev = raw_p - median_p
-                        delta_curr = ndvi_filled[t] - median_t
-                        delta_delta = delta_curr - delta_prev
+                        delta_p = raw_p - median_p
+                        delta_t = ndvi_gapfilled[t] - median_t
+                        delta_delta_p = delta_t - delta_p
 
-                        # confirm vs q_hi/q_low (function params)
-                        if (delta_delta > q_hi) or (delta_delta < q_low):
+                        if delta_delta_p > q_hi or delta_delta_p < q_low:
                             # confirmed outlier
                             outlier_mask[p] = True
-                            # remove potential bookkeeping
-                            potential_mask[p] = False
-                            potential_obs[p] = np.nan
+                            ndvi_gapfilled[p] = np.nan
+                            forecast_only[p] = np.nan
+                            if last_idx is not None:
+                                fill_segment(last_idx, t)
                         else:
-                            # accept candidate p -> retro-fill and fill segments
+                            # accept retroactively
                             outlier_mask[p] = False
-                            potential_mask[p] = False
-                            potential_obs[p] = np.nan
+                            
+                            fill_segment(last_idx, p)
+                            fill_segment(p, t)
 
-                            # ensure endpoint values exist for interpolation:
-                            # if last_idx exists we will fill (last_idx -> p) and (p -> t)
-                            # if last_idx is None, we set ndvi_filled[p] to raw_p first
-                            if last_idx is None or not np.isfinite(ndvi_filled[last_idx]):
-                                ndvi_filled[p] = raw_p
-                                forecast_only[p] = raw_p
-                            else:
-                                # compute retro value for p biased toward median
-                                span = t - last_idx
-                                if span > 0:
-                                    frac_p = (p - last_idx) / span
-                                    obs_interp_p = ndvi_filled[last_idx] + (ndvi_filled[t] - ndvi_filled[last_idx]) * frac_p
-                                    median_val_p = 0.5 * (upper[p] + lower[p])
-                                    diff_p = median_val_p - obs_interp_p
-                                    weight_p = frac_p * (1 - frac_p)
-                                    ndvi_filled[p] = obs_interp_p + weight_median * weight_p * diff_p
-                                    forecast_only[p] = ndvi_filled[p]
-
-                            # fill surrounding segments (if possible)
-                            _fill_segment(last_idx, p)
-                            _fill_segment(p, t)
-
-                            # after retro fill we have filled up to t, so set last_idx = t
                             last_idx = t
 
-                    else:
-                        # no pending potential -> just fill gap last_idx -> t
-                        if last_idx is not None and (t - last_idx) > 1:
-                            _fill_segment(last_idx, t)
-                        last_idx = t
+                        last_potential_idx = None
 
-                else:
-                    # potential_mask[t] True: we keep current obs as tentative but DO NOT
-                    # write to final outlier_mask yet. We store raw observation in potential_obs.
-                    potential_obs[t] = obs
-                    # (do not set ndvi_filled[t] or outlier_mask[t] at this point)
+                    # gapfill between last confirmed obs and this obs
+                    if last_idx is not None:
+                        fill_segment(last_idx, t)
+
+                    last_idx = t
 
             else:
-                # missing observation -> forecast only
-                if last_idx is not None and np.isfinite(ndvi_filled[last_idx]):
-                    med_t = 0.5 * (upper[t] + lower[t])
-                    delta_last = ndvi_filled[last_idx] - (0.5 * (upper[last_idx] + lower[last_idx]))
-                    if use_tau:
-                        multiplicative_factor = math.exp(-math.log(2) * (t - last_idx) / tau)
-                    else:
-                        multiplicative_factor = 1.0
-                    forecast_val = med_t + multiplicative_factor * delta_last
+        
+
+                # missing obs -> forecast continuation
+                if last_idx is not None and np.isfinite(ndvi_gapfilled[last_idx]):
+                    median_t = 0.5 * (upper[t] + lower[t])
+                    delta_last = ndvi_gapfilled[last_idx] - 0.5 * (upper[last_idx] + lower[last_idx])
+                    forecast_val = median_t + delta_last
+                    ndvi_gapfilled[t] = forecast_val
                     forecast_only[t] = forecast_val
-                # else remain NaN
 
-            # smoothing stage (unchanged)
-            if t > 1 + lag_forecast + window_smoothing:
-                a = t - lag_forecast - window_smoothing
-                b = t - lag_forecast + 1
-                data_ndvi = ndvi_filled[a:b]
-                data_forecast = forecast_only[a:b]
-                data_to_smooth = np.where(np.isnan(data_ndvi), data_forecast, data_ndvi)
+        # optional smoothing
+        if smoothing_method is not None:
+            if smoothing_method == "savgol":
+                wl = window_smoothing if (window_smoothing % 2 == 1) else (window_smoothing + 1)
+                maxlen = len(ndvi_gapfilled)
+                if maxlen % 2 == 0:
+                    maxlen -= 1
+                wl = min(wl, maxlen) if maxlen >= 3 else wl
+                if wl >= 3:
+                    smoothed[:] = savgol_filter(ndvi_gapfilled, window_length=wl, polyorder=2)
+            elif smoothing_method == "low_pass":
+                smoothed[:] = gaussian_filter1d(ndvi_gapfilled, sigma=sigma)
+            elif smoothing_method == "loess":
+                index = np.arange(len(ndvi_gapfilled))
+                loess_smooth = sm.nonparametric.lowess(ndvi_gapfilled, index, frac=frac)
+                smoothed[:] = loess_smooth[:, 1]
 
-                if smoothing_method == "savgol":
-                    # ensure window_smoothing odd and valid
-                    wl = window_smoothing if (window_smoothing % 2 == 1) else (window_smoothing + 1)
-                    wl = min(wl, len(data_to_smooth) if (len(data_to_smooth) % 2 == 1) else len(data_to_smooth) - 1)
-                    if wl >= 3:
-                        smoothed[a:b] = savgol_filter(data_to_smooth, window_length=wl, polyorder=2)
-                elif smoothing_method == "low_pass":
-                    smoothed[a:b] = gaussian_filter1d(data_to_smooth, sigma=sigma)
-                elif smoothing_method == "loess":
-                    index = np.arange(len(data_to_smooth))
-                    loess_smooth = sm.nonparametric.lowess(data_to_smooth, index, frac=frac)
-                    smoothed[a:b] = loess_smooth[:, 1]
+        return ndvi_gapfilled, outlier_mask, forecast_only, smoothed
 
-        return ndvi_filled, outlier_mask, forecast_only, smoothed
 
 
 
@@ -408,9 +404,9 @@ def plot_results(title, ndvi_series, ndvi_gapfilled, outlier_arr, lower, upper, 
     if not plot_points:
         ax.plot(dates, ndvi_gapfilled, color="black", label="Gapfilled NDVI")
     else:
-        ax.scatter(dates, ndvi_gapfilled, color="black", label="Gapfilled NDVI")
+        ax.scatter(dates, ndvi_gapfilled, color="black", label="Gapfilled NDVI", s=10, marker='.')
 
-    if show_iqr == True and param_iqr !=1:
+    if show_iqr == True:
         iqr = (upper - lower) /2
         iqr_upper = upper + iqr * param_iqr
         iqr_lower = lower - iqr * param_iqr
@@ -497,40 +493,127 @@ def double_logistic_function(t, params):
                         
                 """
 
-# almost correct
+# workinig not forecast
 
-"""    valid_ndvi = ndvi_series[valid_idx]
+"""       # --------------------
+    #  outlier detection
+    # --------------------
+    valid_idx = np.where(np.isfinite(ndvi_series))[0]
+    if len(valid_idx) < 2:
+        if forecasting:
+            return ndvi_series.copy(), outlier_mask, np.full(n, np.nan)
+        else:
+            return ndvi_series.copy(), outlier_mask
+    # window_size = odd integer for local thresholds (use 5 or 7)
+    window_size = 5
+
+    valid_ndvi = ndvi_series[valid_idx]
     valid_upper = upper[valid_idx]
     valid_lower = lower[valid_idx]
     valid_iqr = valid_upper - valid_lower
-    median_valid = valid_upper - valid_iqr / 2
+    median_valid = (valid_upper + valid_lower) / 2.0   # equivalent to your formula
 
-    # threshold outliers
+    # -----------------------
+    # Global threshold band
+    # -----------------------
     th_hi = valid_upper + param_iqr * valid_iqr
     th_lo = valid_lower - param_iqr * valid_iqr
-    is_outlier_threshold = (valid_ndvi > th_hi) | (valid_ndvi < th_lo)
+    is_outlier_global = (valid_ndvi > th_hi) | (valid_ndvi < th_lo)
 
-    # slope outliers
-    deltas = valid_ndvi - median_valid
-    delta_diff = np.diff(deltas)
-    if len(delta_diff) > 2:
+    # -----------------------
+    # Local rolling threshold (to catch local sharp dips)
+    # -----------------------
+    n = valid_ndvi.size
+    half = window_size // 2
+    local_th_hi = np.empty(n)
+    local_th_lo = np.empty(n)
+
+    for i in range(n):
+        a = max(0, i - half)
+        b = min(n, i + half + 1)
+        window_vals = valid_ndvi[a:b]
+        if window_vals.size >= 3:
+            q1, q3 = np.quantile(window_vals, [0.25, 0.75])
+            iqr_local = q3 - q1
+            local_th_hi[i] = q3 + param_iqr * iqr_local
+            local_th_lo[i] = q1 - param_iqr * iqr_local
+        else:
+            # fallback to global band if window too small
+            local_th_hi[i] = th_hi[i]
+            local_th_lo[i] = th_lo[i]
+
+    is_outlier_local = (valid_ndvi > local_th_hi) | (valid_ndvi < local_th_lo)
+
+    # -----------------------
+    # Slope-based detection
+    # -----------------------
+    deltas = valid_ndvi - median_valid                # shape (n,)
+    delta_diff = np.diff(deltas)                      # shape (n-1,)
+    slope_outlier = np.zeros(n, dtype=bool)
+
+    if delta_diff.size >= 2:
         q_low, q_hi = np.quantile(delta_diff, [bottom_q, top_q])
-        #print((delta_diff > q_hi) | (delta_diff < q_low))
-        slope_outlier = np.zeros_like(is_outlier_threshold)
-        slope_outlier[1:-1] = (
+
+        # same-direction extremes: both previous and next step extreme (same sign allowed)
+        same_dir = (
             ((delta_diff[1:] > q_hi) | (delta_diff[1:] < q_low))
             & ((delta_diff[:-1] > q_hi) | (delta_diff[:-1] < q_low))
-        ) | (
-            # opposite-direction "V-shape" check
+        )  # shape (n-2,)
+
+        # V-shape: previous and next extreme with opposite signs (drop then rise, or rise then drop)
+        vshape = (
             ((delta_diff[1:] > q_hi) & (delta_diff[:-1] < q_low))
             | ((delta_diff[1:] < q_low) & (delta_diff[:-1] > q_hi))
+        )  # shape (n-2,)
+
+        # single-step *very* extreme: use more extreme quantiles (e.g. 1%/99%)
+        q_low_ext, q_hi_ext = np.quantile(delta_diff, [0.1, 0.9])
+        single_step = (delta_diff > q_hi_ext) | (delta_diff < q_low_ext)  # shape (n-1,)
+
+        # For a point i (1..n-2) we consider:
+        # - same_dir or vshape involving delta_diff[i-1] and delta_diff[i]
+        # - OR if either neighboring step is a single very-extreme step
+        slope_outlier[1:-1] = (
+            same_dir | vshape | (single_step[:-1] | single_step[1:])
         )
-        is_outlier = is_outlier_threshold & slope_outlier
+
+        # Optionally check the first/last positions using the single-step rule:
+        slope_outlier[0] = single_step[0]  # change from 0->1
+        slope_outlier[-1] = single_step[-1]  # change from n-2->n-1
     else:
-        is_outlier = is_outlier_threshold
+        # not enough points for 2-step logic; fall back to single-step extremes
+        if delta_diff.size == 1:
+            slope_outlier[0] = slope_outlier[1] = ((delta_diff[0] > q_hi) | (delta_diff[0] < q_low))
+
+    # -----------------------
+    # Final outlier mask (must be slope-outlier AND (global OR local threshold outlier))
+    # -----------------------
+    is_outlier = slope_outlier & (is_outlier_global | is_outlier_local)
+
+    inside_band = (valid_ndvi >= valid_lower) & (valid_ndvi <= valid_upper)
+    is_outlier = is_outlier & ~inside_band
 
     outlier_mask[valid_idx] = is_outlier
-    ndvi_series[valid_idx[is_outlier]] = np.nan"""
+    ndvi_series[valid_idx[is_outlier]] = np.nan
+
+    # --------------------------
+    # Gapfilling on full time serie
+    # --------------------------
+    if not forecasting:
+        ndvi_gapfilled = ndvi_series.copy()
+        valid_idx = np.where(np.isfinite(ndvi_gapfilled))[0]
+        if len(valid_idx) < 2:
+            return ndvi_gapfilled, outlier_mask
+
+        for i in range(len(valid_idx) - 1):
+            start, end = valid_idx[i], valid_idx[i + 1]
+            fill_segment(start,end)
+
+
+        if not return_quantiles:
+            return ndvi_gapfilled, outlier_mask
+        else:
+            return ndvi_gapfilled, outlier_mask, q_hi, q_low, delta_diff"""
 
 
 # continour integration almost working
@@ -844,3 +927,116 @@ def double_logistic_function(t, params):
                     smoothed[a:b] = loess_smooth[:, 1]
 
         return ndvi_filled, outlier_mask, forecast_only, smoothed"""
+
+
+
+"""            if end - start > 1:
+                for j, idx in enumerate(range(start + 1, end)):
+                    frac = (j + 1) / (end - start)
+                    # plain linear interpolation between obs
+                    obs_interp = (
+                        ndvi_gapfilled[start]
+                        + (ndvi_gapfilled[end] - ndvi_gapfilled[start]) * frac
+                    )
+                    # logistic model median
+                    median_val = upper[idx] - (upper[idx] - lower[idx]) / 2
+                    # bias toward median, max at center
+                    diff = median_val - obs_interp
+                    weight = frac * (1 - frac)
+                    ndvi_gapfilled[idx] = obs_interp + weight_median * weight * diff
+"""
+
+
+
+""""else:
+                    # confirmed observation
+                    ndvi_gapfilled[t] = obs
+                    forecast_only[t] = obs
+                    outlier_mask[t] = False
+                    
+                    # resolve pending potential
+                    if last_potential_idx is not None and last_potential_idx > (last_idx or -1):
+                        p = last_potential_idx
+                        raw_p = ndvi_series[p]
+                        median_p = 0.5 * (upper[p] + lower[p])
+                        median_t = 0.5 * (upper[t] + lower[t])
+                        delta_p = raw_p - median_p
+                        delta_t = ndvi_gapfilled[t] - median_t
+                        delta_delta_p = delta_t - delta_p
+
+                        if delta_delta_p > q_hi or delta_delta_p < q_low:
+                            # confirmed outlier
+                            outlier_mask[p] = True
+                            ndvi_gapfilled[p] = np.nan
+                            forecast_only[p] = np.nan
+                            fill_segment(last_idx, t)
+                        else:
+                            # accept retroactively
+                            outlier_mask[p] = False
+                            frac_p = (p - last_idx) / (t - last_idx) if last_idx is not None else 0
+                            obs_interp_p = ndvi_gapfilled[last_idx] + (ndvi_gapfilled[t] - ndvi_gapfilled[last_idx]) * frac_p
+                            diff_p = median_p - obs_interp_p
+                            weight_p = frac_p * (1 - frac_p)
+                            ndvi_gapfilled[p] = obs_interp_p + weight_p * diff_p
+                            forecast_only[p] = ndvi_gapfilled[p]
+
+                            # fill segments
+                            fill_segment(last_idx, p)
+                            fill_segment(p, t)
+                        
+                        last_potential_idx = None
+                    
+                    # gapfill 
+                    fill_segment(last_idx, t)
+                    last_idx = t"""
+
+
+""""outlier detection continous integration
+       for t in range(n):
+            obs = ndvi_series[t]
+
+            if np.isfinite(obs):
+                # thresholds
+                median_iqr = param_iqr * ((upper[t] - lower[t]) / 2)
+                th_hi = upper[t] + median_iqr
+                th_lo = lower[t] - median_iqr
+
+                # local check
+                recent = ndvi_gapfilled[max(0, t - 5):t]
+                recent = recent[np.isfinite(recent)]
+                local_outlier = False
+                if recent.size >= 3:
+                    q1, q3 = np.quantile(recent, [0.1, 0.9])
+                    iqr_local = q3 - q1
+                    local_th_hi = q3 + param_iqr * iqr_local
+                    local_th_lo = q1 - param_iqr * iqr_local
+                    if obs > local_th_hi or obs < local_th_lo:
+                        local_outlier = True
+
+                inside_band = (obs >= lower[t]) and (obs <= upper[t])
+                potential_now = ((obs > th_hi) or (obs < th_lo) or local_outlier) and (not inside_band)
+
+                # slope check
+                delta_delta = 0
+                if last_idx is not None and np.isfinite(ndvi_gapfilled[last_idx]):
+                    median_last = 0.5 * (upper[last_idx] + lower[last_idx])
+                    median_curr = 0.5 * (upper[t] + lower[t])
+                    delta_prev = ndvi_gapfilled[last_idx] - median_last
+                    delta_curr = obs - median_curr
+                    delta_delta = (delta_curr - delta_prev) / (t - last_idx)
+
+                # decision
+                if abs(delta_delta) > 0.5:
+                    outlier_mask[t] = True
+                    ndvi_gapfilled[t] = np.nan
+                    forecast_only[t] = np.nan
+
+                elif potential_now and abs(delta_delta) >= min(q_hi, q_low):
+                    last_potential_idx = t
+
+                else:
+                    # confirmed observation
+                    ndvi_gapfilled[t] = obs
+                    forecast_only[t] = obs
+                    outlier_mask[t] = False
+                    """
