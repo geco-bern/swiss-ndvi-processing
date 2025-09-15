@@ -120,26 +120,35 @@ def gapfill_ndvi(
     # -----------------------
     # Local rolling threshold (to catch local sharp dips)
     # -----------------------
+    deltas = valid_ndvi - median_valid                # shape (n,)
+    th_hi_delta = th_hi - median_valid
+    th_lo_delta = th_lo - median_valid
+
+    # -----------------------
+    # Local rolling threshold (on deltas)
+    # -----------------------
     n = valid_ndvi.size
     half = window_size // 2
-    local_th_hi = np.empty(n)
-    local_th_lo = np.empty(n)
+    local_th_hi_delta = np.empty(n)
+    local_th_lo_delta = np.empty(n)
 
     for i in range(n):
         a = max(0, i - half)
         b = min(n, i + half + 1)
-        window_vals = valid_ndvi[a:b]
-        if window_vals.size >= 3:
-            q1, q3 = np.quantile(window_vals, [0.25, 0.75])
+        window_deltas = deltas[a:b]   # <-- use deltas, not raw values
+        if window_deltas.size >= 3:
+            q1, q3 = np.quantile(window_deltas, [0.3, 0.6])
             iqr_local = q3 - q1
-            local_th_hi[i] = q3 + param_iqr * iqr_local
-            local_th_lo[i] = q1 - param_iqr * iqr_local
+            local_th_hi_delta[i] = q3 + param_iqr * iqr_local
+            local_th_lo_delta[i] = q1 - param_iqr * iqr_local
         else:
-            # fallback to global band if window too small
-            local_th_hi[i] = th_hi[i]
-            local_th_lo[i] = th_lo[i]
+            # fallback to global delta thresholds if window too small
+            local_th_hi_delta[i] = th_hi_delta[i]
+            local_th_lo_delta[i] = th_lo_delta[i]
 
-    is_outlier_local = (valid_ndvi > local_th_hi) | (valid_ndvi < local_th_lo)
+    # apply in delta-space
+    is_outlier_local = (deltas > local_th_hi_delta) | (deltas < local_th_lo_delta)
+
 
     # -----------------------
     # Slope-based detection
@@ -198,7 +207,7 @@ def gapfill_ndvi(
     else:
         extra_outlier = np.zeros_like(slope_outlier)
 
-    ratio = np.minimum(valid_ndvi, median_valid) / np.maximum(valid_ndvi, median_valid)
+    ratio = np.maximum(valid_ndvi, median_valid) / np.minimum(valid_ndvi, median_valid)
     q_hi_ratio = np.quantile(ratio, 0.95)
     extreme_ratio = ratio > q_hi_ratio
 
@@ -229,11 +238,42 @@ def gapfill_ndvi(
             start, end = valid_idx[i], valid_idx[i + 1]
             fill_segment(start,end)
 
+        # After gapfilling is complete (non-forecasting branch)
+        smoothed = np.full_like(ndvi_gapfilled, np.nan)
+
+        # optional smoothing
+        if smoothing_method is not None:
+            if smoothing_method == "savgol":
+                wl = window_smoothing if (window_smoothing % 2 == 1) else (window_smoothing + 1)
+                maxlen = len(ndvi_gapfilled)
+                if maxlen % 2 == 0:
+                    maxlen -= 1
+                wl = min(wl, maxlen) if maxlen >= 3 else wl
+                if wl >= 3:
+                    smoothed[:] = savgol_filter(ndvi_gapfilled, window_length=wl, polyorder=2)
+
+            elif smoothing_method == "low_pass":
+                smoothed[:] = gaussian_filter1d(ndvi_gapfilled, sigma=sigma)
+
+            elif smoothing_method == "loess":
+                index = np.arange(len(ndvi_gapfilled))
+                # drop NaNs before fitting
+                valid = np.isfinite(ndvi_gapfilled)
+                loess_smooth = sm.nonparametric.lowess(
+                    ndvi_gapfilled[valid], index[valid], frac=frac, return_sorted=True
+                )
+                # interpolate smoothed values back onto full index
+                smoothed[:] = np.interp(index, loess_smooth[:, 0], loess_smooth[:, 1])
+
 
         if not return_quantiles:
-            return ndvi_gapfilled, outlier_mask
+            return ndvi_gapfilled, outlier_mask, smoothed
         else:
-            return ndvi_gapfilled, outlier_mask, q_hi, q_low, delta_diff, iqr_param, 
+            return ndvi_gapfilled, outlier_mask, q_hi, q_low, delta_diff, iqr_param, smoothed
+
+
+    # forecasted mode
+
     else:  
 
         n = len(original_obs)
@@ -256,12 +296,12 @@ def gapfill_ndvi(
                 th_hi = upper[t] + median_iqr
                 th_lo = lower[t] - median_iqr
 
-                # local rolling check (5-step)
-                recent = ndvi_gapfilled[max(0, t - 5):t]
+                # local rolling check (25-step)
+                recent = ndvi_gapfilled[max(0, t - 15):t]
                 recent = recent[np.isfinite(recent)]
                 local_outlier = False
                 if recent.size >= 3:
-                    q1, q3 = np.quantile(recent, [0.1, 0.9])
+                    q1, q3 = np.quantile(recent, [0.3, 0.7])
                     iqr_local = q3 - q1
                     local_th_hi = q3 + param_iqr * iqr_local
                     local_th_lo = q1 - param_iqr * iqr_local
@@ -282,36 +322,35 @@ def gapfill_ndvi(
 
                 # ratio check
                 median_curr = 0.5 * (upper[t] + lower[t])
-                ratio = np.minimum(obs, median_curr) / np.maximum(obs, median_curr)
+                ratio = np.maximum(obs, median_curr) / np.minimum(obs, median_curr)
 
                 # -----------------------
                 # Decision rules
                 # -----------------------
-
+                
                 # Strict outlier (extreme values)
                 extreme_outlier = (
-                    (delta_delta > r_delta_h) or (delta_delta < r_delta_l)
-                    or (ratio > r_iqr)
-                )
+                        (delta_delta > r_delta_h) or (delta_delta < r_delta_l)
+                        or (ratio > r_iqr)
+                    )
 
-                # Potential outlier
+                    # Potential outlier
                 potential_outlier = (
-                    ((delta_delta > y_delta_h) or (delta_delta < y_delta_l))
-                    and (ratio > y_iqr)
-                ) or potential_now
+                        ((delta_delta > y_delta_h) or (delta_delta < y_delta_l))
+                        and (ratio > y_iqr)
+                    ) or potential_now
 
-                if extreme_outlier:
-                    outlier_mask[t] = True
-                    ndvi_gapfilled[t] = np.nan
-                    forecast_only[t] = np.nan
+                if extreme_outlier and not inside_band:
+                        outlier_mask[t] = True
+                        ndvi_gapfilled[t] = np.nan
+                        forecast_only[t] = np.nan
 
-                elif potential_outlier:
-                    last_potential_idx = t
+                elif potential_outlier  and not inside_band:
+                        last_potential_idx = t
 
                 else:
                     # confirmed observation
                     ndvi_gapfilled[t] = obs
-                    forecast_only[t] = obs
                     outlier_mask[t] = False
 
                     # resolve pending potential
@@ -324,11 +363,10 @@ def gapfill_ndvi(
                         delta_t = ndvi_gapfilled[t] - median_t
                         delta_delta_p = delta_t - delta_p
 
-                        if delta_delta_p > q_hi or delta_delta_p < q_low:
+                        if (delta_delta_p > y_delta_h or delta_delta_p < y_delta_l) and (ratio > y_iqr):
                             # confirmed outlier
                             outlier_mask[p] = True
                             ndvi_gapfilled[p] = np.nan
-                            forecast_only[p] = np.nan
                             if last_idx is not None:
                                 fill_segment(last_idx, t)
                         else:
@@ -355,8 +393,11 @@ def gapfill_ndvi(
                 if last_idx is not None and np.isfinite(ndvi_gapfilled[last_idx]):
                     median_t = 0.5 * (upper[t] + lower[t])
                     delta_last = ndvi_gapfilled[last_idx] - 0.5 * (upper[last_idx] + lower[last_idx])
-                    forecast_val = median_t + delta_last
-                    ndvi_gapfilled[t] = forecast_val
+                    if use_tau:
+                        decrease_factor = math.exp(-math.log(2) * ((t-last_idx) / tau))
+                    else:
+                        decrease_factor = 1
+                    forecast_val = median_t + delta_last * decrease_factor
                     forecast_only[t] = forecast_val
 
         # optional smoothing
