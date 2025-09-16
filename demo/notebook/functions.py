@@ -62,6 +62,7 @@ def gapfill_ndvi(
         # Only fill if there is a gap larger than 1
         if end - start > 1:
 
+            # for larg gaps this is safer
             if end - start > 30:
 
                 medians =  upper[start + 1: end] - (upper[start + 1: end] - lower[start + 1: end]) / 2
@@ -76,19 +77,18 @@ def gapfill_ndvi(
                 for j, idx in enumerate(range(start + 1, end)):
                     frac = (j + 1) / (end - start)
 
-                    
-                    # plain linear interpolation between observations
+            
+                    # linear interpolation between observations
                     obs_interp = ndvi_gapfilled[start] + (ndvi_gapfilled[end] - ndvi_gapfilled[start]) * frac
                     
                     # logistic model median
                     median_val = upper[idx] - (upper[idx] - lower[idx]) / 2
                     
-                    # bias toward median, max at center
+                    # bias toward median, max at center not working with large gaps
                     diff = median_val - obs_interp
                     weight = frac * (1 - frac)
                     
                     ndvi_gapfilled[idx] = obs_interp + weight_median * weight * diff
-
 
     # --------------------
     #  outlier detection
@@ -120,7 +120,7 @@ def gapfill_ndvi(
     # -----------------------
     # Local rolling threshold (to catch local sharp dips)
     # -----------------------
-    deltas = valid_ndvi - median_valid                # shape (n,)
+    deltas = valid_ndvi - median_valid  
     th_hi_delta = th_hi - median_valid
     th_lo_delta = th_lo - median_valid
 
@@ -135,7 +135,7 @@ def gapfill_ndvi(
     for i in range(n):
         a = max(0, i - half)
         b = min(n, i + half + 1)
-        window_deltas = deltas[a:b]   # <-- use deltas, not raw values
+        window_deltas = deltas[a:b]
         if window_deltas.size >= 3:
             q1, q3 = np.quantile(window_deltas, [0.3, 0.6])
             iqr_local = q3 - q1
@@ -149,14 +149,13 @@ def gapfill_ndvi(
     # apply in delta-space
     is_outlier_local = (deltas > local_th_hi_delta) | (deltas < local_th_lo_delta)
 
-
     # -----------------------
     # Slope-based detection
     # -----------------------
     deltas = valid_ndvi - median_valid                # shape (n,)
     delta_diff = np.diff(deltas)                      # shape (n-1,)
     slope_outlier = np.zeros(n, dtype=bool)
-
+    valid_outlier = np.zeros(len(deltas), dtype = bool)
 
     if delta_diff.size >= 2:
         q_low, q_hi = np.quantile(delta_diff, [0.2, 0.8])
@@ -197,7 +196,7 @@ def gapfill_ndvi(
     # -----------------------
 
     if delta_diff.size >= 2:
-        q_low_dd, q_hi_dd = np.quantile(delta_diff, [0.05, 0.95])
+        q_low_dd, q_hi_dd = np.quantile(delta_diff, [0.1, 0.9])
         extreme_delta = (delta_diff < q_low_dd) | (delta_diff > q_hi_dd)
 
         # expand extreme_delta to point indices
@@ -230,7 +229,6 @@ def gapfill_ndvi(
     if not forecasting:
         
         ndvi_gapfilled = ndvi_series.copy()
-        valid_idx = np.where(np.isfinite(ndvi_gapfilled))[0]
         if len(valid_idx) < 2:
             return ndvi_gapfilled, outlier_mask
 
@@ -265,11 +263,12 @@ def gapfill_ndvi(
                 # interpolate smoothed values back onto full index
                 smoothed[:] = np.interp(index, loess_smooth[:, 0], loess_smooth[:, 1])
 
+        valid_outlier = is_outlier
 
         if not return_quantiles:
-            return ndvi_gapfilled, outlier_mask, smoothed
+            return ndvi_gapfilled, outlier_mask, smoothed, valid_outlier, valid_idx, deltas
         else:
-            return ndvi_gapfilled, outlier_mask, q_hi, q_low, delta_diff, iqr_param, smoothed
+            return ndvi_gapfilled, outlier_mask, q_hi, q_low, delta_diff, iqr_param, smoothed, valid_outlier,valid_idx,deltas
 
 
     # forecasted mode
@@ -422,7 +421,7 @@ def gapfill_ndvi(
 
 
 
-def plot_results(title, ndvi_series, ndvi_gapfilled, outlier_arr, lower, upper, dates, plot_points = False, show_iqr = False,param_iqr = 1.5, save_path=None):
+def plot_results(title, ndvi_series, ndvi_gapfilled, outlier_arr, lower, upper, dates, plot_points = True, show_iqr = False,param_iqr = 1.5, save_path=None):
     """
     Plot NDVI time series for a pixel:
       - raw NDVI with outliers highlighted
@@ -442,17 +441,9 @@ def plot_results(title, ndvi_series, ndvi_gapfilled, outlier_arr, lower, upper, 
     ax.scatter(dates, ndvi_series, s=10, color=colors, label="Raw NDVI", zorder=3)
 
     # gapfilled NDVI
-    if not plot_points:
+    if plot_points:
         ax.plot(dates, ndvi_gapfilled, color="black", label="Gapfilled NDVI")
-    else:
-        ax.scatter(dates, ndvi_gapfilled, color="black", label="Gapfilled NDVI", s=10, marker='.')
 
-    if show_iqr == True:
-        iqr = (upper - lower) /2
-        iqr_upper = upper + iqr * param_iqr
-        iqr_lower = lower - iqr * param_iqr
-        ax.plot(dates, iqr_upper, linestyle='--', color='blue', linewidth=2, label="IQR")
-        ax.plot(dates, iqr_lower, linestyle='--', color='blue', linewidth=2)
 
 
     ax.set_title(title)
@@ -1081,3 +1072,222 @@ def double_logistic_function(t, params):
                     forecast_only[t] = obs
                     outlier_mask[t] = False
                     """
+
+
+import numpy as np
+import pandas as pd
+import math
+from scipy.signal import savgol_filter
+from scipy.ndimage import gaussian_filter1d
+import statsmodels.api as sm
+
+def gapfill_ndvi_dates(
+    ndvi_series: pd.Series,  # must have DatetimeIndex
+    lower_func,
+    upper_func,
+    forecasting=False,
+    param_iqr=1.5,
+    bottom_q=0.3,
+    top_q=0.7,
+    return_quantiles=False,
+    weight_median=0.5,
+    y_delta_l=0,
+    y_delta_h=0,
+    y_iqr=0,
+    r_delta_l=0,
+    r_delta_h=0,
+    r_iqr=0,
+    smoothing_method="savgol",
+    window_smoothing=14,
+    sigma=4,
+    frac=0.2,
+    lag_forecast=14,
+    use_tau=False,
+    tau=9999
+):
+    """
+    NDVI gapfilling with daily resampling + DOY-based envelopes.
+
+    Parameters
+    ----------
+    ndvi_series : pd.Series
+        NDVI time series (scaled 0–10000 integers) with DatetimeIndex.
+    lower_func, upper_func : callable
+        Functions that take DOY array (1–366) and return logistic model lower/upper bounds.
+    forecasting : bool
+        If True, runs sequential forecast gapfilling.
+    """
+
+    # --- resample to daily frequency ---
+    full_index = pd.date_range(ndvi_series.index.min(), ndvi_series.index.max(), freq="D")
+    ndvi_series = ndvi_series.reindex(full_index)
+
+    # --- calculate DOY array ---
+    doy = ndvi_series.index.dayofyear
+
+    # --- build logistic envelopes ---
+    lower = lower_func(doy)
+    upper = upper_func(doy)
+
+    # --- normalize ---
+    ndvi_series = ndvi_series.astype(float) / 10000.0
+    ndvi_series = ndvi_series.where((ndvi_series >= 0) & (ndvi_series <= 1), np.nan)
+
+    n = len(ndvi_series)
+    outlier_mask = np.zeros(n, dtype=bool)
+    smoothed = np.full(n, np.nan)
+    forecast_only = np.full(n, np.nan)
+    original_obs = ndvi_series.copy().values
+    dates = ndvi_series.index
+
+    # --- helper: date-aware interpolation ---
+    def fill_segment(start, end):
+        """Interpolate missing values between two valid points, date-aware."""
+        gap_days = (dates[end] - dates[start]).days
+        if gap_days <= 1:
+            return
+
+        # Large gaps: safer median-guided interpolation
+        if gap_days > 30:
+            medians = upper[start + 1:end] - (upper[start + 1:end] - lower[start + 1:end]) / 2
+            median_end = upper[end] - (upper[end] - lower[end]) / 2
+            median_start = upper[start] - (upper[start] - lower[start]) / 2
+            deltas = (ndvi_gapfilled[end] - median_end) - (ndvi_gapfilled[start] - median_start)
+            ndvi_gapfilled[start + 1:end] = medians + deltas
+        else:
+            for idx in range(start + 1, end):
+                days_since_start = (dates[idx] - dates[start]).days
+                frac_t = days_since_start / gap_days  # time fraction
+
+                # linear interpolation between observations
+                obs_interp = (
+                    ndvi_gapfilled[start]
+                    + (ndvi_gapfilled[end] - ndvi_gapfilled[start]) * frac_t
+                )
+
+                # logistic model median
+                median_val = upper[idx] - (upper[idx] - lower[idx]) / 2
+
+                # bias toward median, max at center
+                diff = median_val - obs_interp
+                weight = frac_t * (1 - frac_t)
+
+                ndvi_gapfilled[idx] = obs_interp + weight_median * weight * diff
+
+    # --------------------------
+    # Outlier detection (same as before)
+    # --------------------------
+    valid_idx = np.where(np.isfinite(original_obs))[0]
+    if len(valid_idx) < 2:
+        if forecasting:
+            return ndvi_series.copy(), outlier_mask, pd.Series(np.full(n, np.nan), index=dates)
+        else:
+            return ndvi_series.copy(), outlier_mask
+
+    valid_ndvi = original_obs[valid_idx]
+    valid_upper = upper[valid_idx]
+    valid_lower = lower[valid_idx]
+    valid_iqr = valid_upper - valid_lower
+    median_valid = (valid_upper + valid_lower) / 2.0  
+
+    # global threshold band
+    iqr_param = np.where(valid_ndvi / median_valid < 1, median_valid / valid_ndvi, valid_ndvi / median_valid)
+    th_hi = valid_upper + np.quantile(iqr_param,0.7) * valid_iqr
+    th_lo = valid_lower - np.quantile(iqr_param,0.7) * valid_iqr
+    is_outlier_global = (valid_ndvi > th_hi) | (valid_ndvi < th_lo)
+
+    # local rolling threshold (on deltas)
+    deltas = valid_ndvi - median_valid
+    n_valid = valid_ndvi.size
+    half = 21 // 2
+    local_th_hi_delta = np.empty(n_valid)
+    local_th_lo_delta = np.empty(n_valid)
+    for i in range(n_valid):
+        a, b = max(0, i-half), min(n_valid, i+half+1)
+        window_deltas = deltas[a:b]
+        if window_deltas.size >= 3:
+            q1, q3 = np.quantile(window_deltas, [0.3, 0.6])
+            iqr_local = q3 - q1
+            local_th_hi_delta[i] = q3 + param_iqr * iqr_local
+            local_th_lo_delta[i] = q1 - param_iqr * iqr_local
+        else:
+            local_th_hi_delta[i] = th_hi[i]
+            local_th_lo_delta[i] = th_lo[i]
+    is_outlier_local = (deltas > local_th_hi_delta) | (deltas < local_th_lo_delta)
+
+    # slope detection
+    delta_diff = np.diff(deltas)
+    slope_outlier = np.zeros(n_valid, dtype=bool)
+    if delta_diff.size >= 2:
+        q_low, q_hi = np.quantile(delta_diff, [0.2, 0.8])
+        same_dir = (((delta_diff[1:] > q_hi) | (delta_diff[1:] < q_low))
+                    & ((delta_diff[:-1] > q_hi) | (delta_diff[:-1] < q_low)))
+        vshape = (((delta_diff[1:] > q_hi) & (delta_diff[:-1] < q_low))
+                  | ((delta_diff[1:] < q_low) & (delta_diff[:-1] > q_hi)))
+        q_low_ext, q_hi_ext = np.quantile(delta_diff, [0.1, 0.9])
+        single_step = (delta_diff > q_hi_ext) | (delta_diff < q_low_ext)
+        slope_outlier[1:-1] = same_dir | vshape | single_step[:-1]
+        slope_outlier[0] = single_step[0]
+        slope_outlier[-1] = single_step[-1]
+
+    # combine masks
+    is_outlier = slope_outlier & (is_outlier_global | is_outlier_local)
+    outlier_mask[valid_idx] = is_outlier
+    ndvi_clean = original_obs.copy()
+    ndvi_clean[valid_idx[is_outlier]] = np.nan
+
+    # --------------------------
+    # Gapfilling & forecasting
+    # --------------------------
+    if not forecasting:
+        ndvi_gapfilled = ndvi_clean.copy()
+        valid_idx = np.where(np.isfinite(ndvi_gapfilled))[0]
+        if len(valid_idx) < 2:
+            return pd.Series(ndvi_gapfilled, index=dates), outlier_mask
+
+        for i in range(len(valid_idx) - 1):
+            fill_segment(valid_idx[i], valid_idx[i + 1])
+
+        # optional smoothing
+        if smoothing_method == "savgol":
+            wl = window_smoothing if window_smoothing % 2 == 1 else window_smoothing + 1
+            wl = min(wl, len(ndvi_gapfilled) if len(ndvi_gapfilled) % 2 == 1 else len(ndvi_gapfilled)-1)
+            if wl >= 3:
+                smoothed[:] = savgol_filter(ndvi_gapfilled, window_length=wl, polyorder=2)
+        elif smoothing_method == "low_pass":
+            smoothed[:] = gaussian_filter1d(ndvi_gapfilled, sigma=sigma)
+        elif smoothing_method == "loess":
+            idx = np.arange(len(ndvi_gapfilled))
+            valid = np.isfinite(ndvi_gapfilled)
+            loess_smooth = sm.nonparametric.lowess(ndvi_gapfilled[valid], idx[valid], frac=frac, return_sorted=True)
+            smoothed[:] = np.interp(idx, loess_smooth[:,0], loess_smooth[:,1])
+
+        return pd.Series(ndvi_gapfilled, index=dates), outlier_mask, pd.Series(smoothed, index=dates)
+
+    else:
+        # sequential mode with date-aware forecast
+        ndvi_gapfilled = ndvi_clean.copy()
+        last_idx = None
+        for t in range(n):
+            obs = original_obs[t]
+            if np.isfinite(obs):
+                ndvi_gapfilled[t] = obs
+                if last_idx is not None:
+                    fill_segment(last_idx, t)
+                last_idx = t
+            else:
+                if last_idx is not None and np.isfinite(ndvi_gapfilled[last_idx]):
+                    days_gap = (dates[t] - dates[last_idx]).days
+                    median_t = 0.5 * (upper[t] + lower[t])
+                    delta_last = ndvi_gapfilled[last_idx] - 0.5*(upper[last_idx] + lower[last_idx])
+                    if use_tau:
+                        decay = math.exp(-math.log(2) * (days_gap / tau))
+                    else:
+                        decay = 1
+                    forecast_only[t] = median_t + delta_last * decay
+        return (
+            pd.Series(ndvi_gapfilled, index=dates),
+            outlier_mask,
+            pd.Series(forecast_only, index=dates),
+            pd.Series(smoothed, index=dates),
+        )
