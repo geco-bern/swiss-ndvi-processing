@@ -1,0 +1,34 @@
+nohup: ignoring input
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:44: UserWarning: The codec `vlen-utf8` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
+/home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/gif_fire_area.py:76: DeprecationWarning: The 'unary_union' attribute is deprecated, use the 'union_all()' method instead.
+  polygon = gdf.geometry.unary_union
+Window cols 16944..17065 (122), rows 17578..17731 (154)
+Mask has 105715396 True pixels.
+Pixels in window: 18788, masked pixels in polygon: 7543
+Gapfilling pixel 0/7543
+/home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/functions.py:114: RuntimeWarning: divide by zero encountered in divide
+  iqr_param = np.where(valid_ndvi / median_valid < 1, median_valid / valid_ndvi, valid_ndvi / median_valid)
+/home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/functions.py:209: RuntimeWarning: divide by zero encountered in divide
+  ratio = np.maximum(valid_ndvi, median_valid) / np.minimum(valid_ndvi, median_valid)
+Gapfilling pixel 1000/7543
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+Gapfilling pixel 2000/7543
+Gapfilling pixel 3000/7543
+Gapfilling pixel 4000/7543
+Gapfilling pixel 5000/7543
+Gapfilling pixel 6000/7543
+Gapfilling pixel 7000/7543
+Step: 0
+Step: 100
+Step: 200
+Step: 300
+Step: 400
+Step: 500
+Step: 600
+Step: 700
+Step: 800
+Step: 900
+Step: 1000
+done
