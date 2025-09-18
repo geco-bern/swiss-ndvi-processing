@@ -1,5 +1,5 @@
-#   nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/highland_broadleaf.py >  /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/highland_broadleaf.log 
-# 2>/dev/null &
+#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/highland_broadleaf.py >  /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/highland_broadleaf.log
+#  2>err.log2>/dev/null &
 
 from IPython.display import IFrame, Image, display
 import numpy as np
@@ -74,12 +74,13 @@ left, bottom = 2474090.0, 1065110.0
 px = 10.0
 top = bottom + height * px
 
-# ----- load polygon from KML -----
-center_x, center_y =  2691107.30, 1121200.01
+# ----- center cooridnates  -----
+center_x, center_y =  2692020.28, 1121443.47
 
-# Rectangle corners (UL and BR), make a 1X1 km area
-UL_x, UL_y = center_x - 500, center_y - 500
+# Rectangle corners (UL and BR)
+UL_x, UL_y = center_x - 500, center_y - 500 
 BR_x, BR_y = center_x + 500, center_y + 500
+
 
 # ----- compute pixel window (row 0 = top) -----
 x_min, x_max = min(UL_x, BR_x), max(UL_x, BR_x)
@@ -92,27 +93,6 @@ row_min = int(math.floor((top - y_max) / px))
 row_max = int(math.floor((top - y_min) / px))
 
 # clip to bounds
-col_min = max(0, min(width - 1, col_min))
-col_max = max(0, min(width - 1, col_max))
-row_min = max(0, min(height - 1, row_min))
-row_max = max(0, min(height - 1, row_max))
-
-win_cols = col_max - col_min + 1
-win_rows = row_max - row_min + 1
-print(f"Window cols {col_min}..{col_max} ({win_cols}), rows {row_min}..{row_max} ({win_rows})")
-
-# ----- raster info -----
-height, width = 24542, 37728
-left, bottom = 2474090.0, 1065110.0
-px = 10.0
-top = bottom + height * px
-
-col_min = int(math.floor((x_min - left) / px))
-col_max = int(math.floor((x_max - left) / px))
-row_min = int(math.floor((top - y_max) / px))
-row_max = int(math.floor((top - y_min) / px))
-
-# clip to raster extent
 col_min = max(0, min(width - 1, col_min))
 col_max = max(0, min(width - 1, col_max))
 row_min = max(0, min(height - 1, row_min))
@@ -150,6 +130,48 @@ if n_masked_in_window == 0:
     raise RuntimeError("No masked pixels in window!")
 
 sel = masked_idx_in_window[is_masked].tolist()
+# ----- open Zarr -----
+N, T = z.shape
+assert N == n_masked, f"Zarr first-dim {N} != mask True count {n_masked}"
+
+# ----- plotting extent -----
+extent = (
+    left + col_min * px,
+    left + (col_max + 1) * px,
+    top - (row_max + 1) * px,
+    top - row_min * px,
+)
+
+
+mask_flat = mask.ravel(order="C")
+masked_positions = np.flatnonzero(mask_flat)
+n_masked = masked_positions.size
+print(f"Mask has {n_masked} True pixels.")
+
+# build index map from full array -> masked array
+idx_map = np.full(mask_flat.shape[0], -1, dtype=np.int64)
+idx_map[masked_positions] = np.arange(n_masked, dtype=np.int64)
+
+# ----- compute flat indices in window -----
+rows = np.arange(row_min, row_max + 1, dtype=np.int64)
+cols = np.arange(col_min, col_max + 1, dtype=np.int64)
+rr, cc = np.meshgrid(rows, cols, indexing="ij")
+full_flat_idx = (rr * width + cc).ravel()
+
+masked_idx_in_window = idx_map[full_flat_idx]
+is_masked = masked_idx_in_window >= 0
+n_masked_in_window = is_masked.sum()
+print(f"Pixels in window: {full_flat_idx.size}, masked pixels: {n_masked_in_window}")
+
+if n_masked_in_window == 0:
+    raise RuntimeError("No masked pixels in window!")
+
+sel = masked_idx_in_window[is_masked].tolist()
+
+print("Window extent:", extent)
+print("win_rows, win_cols:", win_rows, win_cols)
+print("Masked pixels in window:", n_masked_in_window)
+
 
 # ----- open Zarr -----
 N, T = z.shape

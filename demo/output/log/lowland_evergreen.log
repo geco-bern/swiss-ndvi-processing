@@ -1,24 +1,82 @@
 /home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:44: UserWarning: The codec `vlen-utf8` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
   return cls(**configuration_parsed)
 Window cols 28650..28750 (101), rows 11541..11641 (101)
-Window cols 28650..28750 (101), rows 11541..11641 (101)
 Mask has 105715396 True pixels.
 Pixels in window: 10201, masked pixels: 7082
 Gapfilling pixel 0/7082
 Gapfilling pixel 500/7082
-Traceback (most recent call last):
-  File "/home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/lowland_evergreen.py", line 197, in <module>
-    ndvi_gapfilled, outlier_arr, q_hi, q_low, delta_diff, iqr_param, smoothed,valid_outlier,valid_idx,deltas = gapfill_ndvi(ndvi_sorted, lower, upper,forecasting=False,
-                                                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/functions.py", line 260, in gapfill_ndvi
-    loess_smooth = sm.nonparametric.lowess(
-                   ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/statsmodels/nonparametric/smoothers_lowess.py", line 226, in lowess
-    res, _ = _lowess(y, x, x, np.ones_like(x),
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "statsmodels/nonparametric/_smoothers_lowess.pyx", line 201, in statsmodels.nonparametric._smoothers_lowess.lowess
-  File "statsmodels/nonparametric/_smoothers_lowess.pyx", line 346, in statsmodels.nonparametric._smoothers_lowess.calculate_weights
-  File "/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/_core/fromnumeric.py", line 2333, in _sum_dispatcher
-    def _sum_dispatcher(a, axis=None, dtype=None, out=None, keepdims=None,
-    
-KeyboardInterrupt
+Gapfilling pixel 1000/7082
+Gapfilling pixel 1500/7082
+Gapfilling pixel 2000/7082
+Gapfilling pixel 2500/7082
+Gapfilling pixel 3000/7082
+Gapfilling pixel 3500/7082
+Gapfilling pixel 4000/7082
+Gapfilling pixel 4500/7082
+Gapfilling pixel 5000/7082
+Gapfilling pixel 5500/7082
+Gapfilling pixel 6000/7082
+Gapfilling pixel 6500/7082
+Gapfilling pixel 7000/7082
+finished gapfilling
+Step: 0 / 2981
+Step: 50 / 2981
+Step: 100 / 2981
+Step: 150 / 2981
+Step: 200 / 2981
+Step: 250 / 2981
+Step: 300 / 2981
+Step: 350 / 2981
+Step: 400 / 2981
+Step: 450 / 2981
+Step: 500 / 2981
+Step: 550 / 2981
+Step: 600 / 2981
+Step: 650 / 2981
+Step: 700 / 2981
+Step: 750 / 2981
+Step: 800 / 2981
+Step: 850 / 2981
+Step: 900 / 2981
+Step: 950 / 2981
+Step: 1000 / 2981
+Step: 1050 / 2981
+Step: 1100 / 2981
+Step: 1150 / 2981
+Step: 1200 / 2981
+Step: 1250 / 2981
+Step: 1300 / 2981
+Step: 1350 / 2981
+Step: 1400 / 2981
+Step: 1450 / 2981
+Step: 1500 / 2981
+Step: 1550 / 2981
+Step: 1600 / 2981
+Step: 1650 / 2981
+Step: 1700 / 2981
+Step: 1750 / 2981
+Step: 1800 / 2981
+Step: 1850 / 2981
+Step: 1900 / 2981
+Step: 1950 / 2981
+Step: 2000 / 2981
+Step: 2050 / 2981
+Step: 2100 / 2981
+Step: 2150 / 2981
+Step: 2200 / 2981
+Step: 2250 / 2981
+Step: 2300 / 2981
+Step: 2350 / 2981
+Step: 2400 / 2981
+Step: 2450 / 2981
+Step: 2500 / 2981
+Step: 2550 / 2981
+Step: 2600 / 2981
+Step: 2650 / 2981
+Step: 2700 / 2981
+Step: 2750 / 2981
+Step: 2800 / 2981
+Step: 2850 / 2981
+Step: 2900 / 2981
+Step: 2950 / 2981
+done
