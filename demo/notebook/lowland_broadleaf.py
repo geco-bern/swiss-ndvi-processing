@@ -355,7 +355,6 @@ for t in range(d_frames):
 
     # write the frame to the video
     writer1.append_data(frame)
-    print("Frame shape:", frame.shape, frame.dtype, "NaNs?", np.isnan(frame).any())
 
     # close the figure and free memory
     plt.close(fig)
