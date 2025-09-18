@@ -1,0 +1,6 @@
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:44: UserWarning: The codec `vlen-utf8` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
+Window cols 20779..20879 (101), rows 7405..7505 (101)
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 7687
+Gapfilling pixel 0/7687

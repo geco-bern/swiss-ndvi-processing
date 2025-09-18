@@ -1,0 +1,11 @@
+Window cols 21990..22090 (101), rows 18400..18500 (101)
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 6297
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 6297
+Window extent: (2693990.0, 2695000.0, 1125520.0, 1126530.0)
+win_rows, win_cols: 101 101
+Masked pixels in window: 6297
+Gapfilling pixel 0/6297
+Gapfilling pixel 500/6297
+Gapfilling pixel 1000/6297

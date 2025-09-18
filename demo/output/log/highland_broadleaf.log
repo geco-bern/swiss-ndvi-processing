@@ -1,0 +1,13 @@
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:44: UserWarning: The codec `vlen-utf8` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
+Window cols 21651..21751 (101), rows 18882..18982 (101)
+Window cols 21651..21751 (101), rows 18882..18982 (101)
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 8623
+Gapfilling pixel 0/8623
+Gapfilling pixel 500/8623
+Traceback (most recent call last):
+  File "/home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/highland_broadleaf.py", line 197, in <module>
+    ndvi_gapfilled, outlier_arr, q_hi, q_low, delta_diff, iqr_param, smoothed,valid_outlier,valid_idx,deltas = gapfill_ndvi(ndvi_sorted, lower, upper,forecasting=False,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: not enough values to unpack (expected 10, got 2)
