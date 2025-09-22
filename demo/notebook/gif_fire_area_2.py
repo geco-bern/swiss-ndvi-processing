@@ -26,24 +26,38 @@ import warnings
 
 warnings.filterwarnings("ignore", category=RuntimeWarning, message="divide by zero encountered in divide")
 
+np.set_printoptions(threshold=np.inf)  # disable summarization
+
+
 # data loading and raster initialization
 # ----- Config -----
 
+# ----- Config -----
+zarr_path = "/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr"
+mask_path = "/data_2/scratch/sbiegel/processed/forest_mask.npy"
+
+z = zarr.open(zarr_path, mode="r")
 # fitting and smoothing
 # ----- seasonal cycle fitting -----
 ds = xr.open_zarr("/home/francesco/data_scratch/swiss-ndvi-processing/sample_seasonal_cycle_parameter_preds.zarr")
-ndvi = ds["ndvi"]
-dates = ds["dates"]
+dates = z["dates"]
 params_lower = torch.tensor(ds["params_lower"].values)
 params_upper = torch.tensor(ds["params_upper"].values)
 
 # convert dates to doy
-dates_pd = pd.to_datetime(dates)
-df = pd.DataFrame({"date": dates_pd})
-df_sorted = df.sort_values(by="date")
-dates_sorted = df_sorted["date"].values
-dates_pd_sorted = pd.to_datetime(dates_sorted)
-doy = dates_pd_sorted.dayofyear.values
+
+dates = np.array(z["dates"])
+
+# decode bytes → str
+decoded = dates.astype("U") 
+
+dates_pd = pd.to_datetime(decoded[1:-1])
+
+
+# convert to datetime64
+date_array = pd.to_datetime(decoded).to_numpy()
+dates_sorted = pd.DatetimeIndex(date_array).sort_values()
+doy = dates_sorted.dayofyear.values
 doy = torch.tensor(doy, dtype=torch.float32)
 T_SCALE = 1.0 / 365.0
 t = doy.unsqueeze(0).repeat(params_lower.shape[0], 1) * T_SCALE
@@ -62,11 +76,6 @@ polyorder = 2
 
 # area extracion
 
-# ----- Config -----
-zarr_path = "/data_2/scratch/sbiegel/processed/ndvi_dataset.zarr/ndvi"
-mask_path = "/data_2/scratch/sbiegel/processed/forest_mask.npy"
-
-z = zarr.open(zarr_path, mode="r")
 
 # Raster info
 height, width = 24542, 37728
@@ -158,7 +167,7 @@ sel = masked_idx_in_window[is_masked].tolist()
 
 
 # ----- open Zarr -----
-N, T = z.shape
+N, T = z["ndvi"].shape
 assert N == n_masked, f"Zarr first-dim {N} != mask True count {n_masked}"
 
 # ----- plotting extent -----
@@ -184,25 +193,27 @@ ndvi_chunk = np.empty((len(masked_idx_in_window[is_masked]), T), dtype=np.float3
 ndvi_chuck_smoothed = np.empty((len(masked_idx_in_window[is_masked]), T), dtype=np.float32)
 
 # ----- GAPFILLING LOOP -----
-for i, pixel_sel in enumerate(sel):
+sel2 = sel[:3]
+for i, pixel_sel in enumerate(sel2):
 
     if i % 500 == 0:
         print(f"Gapfilling pixel {i}/{len(sel)}")
 
-    ndvi_series = z[pixel_sel, :]   # raw time series
+    ndvi_series = z["ndvi"][pixel_sel] # raw time series
 
     # proper sorting
     df = pd.DataFrame({
         'date': dates_pd,
         'ndvi': ndvi_series
         })
-
-    df_sorted = df.sort_values(by='date')
-
-    ndvi_sorted = df_sorted['ndvi'].values
-
     
-    ndvi_gapfilled, outlier_arr, q_hi, q_low, delta_diff, iqr_param, smoothed,valid_outlier,valid_idx,deltas = gapfill_ndvi(ndvi_sorted, lower, upper,forecasting=False,
+    df_sorted = df.sort_values(by="date").reset_index(drop=True)
+
+    ndvi_sorted = df_sorted["ndvi"].to_numpy()
+
+    print(ndvi_sorted)
+    
+    """ ndvi_gapfilled, outlier_arr, q_hi, q_low, delta_diff, iqr_param, smoothed,valid_outlier,valid_idx,deltas = gapfill_ndvi(ndvi_sorted, lower, upper,forecasting=False,
                                             param_iqr=1.02,bottom_q=0.4,
                                             top_q=0.6,return_quantiles = True, weight_median = 0.5,smoothing_method = "loess", frac = 0.15)
     
@@ -288,7 +299,7 @@ for i, pixel_sel in enumerate(sel):
     
     ndvi_chuck_smoothed[i, :] = final_value
     ndvi_chunk[i,:] = df_daily["obs"]
-
+"""
 print("finished gapfilling")
 
 # !!! is mp4 not gif becuase gif is limtied t0 1000 frames
