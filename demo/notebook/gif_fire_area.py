@@ -1,4 +1,4 @@
-#  nohup python -u  /home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/gif_fire_area_2.py>  /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/fire_extraction.log 
+#  nohup python -u  /home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/gif_fire_area.py>  /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/fire_extraction.log 
 # 2>/dev/null &
 
 from IPython.display import IFrame, Image, display
@@ -171,7 +171,7 @@ extent = (
 
 
 full_index = pd.date_range(min(dates_sorted), max(dates_sorted), freq="D")
-
+full_index = full_index[full_index >= pd.Timestamp("2018-03-01")]
 
 T = len(full_index)
 
@@ -202,90 +202,85 @@ for i, pixel_sel in enumerate(sel):
     ndvi_sorted = df_sorted['ndvi'].values
 
     
-    ndvi_gapfilled, outlier_arr, q_hi, q_low, delta_diff, iqr_param, smoothed,valid_outlier,valid_idx,deltas = gapfill_ndvi(ndvi_sorted, lower, upper,forecasting=False,
+    ndvi_gapfilled, outlier_arr, q_hi, q_low, delta_diff, iqr_param, smoothed,valid_outlier, valid_idx, deltas = gapfill_ndvi(ndvi_sorted, lower, upper,forecasting=False,
                                             param_iqr=1.02,bottom_q=0.4,
-                                            top_q=0.6,return_quantiles = True, weight_median = 0.5,smoothing_method = "loess", frac = 0.15)
-    
-    y_delta_l , y_delta_h,r_delta_h, r_delta_l  = np.quantile(delta_diff, [0.15,0.7,0.8,0.05])
+                                            top_q=0.6,return_quantiles = True, weight_median = 0.5,smoothing_method = "savgol")
+
+
+    y_delta_l , y_delta_h,r_delta_h, r_delta_l  = np.quantile(delta_diff, [0.2,0.8,0.9,0.05])
     y_iqr, r_iqr = np.quantile(iqr_param, [0.4, 0.8])
 
 
-    ndvi_gapfilled, outlier_mask, forecast_only, smoothed, deltas = ndvi_continous(
-        ndvi_sorted,
-        lower,
-        upper,
-        y_delta_l = y_delta_l,
-        y_delta_h = y_delta_h,
-        y_iqr = y_iqr,
-        r_delta_l = r_delta_l,
-        r_delta_h = r_delta_h,
-        r_iqr = r_iqr,
-        frac = 0.05,
-        tau = 14
-    )
-    
-    # --- Select valid observations (filter out outliers) ---
-    ndvi_series_2 = ndvi_sorted.astype(float) / 10000.0
-    ndvi_series_2 = np.where((ndvi_series_2 > 1) | (ndvi_series_2 < 0), np.nan, ndvi_series_2)
+    # placeholders
+    deltas = np.full(len(ndvi), np.nan)
+    smoothed = np.full(len(ndvi), np.nan)
 
-    valid_idx = np.where(np.isfinite(ndvi_series_2))[0]
-    outlier_arr_2 = outlier_mask[valid_idx]
-    outlier_arr_2 = np.where(outlier_arr_2, "red", "green")
+    # clean and normalize NDVI
+    ndvi = ndvi_series.astype(float) / 10000.0
+    ndvi = np.where((ndvi > 1) | (ndvi < 0), np.nan, ndvi)
 
-    ndvi_series_2 = ndvi_series_2[valid_idx]
-    ndvi_series_2 = ndvi_series_2[outlier_arr_2 == "green"]
-
-    dates_sorted_2 = dates_sorted[valid_idx]
-    dates_sorted_2 = dates_sorted_2[outlier_arr_2 == "green"]
-
-    deltas_2 = deltas[valid_idx]
-    deltas_2 = deltas_2[outlier_arr_2 == "green"]
-
-    # --- Build DataFrame for deltas + obs ---
-    df_smooth = pd.DataFrame({
-        "date": dates_sorted_2,
-        "deltas": deltas_2,
-        "obs": ndvi_series_2,
+    # make sure all arrays are 1-D
+    df_starting = pd.DataFrame({
+        "date": pd.to_datetime(dates_pd),
+        "ndvi": ndvi.ravel()
     })
-    df_smooth["date"] = pd.to_datetime(df_smooth["date"])
-    df_smooth = df_smooth.set_index("date").sort_index()
 
-    # --- fix duplicate dates ---
-    if not df_smooth.index.is_unique:
-        df_smooth = df_smooth.groupby(df_smooth.index).mean()
+    # --- 2. Handle duplicate dates ---
+    df_starting = (
+        df_starting.groupby("date", as_index=False)
+        .mean(numeric_only=True)   # average if duplicates exist
+        .set_index("date")
+    )
 
-    # --- Smooth only existing observations ---
-    values = df_smooth["deltas"].values
-    n = len(values)
+    # --- 3. Reindex to full daily series ---
+    full_index = pd.date_range(df_starting.index.min(), df_starting.index.max(), freq="D")
+    df = df_starting.reindex(full_index)
 
-    # LOESS smoothing
-    idx = np.arange(n)
-    loess = sm.nonparametric.lowess(values, idx, frac=0.05, return_sorted=True)
-    df_smooth["smooth_loess"] = np.interp(idx, loess[:, 0], loess[:, 1])
+    # add forecast column for later use
+    df["forecast"] = np.nan
+    df["upper"] = np.nan
+    df["lower"] = np.nan
+    df["gapfilled"] = np.nan
+    df["outlier"] = True
+    df["delta_smoothed"] = np.nan
+    df["deltas"] = np.nan
+    df["idx"] = np.arange(len(df))
+    df["deltas_L1"] = np.nan
 
-    # --- Reindex to full daily series ---
-    #full_index = pd.date_range(df_smooth.index.min(), df_smooth.index.max(), freq="D")
-    df_daily = df_smooth.reindex(full_index)
+    df.index.name = "date"
 
-    df_daily["smooth_loess"] = df_daily["smooth_loess"].interpolate(method="time")
+    # remove data veofre marh 2018
+    df = df.loc[df.index >= pd.Timestamp("2018-03-01")]
 
-    # --- Calculate envelopes ---
-    doy = df_daily.index.dayofyear.values
-    doy = torch.tensor(doy, dtype=torch.float32)
-    T_SCALE = 1.0 / 365.0
-    t = doy.unsqueeze(0).repeat(params_lower.shape[0], 1) * T_SCALE
+    last_date = None
+    last_potential_dates = []
+    deltas_arr = []
+    dates_delta_arr = []
 
-    lower_fit = double_logistic_function(t[[0]], params_lower[[91]]).squeeze().cpu().numpy()
-    upper_fit = double_logistic_function(t[[0]], params_upper[[91]]).squeeze().cpu().numpy()
-    median_iqr = 0.5 * (lower_fit + upper_fit)
+    for date in df.index[df.index >= pd.Timestamp("2018-03-01")]:
+        last_date, last_potential_date_arr, deltas_arr, dates_delta_arr = ndvi_continous_final(
+            df=df,
+            date=date,
+            params_lower =  params_lower[[91]],
+            params_upper =  params_upper[[91]],
+            last_date=last_date,
+            deltas_arr = deltas_arr,
+            dates_delta_arr = dates_delta_arr,
+            last_potential_dates = last_potential_dates,
+            y_delta_l = y_delta_l, 
+            y_delta_h = y_delta_h,
+            r_delta_h = r_delta_h, 
+            r_delta_l = r_delta_l,
+            y_iqr= y_iqr, 
+            r_iqr = r_iqr,
+            tau = 45,
+            smoothing_values = 7,
+            frac= 1
+        )
 
-    df_daily["median"] = median_iqr
+    ndvi_chuck_smoothed[i, :] = df["delta_smoothed"] + 0.5 *(df["upper"] + df["lower"])
+    ndvi_chunk[i,:] = df["ndvi"]
 
-    # --- Final NDVI reconstruction ---
-    final_value = df_daily["median"] + df_daily["smooth_loess"]
-    
-    ndvi_chuck_smoothed[i, :] = final_value
-    ndvi_chunk[i,:] = df_daily["obs"]
 
 print("finished gapfilling")
 
