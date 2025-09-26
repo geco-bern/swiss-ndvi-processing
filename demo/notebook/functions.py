@@ -7,6 +7,7 @@ from scipy.signal import savgol_filter
 from scipy.ndimage import gaussian_filter1d
 import statsmodels.api as sm
 import pandas as pd
+import datetime
 
 def gapfill_ndvi(
     ndvi_series,
@@ -498,6 +499,7 @@ def ndvi_continous(
     n = len(ndvi_series)
     outlier_mask = np.zeros(n, dtype=bool)
     forecast_only = np.full(n, np.nan)
+    deltas = np.full(n, np.nan)
     smoothed = np.full(n, np.nan)
     original_obs = ndvi_series.copy()
     ndvi_gapfilled = ndvi_series.copy()
@@ -514,9 +516,11 @@ def ndvi_continous(
 
             inside_band = (obs >= lower[t]) and (obs <= upper[t])
 
-            if not inside_band:
+            median_t = 0.5 * (upper[t] + lower[t])
 
-                median_t = 0.5 * (upper[t] + lower[t])
+            deltas[t] = obs - median_t
+
+            if not inside_band:
 
                 ratio = np.maximum(obs, median_t) / np.minimum(obs, median_t)
 
@@ -560,12 +564,11 @@ def ndvi_continous(
                     outlier_mask[t] = False
                     ndvi_gapfilled[t] = obs
         
-
             else:
                 # confirmed observation
                 ndvi_gapfilled[t] = obs
                 outlier_mask[t] = False
-
+                
                 # resolve pending potential
                 # --- retroactive resolution of potential outlier ---
                 if last_potential_idx is not None and last_potential_idx > (last_idx or -1):
@@ -591,6 +594,7 @@ def ndvi_continous(
                         
                         # accept retroactively
                         outlier_mask[p] = False
+                        deltas[p] = delta_p
                         #fill_segment(last_idx, p)
                         #fill_segment(p, t)
                         last_idx = t
@@ -611,4 +615,674 @@ def ndvi_continous(
                 forecast_val = median_t + delta_last * decrease_factor
                 forecast_only[t] = forecast_val
 
-    return ndvi_gapfilled, outlier_mask, forecast_only, smoothed
+    return ndvi_gapfilled, outlier_mask, forecast_only, smoothed, deltas 
+
+
+import datetime
+
+
+
+    # Double logistic function
+def double_logistic_function_numpy(date, params):
+    # Convert date to DOY
+    if isinstance(date, (datetime.date, datetime.datetime, np.datetime64, pd.Timestamp)):
+        doy = pd.Timestamp(date).dayofyear
+    else:
+        raise ValueError("date must be a datetime or Timestamp")
+
+    # Scale as in original torch code
+    T_SCALE = 1.0 / 365.0
+    t = torch.tensor([[doy]], dtype=torch.float32) * T_SCALE
+
+    sos, mat_minus_sos, sen, eos_minus_sen, M, m = torch.split(params, 1, dim=1)
+    mat_minus_sos = torch.nn.functional.softplus(mat_minus_sos)
+    eos_minus_sen = torch.nn.functional.softplus(eos_minus_sen)
+
+    sigmoid_sos_mat = torch.sigmoid(
+        -2 * (2 * sos + mat_minus_sos - 2 * t) / (mat_minus_sos + 1e-10)
+    )
+    sigmoid_sen_eos = torch.sigmoid(
+        -2 * (2 * sen + eos_minus_sen - 2 * t) / (eos_minus_sen + 1e-10)
+    )
+
+    return (M - m) * (sigmoid_sos_mat - sigmoid_sen_eos) + m
+
+
+
+def ndvi_continous_final(
+    df,
+    date,
+    last_date,
+    last_potential_dates,
+    deltas_arr,
+    dates_delta_arr,
+    params_upper,
+    params_lower,
+    y_delta_l=0.02,
+    y_delta_h=0.02,
+    y_iqr=0.1,
+    r_delta_l=-0.1,
+    r_delta_h=0.1,
+    r_iqr=0.3,
+    tau=14,
+    smoothing_values = 7,
+    use_real_idx = False,
+    frac = 1
+):
+
+    if smoothing_values % 2 == 1:
+        middle = int((smoothing_values + 1) / 2 -1)
+    else:
+        middle = int(smoothing_values / 2 -1)
+
+    obs = df.at[date, "ndvi"]
+
+    # thresholds
+    upper = double_logistic_function_numpy(date, params_upper).item()
+    lower = double_logistic_function_numpy(date, params_lower).item()
+    median_t = 0.5 * (upper + lower)
+
+    df.at[date, "upper"] = upper
+    df.at[date, "lower"] = lower
+
+    if np.isfinite(obs) and obs > 0:
+
+        inside_band = (obs >= lower) and (obs <= upper)
+
+        outlier = False
+
+        if not inside_band:
+            ratio = np.maximum(obs, median_t) / np.minimum(obs, median_t)
+            potential_now = ratio > y_iqr
+
+            delta_delta = 0
+
+            if last_date is not None and np.isfinite(df.at[last_date, "ndvi"]):
+
+                last_upper =  double_logistic_function_numpy(last_date, params_upper).item()
+                last_lower =  double_logistic_function_numpy(last_date, params_lower).item()
+                median_last = 0.5 * (last_upper + last_lower)
+                delta_prev = df.at[last_date, "ndvi"] - median_last
+                delta_curr = obs - median_t
+                delta_delta = delta_curr - delta_prev
+
+            # rules
+            extreme_outlier = (
+                (delta_delta > r_delta_h) or (delta_delta < r_delta_l) or (ratio > r_iqr)
+            )
+            potential_outlier = (
+                ((delta_delta > y_delta_h) or (delta_delta < y_delta_l)) and potential_now
+            )
+
+            if extreme_outlier:
+                df.at[date, "outlier"] = True
+                df.at[date, "deltas"] = np.nan
+                outlier = True
+
+            elif potential_outlier:
+                last_potential_dates.append(date)
+                outlier = True
+            
+        if not outlier:
+
+            # confirmed obs
+            delta_curr = obs - median_t
+            df.at[date, "outlier"] = False
+            df.at[date, "deltas"] = delta_curr
+
+            deltas_arr.append(delta_curr)
+            dates_delta_arr.append(date)
+
+            if len(deltas_arr) > smoothing_values:
+                deltas_arr = deltas_arr[-smoothing_values:]
+                dates_delta_arr = dates_delta_arr[-smoothing_values:]
+
+            # perform deltas L1
+            if last_date is not None:
+
+                last_upper =  double_logistic_function_numpy(last_date, params_upper).item()
+                last_lower =  double_logistic_function_numpy(last_date, params_lower).item()
+                median_last = 0.5 * (last_upper + last_lower)
+                delta_prev = df.at[last_date, "ndvi"] - median_last
+                
+                days_diff = (date - last_date).days
+                L1_deltas = np.linspace(delta_prev, delta_curr, num = days_diff +1)
+                df.loc[last_date:date, "deltas_L1"] = L1_deltas
+
+            # retroactive check
+            potential_between = 0
+
+            if last_potential_dates:
+
+                last_known_date = date
+
+                for pot_date in reversed(last_potential_dates):
+
+                    last_upper =  double_logistic_function_numpy(pot_date, params_upper).item()
+                    last_lower =  double_logistic_function_numpy(pot_date, params_lower).item()
+                    median_potential_last = 0.5 * (last_upper + last_lower)
+
+                    # read data
+                    delta_potential_prev = df.at[pot_date, "ndvi"] - median_potential_last
+                    delta_potential = delta_potential_prev - median_potential_last
+
+                    # calculate from the most recent obs (may vary backwards)
+                    last_upper_obs =  double_logistic_function_numpy(last_known_date, params_upper).item()
+                    last_lower_obs =  double_logistic_function_numpy(last_known_date, params_lower).item()
+                    median_last_known = 0.5 * (last_upper_obs + last_lower_obs)
+
+                    # read data
+                    delta_t = df.at[last_known_date, "ndvi"] - median_last_known
+                    delta_delta_p = delta_t - delta_potential
+
+                    if  (delta_delta_p > y_delta_h) or (delta_delta_p < y_delta_l):
+
+                        # confirm outlier
+                        df.at[pot_date, "outlier"] = True
+                        df.at[pot_date, "deltas"] = np.nan
+
+                    else:
+
+                        # accept as true value
+                        df.at[pot_date, "outlier"] = False
+
+                        potential_between = potential_between + 1
+                        # insert between current date and last known obs
+                        deltas_arr.insert(len(dates_delta_arr) -1 - 2* potential_between, delta_potential)
+                        dates_delta_arr.insert(len(dates_delta_arr) -1 - 2* potential_between, pot_date)
+
+                        last_known_date = pot_date
+                        
+                # perform smoothing from last_known date to last_pot date
+
+                values_to_keep = max(smoothing_values, 3 +2 * potential_between)
+                
+                # clean the last_potential date
+                last_potential_dates.clear()
+   
+            if potential_between > 0 and len(deltas_arr) >= smoothing_values:
+
+
+                deltas_arr = deltas_arr[-values_to_keep:]
+                dates_delta_arr = dates_delta_arr[- values_to_keep:]
+
+                # Convert list of dates to DatetimeIndex
+                dates_delta_arr_dt = pd.to_datetime(dates_delta_arr)
+
+                if use_real_idx:
+                    idx = (dates_delta_arr_dt - dates_delta_arr_dt[0]).days
+                else:
+                    idx = np.arange(len(dates_delta_arr_dt))
+
+                # LOESS smoothing over the full window
+                loess = sm.nonparametric.lowess(deltas_arr, idx, frac= smoothing_values /len(dates_delta_arr), return_sorted=True)
+
+                start_date = dates_delta_arr_dt[2 * potential_between -1]
+                end_date = dates_delta_arr_dt[-2]
+                dates_interp = pd.date_range(start=start_date, end=end_date, freq='D')
+                dates_interp = dates_interp.intersection(df.index)
+
+                if use_real_idx:
+                    x_interp = (dates_interp - dates_delta_arr_dt[0]).days
+                else:
+                    x_interp = np.linspace(idx[2 * potential_between -1], idx[-2], len(dates_interp))
+
+                # Interpolate LOESS values
+                y_interp = np.interp(x_interp, loess[:, 0], loess[:, 1])
+                # Assign smoothed values
+                mask = df.loc[dates_interp, "delta_smoothed"].isna()
+                if mask.any():
+                    df.loc[dates_interp[mask], "delta_smoothed"] = y_interp[mask.values]
+            
+            else:
+
+                # Write data: perform smoothing from last_date to current date
+                if len(dates_delta_arr) == smoothing_values:
+
+                    # Convert list of dates to DatetimeIndex
+                    dates_delta_arr_dt = pd.to_datetime(dates_delta_arr)
+
+                    if use_real_idx:
+                        idx = (dates_delta_arr_dt - dates_delta_arr_dt[0]).days
+                    else:
+                        idx = np.arange(len(dates_delta_arr_dt))
+
+                    # LOESS smoothing over the full window
+                    loess = sm.nonparametric.lowess(deltas_arr, idx, frac=frac, return_sorted=True)
+
+                    # Dates to interpolate: from second-to-last to last, inclusive
+                    start_date = dates_delta_arr_dt[middle -1]
+                    end_date = dates_delta_arr_dt[middle]
+                    dates_interp = pd.date_range(start=start_date, end=end_date, freq='D')
+                    dates_interp = dates_interp.intersection(df.index)
+
+                    if use_real_idx:
+                        x_interp = (dates_interp - dates_delta_arr_dt[0]).days
+                    else:
+                        x_interp = np.linspace(idx[middle -1], idx[middle], len(dates_interp))
+
+                    # Interpolate LOESS values
+                    y_interp = np.interp(x_interp, loess[:, 0], loess[:, 1])
+                    # Assign smoothed values
+                    df.loc[dates_interp, "delta_smoothed"] = y_interp
+
+            # update the last known date
+            last_date = date
+
+        else:
+            # esitmate NDVI based on last obs
+            if last_date is not None and np.isfinite(df.at[last_date, "ndvi"]):
+
+                last_upper =  double_logistic_function_numpy(last_date, params_upper).item()
+                last_lower =  double_logistic_function_numpy(last_date, params_lower).item()
+                median_last = 0.5 * (last_upper + last_lower)
+
+                # read data
+                delta_prev = df.at[last_date, "ndvi"] - median_last
+                days_diff = (date - last_date).days
+
+                decrease_factor = math.exp(-math.log(2) * (days_diff / tau))
+                forecast_val = median_t + delta_prev * decrease_factor
+
+                # write data
+                df.at[date, "forecast"] = forecast_val
+
+    else:
+        # esitmate NDVI based on last obs
+        if last_date is not None and np.isfinite(df.at[last_date, "ndvi"]):
+
+            last_upper =  double_logistic_function_numpy(last_date, params_upper).item()
+            last_lower =  double_logistic_function_numpy(last_date, params_lower).item()
+            median_last = 0.5 * (last_upper + last_lower)
+
+            # read data
+            delta_prev = df.at[last_date, "ndvi"] - median_last
+            days_diff = (date - last_date).days
+
+            decrease_factor = math.exp(-math.log(2) * (days_diff / tau))
+            forecast_val = median_t + delta_prev * decrease_factor
+
+            # write data
+            df.at[date, "forecast"] = forecast_val
+
+    return last_date, last_potential_dates, deltas_arr, dates_delta_arr
+
+
+
+def ndvi_continous_final_2(
+    df,
+    date,
+    last_date,
+    last_potential_date,
+    deltas_arr,
+    dates_delta_arr,
+    params_upper,
+    params_lower,
+    y_delta_l=0.02,
+    y_delta_h=0.02,
+    y_iqr=0.1,
+    r_delta_l=-0.1,
+    r_delta_h=0.1,
+    r_iqr=0.3,
+    tau=14,
+    smoothing_values = 7,
+    use_real_idx = False,
+    frac = 1
+):
+
+    if smoothing_values % 2 == 1:
+        middle = int((smoothing_values + 1) / 2 -1)
+    else:
+        middle = int(smoothing_values / 2 -1)
+
+    obs = df.at[date, "ndvi"]
+
+    # thresholds
+    upper = double_logistic_function_numpy(date, params_upper).item()
+    lower = double_logistic_function_numpy(date, params_lower).item()
+    median_t = 0.5 * (upper + lower)
+
+    df.at[date, "upper"] = upper
+    df.at[date, "lower"] = lower
+
+    if np.isfinite(obs) and obs > 0:
+
+        inside_band = (obs >= lower) and (obs <= upper)
+
+        outlier = False
+        potential_outlier = False
+
+        if not inside_band:
+            ratio = np.maximum(obs, median_t) / np.minimum(obs, median_t)
+            potential_now = ratio > y_iqr
+
+            delta_delta = 0
+
+            if last_date is not None and np.isfinite(df.at[last_date, "ndvi"]):
+
+                last_upper =  double_logistic_function_numpy(last_date, params_upper).item()
+                last_lower =  double_logistic_function_numpy(last_date, params_lower).item()
+                median_last = 0.5 * (last_upper + last_lower)
+                delta_prev = df.at[last_date, "ndvi"] - median_last
+                delta_curr = obs - median_t
+                delta_delta = delta_curr - delta_prev
+
+            # rules
+            extreme_outlier = (
+                (delta_delta > r_delta_h) or (delta_delta < r_delta_l) or (ratio > r_iqr)
+            )
+            potential_outlier = (
+                ((delta_delta > y_delta_h) or (delta_delta < y_delta_l)) and potential_now
+            )
+
+            if extreme_outlier:
+                df.at[date, "outlier"] = True
+                df.at[date, "deltas"] = np.nan
+                outlier = True
+            
+        if not outlier:
+
+            if not potential_outlier:
+
+                # confirmed obs
+                delta_curr = obs - median_t
+                df.at[date, "outlier"] = False
+                df.at[date, "deltas"] = delta_curr
+
+                deltas_arr.append(delta_curr)
+                dates_delta_arr.append(date)
+
+                if len(deltas_arr) > smoothing_values:
+                    deltas_arr = deltas_arr[-7:]
+                    dates_delta_arr = dates_delta_arr[-7:]
+
+            # check for potential outlier
+            if last_potential_date is not None:
+
+                last_upper =  double_logistic_function_numpy(last_potential_date, params_upper).item()
+                last_lower =  double_logistic_function_numpy(last_potential_date, params_lower).item()
+                median_potential_last = 0.5 * (last_upper + last_lower)
+
+                # read data
+                delta_potential_prev = df.at[last_potential_date, "ndvi"] - median_potential_last
+                delta_potential = delta_potential_prev - median_potential_last
+
+                # calculate from the most recent obs (may vary backwards)
+                last_upper_obs =  double_logistic_function_numpy(date, params_upper).item()
+                last_lower_obs =  double_logistic_function_numpy(date, params_lower).item()
+                median_last_known = 0.5 * (last_upper_obs + last_lower_obs)
+
+                # read data
+                delta_t = df.at[date, "ndvi"] - median_last_known
+                delta_delta_p = delta_t - delta_potential
+
+                potential_outlier = (delta_delta_p > y_delta_h) or (delta_delta_p < y_delta_l)
+
+                if  potential_outlier:
+
+                    # confirm outlier
+                    df.at[last_potential_date, "outlier"] = True
+                    df.at[last_potential_date, "deltas"] = np.nan
+
+                else:
+
+                    # accept as true value
+                    df.at[last_potential_date, "outlier"] = False
+                    df.at[date, "outlier"] = False
+                    potential_outlier = False
+
+                    # insert between current date and last known obs
+                    deltas_arr.insert(len(dates_delta_arr) -2, delta_potential)
+                    dates_delta_arr.insert(len(dates_delta_arr) -2, last_potential_date)
+
+                                    
+                    # perform smoothing from last_known date to last_pot date
+                    if len(deltas_arr) > smoothing_values:
+                        deltas_arr = deltas_arr[-7:]
+                        dates_delta_arr = dates_delta_arr[-7:]
+
+                    if len(deltas_arr) == smoothing_values:
+
+                        # Convert list of dates to DatetimeIndex
+                        dates_delta_arr_dt = pd.to_datetime(dates_delta_arr)
+
+                        if use_real_idx:
+                            idx = (dates_delta_arr_dt - dates_delta_arr_dt[0]).days
+                        else:
+                            idx = np.arange(len(dates_delta_arr_dt))
+
+                        # LOESS smoothing over the full window
+                        loess = sm.nonparametric.lowess(deltas_arr, idx, frac= smoothing_values /len(dates_delta_arr), return_sorted=True)
+
+                        start_date = dates_delta_arr_dt[middle -1 ]
+                        end_date = dates_delta_arr_dt[middle]
+                        dates_interp = pd.date_range(start=start_date, end=end_date, freq='D')
+                        dates_interp = dates_interp.intersection(df.index)
+
+                        if use_real_idx:
+                            x_interp = (dates_interp - dates_delta_arr_dt[0]).days
+                        else:
+                            x_interp = np.linspace(idx[middle -1], idx[middle], len(dates_interp))
+
+                        # Interpolate LOESS values
+                        y_interp = np.interp(x_interp, loess[:, 0], loess[:, 1])
+                        # Assign smoothed values
+                        mask = df.loc[dates_interp, "delta_smoothed"].isna()
+                        if mask.any():
+                            df.loc[dates_interp[mask], "delta_smoothed"] = y_interp[mask.values]
+
+                    # perform deltas L1
+                    if last_date is not None:
+
+                        last_upper =  double_logistic_function_numpy(last_date, params_upper).item()
+                        last_lower =  double_logistic_function_numpy(last_date, params_lower).item()
+                        median_last = 0.5 * (last_upper + last_lower)
+                        delta_prev = df.at[last_date, "ndvi"] - median_last
+                        
+                        days_diff = (date - last_date).days
+                        L1_deltas = np.linspace(delta_prev, delta_curr, num = days_diff +1)
+                        df.loc[last_date:date, "deltas_L1"] = L1_deltas
+                    
+                    # clean the last_potential date
+                if potential_outlier:
+                    last_potential_date = date
+                else:
+                    last_potential_date = None
+
+            else:
+
+                # Write data: perform smoothing from last_date to current date
+                if len(dates_delta_arr) == smoothing_values:
+
+                    # Convert list of dates to DatetimeIndex
+                    dates_delta_arr_dt = pd.to_datetime(dates_delta_arr)
+
+                    if use_real_idx:
+                        idx = (dates_delta_arr_dt - dates_delta_arr_dt[0]).days
+                    else:
+                        idx = np.arange(len(dates_delta_arr_dt))
+
+                    # LOESS smoothing over the full window
+                    loess = sm.nonparametric.lowess(deltas_arr, idx, frac=frac, return_sorted=True)
+
+                    # Dates to interpolate: from second-to-last to last, inclusive
+                    start_date = dates_delta_arr_dt[middle -1 ]
+                    end_date = dates_delta_arr_dt[middle]
+                    dates_interp = pd.date_range(start=start_date, end=end_date, freq='D')
+                    dates_interp = dates_interp.intersection(df.index)
+
+                    if use_real_idx:
+                        x_interp = (dates_interp - dates_delta_arr_dt[0]).days
+                    else:
+                        x_interp = np.linspace(idx[middle -1], idx[middle], len(dates_interp))
+
+                    # Interpolate LOESS values
+                    y_interp = np.interp(x_interp, loess[:, 0], loess[:, 1])
+                    # Assign smoothed values
+                    df.loc[dates_interp, "delta_smoothed"] = y_interp
+
+            # update the last known date
+            last_date = date
+
+        else:
+            # esitmate NDVI based on last obs
+            if last_date is not None and np.isfinite(df.at[last_date, "ndvi"]):
+
+                last_upper =  double_logistic_function_numpy(last_date, params_upper).item()
+                last_lower =  double_logistic_function_numpy(last_date, params_lower).item()
+                median_last = 0.5 * (last_upper + last_lower)
+
+                # read data
+                delta_prev = df.at[last_date, "ndvi"] - median_last
+                days_diff = (date - last_date).days
+
+                decrease_factor = math.exp(-math.log(2) * (days_diff / tau))
+                forecast_val = median_t + delta_prev * decrease_factor
+
+                # write data
+                df.at[date, "forecast"] = forecast_val
+
+    else:
+        # esitmate NDVI based on last obs
+        if last_date is not None and np.isfinite(df.at[last_date, "ndvi"]):
+
+            last_upper =  double_logistic_function_numpy(last_date, params_upper).item()
+            last_lower =  double_logistic_function_numpy(last_date, params_lower).item()
+            median_last = 0.5 * (last_upper + last_lower)
+
+            # read data
+            delta_prev = df.at[last_date, "ndvi"] - median_last
+            days_diff = (date - last_date).days
+
+            decrease_factor = math.exp(-math.log(2) * (days_diff / tau))
+            forecast_val = median_t + delta_prev * decrease_factor
+
+            # write data
+            df.at[date, "forecast"] = forecast_val
+
+    return last_date, last_potential_date, deltas_arr, dates_delta_arr
+
+# almost working
+"""def ndvi_continous_final(
+    df,
+    date,
+    last_date,
+    last_potential_date,
+    params_upper,
+    params_lower,
+    y_delta_l=0.02,
+    y_delta_h=0.02,
+    y_iqr=0.1,
+    r_delta_l=-0.1,
+    r_delta_h=0.1,
+    r_iqr=0.3,
+    tau=14,
+):
+
+    obs = df.at[date, "ndvi"]
+
+    # thresholds
+    upper = double_logistic_function_numpy(date, params_upper).item()
+    lower = double_logistic_function_numpy(date, params_lower).item()
+    median_t = 0.5 * (upper + lower)
+
+    df.at[date, "upper"] = upper
+    df.at[date, "lower"] = lower
+
+    if np.isfinite(obs) and obs > 0:
+        inside_band = (obs >= lower) and (obs <= upper)
+        df.at[date, "deltas"] = obs - median_t
+
+        outlier = False
+
+        if not inside_band:
+            ratio = np.maximum(obs, median_t) / np.minimum(obs, median_t)
+            potential_now = ratio > y_iqr
+
+            delta_delta = 0
+
+            if last_date is not None and np.isfinite(df.at[last_date, "ndvi"]):
+
+                last_upper =  double_logistic_function_numpy(last_date, params_upper).item()
+                last_lower =  double_logistic_function_numpy(last_date, params_lower).item()
+                median_last = 0.5 * (last_upper + last_lower)
+                delta_prev = df.at[last_date, "ndvi"] - median_last
+                delta_curr = obs - median_t
+                delta_delta = delta_curr - delta_prev
+
+            # rules
+            extreme_outlier = (
+                (delta_delta > r_delta_h) or (delta_delta < r_delta_l) or (ratio > r_iqr)
+            )
+            potential_outlier = (
+                ((delta_delta > y_delta_h) or (delta_delta < y_delta_l)) and potential_now
+            )
+
+            if extreme_outlier:
+                df.at[date, "outlier"] = True
+                df.at[date, "deltas"] = np.nan
+                outlier = True
+
+            elif potential_outlier:
+                last_potential_date = date
+                outlier = True
+            
+
+        if not outlier:
+
+            # confirmed obs
+            df.at[date, "outlier"] = False
+
+            # retroactive check
+            if last_potential_date is not None:
+
+                last_upper =  double_logistic_function_numpy(last_potential_date, params_upper).item()
+                last_lower =  double_logistic_function_numpy(last_potential_date, params_lower).item()
+                median_potential_last = 0.5 * (last_upper + last_lower)
+
+                delta_potential_prev = df.at[last_potential_date, "ndvi"] - median_potential_last
+
+                delta_potential = delta_potential_prev - median_potential_last
+                delta_t = obs - median_t
+                delta_delta_p = delta_t - delta_potential
+
+                if  (delta_delta_p > y_delta_h) or (delta_delta_p < y_delta_l):
+
+                    # confirm outlier
+                    df.at[last_potential_date, "outlier"] = True
+                    df.at[last_potential_date, "deltas"] = np.nan
+
+                    # perform smoothing from last date to date
+
+                else:
+
+                    # accept as true value
+                    df.at[last_potential_date, "outlier"] = False
+
+                    # perform smoothing from last date to last potential date and from last potential date to date
+
+                # clean the last_potential date
+                last_potential_date = None
+
+            # update the last known date
+            last_date = date
+
+    else:
+        # esitmate NDVI based on last obs
+        if last_date is not None and np.isfinite(df.at[last_date, "ndvi"]):
+
+            last_upper =  double_logistic_function_numpy(last_date, params_upper).item()
+            last_lower =  double_logistic_function_numpy(last_date, params_lower).item()
+            median_last = 0.5 * (last_upper + last_lower)
+
+            # read last value
+            delta_prev = df.at[last_date, "ndvi"] - median_last
+            days_diff = (date - last_date).days
+
+            decrease_factor = math.exp(-math.log(2) * (days_diff / tau))
+            forecast_val = median_t + delta_prev * decrease_factor
+            # write NDVI estimation
+            df.at[date, "forecast"] = forecast_val
+
+    return last_date, last_potential_date"""
+
