@@ -1,4 +1,4 @@
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/demo/script/area_extraction_gif_creation/extract_pixel_biomes.py > /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/extraction.log 2>&1 &
+# nohup python -u  /home/francesco/data_scratch/swiss-ndvi-processing/demo/script/extract_pixel_biomes.py > /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/extraction.log 2>&1 &
 
 import numpy as np
 import math
@@ -93,13 +93,28 @@ def extract_pixel(UL_x, UL_y,BR_x, BR_y ):
     return(sel_window)
 
 # lowland broadleaf
-sel_1 = extract_pixel( UL_x = 2694027.49, UL_y = 1123239.84, BR_x = 2693027.49, BR_y = 1122239.84) 
+
+center_x, center_y =  2694491.82, 1126023.20
+UL_x, UL_y = center_x - 500, center_y - 500 
+BR_x, BR_y = center_x + 500, center_y + 500
+sel_1 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 # hihgland broadleaf
-sel_2 = extract_pixel( UL_x = 2694027.49, UL_y = 1123239.84, BR_x = 2693027.49, BR_y = 1122239.84)
+center_x, center_y =  2692020.28, 1121443.47
+
+# Rectangle corners (UL and BR)
+UL_x, UL_y = center_x - 500, center_y - 500 
+BR_x, BR_y = center_x + 500, center_y + 500
+sel_2 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 # lowland evergreen
-sel_3 = extract_pixel( UL_x =2613028.38, UL_y = 1127777.24, BR_x = 2612028.38, BR_y = 1126777.24)
+center_x, center_y = 2761097.61, 1194613.45
+UL_x, UL_y = center_x - 500, center_y - 500 
+BR_x, BR_y = center_x + 500, center_y + 500
+sel_3 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 # hihgland evergreen
-sel_4 = extract_pixel( UL_x = 2782037.00, UL_y = 1183475.00, BR_x = 2783037.00, BR_y = 1184475.00)
+center_x, center_y = 2781537.00, 1182975.00
+UL_x, UL_y = center_x - 500, center_y - 500 
+BR_x, BR_y = center_x + 500, center_y + 500
+sel_4 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 
 gdf = gpd.read_file("demo/shapefiles/polygon_fire.kml", driver="KML")
 gdf = gdf.to_crs(epsg=2056)   # Swiss LV95
@@ -434,7 +449,7 @@ all_sel = sel_1 + sel_2 + sel_3 + sel_4 + sel_5 + sel_6 + sel_7 + sel_8
 # Convert to numpy array
 all_sel = np.array(all_sel, dtype=np.int64)
 
-subset_path = "/home/francesco/data_scratch/swiss-ndvi-processing/demo/pixel_biomes.zarr"
+subset_path = "/home/francesco/data_scratch/swiss-ndvi-processing/demo/pixel_biomes_2.zarr"
 if os.path.exists(subset_path):
     shutil.rmtree(subset_path)
 
