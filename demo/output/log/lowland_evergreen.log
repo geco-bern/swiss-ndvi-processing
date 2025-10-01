@@ -3,6 +3,11 @@
 Window cols 28650..28750 (101), rows 11541..11641 (101)
 Mask has 105715396 True pixels.
 Pixels in window: 10201, masked pixels: 7082
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 7082
+Window extent: (2760590.0, 2761600.0, 1194110.0, 1195120.0)
+win_rows, win_cols: 101 101
+Masked pixels in window: 7082
 Gapfilling pixel 0/7082
 Gapfilling pixel 500/7082
 Gapfilling pixel 1000/7082
@@ -19,64 +24,58 @@ Gapfilling pixel 6000/7082
 Gapfilling pixel 6500/7082
 Gapfilling pixel 7000/7082
 finished gapfilling
-Step: 0 / 2981
-Step: 50 / 2981
-Step: 100 / 2981
-Step: 150 / 2981
-Step: 200 / 2981
-Step: 250 / 2981
-Step: 300 / 2981
-Step: 350 / 2981
-Step: 400 / 2981
-Step: 450 / 2981
-Step: 500 / 2981
-Step: 550 / 2981
-Step: 600 / 2981
-Step: 650 / 2981
-Step: 700 / 2981
-Step: 750 / 2981
-Step: 800 / 2981
-Step: 850 / 2981
-Step: 900 / 2981
-Step: 950 / 2981
-Step: 1000 / 2981
-Step: 1050 / 2981
-Step: 1100 / 2981
-Step: 1150 / 2981
-Step: 1200 / 2981
-Step: 1250 / 2981
-Step: 1300 / 2981
-Step: 1350 / 2981
-Step: 1400 / 2981
-Step: 1450 / 2981
-Step: 1500 / 2981
-Step: 1550 / 2981
-Step: 1600 / 2981
-Step: 1650 / 2981
-Step: 1700 / 2981
-Step: 1750 / 2981
-Step: 1800 / 2981
-Step: 1850 / 2981
-Step: 1900 / 2981
-Step: 1950 / 2981
-Step: 2000 / 2981
-Step: 2050 / 2981
-Step: 2100 / 2981
-Step: 2150 / 2981
-Step: 2200 / 2981
-Step: 2250 / 2981
-Step: 2300 / 2981
-Step: 2350 / 2981
-Step: 2400 / 2981
-Step: 2450 / 2981
-Step: 2500 / 2981
-Step: 2550 / 2981
-Step: 2600 / 2981
-Step: 2650 / 2981
-Step: 2700 / 2981
-Step: 2750 / 2981
-Step: 2800 / 2981
-Step: 2850 / 2981
-Step: 2900 / 2981
-Step: 2950 / 2981
+Step: 0 / 2649
+Multiple -pix_fmt options specified for stream 0, only the last option '-pix_fmt yuv420p' will be used.
+Step: 50 / 2649
+Step: 100 / 2649
+Step: 150 / 2649
+Step: 200 / 2649
+Step: 250 / 2649
+Step: 300 / 2649
+Step: 350 / 2649
+Step: 400 / 2649
+Step: 450 / 2649
+Step: 500 / 2649
+Step: 550 / 2649
+Step: 600 / 2649
+Step: 650 / 2649
+Step: 700 / 2649
+Step: 750 / 2649
+Step: 800 / 2649
+Step: 850 / 2649
+Step: 900 / 2649
+Step: 950 / 2649
+Step: 1000 / 2649
+Step: 1050 / 2649
+Step: 1100 / 2649
+Step: 1150 / 2649
+Step: 1200 / 2649
+Step: 1250 / 2649
+Step: 1300 / 2649
+Step: 1350 / 2649
+Step: 1400 / 2649
+Step: 1450 / 2649
+Step: 1500 / 2649
+Step: 1550 / 2649
+Step: 1600 / 2649
+Step: 1650 / 2649
+Step: 1700 / 2649
+Step: 1750 / 2649
+Step: 1800 / 2649
+Step: 1850 / 2649
+Step: 1900 / 2649
+Step: 1950 / 2649
+Step: 2000 / 2649
+Step: 2050 / 2649
+Step: 2100 / 2649
+Step: 2150 / 2649
+Step: 2200 / 2649
+Step: 2250 / 2649
+Step: 2300 / 2649
+Step: 2350 / 2649
+Step: 2400 / 2649
+Step: 2450 / 2649
+Step: 2500 / 2649
+Step: 2550 / 2649
+Step: 2600 / 2649
 done

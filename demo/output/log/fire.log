@@ -1,0 +1,1209 @@
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:44: UserWarning: The codec `vlen-utf8` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
+Window cols 16943..17043 (101), rows 17590..17690 (101)
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 8607
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 8607
+Window extent: (2643520.0, 2644530.0, 1133620.0, 1134630.0)
+win_rows, win_cols: 101 101
+Masked pixels in window: 8607
+Gapfilling pixel 0/8607
+Gapfilling pixel 500/8607
+Gapfilling pixel 1000/8607
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+Gapfilling pixel 1500/8607
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:4671: RuntimeWarning: invalid value encountered in subtract
+  diff_b_a = subtract(b, a)
+Gapfilling pixel 2000/8607
+Gapfilling pixel 2500/8607
+Gapfilling pixel 3000/8607
+Gapfilling pixel 3500/8607
+Gapfilling pixel 4000/8607
+Gapfilling pixel 4500/8607
+Gapfilling pixel 5000/8607
+Gapfilling pixel 5500/8607
+Gapfilling pixel 6000/8607
+Gapfilling pixel 6500/8607
+Gapfilling pixel 7000/8607
+Gapfilling pixel 7500/8607
+Gapfilling pixel 8000/8607
+Gapfilling pixel 8500/8607
+finished gapfilling
+Step: 0 / 882
+Multiple -pix_fmt options specified for stream 0, only the last option '-pix_fmt yuv420p' will be used.
+Step: 50 / 882
+Step: 100 / 882
+Step: 150 / 882
+Step: 200 / 882
+Step: 250 / 882
+Step: 300 / 882
+Step: 350 / 882
+Step: 400 / 882
+Step: 450 / 882
+Step: 500 / 882
+Step: 550 / 882
+Step: 600 / 882
+Step: 650 / 882
+Step: 700 / 882
+Step: 750 / 882
+Step: 800 / 882
+Step: 850 / 882
+done

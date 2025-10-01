@@ -1,0 +1,46 @@
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:44: UserWarning: The codec `vlen-utf8` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
+Window cols 21543..21643 (101), rows 2261..2361 (101)
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 6595
+Mask has 105715396 True pixels.
+Pixels in window: 10201, masked pixels: 6595
+Window extent: (2689520.0, 2690530.0, 1286910.0, 1287920.0)
+win_rows, win_cols: 101 101
+Masked pixels in window: 6595
+Gapfilling pixel 0/6595
+Gapfilling pixel 500/6595
+Gapfilling pixel 1000/6595
+Gapfilling pixel 1500/6595
+Gapfilling pixel 2000/6595
+Gapfilling pixel 2500/6595
+Gapfilling pixel 3000/6595
+Gapfilling pixel 3500/6595
+Gapfilling pixel 4000/6595
+Gapfilling pixel 4500/6595
+Gapfilling pixel 5000/6595
+Gapfilling pixel 5500/6595
+Gapfilling pixel 6000/6595
+Gapfilling pixel 6500/6595
+finished gapfilling
+Step: 0 / 912
+Multiple -pix_fmt options specified for stream 0, only the last option '-pix_fmt yuv420p' will be used.
+Step: 50 / 912
+Step: 100 / 912
+Step: 150 / 912
+Step: 200 / 912
+Step: 250 / 912
+Step: 300 / 912
+Step: 350 / 912
+Step: 400 / 912
+Step: 450 / 912
+Step: 500 / 912
+Step: 550 / 912
+Step: 600 / 912
+Step: 650 / 912
+Step: 700 / 912
+Step: 750 / 912
+Step: 800 / 912
+Step: 850 / 912
+Step: 900 / 912
+done

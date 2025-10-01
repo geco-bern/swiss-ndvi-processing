@@ -1,5 +1,5 @@
-#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/highland_broadleaf.py >  /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/highland_broadleaf.log
-#  2>err.log2>/dev/null &
+#   nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/demo/notebook/highland_broadleaf.py >  /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/highland_broadleaf.log 
+# 2>/dev/null &
 
 from IPython.display import IFrame, Image, display
 import numpy as np
@@ -75,7 +75,7 @@ px = 10.0
 top = bottom + height * px
 
 # ----- center cooridnates  -----
-center_x, center_y =  2692020.28, 1121443.47
+center_x, center_y =  2692020.28, 1121443.47 
 
 # Rectangle corners (UL and BR)
 UL_x, UL_y = center_x - 500, center_y - 500 
@@ -187,7 +187,11 @@ extent = (
 
 full_index = pd.date_range(min(dates_sorted), max(dates_sorted), freq="D")
 
+full_index = full_index[(full_index>= "2018-03-01")]
+
+
 T = len(full_index)
+
 
 # Limit to first timesteps
 d_frames = min(3000, T)
@@ -223,85 +227,82 @@ for i, pixel_sel in enumerate(sel):
     y_delta_l , y_delta_h,r_delta_h, r_delta_l  = np.quantile(delta_diff, [0.2,0.6,0.8,0.15])
     y_iqr, r_iqr = np.quantile(iqr_param, [0.7, 0.95])
 
+    ndvi = z[pixel_sel, :]  
+    dates = ds["dates"].values   # numpy datetime64
 
-    ndvi_gapfilled, outlier_mask, smoothed, valid_outlier, valid_idx, deltas = gapfill_ndvi(ndvi_sorted, lower, upper,
-                                                                                            forecasting=False,
-                                                                                            param_iqr=1.5,
-                                                                                            bottom_q=0.3,
-                                                                                            top_q=0.7,
-                                                                                            weight_median = 0.5,
-                                                                                            y_delta_l = y_delta_l, 
-                                                                                            y_delta_h =y_delta_h,
-                                                                                            r_delta_h =r_delta_h, 
-                                                                                            r_delta_l =r_delta_l, 
-                                                                                            y_iqr = y_iqr,
-                                                                                            r_iqr = r_iqr,
-                                                                                            window_smoothing = 14,
-                                                                                            use_tau= True,
-                                                                                            tau = 7,
-                                                                                            lag_forecast= 14
-                                                                                            )
+    # clean and normalize NDVI
+    ndvi = ndvi.astype(float) / 10000.0
+    ndvi = np.where((ndvi > 1) | (ndvi < 0), np.nan, ndvi)
+
+    # --- 1. Create initial df ---
+    df_starting = pd.DataFrame({
+        "date": pd.to_datetime(dates),
+        "ndvi": ndvi
+        })
+
+    # --- 2. Handle duplicate dates ---
+    df_starting = (
+        df_starting.groupby("date", as_index=False)
+        .mean(numeric_only=True)   # average if duplicates exist
+        .set_index("date")
+    )
+
+    # --- 3. Reindex to full daily series ---
+    full_index = pd.date_range(df_starting.index.min(), df_starting.index.max(), freq="D")
+    df = df_starting.reindex(full_index)
+
+    # add forecast column for later use
+    df["forecast"] = np.nan
+    df["upper"] = np.nan
+    df["lower"] = np.nan
+    df["gapfilled"] = np.nan
+    df["outlier"] = False
+    df["delta_smoothed"] = np.nan
+    df["idx"] = np.arange(len(df))
+    df["deltas_L1"] = np.nan
+
+
+    df.index.name = "date"
+
+    # remove data veofre marh 2018
+    df = df.loc[df.index >= pd.Timestamp("2018-03-01")]
+
+
+    last_date =  None #pd.Timestamp("2018-04-25")
+    last_potential_date =None
+    deltas_arr = []
+    dates_delta_arr = []
+    # this is extra just for the plotting
+    latency = []
+    current_date_latency = []
+
+    for date in df.index[df.index >= pd.Timestamp("2018-03-01")]:
+        last_date, last_potential_date_arr, deltas_arr, dates_delta_arr, latency,  current_date_latency = ndvi_continous_final_2(
+            df=df,
+            date=date,
+            params_lower =  params_lower[[91]],
+            params_upper =  params_upper[[91]],
+            last_date=last_date,
+            deltas_arr = deltas_arr,
+            dates_delta_arr = dates_delta_arr,
+            last_potential_date = last_potential_date,
+            y_delta_l = y_delta_l, 
+            y_delta_h = y_delta_h,
+            r_delta_h = r_delta_h, 
+            r_delta_l = r_delta_l,
+            y_iqr= y_iqr, 
+            r_iqr = r_iqr,
+            tau = 45,
+            smoothing_values = 7,
+            latency = latency,
+            current_date_latency = current_date_latency)
     
-    # --- Select valid observations (filter out outliers) ---
-    ndvi_series_2 = ndvi_sorted.astype(float) / 10000.0
-    ndvi_series_2 = np.where((ndvi_series_2 > 1) | (ndvi_series_2 < 0), np.nan, ndvi_series_2)
-
-    valid_idx = np.where(np.isfinite(ndvi_series_2))[0]
-    outlier_arr_2 = outlier_arr[valid_idx]
-    outlier_arr_2 = np.where(outlier_arr_2, "red", "green")
-
-    ndvi_series_2 = ndvi_series_2[valid_idx]
-    ndvi_series_2 = ndvi_series_2[outlier_arr_2 == "green"]
-
-    dates_sorted_2 = dates_sorted[valid_idx]
-    dates_sorted_2 = dates_sorted_2[outlier_arr_2 == "green"]
-    deltas_2 = deltas[outlier_arr_2 == "green"]
-
-    # --- Build DataFrame for deltas + obs ---
-    df_smooth = pd.DataFrame({
-        "date": dates_sorted_2,
-        "deltas": deltas_2,
-        "obs": ndvi_series_2,
-    })
-    df_smooth["date"] = pd.to_datetime(df_smooth["date"])
-    df_smooth = df_smooth.set_index("date").sort_index()
-
-    # --- fix duplicate dates ---
-    if not df_smooth.index.is_unique:
-        df_smooth = df_smooth.groupby(df_smooth.index).mean()
-
-    # --- Smooth only existing observations ---
-    values = df_smooth["deltas"].values
-    n = len(values)
-
-    # LOESS smoothing
-    idx = np.arange(n)
-    loess = sm.nonparametric.lowess(values, idx, frac=0.05, return_sorted=True)
-    df_smooth["smooth_loess"] = np.interp(idx, loess[:, 0], loess[:, 1])
-
-    # --- Reindex to full daily series ---
-    #full_index = pd.date_range(df_smooth.index.min(), df_smooth.index.max(), freq="D")
-    df_daily = df_smooth.reindex(full_index)
-
-    df_daily["smooth_loess"] = df_daily["smooth_loess"].interpolate(method="time")
-
-    # --- Calculate envelopes ---
-    doy = df_daily.index.dayofyear.values
-    doy = torch.tensor(doy, dtype=torch.float32)
-    T_SCALE = 1.0 / 365.0
-    t = doy.unsqueeze(0).repeat(params_lower.shape[0], 1) * T_SCALE
-
-    lower_fit = double_logistic_function(t[[0]], params_lower[[91]]).squeeze().cpu().numpy()
-    upper_fit = double_logistic_function(t[[0]], params_upper[[91]]).squeeze().cpu().numpy()
-    median_iqr = 0.5 * (lower_fit + upper_fit)
-
-    df_daily["median"] = median_iqr
 
     # --- Final NDVI reconstruction ---
-    final_value = df_daily["median"] + df_daily["smooth_loess"]
+    final_value = df["delta_smoothed"] + 0.5 *(df["upper"] + df["lower"])
     
     ndvi_chuck_smoothed[i, :] = final_value
-    ndvi_chunk[i,:] = df_daily["obs"]
+    ndvi_chunk[i,:] = df["ndvi"]
 
 print("finished gapfilling")
 
@@ -309,7 +310,7 @@ print("finished gapfilling")
 out_gif_combined_1 = "/home/francesco/data_scratch/swiss-ndvi-processing/demo/output/gif/highland_broadleaf_area.mp4"
 
 # Prepare writers (stream to disk instead of keeping frames in memory)
-writer1 = imageio.get_writer(out_gif_combined_1, fps=30, format="FFMPEG", codec="mpeg4", quality=8)
+writer1 = imageio.get_writer(out_gif_combined_1, fps=30, format='ffmpeg', codec='libx264', ffmpeg_params=['-pix_fmt','yuv420p','-crf','18','-preset','fast'], quality = 8)
 
 for t in range(d_frames):
 
