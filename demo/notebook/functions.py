@@ -1169,7 +1169,7 @@ def ndvi_continous_final_2(
                             else:
                                 window = 5
 
-                        y_interp = pd.Series(y_interp).rolling(window=window, center=True, min_periods=1).mean().values
+                            y_interp = pd.Series(y_interp).rolling(window=window, center=True, min_periods=1).mean().values
 
                     # Assign smoothed values
                     df.loc[dates_interp, "delta_smoothed"] = y_interp
@@ -1232,10 +1232,3 @@ def ndvi_continous_final_2(
             df.at[date, "forecast"] = forecast_val
 
     return last_date, last_potential_date, deltas_arr, dates_delta_arr, latency, current_date_latency
-
-# if an extreme event occours, do not consider the iqr
-
-def extreme_events():
-
-
-    return(y_interp)
