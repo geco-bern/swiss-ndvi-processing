@@ -1,0 +1,89 @@
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:99: UserWarning: The codec `vlen-bytes` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
+Window cols 17009..17015 (7), rows 17617..17623 (7)
+Mask has 105715396 True pixels.
+Pixels in window: 49, masked pixels: 49
+finish selection
+ciao 0
+ciao 1
+ciao 2
+ciao 3
+ciao 4
+ciao 5
+ciao 6
+ciao 7
+ciao 8
+ciao 9
+ciao 10
+ciao 11
+ciao 0
+ciao 1
+ciao 2
+ciao 3
+ciao 4
+ciao 5
+ciao 6
+ciao 7
+ciao 8
+ciao 9
+ciao 10
+ciao 11
+finish non fire
+Window cols 21544..21550 (7), rows 15608..15614 (7)
+Mask has 105715396 True pixels.
+Pixels in window: 49, masked pixels: 49
+finish selection
+ciao 0
+ciao 1
+ciao 2
+ciao 3
+ciao 4
+ciao 5
+ciao 6
+ciao 7
+ciao 8
+ciao 9
+ciao 10
+ciao 11
+ciao 0
+ciao 1
+ciao 2
+ciao 3
+ciao 4
+ciao 5
+ciao 6
+ciao 7
+ciao 8
+ciao 9
+ciao 10
+ciao 11
+finish storm
+Window cols 21590..21596 (7), rows 2308..2314 (7)
+Mask has 105715396 True pixels.
+Pixels in window: 49, masked pixels: 49
+finish selection
+ciao 0
+ciao 1
+ciao 2
+ciao 3
+ciao 4
+ciao 5
+ciao 6
+ciao 7
+ciao 8
+ciao 9
+ciao 10
+ciao 11
+ciao 0
+ciao 1
+ciao 2
+ciao 3
+ciao 4
+ciao 5
+ciao 6
+ciao 7
+ciao 8
+ciao 9
+ciao 10
+ciao 11
+finish drought
