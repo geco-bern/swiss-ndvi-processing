@@ -316,7 +316,7 @@ for i, pixel in enumerate(sel):
         # hot fix, take the mean between the 2 nearest point
         left = df_plot["smoothed_combined"].shift(1)
         right = df_plot["smoothed_combined"].shift(-1)
-        mask_neighbors_high = (left > 0.3) & (right > 0.3)
+        mask_neighbors_high = (left > 0.1) & (right > 0.1)
 
         # replace center point with the mean of the two neighbors
         df_plot.loc[mask_neighbors_high, "smoothed_combined"] = (left + right) / 2
