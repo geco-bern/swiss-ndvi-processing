@@ -1,34 +1,9 @@
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:99: UserWarning: The codec `vlen-bytes` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:99: UserWarning: The codec `vlen-bytes` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
 Traceback (most recent call last):
-  File "/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/core/group.py", line 691, in getitem
-    return await get_node(
-           ^^^^^^^^^^^^^^^
-  File "/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/core/group.py", line 3565, in get_node
-    return await _get_node_v3(store=store, path=path)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/core/group.py", line 3537, in _get_node_v3
-    metadata = await _read_metadata_v3(store=store, path=path)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/core/group.py", line 3373, in _read_metadata_v3
-    raise FileNotFoundError(path)
-FileNotFoundError: dates
+  File "/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/02_test_function.py", line 170, in <module>
+    ndvi_zarr[date_index, pixel_idx] = np.int16(estimation * 10000)
 
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/02_test_function.py", line 18, in <module>
-    dates = pd.to_datetime([d.decode() if isinstance(d, (bytes, np.bytes_)) else str(d) for d in ds["dates"][:]])
-                                                                                                 ~~^^^^^^^^^
-  File "/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/core/group.py", line 1842, in __getitem__
-    obj = self._sync(self._async_group.getitem(path))
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/core/sync.py", line 208, in _sync
-    return sync(
-           ^^^^^
-  File "/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/core/sync.py", line 163, in sync
-    raise return_result
-  File "/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/core/sync.py", line 119, in _runner
-    return await coro
-           ^^^^^^^^^^
-  File "/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/core/group.py", line 695, in getitem
-    raise KeyError(key) from e
-KeyError: 'dates'
+NameError: name 'fig' is not defined
