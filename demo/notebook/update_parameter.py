@@ -24,7 +24,7 @@ import matplotlib.dates as mdates
 import os
 from functions import *
 
-save_path = "figure/"
+save_path = "figure2/"
 
 os.makedirs(save_path, exist_ok=True)
 
@@ -120,7 +120,7 @@ def extract_pixel(UL_x, UL_y,BR_x, BR_y ):
     sel_window = sel[start:end]
     return(sel_window)
 
-def analysis(pixels,output):
+def analysis(pixels,output,all_metrics):
     # --- loop over pixels 12 to 24 and create a 4x3 figure ---
     fig, axes = plt.subplots(4, 3, figsize=(18, 12), sharex=True, sharey=True)
     axes = axes.flatten()
@@ -147,7 +147,7 @@ def analysis(pixels,output):
         df_sorted = df.sort_values(by='date')
 
         ndvi_sorted = df_sorted['ndvi'].values
-        y_delta_l , y_delta_h,r_delta_h, r_delta_l  = -0.25, 0.25,1,-1 #np.quantile(delta_diff, [0.1,0.9,0.95,0.05])
+        y_delta_l , y_delta_h,r_delta_h, r_delta_l  = -0.15, 0.15,1,-1 #np.quantile(delta_diff, [0.1,0.9,0.95,0.05])
         y_iqr, r_iqr = 0.05,2
 
         # --- 1. Create initial df ---
@@ -210,7 +210,7 @@ def analysis(pixels,output):
                 y_iqr= y_iqr, 
                 r_iqr = r_iqr,
                 tau = 45,
-                smoothing_values = 9,
+                smoothing_values = 5,
                 latency = latency,
                 current_date_latency = current_date_latency
 
@@ -241,6 +241,42 @@ def analysis(pixels,output):
         right = df_plot["smoothed_combined"].shift(-1)
         mask_neighbors_high = (left > 0.1) & (right > 0.1)
 
+
+        months_to_keep = [3, 4, 5, 6, 7, 8, 9, 10]  # March–October only for metrics
+        df_metrics = df_plot[df_plot.index.month.isin(months_to_keep)]
+
+        valid_mask = df_metrics["ndvi"].notna() & df_metrics["smoothed_combined"].notna()
+        if valid_mask.sum() > 2:
+                    y_true = df_metrics.loc[valid_mask, "ndvi"].values
+                    y_pred = df_metrics.loc[valid_mask, "smoothed_combined"].values
+                    rmse = np.sqrt(np.nanmean((y_true - y_pred) ** 2))
+                    corr = np.corrcoef(y_true, y_pred)[0, 1]
+        else:
+                    rmse, corr = np.nan, np.nan
+
+        all_metrics.append({
+            "case": output.replace(".png", ""),  # to know which case it belongs to
+            "pixel": pixel,
+            "rmse": rmse,
+            "correlation": corr
+        })
+        """# --- compute RMSE and correlation ---
+        valid_mask = df_plot["ndvi"].notna() & df_plot["smoothed_combined"].notna()
+        if valid_mask.sum() > 2:
+            y_true = df_plot.loc[valid_mask, "ndvi"].values
+            y_pred = df_plot.loc[valid_mask, "smoothed_combined"].values
+            rmse = np.sqrt(np.nanmean((y_true - y_pred) ** 2))
+            corr = np.corrcoef(y_true, y_pred)[0, 1]
+        else:
+            rmse, corr = np.nan, np.nan
+
+        all_metrics.append({
+            "case": output.replace(".png", ""),  # to know which case it belongs to
+            "pixel": pixel,
+            "rmse": rmse,
+            "correlation": corr
+        })
+"""
         # replace center point with the mean of the two neighbors
         df_plot.loc[mask_neighbors_high, "smoothed_combined"] = (left + right) / 2
 
@@ -264,6 +300,9 @@ def analysis(pixels,output):
     fig.savefig(os.path.join(save_path, output), dpi=300, bbox_inches="tight")
 
 
+# save all the performance metrics
+all_metrics = []
+
 # fire
 center_x, center_y =  2643749.70, 1133693.64
 
@@ -271,8 +310,8 @@ UL_x, UL_y = center_x - 30, center_y - 30
 BR_x, BR_y = center_x + 30, center_y + 30
 sel_1 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 print("finish selection")
-analysis(sel_1[:12],"fire_1.png")
-analysis(sel_1[13:],"fire_2.png")
+analysis(sel_1[:12],"fire_1.png",all_metrics)
+analysis(sel_1[13:],"fire_2.png",all_metrics)
 print("finish fire")
 
 
@@ -284,8 +323,8 @@ BR_x, BR_y = center_x + 30, center_y + 30
 sel_1 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 print("finish selection")
 
-analysis(sel_1[:12],"broad_low_1.png")
-analysis(sel_1[13:],"broad_low_2.png")
+analysis(sel_1[:12],"broad_low_1.png",all_metrics)
+analysis(sel_1[13:],"broad_low_2.png",all_metrics)
 print("finish broad low")
 
 # highland broadleaf
@@ -296,8 +335,8 @@ BR_x, BR_y = center_x + 30, center_y + 30
 sel_1 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 print("finish selection")
 
-analysis(sel_1[:12],"broad_high_1.png")
-analysis(sel_1[13:],"broad_high_2.png")
+analysis(sel_1[:12],"broad_high_1.png",all_metrics)
+analysis(sel_1[13:],"broad_high_2.png",all_metrics)
 print("finish broad high")
 
 # lowland evergreen
@@ -308,8 +347,8 @@ BR_x, BR_y = center_x + 30, center_y + 30
 sel_1 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 print("finish selection")
 
-analysis(sel_1[:12],"ever_low_1.png")
-analysis(sel_1[13:],"ever_low_2.png")
+analysis(sel_1[:12],"ever_low_1.png",all_metrics)
+analysis(sel_1[13:],"ever_low_2.png",all_metrics)
 print("finish ever low")
 
 # highland evergreen
@@ -320,8 +359,8 @@ BR_x, BR_y = center_x + 30, center_y + 30
 sel_1 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 print("finish selection")
 
-analysis(sel_1[:12],"ever_high_1.png")
-analysis(sel_1[13:],"ever_high_2.png")
+analysis(sel_1[:12],"ever_high_1.png",all_metrics)
+analysis(sel_1[13:],"ever_high_2.png",all_metrics)
 print("finish ever high")
 
 # non fire
@@ -332,8 +371,8 @@ BR_x, BR_y = center_x + 30, center_y + 30
 sel_1 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 print("finish selection")
 
-analysis(sel_1[:12],"non_fire_1.png")
-analysis(sel_1[13:],"non_fire_2.png")
+analysis(sel_1[:12],"non_fire_1.png",all_metrics)
+analysis(sel_1[13:],"non_fire_2.png",all_metrics)
 print("finish non fire")
 
 # storm
@@ -344,8 +383,8 @@ BR_x, BR_y = center_x + 30, center_y + 30
 sel_1 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 print("finish selection")
 
-analysis(sel_1[:12],"storm_1.png")
-analysis(sel_1[13:],"storm_2.png")
+analysis(sel_1[:12],"storm_1.png",all_metrics)
+analysis(sel_1[13:],"storm_2.png",all_metrics)
 print("finish storm")
 
 # drought
@@ -356,6 +395,11 @@ BR_x, BR_y = center_x + 30, center_y + 30
 sel_1 = extract_pixel( UL_x = UL_x, UL_y = UL_y, BR_x = BR_x, BR_y = BR_y) 
 print("finish selection")
 
-analysis(sel_1[:12],"drought_1.png")
-analysis(sel_1[13:],"drought_2.png")
+analysis(sel_1[:12],"drought_1.png",all_metrics)
+analysis(sel_1[13:],"drought_2.png",all_metrics)
 print("finish drought")
+
+all_metrics_df = pd.DataFrame(all_metrics)
+all_metrics_csv_path = os.path.join(save_path, "all_pixel_metrics_no_winter.csv")
+all_metrics_df.to_csv(all_metrics_csv_path, index=False)
+print(f"Saved pixel metrics to: {all_metrics_csv_path}")
