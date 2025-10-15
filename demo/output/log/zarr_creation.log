@@ -1,0 +1,29 @@
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:99: UserWarning: The codec `vlen-bytes` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
+Window cols 21390..22690, rows 17800..19100
+Selected 1000014 masked pixels
+Subset has 1000014 pixels and 1137 dates.
+NDVI array shape: (105715396, 1137)
+Detected (pixel, time)
+/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/00_create_demo_zarr_folder.py:103: DeprecationWarning: Use Group.create_array instead.
+  subset_group.create_dataset(
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:99: UserWarning: The codec `vlen-bytes` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/core/array.py:3989: UserWarning: The dtype `|S10` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  meta = AsyncArray._create_metadata_v3(
+/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/00_create_demo_zarr_folder.py:111: DeprecationWarning: Use Group.create_array instead.
+  subset_group.create_dataset(
+/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/00_create_demo_zarr_folder.py:120: DeprecationWarning: Use Group.create_array instead.
+  subset_group.create_dataset(
+/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/00_create_demo_zarr_folder.py:133: DeprecationWarning: Use Group.create_array instead.
+  param_group.create_dataset(
+/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/00_create_demo_zarr_folder.py:139: DeprecationWarning: Use Group.create_array instead.
+  param_group.create_dataset(
+/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/00_create_demo_zarr_folder.py:150: DeprecationWarning: Use Group.create_array instead.
+  subset_group.create_dataset(
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/codecs/vlen_utf8.py:99: UserWarning: The codec `vlen-bytes` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  return cls(**configuration_parsed)
+/home/francesco/miniconda3/envs/ndvi/lib/python3.11/site-packages/zarr/core/array.py:3989: UserWarning: The dtype `|S10` is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  meta = AsyncArray._create_metadata_v3(
+✅ Subset saved to: /data_2/scratch/francesco/zarr_demo/
+Execution time: 47.94 seconds
