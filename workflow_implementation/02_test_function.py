@@ -95,43 +95,22 @@ def zarr_date_to_date(zarr_date):
     else:
         raise TypeError(f"Unknown date type: {type(zarr_date)}")
 
-def L1_interpolation(date_1, date_2, ndvi_series):
+def L1_interpolation(days_diff, delta_1, delta_2, date_1, date_2, base_date, params_lower, params_upper,pixel_idx):
 
-    days_diff = (date_2 - date_1).days
-    if days_diff < 1:
-        return  # nothing to interpolate
-
-    index_1 = dates_cache.get(date_1.strftime("%Y-%m-%d"))
-    index_2 = dates_cache.get(date_2.strftime("%Y-%m-%d"))
-    if index_1 is None or index_2 is None:
-        print(f"[WARN] date indices not found: {date_1}, {date_2}")
-        return
-
-    ndvi_1 = ndvi_series[index_1].item()
-    ndvi_2 = ndvi_series[index_2].item()
-
-    median_1 = calculate_median(date_1)
-    median_2 = calculate_median(date_2)
-
-    delta_1 = ndvi_1 - median_1
-    delta_2 = ndvi_2 - median_2
-
-    #  Linear interpolation of deltas
     L1_deltas = np.linspace(delta_1, delta_2, num=days_diff + 1)
+    doy_1 = date_1.timetuple().tm_yday
+    doy_2 = date_2.timetuple().tm_yday
+    idx_1 = (date_1 - base_date).days
+    idx_2 = (date_2 - base_date).days
 
-    start_ordinal = date_1.toordinal()
-    end_ordinal = date_2.toordinal()
-    ordinals = np.arange(start_ordinal, end_ordinal + 1)
-    dates_to_interpolate = np.array([datetime.fromordinal(o) for o in ordinals])
+    doys = np.linspace(doy_1, doy_2, num=days_diff + 1)
+    medians = calculate_median(doys, params_lower, params_upper)
 
-    medians = calculate_median(dates_to_interpolate)
-    interpolated_ndvi = L1_deltas + medians
+    ndvi = L1_deltas + medians
+    ndvi_scaled = np.clip(ndvi * 10000, 0, 10000).astype(np.int16)
 
-    #  Write interpolated values back to ndvi_series 
-    for dt, value in zip(dates_to_interpolate, interpolated_ndvi):
-        idx = dates_cache.get(dt.strftime("%Y-%m-%d"))
-        if idx is not None:
-            ndvi_series[idx] = value 
+    ndvi_zarr[idx_1: idx_2 + 1, pixel_idx] = ndvi_scaled
+
 
 # --- Main function ---
 def print_ndvi(day, pixel_idx):
@@ -161,6 +140,9 @@ def print_ndvi(day, pixel_idx):
 
     ndvi_val = ndvi_val / 10000.0
 
+    current_median = calculate_median(doy, params_lower, params_upper)
+    current_delta = ndvi_val - current_median
+
     if ndvi_val >= 1 or ndvi_val <= 0:
         ndvi_val = np.nan
 
@@ -170,6 +152,9 @@ def print_ndvi(day, pixel_idx):
             ndvi_zarr[date_index, pixel_idx] = np.int16(estimation * 10000)
 
     else:
+
+        if last_date !=  date(1900, 1, 1):
+            L1_interpolation(days_diff, delta_prev, current_delta, last_date, day,base_date, params_lower, params_upper,pixel_idx)
         
         last_dates_zarr[6:7, pixel_idx] = np.array([day.strftime("%Y-%m-%d").encode("utf-8")], dtype=object)
 
