@@ -15,7 +15,7 @@ REF_CRS = CRS.from_epsg(2056)
 
 CHUNK_SIZE = 4000
 
-DATASET_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset.zarr"
+DATASET_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr"
 FOREST_MASK = "/data_2/scratch/sbiegel/processed/forest_mask.npy"
 
 SERVICE_URL = 'https://data.geo.admin.ch/api/stac/v0.9/'

@@ -1,3 +1,7 @@
+"""
+Load the SwissALTI3D DEM data at 2m resolution and store in a Zarr array.
+"""
+
 import zarr
 import rasterio
 from tqdm import tqdm
