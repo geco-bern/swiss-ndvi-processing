@@ -1,3 +1,6 @@
+"""
+Convert full DEM at 2m resolution from Zarr to Cloud-Optimized GeoTIFF.
+"""
 import zarr
 import rasterio
 from rasterio.windows import Window
@@ -38,7 +41,7 @@ if __name__ == "__main__":
         "BIGTIFF":   "YES",
     }
 
-    cog_path = "/data_2/scratch/sbiegel/processed/dem2m_2.tif"
+    cog_path = "/data_2/scratch/sbiegel/processed/dem2m.tif"
     with rasterio.open(cog_path, "w", **profile) as dst:
 
         nchunks_y = (ny + chunk_h - 1) // chunk_h
