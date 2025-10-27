@@ -1,2 +1,6 @@
 demo/output/gif/*.gif
 demo/output/gif/*.gif
+*.png
+*.log
+*.tif
+*.egg-info

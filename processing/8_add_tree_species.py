@@ -1,3 +1,6 @@
+"""
+Add tree species information from tree species map to the dataset
+"""
 import numpy as np
 import rasterio
 from rasterio.warp import reproject, Resampling
@@ -56,3 +59,4 @@ feat_grp.create_array(
 )
 
 feat_grp['tree_species'][:] = dst_flat
+feat_grp['tree_species'].attrs['nodata'] = src_nodata
