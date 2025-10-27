@@ -1,4 +1,4 @@
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/00_create_daily_zarr.py > /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/zarr_daily_creation.log &
+# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/00_create_demo_zarr_folder.py > /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/zarr_daily_creation.log &
 
 import numpy as np
 import math
