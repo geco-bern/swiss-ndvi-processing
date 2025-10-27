@@ -1,3 +1,6 @@
+"""
+Compute median vegetation height from annual Sentinel-2 based height models and add as a feature to the dataset.
+"""
 import numpy as np
 import rasterio
 from config import DATASET_ZARR, CHUNK_SIZE, FOREST_MASK, REF_BBOX, REF_BBOX_4326, SERVICE_URL
@@ -29,11 +32,16 @@ for idx, item in tqdm(enumerate(items)):
     with rasterio.open(asset.href) as src:
         window = src.window(*REF_BBOX)
         vh = src.read(1, window=window, boundless=True, fill_value=src.nodata)
+        src_nodata = src.nodata
     vh_flat = vh.ravel()
     forest_heights[idx] = vh_flat[forest_flat_indices]
 
 # Compute median height per forest pixel
 median_per_pixel = np.nanmedian(forest_heights, axis=0)
+
+median_per_pixel[median_per_pixel == -9999] = np.nan
+mean_fh = np.nanmean(median_per_pixel)
+median_per_pixel[np.isnan(median_per_pixel)] = mean_fh
 
 group = zarr.open_group(DATASET_ZARR, mode='a')
 feat_grp = group.require_group('features')

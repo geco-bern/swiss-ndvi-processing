@@ -1,3 +1,6 @@
+"""
+Create topographic and hydrological features from DEM data and store them in a Zarr array.
+"""
 import os
 import subprocess
 import numpy as np
@@ -66,12 +69,12 @@ def create_hydrological_features_10m(dem10m_path):
 def create_northing_easting(aspect_path, northing_path, easting_path):
     run_cmd(
         f"gdal_calc.py -A {aspect_path} --outfile={northing_path} "
-        f'--calc="sin(A * pi / 180)" --NoDataValue=-9999 --type=Float32 '
+        f'--calc="-cos(A * pi / 180)" --NoDataValue=-9999 --type=Float32 '
         f'--co="COMPRESS=DEFLATE" --co="TILED=YES" --co="BIGTIFF=YES" --overwrite --quiet'
     )
     run_cmd(
         f"gdal_calc.py -A {aspect_path} --outfile={easting_path} "
-        f'--calc="cos(A * pi / 180)" --NoDataValue=-9999 --type=Float32 '
+        f'--calc="-sin(A * pi / 180)" --NoDataValue=-9999 --type=Float32 '
         f'--co="COMPRESS=DEFLATE" --co="TILED=YES" --co="BIGTIFF=YES" --overwrite --quiet'
     )
 
@@ -84,7 +87,8 @@ def write_features_to_zarr(tmpdir, forest_mask, zarr_path):
 
     features = [
         "slope10m", "northing10m", "easting10m", "tri10m", "roughness10m",
-        "twi10m", "mean_curv10m", "profile_curv10m", "plan_curv10m", "accum10m"
+        "twi10m", "mean_curv10m", "profile_curv10m", "plan_curv10m", 
+        "dem10m"
     ]
 
     for feat in features:
