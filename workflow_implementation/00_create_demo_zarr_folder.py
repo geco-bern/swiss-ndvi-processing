@@ -86,85 +86,95 @@ n_pixels = len(sel_1)
 print(f"Subset has {n_pixels} pixels.")
 
 # =====================================================
-#  Build Daily NDVI Subset
+#  Split into 1000-pixel chunks and save each as a separate Zarr file
 # =====================================================
-shape = ndvi.shape
-print(f"NDVI array shape: {shape}")
-if shape[0] == len(dates):
-    print("Detected (time, pixel)")
-    ndvi_subset = ndvi.get_orthogonal_selection((slice(None), sel_1))
-else:
-    print("Detected (pixel, time)")
-    ndvi_subset = ndvi.get_orthogonal_selection((sel_1, slice(None))).T
+import math
 
-# --- Allocate daily NDVI ---
-daily_ndvi = np.full((len(daily_dates), ndvi_subset.shape[1]), 32767, dtype=np.int16)
-
-# Fill available days
-for i, day in enumerate(daily_dates):
-    d = day.date()
-    if d in date_to_index:
-        daily_ndvi[i, :] = ndvi_subset[date_to_index[d], :]
-
-# =====================================================
-#  Save subset (Zarr v2 API)
-# =====================================================
+CHUNK_SIZE = 1000
 os.makedirs(OUT_ZARR, exist_ok=True)
-subset_group = zarr.open_group(OUT_ZARR, mode="w")
 
-# --- Dates ---
-dates_data = np.array([d.strftime("%Y-%m-%d").encode("utf-8") for d in daily_dates], dtype="S10")
-subset_group.create_dataset("dates", data=dates_data, shape=dates_data.shape, dtype="S10")
+# Split pixel indices
+chunks = [sel_1[i:i + CHUNK_SIZE] for i in range(0, len(sel_1), CHUNK_SIZE)]
+print(f"Total chunks to create: {len(chunks)}")
 
-# --- NDVI subset ---
-subset_group.create_dataset(
-    "ndvi",
-    data=daily_ndvi,
-    shape=daily_ndvi.shape,
-    chunks=(1, daily_ndvi.shape[1]),
-    dtype=np.int16,
-)
+for idx, chunk_pixels in enumerate(chunks):
+    print(f"\n--- Processing chunk {idx+1}/{len(chunks)} with {len(chunk_pixels)} pixels ---")
 
-# --- Counter array ---
-subset_group.create_dataset(
-    "counter",
-    data=np.zeros(len(daily_dates), dtype=np.int16),
-    shape=(len(daily_dates),),
-    dtype=np.int16,
-)
+    # =====================================================
+    # Extract NDVI subset for this chunk
+    # =====================================================
+    if ndvi.shape[0] == len(dates):
+        ndvi_subset = ndvi.get_orthogonal_selection((slice(None), chunk_pixels))
+    else:
+        ndvi_subset = ndvi.get_orthogonal_selection((chunk_pixels, slice(None))).T
 
-# --- Params ---
-# --- Params ---
-param_group = subset_group.create_group("params")
+    # --- Allocate daily NDVI ---
+    daily_ndvi = np.full((len(daily_dates), ndvi_subset.shape[1]), 32767, dtype=np.int16)
 
-params_lower_subset = params_lower.get_orthogonal_selection((sel_1, slice(None)))
-params_upper_subset = params_upper.get_orthogonal_selection((sel_1, slice(None)))
+    # Fill available days
+    for i, day in enumerate(daily_dates):
+        d = day.date()
+        if d in date_to_index:
+            daily_ndvi[i, :] = ndvi_subset[date_to_index[d], :]
 
-param_group.create_dataset(
-    "params_lower",
-    data=params_lower_subset,
-    shape=params_lower_subset.shape, 
-    dtype=np.float32,
-)
-param_group.create_dataset(
-    "params_upper",
-    data=params_upper_subset,
-    shape=params_upper_subset.shape, 
-    dtype=np.float32,
-)
+    # =====================================================
+    # Save subset (Zarr v2 API)
+    # =====================================================
+    subset_path = os.path.join(OUT_ZARR, f"chunk_{idx:04d}.zarr")
+    subset_group = zarr.open_group(subset_path, mode="w")
 
-# --- Last dates (dummy placeholder) ---
-last_dates_str = b"1900-01-01"
-last_dates_data = np.full((8, n_pixels), last_dates_str, dtype="S10")
+    # --- Dates ---
+    dates_data = np.array([d.strftime("%Y-%m-%d").encode("utf-8") for d in daily_dates], dtype="S10")
+    subset_group.create_dataset("dates", data=dates_data, shape=dates_data.shape, dtype="S10")
 
-subset_group.create_dataset(
-    "last_dates",
-    data=last_dates_data,
-    shape=last_dates_data.shape,  
-    dtype="S10",
-    chunks=(1, n_pixels),
-)
+    # --- NDVI subset ---
+    subset_group.create_dataset(
+        "ndvi",
+        data=daily_ndvi,
+        shape=daily_ndvi.shape,
+        chunks=(1, daily_ndvi.shape[1]),
+        dtype=np.int16,
+    )
 
+    # --- Counter array ---
+    subset_group.create_dataset(
+        "counter",
+        data=np.zeros(len(daily_dates), dtype=np.int16),
+        shape=(len(daily_dates),),
+        dtype=np.int16,
+    )
 
-print(f"✅ Daily NDVI Zarr created at: {OUT_ZARR}")
+    # --- Params ---
+    param_group = subset_group.create_group("params")
+    params_lower_subset = params_lower.get_orthogonal_selection((chunk_pixels, slice(None)))
+    params_upper_subset = params_upper.get_orthogonal_selection((chunk_pixels, slice(None)))
+
+    param_group.create_dataset(
+        "params_lower",
+        data=params_lower_subset,
+        shape=params_lower_subset.shape, 
+        dtype=np.float32,
+    )
+    param_group.create_dataset(
+        "params_upper",
+        data=params_upper_subset,
+        shape=params_upper_subset.shape, 
+        dtype=np.float32,
+    )
+
+    # --- Last dates (dummy placeholder) ---
+    last_dates_str = b"1900-01-01"
+    last_dates_data = np.full((8, len(chunk_pixels)), last_dates_str, dtype="S10")
+
+    subset_group.create_dataset(
+        "last_dates",
+        data=last_dates_data,
+        shape=last_dates_data.shape,  
+        dtype="S10",
+        chunks=(1, len(chunk_pixels)),
+    )
+
+    print(f"✅ Created {subset_path}")
+
+print(f"Finished creating {len(chunks)} Zarr files at {OUT_ZARR}")
 print(f"Total time: {time.time() - start_time:.1f} s")
