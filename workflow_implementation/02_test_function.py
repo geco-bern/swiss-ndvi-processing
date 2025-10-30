@@ -473,7 +473,7 @@ def continous_ndvi(day, pixel_idx):
 
 pixels = np.random.choice(np.arange(1_000_000), size=5, replace=False) # np.array([42,5645,129483,248738,582910,302]) # 
 
-"""
+
 def process_pixel(pixel_idx):
 
     for i in range(1500):
@@ -482,17 +482,17 @@ def process_pixel(pixel_idx):
         print(i)
 
 # Run each pixel in parallel 
-with concurrent.futures.ProcessPoolExecutor() as executor:
-    executor.map(process_pixel, pixels)"""
+with concurrent.futures.ProcessThreadExecutor() as executor:
+    executor.map(process_pixel, pixels)
 
 
-for i in range(1500):
+"""for i in range(1500):
     day = zarr_date_to_date(dates[i])
     print(i)
     #continous_ndvi_2(day, pixels[0])
 
     for pixel in pixels:
-        continous_ndvi(day, pixel)
+        continous_ndvi(day, pixel)"""
 
 print("done")
 
