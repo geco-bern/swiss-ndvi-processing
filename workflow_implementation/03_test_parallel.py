@@ -354,22 +354,24 @@ def continous_ndvi(day_date, pixel_idx):
 # =====================================================
 # PROCESS SINGLE FILE
 # =====================================================
+
 def process_file(file_path):
     try:
         file_name = os.path.basename(file_path)
-        out_path = os.path.join(OUTPUT_DIR, file_name)
+        final_out_path = os.path.join(OUTPUT_DIR, file_name)
+        tmp_out_path = final_out_path + f".tmp_{os.getpid()}"
 
-        tmp_out_path = out_path + f".tmp_{os.getpid()}"
+        # Clean up any previous temp dir for this process
         if os.path.exists(tmp_out_path):
-
             shutil.rmtree(tmp_out_path)
+
+        # Make a private copy for this process
         shutil.copytree(file_path, tmp_out_path)
 
-        os.rename(tmp_out_path, out_path)
+        # --- open and process BEFORE renaming ---
+        ds = zarr.open_group(tmp_out_path, mode="r+")
 
-        ds = zarr.open_group(out_path, mode="r+")
         global ndvi_zarr, last_dates_zarr, params_lower_zarr, params_upper_zarr, dates_list
-
         ndvi_zarr = ds["ndvi"]
         last_dates_zarr = ds["last_dates"]
         params_lower_zarr = ds["params"]["params_lower"]
@@ -383,19 +385,30 @@ def process_file(file_path):
         selected_pixels = rng.choice(np.arange(n_pixels), size=N_PIXELS_PER_FILE, replace=False)
         print(f"[{file_name}] Selected {len(selected_pixels)} random pixels")
         print(selected_pixels)
+
         for day_date in dates_list[:1000]:
             for pixel_idx in selected_pixels:
                 continous_ndvi(day_date, pixel_idx)
 
-        print(f"[{file_name}] Done.")
-        gc.collect()
+        # (no flush, no close needed for Zarr v3)
+        zarr.consolidate_metadata(tmp_out_path)
+
+        # --- atomic finalization ---
+        if not os.path.exists(final_out_path):
+            os.rename(tmp_out_path, final_out_path)
+            print(f"[{file_name}] ✅ Saved to {final_out_path}")
+        else:
+            print(f"[{file_name}] ⚠️ Output already exists — removing temp.")
+            shutil.rmtree(tmp_out_path)
+
         return {"file": file_name, "status": "ok"}
 
     except Exception as e:
-        print(f"[{file_path}] FAILED: {e}")
         traceback.print_exc()
+        # cleanup on error
+        if os.path.exists(tmp_out_path):
+            shutil.rmtree(tmp_out_path)
         return {"file": file_path, "status": "error", "error": str(e)}
-
 
 # =====================================================
 # RUN PARALLEL
