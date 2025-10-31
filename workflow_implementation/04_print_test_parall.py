@@ -41,7 +41,7 @@ def _parse_zarr_date(d_val):
                 s = m.group(1)
         return pd.to_datetime(s, errors="coerce")
 
-root = zarr.open("/data_2/scratch/francesco/zarr_demo_daily_output", mode="r")
+root = zarr.open("/data_2/scratch/francesco/zarr_demo_daily_processed_3/chunk_0000.zarr", mode="r")
 #original_root = zarr.open("/data_2/scratch/francesco/zarr_demo_daily/", mode="r")
 
 
@@ -65,7 +65,7 @@ ndvi_arr = root["ndvi"]
 
 # Extract NDVI time series
 base_date = zarr_date_to_date(dates[0])
-date_list = [zarr_date_to_date(d) for d in dates[:1500]]
+date_list = [zarr_date_to_date(d) for d in dates[:1000]]
 
 import matplotlib
 matplotlib.use("Agg")   
@@ -73,17 +73,15 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
 
-out_dir = "/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/figure/test_parallelization/"
+out_dir = "./workflow_implementation/figure"
 os.makedirs(out_dir, exist_ok=True)  
 
-pixels = [564891, 316517, 924896, 475939, 136766, 384152 ,100670, 210095, 562418, 471642,
- 338199, 310485, 701026,  65215, 936349
- ]
+pixels = [ 74, 705, 227, 357, 953]
 
 
 
 for pixel in pixels:
-    ndvi_series = ndvi_arr[:1500, pixel] / 10000.0
+    ndvi_series = ndvi_arr[:1000, pixel] / 10000.0
 
     plt.figure(figsize=(10, 5))
     plt.plot(date_list, ndvi_series, lw=1, label="NDVI") 
