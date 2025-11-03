@@ -1,4 +1,4 @@
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/03_test_parallel_with_gpu.py > /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/zarr_parallel_continous_ndvi_small_gpu.log &
+# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/03_test_parallel_with_gpu.py > /home/francesco/data_scratch/swiss-ndvi-processing/demo/output/log/zarr_parallel_continous_ndvi_gpu_ssd.log &
 
 #!/usr/bin/env python3
 import os
@@ -17,11 +17,11 @@ import pandas as pd
 import torch
 import statsmodels.api as sm
 
-INPUT_DIR = "/data_2/scratch/francesco/zarr_demo_daily/"
-OUTPUT_DIR = "/data_2/scratch/francesco/zarr_demo_daily_processed_3/"
-N_FILES = 20
-N_PIXELS_PER_FILE = 100
-PROCESS_DATES_LIMIT = 3000
+INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily/"
+OUTPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily_processed/"
+N_FILES = 15
+N_PIXELS_PER_FILE = 1
+PROCESS_DATES_LIMIT = 3072
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -333,6 +333,8 @@ def process_file(file_path):
             shutil.rmtree(tmp_out_path)
         return {"file": file_path, "status": "error", "error": str(e)}
 
+results = []  
+
 if __name__ == "__main__":
     all_entries = sorted(os.listdir(INPUT_DIR))
     zarr_files = [os.path.join(INPUT_DIR, e) for e in all_entries if e.endswith(".zarr")]
@@ -343,4 +345,18 @@ if __name__ == "__main__":
         for fut in concurrent.futures.as_completed(futures):
             res = fut.result()
             print("Result:", res)
+            results.append(res)
     print("✅ All processing complete.")
+
+rows = []
+for r in results:
+    row = {'file': r.get('file'), 'status': r.get('status')}
+    # flatten timing info
+    timing = r.get('timing', {})
+    for k, v in timing.items():
+        row[k] = v
+    rows.append(row)
+
+# Convert to DataFrame and save
+df = pd.DataFrame(rows)
+df.to_csv('workflow_implementation/output/timing_as_it_is.csv', index=False)
