@@ -1,6 +1,5 @@
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/03_test_parallel_with_gpu.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/zarr_parallel_continous_ndvi_gpu_ssd.log &
+# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/03_test_parallel_with_dask.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/zarr_parallel_continous_ndvi_gpu_ssd_3.log &
 
-#!/usr/bin/env python3
 import os
 import sys
 import time
@@ -16,12 +15,17 @@ import numpy as np
 import pandas as pd
 import torch
 import statsmodels.api as sm
+import dask.array as da
+from dask.distributed import Client
+from dask import delayed
 
-INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily/"
+
+
+INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily.zarr/"
 OUTPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily_processed/"
-N_FILES = 15
-N_PIXELS_PER_FILE = 1
-PROCESS_DATES_LIMIT = 3072
+N_WORKERS = 10
+N_PIXELS_PER_FILE = 1000
+device = "cpu"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -30,18 +34,53 @@ def unwrap_scalar(x):
         x = x.item()
     return x
 
+def to_date(obj):
+    """Convert various date/time objects to datetime.date."""
+    if obj is None:
+        return None
+    if isinstance(obj, date) and not isinstance(obj, datetime):
+        return obj
+    if isinstance(obj, datetime):
+        return obj.date()
+    if isinstance(obj, (np.datetime64,)):
+        return obj.astype("M8[D]").astype(datetime).date()
+    if isinstance(obj, (bytes, str)):
+        s = obj.decode("utf-8") if isinstance(obj, bytes) else obj
+        # Try multiple common formats
+        for fmt in ("%Y-%m-%d", "%Y%m%d", "%Y/%m/%d"):
+            try:
+                return datetime.strptime(s, fmt).date()
+            except ValueError:
+                pass
+    raise TypeError(f"Cannot convert {type(obj)} to datetime.date")
+
 def zarr_date_to_date(zarr_date):
-    zarr_date = unwrap_scalar(zarr_date)
-    if isinstance(zarr_date, bytes):
-        return datetime.strptime(zarr_date.decode("utf-8"), "%Y-%m-%d").date()
-    elif isinstance(zarr_date, np.datetime64):
-        return zarr_date.astype("M8[D]").astype(datetime).date()
-    elif isinstance(zarr_date, datetime):
-        return zarr_date.date()
-    elif isinstance(zarr_date, date):
-        return zarr_date
+    """
+    Convert int or np.ndarray of int in YYYYMMDD format to datetime.date.
+    Works for both single integers and numpy arrays.
+    """
+    # Handle numpy array of ints
+    if isinstance(zarr_date, np.ndarray):
+        if not np.issubdtype(zarr_date.dtype, np.integer):
+            raise TypeError(f"Expected int array, got {zarr_date.dtype}")
+        years = zarr_date // 10000
+        months = (zarr_date % 10000) // 100
+        days = zarr_date % 100
+        return np.array(
+            [date(int(y), int(m), int(d)) for y, m, d in zip(years, months, days)],
+            dtype=object
+        )
+
+    # Handle single integer
+    elif isinstance(zarr_date, (int, np.integer)):
+        y = zarr_date // 10000
+        m = (zarr_date % 10000) // 100
+        d = zarr_date % 100
+        return date(int(y), int(m), int(d))
+
     else:
-        raise TypeError(f"Unknown date type: {type(zarr_date)}")
+        raise TypeError(f"Expected int or np.ndarray of int, got {type(zarr_date)}")
+
 
 T_SCALE = 1.0 / 365.0
 
@@ -140,9 +179,13 @@ def L2_smoothing(pixel_rel_idx, init_position, params_lower, params_upper, ndvi_
         return
     ndvi_vals = []
     median_vals = []
-    base_date = dates_list[0]
+    base_date = to_date(dates_list[0])
+
     for d in last_dates:
+
+        d = to_date(d)
         idx = (d - base_date).days
+
         if 0 <= idx < ndvi_arr.shape[0]:
             ndvi_val = ndvi_arr[idx, pixel_rel_idx] / 10000.0
         else:
@@ -156,6 +199,9 @@ def L2_smoothing(pixel_rel_idx, init_position, params_lower, params_upper, ndvi_
     deltas_arr = ndvi_vals - median_vals
     start_date = last_dates[init_position]
     end_date = last_dates[-1]
+
+    start_date = to_date(start_date)
+    end_date = to_date(end_date)
     days_diff = (end_date - start_date).days
     if days_diff <= 0:
         return
@@ -193,22 +239,34 @@ def L2_smoothing(pixel_rel_idx, init_position, params_lower, params_upper, ndvi_
     #ndvi_arr[base_idx_start:base_idx_end + 1, pixel_rel_idx] = smoothed_scaled[: base_idx_end - base_idx_start + 1]
 
 def continous_ndvi(day_date, pixel_rel_idx, pixel_global_idx, ndvi_arr, last_dates_arr, params_lower_arr, params_upper_arr, dates_list, device, timing):
-    t0 = time.perf_counter()
+
+
     base_date = dates_list[0]
+
+    day_date = to_date(day_date)
+    base_date = to_date(dates_list[0])
+
     date_index = (day_date - base_date).days
     if not (0 <= date_index < ndvi_arr.shape[0]):
         return
-    timing['calls'] += 1
     ndvi_val_raw = ndvi_arr[date_index, pixel_rel_idx]
     last_date_raw = last_dates_arr[6, pixel_rel_idx]
     last_date = zarr_date_to_date(last_date_raw) if not np.all(last_date_raw == b"1900-01-01") else date(1900,1,1)
+
+    last_date = to_date(last_date)
+
     potential_date_raw = last_dates_arr[7, pixel_rel_idx]
     potential_date = zarr_date_to_date(potential_date_raw) if not np.all(potential_date_raw == b"1900-01-01") else date(1900,1,1)
+    
+    potential_date = to_date(potential_date)
+
     params_lower = params_lower_arr[pixel_rel_idx]
     params_upper = params_upper_arr[pixel_rel_idx]
     doy = day_date.timetuple().tm_yday
+
     if last_date != date(1900,1,1):
         last_doy = last_date.timetuple().tm_yday
+
         last_idx = (last_date - base_date).days
         last_ndvi = ndvi_arr[last_idx, pixel_rel_idx] / 10000.0
         delta_prev = last_ndvi - calculate_median([last_doy], params_lower, params_upper, device=device)[0]
@@ -240,123 +298,142 @@ def continous_ndvi(day_date, pixel_rel_idx, pixel_global_idx, ndvi_arr, last_dat
                 if last_date != date(1900,1,1):
                     L1_interpolation(potential_delta, delta_prev, potential_date, last_date, base_date, params_lower, params_upper, pixel_rel_idx, ndvi_arr, device)
                 old_dates = last_dates_arr[:7, pixel_rel_idx].copy()
-                old_dates = np.array(old_dates, dtype='S10')
-                shifted = np.empty(old_dates.shape, dtype='S10')
+                old_dates = last_dates_arr[:7, pixel_rel_idx].copy().astype(np.int32)
+                shifted = np.empty_like(old_dates, dtype=np.int32) 
                 shifted[:-2] = old_dates[1:-1]
-                shifted[-2] = potential_date.strftime("%Y-%m-%d").encode("utf-8")
-                shifted[-1] = day_date.strftime("%Y-%m-%d").encode("utf-8")
+                shifted[-2] = potential_date.year * 10000 + potential_date.month * 100 + potential_date.day
+                shifted[-1] = day_date.year * 10000 + day_date.month * 100 + day_date.day
                 last_dates_arr[:7, pixel_rel_idx] = shifted
                 valid_window = [zarr_date_to_date(d) for d in shifted]
                 if all(d != date(1900,1,1) for d in valid_window):
-                    L2_smoothing(pixel_rel_idx, 1, params_lower, params_upper, ndvi_arr, last_dates_arr, dates_list, device)
-                last_dates_arr[7:, pixel_rel_idx] = b"1900-01-01"
+                    r = 3
+                    #L2_smoothing(pixel_rel_idx, 1, params_lower, params_upper, ndvi_arr, last_dates_arr, dates_list, device)
+                last_dates_arr[7:, pixel_rel_idx] = 19000101
             else:
                 if last_date != date(1900,1,1):
                     L1_interpolation(delta_prev, current_delta, last_date, day_date, base_date, params_lower, params_upper, pixel_rel_idx, ndvi_arr, device)
-                old_dates = last_dates_arr[:7, pixel_rel_idx].copy()
-                old_dates = np.array(old_dates, dtype='S10')
-                shifted = np.empty(old_dates.shape, dtype='S10')
+                old_dates = last_dates_arr[:7, pixel_rel_idx].copy().astype(np.int32)
+                shifted = np.empty_like(old_dates, dtype=np.int32)
                 shifted[:-1] = old_dates[1:]
-                shifted[-1] = day_date.strftime("%Y-%m-%d").encode("utf-8")
+                shifted[-1] = day_date.year * 10000 + day_date.month * 100 + day_date.day
                 last_dates_arr[:7, pixel_rel_idx] = shifted
                 valid_window = [zarr_date_to_date(d) for d in shifted]
                 if all(d != date(1900,1,1) for d in valid_window):
-                    L2_smoothing(pixel_rel_idx, 2, params_lower, params_upper, ndvi_arr, last_dates_arr, dates_list, device)
-                last_dates_arr[7:, pixel_rel_idx] = b"1900-01-01"
+                    r = 3
+                    #L2_smoothing(pixel_rel_idx, 2, params_lower, params_upper, ndvi_arr, last_dates_arr, dates_list, device)
+                last_dates_arr[7:, pixel_rel_idx] = 19000101
         else:
             if last_date != date(1900,1,1):
                 L1_interpolation(delta_prev, current_delta, last_date, day_date, base_date, params_lower, params_upper, pixel_rel_idx, ndvi_arr, device)
-            old_dates = last_dates_arr[:7, pixel_rel_idx].copy()
-            old_dates = np.array(old_dates, dtype='S10')
-            shifted = np.empty(old_dates.shape, dtype='S10')
+
+            old_dates = last_dates_arr[:7, pixel_rel_idx].copy().astype(np.int32)
+            shifted = np.empty_like(old_dates, dtype=np.int32)
             shifted[:-1] = old_dates[1:]
-            shifted[-1] = day_date.strftime("%Y-%m-%d").encode("utf-8")
+            shifted[-1] = day_date.year * 10000 + day_date.month * 100 + day_date.day
             last_dates_arr[:7, pixel_rel_idx] = shifted
             valid_window = [zarr_date_to_date(d) for d in shifted]
             if all(d != date(1900,1,1) for d in valid_window):
-                L2_smoothing(pixel_rel_idx, 2, params_lower, params_upper, ndvi_arr, last_dates_arr, dates_list, device)
-            last_dates_arr[7:, pixel_rel_idx] = b"1900-01-01"
+                r = 3
+                #L2_smoothing(pixel_rel_idx, 2, params_lower, params_upper, ndvi_arr, last_dates_arr, dates_list, device)
+            last_dates_arr[7:, pixel_rel_idx] = 19000101
     else:
-        date_to_potential = day_date.strftime("%Y-%m-%d").encode("utf-8")
+        date_to_potential = day_date.year * 10000 + day_date.month * 100 + day_date.day
         last_dates_arr[7:, pixel_rel_idx] = date_to_potential
-    timing['time'] += time.perf_counter() - t0
 
-def process_file(file_path):
-    timing = {'load':0.0, 'write':0.0, 'median':0.0, 'time':0.0, 'calls':0}
-    try:
-        t_file_start = time.perf_counter()
-        file_name = os.path.basename(file_path)
-        """final_out_path = os.path.join(OUTPUT_DIR, file_name)
-        tmp_out_path = final_out_path + f".tmp_{os.getpid()}"
-        if os.path.exists(tmp_out_path):
-            shutil.rmtree(tmp_out_path)
-        shutil.copytree(file_path, tmp_out_path)"""
-        ds = zarr.open_group(INPUT_DIR, mode="r")
-        ndvi_zarr = ds["ndvi"]
-        last_dates_zarr = ds["last_dates"]
-        params_lower_zarr = ds["params"]["params_lower"]
-        params_upper_zarr = ds["params"]["params_upper"]
-        dates_zarr = ds["dates"]
-        dates_list = [zarr_date_to_date(d) for d in dates_zarr[:]]
-        n_pixels = ndvi_zarr.shape[1]
-        seed = int(hashlib.md5(file_name.encode("utf-8")).hexdigest(), 16) % (2**32 - 1)
-        rng = np.random.default_rng(seed)
-        selected_pixels_global = rng.choice(np.arange(n_pixels), size=N_PIXELS_PER_FILE, replace=False)
-        #print(selected_pixels_global)
-        t0 = time.perf_counter()
-        ndvi_arr = np.array(ndvi_zarr[:, selected_pixels_global], dtype=np.int16)
-        last_dates_arr = np.array(last_dates_zarr[:, selected_pixels_global], dtype='S10')
-        params_lower_arr = np.array(params_lower_zarr[selected_pixels_global, :], dtype=np.float32)
-        params_upper_arr = np.array(params_upper_zarr[selected_pixels_global, :], dtype=np.float32)
-        t_read = time.perf_counter() - t0
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        t_iter_start = time.perf_counter()
-        for day_date in dates_list[:PROCESS_DATES_LIMIT]:
-            for rel_idx, global_idx in enumerate(selected_pixels_global):
-                continous_ndvi(day_date, rel_idx, global_idx, ndvi_arr, last_dates_arr, params_lower_arr, params_upper_arr, dates_list, device, timing)
-        t_iter = time.perf_counter() - t_iter_start
-        t0 = time.perf_counter()
-        """ndvi_zarr[:, selected_pixels_global] = ndvi_arr
-        last_dates_zarr[:, selected_pixels_global] = last_dates_arr"""
-        t_write = time.perf_counter() - t0
-        """zarr.consolidate_metadata(tmp_out_path)
-        if not os.path.exists(final_out_path):
-            os.rename(tmp_out_path, final_out_path)
-        else:
-            shutil.rmtree(tmp_out_path)"""
-        t_file_end = time.perf_counter()
-        print(f"[{file_name}] loaded={t_read:.3f}s iter={t_iter:.3f}s write={t_write:.3f}s total={t_file_end - t_file_start:.3f}s calls={timing['calls']} time_spent={timing['time']:.3f}s")
-        return {"file": file_name, "status": "ok", "timing": timing}
-    except Exception as e:
-        traceback.print_exc()
-        """if os.path.exists(tmp_out_path):
-            shutil.rmtree(tmp_out_path)"""
-        return {"file": file_path, "status": "error", "error": str(e)}
 
-results = []  
+# ==== MAIN PROCESS ====
+@delayed
+def process_pixel_chunk_dask(ndvi_block, last_dates_block, params_lower, params_upper, dates_list, device):
+    # ndvi_block: (time, pixels_in_chunk)
+    # last_dates_block: (dates_recorded, pixels_in_chunk)
+    for pixel_idx in range(ndvi_block.shape[1]):
+        for day in dates_list:
+            continous_ndvi(
+                day_date=day,
+                pixel_rel_idx=pixel_idx,
+                pixel_global_idx=pixel_idx,
+                ndvi_arr=ndvi_block,
+                last_dates_arr=last_dates_block,
+                params_lower_arr=params_lower,
+                params_upper_arr=params_upper,
+                dates_list=dates_list,
+                device=device,
+                timing=None
+            )
+    return ndvi_block, last_dates_block
 
 if __name__ == "__main__":
-    all_entries = sorted(os.listdir(INPUT_DIR))
-    zarr_files = [os.path.join(INPUT_DIR, e) for e in all_entries if e.endswith(".zarr")]
-    zarr_files = zarr_files[:N_FILES]
-    print(f"Starting analysis on {len(zarr_files)} files with {N_PIXELS_PER_FILE} pixels each.")
-    with concurrent.futures.ProcessPoolExecutor(max_workers=N_FILES) as executor:
-        futures = {executor.submit(process_file, path): path for path in zarr_files}
-        for fut in concurrent.futures.as_completed(futures):
-            res = fut.result()
-            print("Result:", res)
-            results.append(res)
-    print("✅ All processing complete.")
 
-rows = []
-for r in results:
-    row = {'file': r.get('file'), 'status': r.get('status')}
-    # flatten timing info
-    timing = r.get('timing', {})
-    for k, v in timing.items():
-        row[k] = v
-    rows.append(row)
+    client = Client(n_workers=10, threads_per_worker=1, memory_limit='4GB')
+    print(client)
+    client.dashboard_link
 
-# Convert to DataFrame and save
-df = pd.DataFrame(rows)
-df.to_csv('workflow_implementation/output/timing_as_it_is.csv', index=False)
+    ds = zarr.open_group(INPUT_DIR, mode='r')
+
+    ndvi_z = da.from_zarr(ds["ndvi"])
+    last_dates_z = da.from_zarr(ds["last_dates"])
+    params_lower_z = da.from_zarr(ds["params"]["params_lower"])
+    params_upper_z = da.from_zarr(ds["params"]["params_upper"])
+
+    # Convert dates to Python datetime
+    dates_int = ds["dates"][:].astype(np.int32)
+    dates_list = [datetime.strptime(str(d), "%Y%m%d").date() for d in dates_int]
+
+    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    pixel_indices = list(range(0, N_WORKERS * N_PIXELS_PER_FILE, N_PIXELS_PER_FILE))
+
+    print(f"Total pixels: {N_WORKERS * N_PIXELS_PER_FILE}, Processing in chunks of {N_PIXELS_PER_FILE} pixels with {N_WORKERS} workers.")
+    delayed_chunks = []
+    for start in pixel_indices:
+        end = min(start + N_PIXELS_PER_FILE, ndvi_z.shape[1])
+
+        timing = {'computing': 0.0, "loading": 0.0}
+
+        t_start_Loading = time.perf_counter()
+        # Select chunk and compute lazily
+        ndvi_chunk = ndvi_z[:, start:end].compute()
+        last_dates_chunk = last_dates_z[:, start:end].compute()
+        params_lower_chunk = params_lower_z[start:end, :].compute()
+        params_upper_chunk = params_upper_z[start:end, :].compute()
+        
+        t_load = time.perf_counter() - t_start_Loading
+        timing["loading"] = t_load
+        
+        delayed_chunk = process_pixel_chunk_dask(
+            ndvi_chunk, last_dates_chunk,
+            params_lower_chunk, params_upper_chunk,
+            dates_list, device
+        )
+
+        delayed_chunks.append(delayed_chunk)
+
+    # Compute all chunks in parallel
+    t_start = time.perf_counter()
+    results = da.compute(*delayed_chunks)
+    t_compute = time.perf_counter() - t_start
+    timing["computing"] = t_compute
+    print(f"[Chunk computing={t_compute:.2f}s, loading={t_load:.2f}s]")
+
+    # Unpack results
+    ndvi_results = [r[0] for r in results]
+    last_dates_results = [r[1] for r in results]
+
+    # Optionally, save results back to Zarr
+
+    output_ndvi_path = os.path.join(OUTPUT_DIR, "ndvi.zarr")
+    output_last_dates_path = os.path.join(OUTPUT_DIR, "last_dates.zarr")
+    if os.path.exists(output_ndvi_path):
+        shutil.rmtree(output_ndvi_path)
+    if os.path.exists(output_last_dates_path):
+        shutil.rmtree(output_last_dates_path)
+    ndvi_store = zarr.open(output_ndvi_path, mode='w', shape=ndvi_z.shape, chunks=ndvi_z.chunks, dtype=np.int16)
+    last_dates_store = zarr.open(output_last_dates_path, mode='w', shape=last_dates_z.shape, chunks=last_dates_z.chunks, dtype=last_dates_z.dtype)
+    # Write results
+    pixel_offset = 0
+    for ndvi_chunk, last_dates_chunk in zip(ndvi_results, last_dates_results):
+        n_pixels = ndvi_chunk.shape[1]
+        ndvi_store[:, pixel_offset:pixel_offset + n_pixels] = ndvi_chunk
+        last_dates_store[:, pixel_offset:pixel_offset + n_pixels] = last_dates_chunk
+        pixel_offset += n_pixels
+    print("Processing completed and results saved.")
