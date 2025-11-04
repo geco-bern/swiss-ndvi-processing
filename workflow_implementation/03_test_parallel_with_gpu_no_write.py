@@ -1,6 +1,5 @@
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/03_test_parallel_with_gpu.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/zarr_parallel_continous_ndvi_gpu_ssd.log &
+# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/03_test_parallel_with_gpu_no_write.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/zarr_parallel_continous_ndvi_gpu_ssd_2.log &
 
-#!/usr/bin/env python3
 import os
 import sys
 import time
@@ -16,32 +15,19 @@ import numpy as np
 import pandas as pd
 import torch
 import statsmodels.api as sm
+import dask.array as da
+from zarr.storage import LocalStore as FSStore
 
-INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily/"
+INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily.zarr/"
 OUTPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily_processed/"
-N_FILES = 15
+N_WORKERS = 10
 N_PIXELS_PER_FILE = 1
-PROCESS_DATES_LIMIT = 3072
-
-os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def unwrap_scalar(x):
     while isinstance(x, np.ndarray) and x.shape == ():
         x = x.item()
     return x
 
-def zarr_date_to_date(zarr_date):
-    zarr_date = unwrap_scalar(zarr_date)
-    if isinstance(zarr_date, bytes):
-        return datetime.strptime(zarr_date.decode("utf-8"), "%Y-%m-%d").date()
-    elif isinstance(zarr_date, np.datetime64):
-        return zarr_date.astype("M8[D]").astype(datetime).date()
-    elif isinstance(zarr_date, datetime):
-        return zarr_date.date()
-    elif isinstance(zarr_date, date):
-        return zarr_date
-    else:
-        raise TypeError(f"Unknown date type: {type(zarr_date)}")
 
 T_SCALE = 1.0 / 365.0
 
@@ -53,28 +39,6 @@ def double_logistic_function(t, params):
     sigmoid_sen_eos = torch.sigmoid(-2 * (2 * sen + eos_minus_sen - 2 * t[:, None]) / (eos_minus_sen + 1e-10))
     return (M - m) * (sigmoid_sos_mat - sigmoid_sen_eos) + m
 
-def calculate_median(doys, params_lower, params_upper, device=torch.device("cpu")):
-    doys = np.asarray(doys, dtype=np.float32)
-    t = torch.tensor(doys * T_SCALE, dtype=torch.float32, device=device)
-    pl = params_lower
-    pu = params_upper
-    if isinstance(pl, np.ndarray):
-        pl = torch.from_numpy(pl)
-    if isinstance(pu, np.ndarray):
-        pu = torch.from_numpy(pu)
-    pl = pl.to(device=device)
-    pu = pu.to(device=device)
-    if pl.ndim == 1:
-        pl = pl.unsqueeze(0)
-    if pu.ndim == 1:
-        pu = pu.unsqueeze(0)
-    lower = double_logistic_function(t, pl)
-    upper = double_logistic_function(t, pu)
-    med = 0.5 * (upper + lower)
-    med_np = med.detach().cpu().numpy()
-    if med_np.ndim == 2 and med_np.shape[1] == 1:
-        med_np = med_np[:, 0]
-    return med_np
 
 def estimate_ndvi(days_diff, median, delta_prev):
     decrease_factor = math.exp(-math.log(2) * (days_diff / 15.0))
@@ -134,8 +98,13 @@ def L1_interpolation(delta_1, delta_2, date_1, date_2, base_date, params_lower, 
     #ndvi_arr[a:b + 1, pixel_rel_idx] = ndvi_scaled[(a - idx_start):(b - idx_start) + 1]
 
 def L2_smoothing(pixel_rel_idx, init_position, params_lower, params_upper, ndvi_arr, last_dates_arr, dates_list, device):
+
     last_dates_bytes = last_dates_arr[:7, pixel_rel_idx]
-    last_dates = [zarr_date_to_date(d) for d in last_dates_bytes if not np.all(d == b'1900-01-01')]
+
+    dates_str = last_dates_bytes.astype(str)
+
+    last_dates = dates_str.astype('datetime64[D]')
+
     if len(last_dates) < 2:
         return
     ndvi_vals = []
@@ -193,7 +162,7 @@ def L2_smoothing(pixel_rel_idx, init_position, params_lower, params_upper, ndvi_
     #ndvi_arr[base_idx_start:base_idx_end + 1, pixel_rel_idx] = smoothed_scaled[: base_idx_end - base_idx_start + 1]
 
 def continous_ndvi(day_date, pixel_rel_idx, pixel_global_idx, ndvi_arr, last_dates_arr, params_lower_arr, params_upper_arr, dates_list, device, timing):
-    t0 = time.perf_counter()
+
     base_date = dates_list[0]
     date_index = (day_date - base_date).days
     if not (0 <= date_index < ndvi_arr.shape[0]):
@@ -279,84 +248,89 @@ def continous_ndvi(day_date, pixel_rel_idx, pixel_global_idx, ndvi_arr, last_dat
     else:
         date_to_potential = day_date.strftime("%Y-%m-%d").encode("utf-8")
         last_dates_arr[7:, pixel_rel_idx] = date_to_potential
-    timing['time'] += time.perf_counter() - t0
 
-def process_file(file_path):
-    timing = {'load':0.0, 'write':0.0, 'median':0.0, 'time':0.0, 'calls':0}
+
+# ==== MAIN PROCESS ====
+def process_pixel_chunk(start_idx, end_idx):
+    """Fast loading of pixel chunk from Zarr dataset (optimized I/O only)."""
+    timing = {'computing': 0.0}
+    
     try:
-        t_file_start = time.perf_counter()
-        file_name = os.path.basename(file_path)
-        """final_out_path = os.path.join(OUTPUT_DIR, file_name)
-        tmp_out_path = final_out_path + f".tmp_{os.getpid()}"
-        if os.path.exists(tmp_out_path):
-            shutil.rmtree(tmp_out_path)
-        shutil.copytree(file_path, tmp_out_path)"""
-        ds = zarr.open_group(INPUT_DIR, mode="r")
-        ndvi_zarr = ds["ndvi"]
-        last_dates_zarr = ds["last_dates"]
-        params_lower_zarr = ds["params"]["params_lower"]
-        params_upper_zarr = ds["params"]["params_upper"]
-        dates_zarr = ds["dates"]
-        dates_list = [zarr_date_to_date(d) for d in dates_zarr[:]]
-        n_pixels = ndvi_zarr.shape[1]
-        seed = int(hashlib.md5(file_name.encode("utf-8")).hexdigest(), 16) % (2**32 - 1)
-        rng = np.random.default_rng(seed)
-        selected_pixels_global = rng.choice(np.arange(n_pixels), size=N_PIXELS_PER_FILE, replace=False)
-        #print(selected_pixels_global)
-        t0 = time.perf_counter()
-        ndvi_arr = np.array(ndvi_zarr[:, selected_pixels_global], dtype=np.int16)
-        last_dates_arr = np.array(last_dates_zarr[:, selected_pixels_global], dtype='S10')
-        params_lower_arr = np.array(params_lower_zarr[selected_pixels_global, :], dtype=np.float32)
-        params_upper_arr = np.array(params_upper_zarr[selected_pixels_global, :], dtype=np.float32)
-        t_read = time.perf_counter() - t0
+        # --- Use threaded FSStore for parallel disk access ---
+        ds = zarr.open_group(INPUT_DIR, mode='r')
+
+        # --- Open arrays lazily using Dask ---
+        ndvi_z = da.from_zarr(ds["ndvi"])
+        median_z = da.from_zarr(ds["median_ndvi"])
+        last_dates_z = da.from_zarr(ds["last_dates"])
+        params_lower_z = da.from_zarr(ds["params"]["params_lower"])
+        params_upper_z = da.from_zarr(ds["params"]["params_upper"])
+
+        # --- Load only needed pixel range ---
+        ndvi = ndvi_z[:, start_idx:end_idx].compute()
+        median_ndvi = median_z[:, start_idx:end_idx].compute()
+        last_dates = last_dates_z[:, start_idx:end_idx].compute()
+        params_lower = params_lower_z[start_idx:end_idx, :].compute()
+        params_upper = params_upper_z[start_idx:end_idx, :].compute()
+
+        # --- Dates  ---
+        dates_int = ds["dates"][:]
+        dates = np.array(
+            [np.datetime64(str(d), "D") for d in dates_int],
+            dtype="datetime64[D]"
+        )
+
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        t_iter_start = time.perf_counter()
-        for day_date in dates_list[:PROCESS_DATES_LIMIT]:
-            for rel_idx, global_idx in enumerate(selected_pixels_global):
-                continous_ndvi(day_date, rel_idx, global_idx, ndvi_arr, last_dates_arr, params_lower_arr, params_upper_arr, dates_list, device, timing)
-        t_iter = time.perf_counter() - t_iter_start
-        t0 = time.perf_counter()
-        """ndvi_zarr[:, selected_pixels_global] = ndvi_arr
-        last_dates_zarr[:, selected_pixels_global] = last_dates_arr"""
-        t_write = time.perf_counter() - t0
-        """zarr.consolidate_metadata(tmp_out_path)
-        if not os.path.exists(final_out_path):
-            os.rename(tmp_out_path, final_out_path)
-        else:
-            shutil.rmtree(tmp_out_path)"""
-        t_file_end = time.perf_counter()
-        print(f"[{file_name}] loaded={t_read:.3f}s iter={t_iter:.3f}s write={t_write:.3f}s total={t_file_end - t_file_start:.3f}s calls={timing['calls']} time_spent={timing['time']:.3f}s")
-        return {"file": file_name, "status": "ok", "timing": timing}
+        dates_list = pd.to_datetime(dates).to_pydatetime().tolist()
+
+        t_start = time.perf_counter()
+
+        # compute continous_ndvi function
+        for pixel_rel_idx in range(ndvi.shape[1]):
+            pixel_global_idx = start_idx + pixel_rel_idx
+            for d in dates_list:
+                continous_ndvi(
+                    day_date=d,
+                    pixel_rel_idx=pixel_rel_idx,
+                    pixel_global_idx=pixel_global_idx,
+                    ndvi_arr=ndvi,
+                    last_dates_arr=last_dates,
+                    params_lower_arr=params_lower,
+                    params_upper_arr=params_upper,
+                    dates_list=dates_list,
+                    device=device,
+                    timing=timing
+                )
+
+        # --- Record timing ---
+        t_compute = time.perf_counter() - t_start
+        timing["computing"] = t_compute
+
+        print(f"[Chunk {start_idx}:{end_idx}] computing={t_compute:.2f}s")
+
     except Exception as e:
         traceback.print_exc()
-        """if os.path.exists(tmp_out_path):
-            shutil.rmtree(tmp_out_path)"""
-        return {"file": file_path, "status": "error", "error": str(e)}
+        return {"chunk": (start_idx, end_idx), "status": "error", "error": str(e)}
 
-results = []  
-
+# ==== PARALLEL EXECUTION ====
 if __name__ == "__main__":
-    all_entries = sorted(os.listdir(INPUT_DIR))
-    zarr_files = [os.path.join(INPUT_DIR, e) for e in all_entries if e.endswith(".zarr")]
-    zarr_files = zarr_files[:N_FILES]
-    print(f"Starting analysis on {len(zarr_files)} files with {N_PIXELS_PER_FILE} pixels each.")
-    with concurrent.futures.ProcessPoolExecutor(max_workers=N_FILES) as executor:
-        futures = {executor.submit(process_file, path): path for path in zarr_files}
-        for fut in concurrent.futures.as_completed(futures):
+    ds = zarr.open_group(INPUT_DIR, mode="r")
+    n_pixels = N_PIXELS_PER_FILE * N_WORKERS #ds["ndvi"].shape[1]
+
+    chunk_size = math.ceil(n_pixels / N_WORKERS)
+    chunks = [(i, min(i + chunk_size, n_pixels)) for i in range(0, n_pixels, chunk_size)]
+
+    print(f"Processing {n_pixels:,} pixels in {len(chunks)} chunks...")
+
+    results = []
+    with concurrent.futures.ProcessPoolExecutor(max_workers=N_WORKERS) as executor:
+        futs = {executor.submit(process_pixel_chunk, start, end): (start, end) for start, end in chunks}
+        for fut in concurrent.futures.as_completed(futs):
             res = fut.result()
             print("Result:", res)
             results.append(res)
-    print("✅ All processing complete.")
 
-rows = []
-for r in results:
-    row = {'file': r.get('file'), 'status': r.get('status')}
-    # flatten timing info
-    timing = r.get('timing', {})
-    for k, v in timing.items():
-        row[k] = v
-    rows.append(row)
-
-# Convert to DataFrame and save
-df = pd.DataFrame(rows)
-df.to_csv('workflow_implementation/output/timing_as_it_is.csv', index=False)
+    # Save timing summary
+    df = pd.DataFrame(results)
+    df.to_csv(os.path.join(OUTPUT_DIR, "timing_summary.csv"), index=False)
+    print("✅ Processing complete. Summary saved.")
