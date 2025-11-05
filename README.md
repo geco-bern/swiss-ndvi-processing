@@ -9,6 +9,14 @@ To use the package, you have to download the required libraries using **Conda** 
 conda env create -f environment.yml --name ndvi
 ```
 
+If during development `environment.yml` needs to be change, update it with:
+```bash
+conda install dask distributed
+conda env export --name ndvi --no-builds > environment.yml
+# and on another machine:
+conda env update --name ndvi --file environment.yml
+```
+
 # Content
 
 The demo is divided into two notebooks:  
