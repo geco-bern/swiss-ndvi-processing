@@ -18,13 +18,13 @@ import statsmodels.api as sm
 import dask.array as da
 from dask.distributed import Client
 from dask import delayed
+import xarray as xr
 
 
-
-INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily.zarr/"
+INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily_v2.zarr/"
 OUTPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily_processed/"
 N_WORKERS = 10
-N_PIXELS_PER_FILE = 1000
+N_PIXELS_PER_FILE = 1
 device = "cpu"
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -341,99 +341,117 @@ def continous_ndvi(day_date, pixel_rel_idx, pixel_global_idx, ndvi_arr, last_dat
         last_dates_arr[7:, pixel_rel_idx] = date_to_potential
 
 
-# ==== MAIN PROCESS ====
-@delayed
-def process_pixel_chunk_dask(ndvi_block, last_dates_block, params_lower, params_upper, dates_list, device):
-    # ndvi_block: (time, pixels_in_chunk)
-    # last_dates_block: (dates_recorded, pixels_in_chunk)
-    for pixel_idx in range(ndvi_block.shape[1]):
-        for day in dates_list:
-            continous_ndvi(
-                day_date=day,
-                pixel_rel_idx=pixel_idx,
-                pixel_global_idx=pixel_idx,
-                ndvi_arr=ndvi_block,
-                last_dates_arr=last_dates_block,
-                params_lower_arr=params_lower,
-                params_upper_arr=params_upper,
-                dates_list=dates_list,
-                device=device,
-                timing=None
-            )
-    return ndvi_block, last_dates_block
+def process_block_for_apply_ufunc(ndvi_block, last_dates_block, params_lower_block, params_upper_block, dates_list, device="cpu"):
+    """
+    ndvi_block: 2D numpy array (time, pixels_in_block) dtype int16 (scaled by 10000)
+    last_dates_block: 2D numpy array (band, pixels_in_block) dtype int32 or bytes representation
+    params_lower_block: 2D numpy array (pixels_in_block, 6) float32
+    params_upper_block: 2D numpy array (pixels_in_block, 6) float32
 
-if __name__ == "__main__":
+    Returns modified (ndvi_block, last_dates_block).
+    """
+    # Convert to writable arrays (should already be numpy arrays)
+    ndvi_arr = np.array(ndvi_block, copy=False)
+    last_dates_arr = np.array(last_dates_block, copy=False)
+    params_lower_arr = np.array(params_lower_block, copy=False)
+    params_upper_arr = np.array(params_upper_block, copy=False)
 
-    client = Client(n_workers=10, threads_per_worker=1, memory_limit='4GB')
-    print(client)
-    client.dashboard_link
+    # Local copies of helper functions are allowed (they are in global scope)
+    # Use CPU device by default unless user supplied gpu-capable workers
+    torch_device = torch.device(device)
 
-    ds = zarr.open_group(INPUT_DIR, mode='r')
+    n_pixels = ndvi_arr.shape[1]
+    # pre-convert dates_list to python dates for speed (may already be)
+    base_dates_list = [to_date(d) for d in dates_list]
 
-    ndvi_z = da.from_zarr(ds["ndvi"])
-    last_dates_z = da.from_zarr(ds["last_dates"])
-    params_lower_z = da.from_zarr(ds["params"]["params_lower"])
-    params_upper_z = da.from_zarr(ds["params"]["params_upper"])
+    # Iterate pixels and days similarly to your original logic
+    for pix in range(n_pixels):
+        # The functions in your code expect pixel index relative to the block
+        # and modify ndvi_arr and last_dates_arr in-place.
+        # We'll call continous_ndvi for each day in dates_list
+        for day in base_dates_list:
+            try:
+                continous_ndvi(
+                    day_date=day,
+                    pixel_rel_idx=pix,
+                    pixel_global_idx=pix,   # global index not available here; if required you can pass offset via kwargs
+                    ndvi_arr=ndvi_arr,
+                    last_dates_arr=last_dates_arr,
+                    params_lower_arr=params_lower_arr,
+                    params_upper_arr=params_upper_arr,
+                    dates_list=base_dates_list,
+                    device=torch_device,
+                    timing=None
+                )
+            except Exception as e:
+                # Avoid worker crash on single bad pixel — log and continue
+                import traceback
+                traceback.print_exc()
+                # optionally continue
+                continue
 
-    # Convert dates to Python datetime
-    dates_int = ds["dates"][:].astype(np.int32)
-    dates_list = [datetime.strptime(str(d), "%Y%m%d").date() for d in dates_int]
+    # Must return numpy arrays (the modified blocks)
+    return ndvi_arr.astype(np.int16), last_dates_arr.astype(np.int32)
 
-    #device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    pixel_indices = list(range(0, N_WORKERS * N_PIXELS_PER_FILE, N_PIXELS_PER_FILE))
+# --- Open dataset with chunking (important) ---
+# chunk on 'pixel' so each task gets a reasonable block
 
-    print(f"Total pixels: {N_WORKERS * N_PIXELS_PER_FILE}, Processing in chunks of {N_PIXELS_PER_FILE} pixels with {N_WORKERS} workers.")
-    delayed_chunks = []
-    for start in pixel_indices:
-        end = min(start + N_PIXELS_PER_FILE, ndvi_z.shape[1])
+ds = xr.open_zarr(INPUT_DIR, consolidated=True)
+ds = xr.open_zarr(INPUT_DIR, consolidated=False, chunks={"pixel": N_PIXELS_PER_FILE, "time": ds.sizes["time"]})
+params = xr.open_zarr(INPUT_DIR, group="params", consolidated=False)
 
-        timing = {'computing': 0.0, "loading": 0.0}
+# get DataArrays
 
-        t_start_Loading = time.perf_counter()
-        # Select chunk and compute lazily
-        ndvi_chunk = ndvi_z[:, start:end].compute()
-        last_dates_chunk = last_dates_z[:, start:end].compute()
-        params_lower_chunk = params_lower_z[start:end, :].compute()
-        params_upper_chunk = params_upper_z[start:end, :].compute()
-        
-        t_load = time.perf_counter() - t_start_Loading
-        timing["loading"] = t_load
-        
-        delayed_chunk = process_pixel_chunk_dask(
-            ndvi_chunk, last_dates_chunk,
-            params_lower_chunk, params_upper_chunk,
-            dates_list, device
-        )
+ndvi_da = ds["ndvi"]            # dims ("time","pixel")
+last_dates_da = ds["last_dates"]# dims ("band","pixel")
+params_lower_da = params["params_lower"] # dims ("pixel","param")
+params_upper_da = params["params_upper"] # dims ("pixel","param")
 
-        delayed_chunks.append(delayed_chunk)
+block_size = 16
+ndvi_da = ndvi_da.chunk({"pixel": block_size})
+last_dates_da = last_dates_da.chunk({"pixel": block_size})
+params_lower_da = params_lower_da.chunk({"pixel": block_size})
+params_upper_da = params_upper_da.chunk({"pixel": block_size})
 
-    # Compute all chunks in parallel
-    t_start = time.perf_counter()
-    results = da.compute(*delayed_chunks)
-    t_compute = time.perf_counter() - t_start
-    timing["computing"] = t_compute
-    print(f"[Chunk computing={t_compute:.2f}s, loading={t_load:.2f}s]")
+# dates_list as Python sequence (passed as kwargs)
+dates_int = ds["dates"].values.astype(np.int32)
+dates_list = [datetime.strptime(str(d), "%Y%m%d").date() for d in dates_int]
 
-    # Unpack results
-    ndvi_results = [r[0] for r in results]
-    last_dates_results = [r[1] for r in results]
+# Now call apply_ufunc
+result = xr.apply_ufunc(
+    process_block_for_apply_ufunc,
+    ndvi_da,                    # input 1 (time,pixel)
+    last_dates_da,              # input 2 (band,pixel)
+    params_lower_da,            # input 3 (pixel,param)
+    params_upper_da,            # input 4 (pixel,param)
+    input_core_dims=[["time", "pixel"], ["band", "pixel"], ["pixel", "param"], ["pixel", "param"]],
+    output_core_dims=[["time", "pixel"], ["band", "pixel"]],
+    kwargs={"dates_list": dates_list, "device": "cpu"},
+    vectorize=False,            # function consumes full core dims and returns full core dims
+    dask="parallelized",
+    dask_gufunc_kwargs={
+        "allow_rechunk": True,
+        "output_sizes": {"pixel": ds.sizes["pixel"]}
+    },
+    output_dtypes=[np.int16, np.int32],
+)
 
-    # Optionally, save results back to Zarr
+# result is a tuple-like xarray object (xarray wraps multiple outputs)
+processed_ndvi_da, processed_last_dates_da = result
+print("done")
 
-    output_ndvi_path = os.path.join(OUTPUT_DIR, "ndvi.zarr")
-    output_last_dates_path = os.path.join(OUTPUT_DIR, "last_dates.zarr")
-    if os.path.exists(output_ndvi_path):
-        shutil.rmtree(output_ndvi_path)
-    if os.path.exists(output_last_dates_path):
-        shutil.rmtree(output_last_dates_path)
-    ndvi_store = zarr.open(output_ndvi_path, mode='w', shape=ndvi_z.shape, chunks=ndvi_z.chunks, dtype=np.int16)
-    last_dates_store = zarr.open(output_last_dates_path, mode='w', shape=last_dates_z.shape, chunks=last_dates_z.chunks, dtype=last_dates_z.dtype)
-    # Write results
-    pixel_offset = 0
-    for ndvi_chunk, last_dates_chunk in zip(ndvi_results, last_dates_results):
-        n_pixels = ndvi_chunk.shape[1]
-        ndvi_store[:, pixel_offset:pixel_offset + n_pixels] = ndvi_chunk
-        last_dates_store[:, pixel_offset:pixel_offset + n_pixels] = last_dates_chunk
-        pixel_offset += n_pixels
-    print("Processing completed and results saved.")
+# processed_ndvi_da and processed_last_dates_da are lazy Dask-backed arrays.
+# You can now write them to Zarr (lazy parallel write) or compute them explicitly.
+
+# Example: write directly to Zarr lazily (recommended, efficient)
+"""out_ds = xr.Dataset({
+    "ndvi": processed_ndvi_da,
+    "last_dates": processed_last_dates_da
+}, coords={"time": ds["dates"], "pixel": ds["pixel"]})
+
+# Choose chunking for output (align with inputs)
+out_ds = out_ds.chunk({"pixel": N_PIXELS_PER_FILE, "time": ds.sizes["time"]})
+
+# Write lazy result to zarr (this will compute the dask graph and write chunks)
+out_ds.to_zarr(OUTPUT_DIR, mode="w", consolidated=True)"""
