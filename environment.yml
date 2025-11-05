@@ -2,6 +2,8 @@ name: ndvi
 channels:
   - pytorch
   - defaults
+  - https://repo.anaconda.com/pkgs/main
+  - https://repo.anaconda.com/pkgs/r
 dependencies:
   - _libgcc_mutex=0.1
   - _openmp_mutex=5.1
@@ -11,9 +13,23 @@ dependencies:
   - aom=3.6.0
   - argon2-cffi=21.3.0
   - argon2-cffi-bindings=21.2.0
+  - arrow-cpp=19.0.0
   - asttokens=3.0.0
   - async-lru=2.0.4
   - attrs=24.3.0
+  - aws-c-auth=0.9.0
+  - aws-c-cal=0.9.2
+  - aws-c-common=0.12.3
+  - aws-c-compression=0.3.1
+  - aws-c-event-stream=0.5.5
+  - aws-c-http=0.10.2
+  - aws-c-io=0.20.1
+  - aws-c-mqtt=0.13.2
+  - aws-c-s3=0.8.3
+  - aws-c-sdkutils=0.2.4
+  - aws-checksums=0.2.7
+  - aws-crt-cpp=0.32.10
+  - aws-sdk-cpp=1.11.528
   - babel=2.16.0
   - beautifulsoup4=4.13.4
   - binutils_impl_linux-64=2.40
@@ -21,15 +37,16 @@ dependencies:
   - blas=1.0
   - bleach=6.2.0
   - blosc=1.21.6
+  - bokeh=3.8.0
   - boost-cpp=1.82.0
   - bottleneck=1.4.2
   - brotli-python=1.0.9
   - brotlicffi=1.0.9.2
   - bzip2=1.0.8
   - c-ares=1.19.1
-  - ca-certificates=2025.7.15
+  - ca-certificates=2025.11.4
   - cairo=1.16.0
-  - certifi=2025.8.3
+  - certifi=2025.10.5
   - cffi=1.17.1
   - cfitsio=3.470
   - charset-normalizer=3.3.2
@@ -67,10 +84,14 @@ dependencies:
   - cudnn=9.1.1.17
   - cycler=0.11.0
   - cyrus-sasl=2.1.28
+  - dask=2025.10.0
+  - dask-core=2025.10.0
   - dav1d=1.2.1
   - debugpy=1.8.11
   - decorator=5.1.1
   - defusedxml=0.7.1
+  - deprecated=1.2.18
+  - distributed=2025.10.0
   - donfig=0.8.1.post1
   - executing=0.8.3
   - expat=2.7.1
@@ -86,7 +107,9 @@ dependencies:
   - gcc_linux-64=11.2.0
   - geos=3.10.6
   - geotiff=1.7.0
+  - gflags=2.2.2
   - giflib=5.2.2
+  - glog=0.5.0
   - gmp=6.3.0
   - gmpy2=2.2.1
   - graphite2=1.3.14
@@ -96,6 +119,7 @@ dependencies:
   - harfbuzz=10.2.0
   - hdf4=4.2.13
   - hdf5=1.14.5
+  - heapdict=1.0.1
   - httpcore=1.0.9
   - httpx=0.28.1
   - icu=73.1
@@ -139,6 +163,9 @@ dependencies:
   - libarchive=3.7.7
   - libavif=1.1.1
   - libboost=1.82.0
+  - libbrotlicommon=1.0.9
+  - libbrotlidec=1.0.9
+  - libbrotlienc=1.0.9
   - libcublas=12.4.5.8
   - libcufft=11.2.1.3
   - libcups=2.4.2
@@ -151,6 +178,7 @@ dependencies:
   - libedit=3.1.20230828
   - libegl=1.7.0
   - libev=4.33
+  - libevent=2.1.12
   - libffi=3.4.4
   - libgcc-devel_linux-64=11.2.0
   - libgcc-ng=11.2.0
@@ -162,6 +190,7 @@ dependencies:
   - libglvnd=1.7.0
   - libglx=1.7.0
   - libgomp=11.2.0
+  - libgrpc=1.71.0
   - libiconv=1.16
   - libkml=1.3.0
   - libkrb5=1.21.3
@@ -179,12 +208,14 @@ dependencies:
   - libpng=1.6.39
   - libpq=17.4
   - libprotobuf=5.29.3
+  - libre2-11=2024.07.02
   - libsodium=1.0.18
   - libspatialite=5.1.0
   - libssh2=1.11.1
   - libstdcxx-devel_linux-64=11.2.0
   - libstdcxx-ng=11.2.0
   - libtheora=1.1.1
+  - libthrift=0.15.0
   - libtiff=4.7.0
   - libtorch=2.5.1
   - libuuid=1.41.5
@@ -199,6 +230,8 @@ dependencies:
   - libzip=1.8.0
   - lit=19.1.7
   - lmdb=0.9.31
+  - locket=1.0.0
+  - lz4=4.3.2
   - lz4-c=1.9.4
   - magma=2.7.1
   - markdown-it-py=2.2.0
@@ -216,6 +249,7 @@ dependencies:
   - mpmath=1.3.0
   - msgpack-python=1.1.1
   - mysql=8.4.0
+  - narwhals=2.7.0
   - nbclient=0.10.2
   - nbconvert=7.16.6
   - nbconvert-core=7.16.6
@@ -237,14 +271,16 @@ dependencies:
   - openh264=2.1.1
   - openjpeg=2.5.2
   - openldap=2.6.4
-  - openssl=3.0.17
+  - openssl=3.0.18
   - opentelemetry-api=1.30.0
+  - orc=2.1.1
   - overrides=7.4.0
   - packaging=25.0
   - pandas=2.3.1
   - pandoc=2.12
   - pandocfilters=1.5.0
   - parso=0.8.4
+  - partd=1.4.2
   - patsy=1.0.1
   - pcre2=10.42
   - pexpect=4.9.0
@@ -262,6 +298,7 @@ dependencies:
   - pthread-stubs=0.3
   - ptyprocess=0.7.0
   - pure_eval=0.2.2
+  - pyarrow=19.0.0
   - pycparser=2.21
   - pygments=2.19.1
   - pyparsing=3.2.0
@@ -273,6 +310,7 @@ dependencies:
   - python-dateutil=2.9.0post0
   - python-fastjsonschema=2.20.0
   - python-json-logger=3.2.1
+  - python-lmdb=1.6.2
   - python-tzdata=2025.2
   - pytorch=2.5.1
   - pytorch-mutex=1.0
@@ -289,6 +327,7 @@ dependencies:
   - qtwebchannel=6.7.3
   - qtwebsockets=6.7.3
   - rasterio=1.4.3
+  - re2=2024.07.02
   - readline=8.2
   - referencing=0.30.2
   - requests=2.32.4
@@ -297,13 +336,16 @@ dependencies:
   - rich=13.9.4
   - rioxarray=0.18.1
   - rpds-py=0.22.3
+  - s2n=1.5.14
   - scipy=1.16.0
   - send2trash=1.8.2
   - setuptools=72.1.0
   - sip=6.10.0
   - six=1.17.0
   - sleef=3.5.1
+  - snappy=1.2.1
   - sniffio=1.3.0
+  - sortedcontainers=2.4.0
   - soupsieve=2.5
   - spirv-tools=2025.1
   - sqlite=3.50.2
@@ -313,6 +355,7 @@ dependencies:
   - sysroot_linux-64=2.17
   - tbb=2022.0.0
   - tbb-devel=2022.0.0
+  - tblib=3.1.0
   - terminado=0.17.1
   - tesseract=5.2.0
   - tiledb=2.3.3
@@ -329,6 +372,7 @@ dependencies:
   - unicodedata2=15.1.0
   - uriparser=0.9.8
   - urllib3=2.5.0
+  - utf8proc=2.6.1
   - wcwidth=0.2.13
   - webencodings=0.5.1
   - websocket-client=1.8.0
@@ -356,14 +400,17 @@ dependencies:
   - xorg-libxshmfence=1.3.3
   - xorg-libxxf86vm=1.1.6
   - xorg-xorgproto=2024.1
+  - xyzservices=2025.4.0
   - xz=5.6.4
   - yaml=0.2.5
   - zarr=3.0.5
   - zeromq=4.3.5
+  - zict=3.0.0
   - zipp=3.21.0
   - zlib=1.2.13
   - zstd=1.5.6
   - pip:
-      - deprecated==1.2.18
+      - cloudpickle==3.1.2
       - git-filter-repo==2.47.0
-prefix: /home/francesco/miniconda3/envs/ndvi
+      - toolz==1.1.0
+prefix: /home/fabian/miniconda3/envs/ndvi
