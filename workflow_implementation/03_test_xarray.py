@@ -20,6 +20,7 @@
 
 from dask.distributed import Client, LocalCluster
 from matplotlib import pyplot as plt
+from cycler import cycler
 import xarray as xr
 import timeit
 
@@ -66,6 +67,7 @@ ds_main["ndvi"].encoding["_FillValue"]
 
 # computations are always done layzli (unless they are triggered by a compute(), plot(), load(), write_to_disk(), ... )
 ds_main["ndvi"].isel(pixel = slice(0,1))[1:5].mean()           # lazy
+ds_main["ndvi"].isel(pixel = slice(0,1))[1:5].mean().compute() # not lazy, but actually computing the result
 
 # thus our workflow would open data lazily, define the task list of TODOs, and then only do them when data is outputted to the final data set
 # result = ds_main["ndvi"].isel(pixel = slice(0,1))[1:5].mean() # lazy
@@ -100,6 +102,31 @@ ds_main["ndvi_filtered"] = ds_main["ndvi"].where(ds_main["ndvi"] >= 20000)
 (ds_main["ndvi_filtered"]
     .isel(pixel = slice(0,3), time = slice(0,365))
     .plot(x = 'time', hue ='pixel'))
+
+
+
+# Do plotting without NA values (ideally these would be specified as _FillValue in the Zarr data set, and using mask_and_scale=True should overwrite them)
+def filter_ndvi_na(da):
+    return da.where((da >= -32000) & (da < 32000))
+fig, axs = plt.subplots(ncols=1)
+# ds_main["ndvi"       ].isel(pixel = slice(0,1))[365:730].pipe(filter_ndvi_na).plot(ax = axs, label = "Obs", marker = 'o')
+# ds_main["median_ndvi"].isel(pixel = slice(0,1))[365:730].plot(                     ax = axs, label = "Median NDVI")
+axs.set_prop_cycle(cycler(color=['#1f77b4', '#ff7f0e', '#2ca02c']))
+lines = ds_main["median_ndvi"].isel(pixel = slice(1,4))[365:730].plot.line(                     x='time', hue = 'pixel', ax = axs, add_legend=True)
+dots  = ds_main["ndvi"       ].isel(pixel = slice(1,4))[365:730].pipe(filter_ndvi_na).plot.line(x='time', hue = 'pixel', ax = axs, add_legend=True,  marker = 'o')
+fig
+
+
+fig, axs = plt.subplots(ncols=1)
+# ds_main["ndvi"       ].isel(pixel = slice(0,1))[365:730].pipe(filter_ndvi_na).plot(ax = axs, label = "Obs", marker = 'o')
+# ds_main["median_ndvi"].isel(pixel = slice(0,1))[365:730].plot(                     ax = axs, label = "Median NDVI")
+axs.set_prop_cycle(cycler(color=['#1f77b4', '#ff7f0e', '#2ca02c']))
+lines = ds_main["median_ndvi"].isel(pixel = slice(1,4))[365:(5*365)].plot.line(                     x='time', hue = 'pixel', ax = axs, add_legend=True)
+dots  = ds_main["ndvi"       ].isel(pixel = slice(1,4))[365:(5*365)].pipe(filter_ndvi_na).plot.line(x='time', hue = 'pixel', ax = axs, add_legend=True,  marker = 'o')
+fig
+# see also: https://docs.xarray.dev/en/latest/user-guide/plotting.html
+
+
 
 
 # Perform some timings:
