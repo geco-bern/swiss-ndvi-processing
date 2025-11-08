@@ -1,15 +1,8 @@
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/benchmark_function.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/benchmark_function_2.log &
+# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/benchmark__function_xarray.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/benchmark_function_xarray.log &
 
 import os
-import sys
 import time
 import math
-import gc
-import zarr
-import shutil
-import hashlib
-import traceback
-import concurrent.futures
 from datetime import datetime, date
 import numpy as np
 import pandas as pd
@@ -18,7 +11,11 @@ import statsmodels.api as sm
 import dask.array as da
 from zarr.storage import LocalStore as FSStore
 import xarray as xr 
-
+import timeit
+import socket
+from dask.distributed import Client
+import xarray as xr
+from matplotlib import pyplot as plt
 
 
 
@@ -65,8 +62,6 @@ def zarr_date_to_date(zarr_date):
         
     return date_to_return 
 
-
-T_SCALE = 1.0 / 365.0
 
 def double_logistic_function(t, params):
     """
@@ -434,124 +429,140 @@ def continous_ndvi(day_date, ndvi_arr, last_dates_arr, params_lower, params_uppe
 
     return ndvi_arr, last_dates_arr
 
+# -------------------
+# CONFIGURATION
+# -------------------
+T_SCALE = 1.0 / 365.0
+INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_pixel_chunked_4000.zarr/"
+DEVICE = "cpu"
+PIXEL_SIZES = [1, 10, 100, 999]  # sizes to benchmark
+OUTPUT_CSV = "/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/benchmark_results_chink_4000_pixels.csv"
 
-INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_pixel_chunked_small.zarr/"
-
-#pixel_rel_idx = 905083
-size = 999
-pixels = np.random.choice(999, size=size, replace=False).astype(np.int_)
-
+# -------------------
+# LOAD ONCE
+# -------------------
+print("ciao")
 ds = xr.open_zarr(INPUT_DIR, consolidated=True)
-
-print(ds)
 params = xr.open_zarr(INPUT_DIR, group="params", consolidated=False)
-device = "cpu"
 
-# get DataArrays
-
-ndvi_da = ds["ndvi"]            # dims ("time","pixel")
-last_dates_da = ds["last_dates"]# dims ("band","pixel")
-params_lower_da = params["params_lower"] # dims ("pixel","param")
-params_upper_da = params["params_upper"] # dims ("pixel","param")
+ndvi_da = ds["ndvi"]
+last_dates_da = ds["last_dates"]
+params_lower_da = params["params_lower"]
+params_upper_da = params["params_upper"]
 
 dates_int = ds["dates"].values.astype(np.int32)
 dates_list = [datetime.strptime(str(d), "%Y%m%d").date() for d in dates_int]
 
-# loading data
+results = []
 
-timing = {"loading": 0,'computing': 0.0, "writing" : 0}
+# -------------------
+# MAIN BENCHMARK LOOP
+# -------------------
+for size in PIXEL_SIZES:
 
-t_start_loading = time.perf_counter()
+    print(f"\n=== Benchmark: {size} pixels ===")
+    all_pixels = np.arange(ndvi_da.sizes["pixel"])
+    if size > len(all_pixels):
+        print(f"Requested {size} pixels but only {len(all_pixels)} available. Skipping.")
+        continue
+    pixels = np.random.choice(all_pixels, size=size, replace=False).astype(np.int_)
 
-ndvi_arr = ndvi_da.isel(pixel=pixels).values
-last_dates_arr = last_dates_da.isel(pixel=pixels).values 
-params_lower_arr =params_lower_da.isel(pixel=pixels).values  
-params_upper_arr = params_upper_da.isel(pixel=pixels).values  
+    timing = {"loading": 0.0, "computing": 0.0}
 
-t_loading = time.perf_counter() - t_start_loading
-timing["loading"] = t_loading
+    # ---- LOADING ----
+    t_start_load = time.perf_counter()
+    ndvi_arr = ndvi_da.isel(pixel=pixels).values
+    last_dates_arr = last_dates_da.isel(pixel=pixels).values
+    params_lower_arr = params_lower_da.isel(pixel=pixels).values
+    params_upper_arr = params_upper_da.isel(pixel=pixels).values
+    t_load = time.perf_counter() - t_start_load
+    timing["loading"] = t_load
+    print(f"Loaded {size} pixels in {t_load:.2f} s")
 
-print(f"{size} loading: {t_loading:.2f}")
+    # ---- COMPUTING ----
+    t_start_compute = time.perf_counter()
+    for idx_in_block, pixel_global_idx in enumerate(pixels):
+        ndvi_pixel = ndvi_arr[:, idx_in_block].copy()
+        last_dates_pixel = last_dates_arr[:, idx_in_block].copy()
+        params_lower_pixel = params_lower_arr[idx_in_block]
+        params_upper_pixel = params_upper_arr[idx_in_block]
 
-# computing
+        for day_date in dates_list:
+            ndvi_pixel, last_dates_pixel = continous_ndvi(
+                day_date,
+                ndvi_pixel,
+                last_dates_pixel,
+                params_lower_pixel,
+                params_upper_pixel,
+                dates_list,
+                DEVICE,
+            )
 
-t_start = time.perf_counter()
-
-for idx_in_block, pixel_global_idx in enumerate(pixels):
-    # per-pixel 1-D views (ndvi: time, last_dates: band)
-    ndvi_pixel = ndvi_arr[:, idx_in_block].copy()
-    last_dates_pixel = last_dates_arr[:, idx_in_block].copy()
-    params_lower_pixel = params_lower_arr[idx_in_block]
-    params_upper_pixel = params_upper_arr[idx_in_block]
-
-    # process this pixel over all dates and update the pixel arrays
-    for day_date in dates_list:
-        
-        ndvi_pixel, last_dates_pixel = continous_ndvi(
-            day_date,
-            ndvi_pixel,
-            last_dates_pixel,
-            params_lower_pixel,
-            params_upper_pixel,
-            dates_list,
-            device
-        )
-
-    t_compute = time.perf_counter() - t_start
+    t_compute = time.perf_counter() - t_start_compute
     timing["computing"] = t_compute
+    print(f" Computed {size} pixels in {t_compute:.2f} s")
+
+    results.append({
+        "pixels": size,
+        "loading_s": round(t_load, 2),
+        "computing_s": round(t_compute, 2),
+        "total_s": round(t_load + t_compute, 2),
+    })
+
+# -------------------
+# DISPLAY RESULTS
+# -------------------
+print("\n=== BENCHMARK SUMMARY ===")
+for r in results:
+    print(f"{r['pixels']:>5} px | load: {r['loading_s']:>7.2f}s | compute: {r['computing_s']:>7.2f}s | total: {r['total_s']:>7.2f}s")
+
+# -------------------
+# OPTIONAL: SAVE TO CSV
+# -------------------
+try:
+    import pandas as pd
+    df = pd.DataFrame(results)
+    os.makedirs(os.path.dirname(OUTPUT_CSV), exist_ok=True)
+    df.to_csv(OUTPUT_CSV, index=False)
+    print(f"\n Saved benchmark results to {OUTPUT_CSV}")
+except Exception as e:
+    print(" Could not save results to CSV:", e)
 
 
-print(f"{size} pixel: loading ={t_loading:.2f}s, computing ={t_compute:.2f}s")
+
+def find_free_port(default_port=1234):
+    """Find an available dashboard port (use default if possible)."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind(("", default_port))
+        port = s.getsockname()[1]
+    except OSError:
+        s.bind(("", 0))
+        port = s.getsockname()[1]
+    finally:
+        s.close()
+    return port
 
 
-"""# writing data
-# ---- writing data (fixed) ----
-OUTPUT_DIR = "/data_3/scratch/francesco/zarr_demo_daily_v2_processed.zarr/"
+def main():
+    
+    N_WORKERS = 10
 
-# Remove existing folder if present
-if os.path.exists(OUTPUT_DIR):
-    print(f"Removing existing output Zarr store at {OUTPUT_DIR} ...")
-    shutil.rmtree(OUTPUT_DIR)
+    port = find_free_port(1234)
 
-print(f"Creating new output Zarr store at {OUTPUT_DIR} ...")
+    client = Client(
+        n_workers=N_WORKERS,
+        threads_per_worker=1,
+        memory_limit="24GB",
+        processes=True,
+        dashboard_address=f":{port}",
+    )
 
-# Remove or neutralize incompatible compressor metadata to avoid zarr v3 codec issues
-for v in ds.data_vars:
-    ds[v].encoding.pop("compressor", None)
-for v in ds.coords:
-    ds[v].encoding.pop("compressor", None)
+    ds_main = xr.open_zarr(INPUT_DIR, chunks="auto")
 
-# Use no compressor for the output (safe). If you want Blosc as numcodecs object (z2), you can set it here.
-encoding = {v: {"compressor": None} for v in ds.data_vars}
+    # Run benchmarks
+    benchmark(ds_main)
 
-t_start_writing = time.perf_counter()
 
-# Write dataset as Zarr v2 explicitly (no delayed compute)
-# NOTE: zarr_version=2 forces xarray to create the legacy v2 layout if xarray supports the arg.
-# compute=True ensures arrays are created on disk before we open and write slices.
-ds.to_zarr(
-    OUTPUT_DIR,
-    mode="w",
-    consolidated=True,
-    encoding=encoding,
-    zarr_version=2,
-    compute=True,
-)
-
-# Re-open the store and write back the modified per-pixel arrays
-# Use zarr.open_group or zarr.open depending on zarr version; zarr.open works for both.
-zarr_out = zarr.open(OUTPUT_DIR, mode="r+")
-
-# pixels is an array of ints (shape (1,) in your run)
-for i, pixel_rel_idx in enumerate(pixels):
-    pix = int(pixel_rel_idx)  # ensure Python int
-    # ndvi_arr is 1D after squeeze: shape (time,)
-    # last_dates_arr is 1D after squeeze: shape (band,)
-    # so write directly
-    zarr_out["ndvi"][:, pix] = ndvi_arr
-    zarr_out["last_dates"][:, pix] = last_dates_arr
-
-t_writing = time.perf_counter() - t_start_writing
-timing["writing"] = t_writing"""
-
-print(f"{size} pixel: loading ={t_loading:.2f}s, computing ={t_compute:.2f}s")
+if __name__ == "__main__":
+    main()

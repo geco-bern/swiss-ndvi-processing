@@ -1,4 +1,4 @@
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/04_create_zarr_lookup_table.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/zarr_daily_creation_extended.log &
+# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/04_create_zarr_better.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/zarr_daily_creation_better_2.log &
 
 import os
 import time
@@ -7,17 +7,17 @@ import numpy as np
 import pandas as pd
 import torch
 import zarr
-from numcodecs import Blosc  # <-- use numcodecs for Zarr v2 compression
+from numcodecs import Blosc  # compression
 
 start_time = time.time()
 
 # ================= CONFIG =================
 SRC_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr"
-OUT_ZARR = "/data_3/scratch/francesco/zarr_demo_daily_v2.zarr"
+OUT_ZARR = "/data_3/scratch/francesco/zarr_demo_pixel_chunked_10000.zarr"
 MASK_PATH = "/data_2/scratch/sbiegel/processed/forest_mask.npy"
 
 MAX_PIXELS = 1_000_000
-CHUNK_COLS = 5000
+CHUNK_PIXELS = 10000 
 # ==========================================
 
 print("Opening source Zarr:", SRC_ZARR)
@@ -36,10 +36,12 @@ print(f"Generated {n_times} daily dates from {daily_dates.min().date()} to {dail
 
 date_to_index = {d.date(): i for i, d in enumerate(dates)}
 
+# --- geometry constants ---
 height, width = 24542, 37728
 left, bottom = 2474090.0, 1065110.0
 px = 10.0
 top = bottom + height * px
+
 
 def extract_pixel(UL_x, UL_y, BR_x, BR_y):
     x_min, x_max = min(UL_x, BR_x), max(UL_x, BR_x)
@@ -91,47 +93,48 @@ root.create_dataset("dates", data=dates_int, shape=dates_int.shape, dtype=np.int
 
 # compressor
 blosc = Blosc(cname="zstd", clevel=3, shuffle=Blosc.SHUFFLE)
-chunk_cols = CHUNK_COLS
 
-# main datasets
+# main datasets (1 pixel × full time series chunks)
 ndvi_ds = root.create_dataset("ndvi",
                               shape=(n_times, n_pixels),
-                              chunks=(1, min(chunk_cols, n_pixels)),
+                              chunks=(n_times, CHUNK_PIXELS),
                               dtype=np.int16,
                               compressor=blosc)
 
 last_dates_ds = root.create_dataset("last_dates",
                                     shape=(8, n_pixels),
-                                    chunks=(1, min(chunk_cols, n_pixels)),
+                                    chunks=(8, CHUNK_PIXELS),
                                     dtype=np.int32,
                                     compressor=blosc)
 
 params_group = root.create_group("params")
 params_lower_ds = params_group.create_dataset("params_lower",
                                               shape=(n_pixels, 6),
-                                              chunks=(min(chunk_cols, n_pixels), 6),
+                                              chunks=(CHUNK_PIXELS, 6),
                                               dtype=np.float32,
                                               compressor=blosc)
 params_upper_ds = params_group.create_dataset("params_upper",
                                               shape=(n_pixels, 6),
-                                              chunks=(min(chunk_cols, n_pixels), 6),
+                                              chunks=(CHUNK_PIXELS, 6),
                                               dtype=np.float32,
                                               compressor=blosc)
 
 print("Created Zarr store and datasets. Beginning chunked write.")
 
-chunk_size = CHUNK_COLS
-chunks = [sel_1[i:i + chunk_size] for i in range(0, n_pixels, chunk_size)]
-print(f"Total chunks to write: {len(chunks)} (chunk size {chunk_size})")
+# Each chunk = one pixel (or more if CHUNK_PIXELS > 1)
+chunks = [sel_1[i:i + CHUNK_PIXELS] for i in range(0, n_pixels, CHUNK_PIXELS)]
+print(f"Total chunks to write: {len(chunks)} (chunk size {CHUNK_PIXELS})")
 
+# prepare temporal tensor (for later model use)
 doy = np.array([d.timetuple().tm_yday for d in daily_dates], dtype=np.int16)
 doy[doy == 366] = 365
 T_SCALE = 1.0 / 365.0
 t = torch.tensor(doy * T_SCALE, dtype=torch.float32).to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
 
+# ---------- Write loop ----------
 for idx, chunk_pixels in enumerate(chunks):
-    print(f"\n--- chunk {idx+1}/{len(chunks)}: writing {len(chunk_pixels)} pixels ---")
-    col_start = idx * chunk_size
+    #print(f"\n--- chunk {idx+1}/{len(chunks)}: writing {len(chunk_pixels)} pixel(s) ---")
+    col_start = idx * CHUNK_PIXELS
     col_end = col_start + len(chunk_pixels)
 
     if ndvi.shape[0] == len(dates):
@@ -139,7 +142,7 @@ for idx, chunk_pixels in enumerate(chunks):
     else:
         ndvi_subset = ndvi.get_orthogonal_selection((chunk_pixels, slice(None))).T
 
-    daily_ndvi = np.full((n_times, ndvi_subset.shape[1]), 32767, dtype=np.int16)
+    daily_ndvi = np.full((n_times, len(chunk_pixels)), 32767, dtype=np.int16)
     for i, day in enumerate(daily_dates):
         d = day.date()
         if d in date_to_index:
@@ -148,23 +151,21 @@ for idx, chunk_pixels in enumerate(chunks):
     params_lower_subset = params_lower.get_orthogonal_selection((chunk_pixels, slice(None)))
     params_upper_subset = params_upper.get_orthogonal_selection((chunk_pixels, slice(None)))
 
-    
     ndvi_ds[:, col_start:col_end] = daily_ndvi
     params_lower_ds[col_start:col_end, :] = params_lower_subset
     params_upper_ds[col_start:col_end, :] = params_upper_subset
     last_dates_ds[:, col_start:col_end] = np.full((8, len(chunk_pixels)), 19000101, dtype=np.int32)
 
-    print(f"Written cols {col_start}..{col_end-1} (pixels {len(chunk_pixels)})")
+    print(f"Written pixel(s) {idx}")
 
 # ---------- Add coordinate metadata ----------
 pixel_coord = root.create_array(
     name="pixel",
     shape=(n_pixels,),
-    chunks=(min(chunk_cols, n_pixels),),
+    chunks=(min(CHUNK_PIXELS, n_pixels),),
     dtype=np.int64
 )
 pixel_coord[:] = np.arange(n_pixels, dtype=np.int64)
-
 
 root["dates"].attrs["_ARRAY_DIMENSIONS"] = ["time"]
 root["pixel"].attrs["_ARRAY_DIMENSIONS"] = ["pixel"]
@@ -174,11 +175,11 @@ root["params/params_lower"].attrs["_ARRAY_DIMENSIONS"] = ["pixel", "param"]
 root["params/params_upper"].attrs["_ARRAY_DIMENSIONS"] = ["pixel", "param"]
 
 root.attrs.update({
-    "title": "Daily NDVI lookup table (Zarr v2)",
+    "title": "Daily NDVI lookup table (Zarr v2, pixel-chunked)",
     "institution": "Your Lab or Organization",
     "source": SRC_ZARR,
     "history": f"Created on {pd.Timestamp.now()}",
-    "description": "Daily NDVI data, median logistic curves, and model parameters for selected pixels."
+    "description": "Daily NDVI data, median logistic curves, and model parameters for selected pixels (chunked per pixel)."
 })
 
 # ---------- Consolidate metadata ----------
@@ -187,7 +188,7 @@ zarr.consolidate_metadata(OUT_ZARR)
 total_time = time.time() - start_time
 print(f"\n✅ Finished writing {n_pixels} pixels into {OUT_ZARR} in {total_time:.1f} s")
 
-
+# ---------- Quick verification ----------
 import xarray as xr
-ds = xr.open_zarr("/data_3/scratch/francesco/zarr_demo_daily_v2.zarr", consolidated=True)
+ds = xr.open_zarr(OUT_ZARR, consolidated=True)
 print(ds)
