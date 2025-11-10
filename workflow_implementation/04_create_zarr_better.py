@@ -1,4 +1,4 @@
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/04_create_zarr_better.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/zarr_daily_creation_better_2.log &
+# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/04_create_zarr_better.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/zarr_daily_creation_better_3.log &
 
 import os
 import time
@@ -13,11 +13,11 @@ start_time = time.time()
 
 # ================= CONFIG =================
 SRC_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr"
-OUT_ZARR = "/data_3/scratch/francesco/zarr_demo_pixel_chunked_10000.zarr"
+OUT_ZARR = "/data_3/scratch/francesco/zarr_demo_pixel_chunked_300000.zarr"
 MASK_PATH = "/data_2/scratch/sbiegel/processed/forest_mask.npy"
 
-MAX_PIXELS = 1_000_000
-CHUNK_PIXELS = 10000 
+MAX_PIXELS = 105715396
+CHUNK_PIXELS = 300_000 
 # ==========================================
 
 print("Opening source Zarr:", SRC_ZARR)
@@ -36,52 +36,8 @@ print(f"Generated {n_times} daily dates from {daily_dates.min().date()} to {dail
 
 date_to_index = {d.date(): i for i, d in enumerate(dates)}
 
-# --- geometry constants ---
-height, width = 24542, 37728
-left, bottom = 2474090.0, 1065110.0
-px = 10.0
-top = bottom + height * px
-
-
-def extract_pixel(UL_x, UL_y, BR_x, BR_y):
-    x_min, x_max = min(UL_x, BR_x), max(UL_x, BR_x)
-    y_min, y_max = min(UL_y, BR_y), max(UL_y, BR_y)
-    col_min = int(math.floor((x_min - left) / px))
-    col_max = int(math.floor((x_max - left) / px))
-    row_min = int(math.floor((top - y_max) / px))
-    row_max = int(math.floor((top - y_min) / px))
-    col_min = max(0, min(width - 1, col_min))
-    col_max = max(0, min(width - 1, col_max))
-    row_min = max(0, min(height - 1, row_min))
-    row_max = max(0, min(height - 1, row_max))
-
-    print(f"Window cols {col_min}..{col_max}, rows {row_min}..{row_max}")
-
-    mask = np.load(MASK_PATH)
-    mask_flat = mask.ravel(order="C")
-    masked_positions = np.flatnonzero(mask_flat)
-    idx_map = np.full(mask_flat.shape[0], -1, dtype=np.int64)
-    idx_map[masked_positions] = np.arange(masked_positions.size, dtype=np.int64)
-
-    rows = np.arange(row_min, row_max + 1, dtype=np.int64)
-    cols = np.arange(col_min, col_max + 1, dtype=np.int64)
-    rr, cc = np.meshgrid(rows, cols, indexing="ij")
-    full_flat_idx = (rr * width + cc).ravel()
-    masked_idx_in_window = idx_map[full_flat_idx]
-    sel = masked_idx_in_window[masked_idx_in_window >= 0].tolist()
-    sel = sel[:MAX_PIXELS]
-    print(f"Selected {len(sel)} masked pixels")
-    return sel
-
-
-center_x, center_y = 2694491.82, 1126023.20
-sel_1 = extract_pixel(center_x - 6500, center_y - 6500,
-                      center_x + 6500, center_y + 6500)
-
-n_pixels_available = len(sel_1)
-n_pixels = min(n_pixels_available, MAX_PIXELS)
-sel_1 = sel_1[:n_pixels]
-print(f"Using {n_pixels} pixels (available {n_pixels_available})")
+sel_1 = np.linspace(0,MAX_PIXELS,MAX_PIXELS, dtype = int)
+print(f"Using {MAX_PIXELS} pixels (available {MAX_PIXELS})")
 
 # ---------- Create Zarr v2 store ----------
 os.makedirs(os.path.dirname(OUT_ZARR), exist_ok=True)
@@ -96,25 +52,25 @@ blosc = Blosc(cname="zstd", clevel=3, shuffle=Blosc.SHUFFLE)
 
 # main datasets (1 pixel × full time series chunks)
 ndvi_ds = root.create_dataset("ndvi",
-                              shape=(n_times, n_pixels),
+                              shape=(n_times, MAX_PIXELS),
                               chunks=(n_times, CHUNK_PIXELS),
                               dtype=np.int16,
                               compressor=blosc)
 
 last_dates_ds = root.create_dataset("last_dates",
-                                    shape=(8, n_pixels),
+                                    shape=(8, MAX_PIXELS),
                                     chunks=(8, CHUNK_PIXELS),
                                     dtype=np.int32,
                                     compressor=blosc)
 
 params_group = root.create_group("params")
 params_lower_ds = params_group.create_dataset("params_lower",
-                                              shape=(n_pixels, 6),
+                                              shape=(MAX_PIXELS, 6),
                                               chunks=(CHUNK_PIXELS, 6),
                                               dtype=np.float32,
                                               compressor=blosc)
 params_upper_ds = params_group.create_dataset("params_upper",
-                                              shape=(n_pixels, 6),
+                                              shape=(MAX_PIXELS, 6),
                                               chunks=(CHUNK_PIXELS, 6),
                                               dtype=np.float32,
                                               compressor=blosc)
@@ -122,25 +78,31 @@ params_upper_ds = params_group.create_dataset("params_upper",
 print("Created Zarr store and datasets. Beginning chunked write.")
 
 # Each chunk = one pixel (or more if CHUNK_PIXELS > 1)
-chunks = [sel_1[i:i + CHUNK_PIXELS] for i in range(0, n_pixels, CHUNK_PIXELS)]
+chunks = [sel_1[i:i + CHUNK_PIXELS] for i in range(0, MAX_PIXELS, CHUNK_PIXELS)]
 print(f"Total chunks to write: {len(chunks)} (chunk size {CHUNK_PIXELS})")
 
-# prepare temporal tensor (for later model use)
-doy = np.array([d.timetuple().tm_yday for d in daily_dates], dtype=np.int16)
-doy[doy == 366] = 365
-T_SCALE = 1.0 / 365.0
-t = torch.tensor(doy * T_SCALE, dtype=torch.float32).to(torch.device("cuda" if torch.cuda.is_available() else "cpu"))
 
 # ---------- Write loop ----------
 for idx, chunk_pixels in enumerate(chunks):
-    #print(f"\n--- chunk {idx+1}/{len(chunks)}: writing {len(chunk_pixels)} pixel(s) ---")
+    print(f"\n--- chunk {idx+1}/{len(chunks)}: writing {len(chunk_pixels)} pixel(s) ---")
     col_start = idx * CHUNK_PIXELS
     col_end = col_start + len(chunk_pixels)
 
+    print(f"writing pixels from {col_start} to {col_end}")
+
     if ndvi.shape[0] == len(dates):
+
+        # shape is (time, pixel)
+
         ndvi_subset = ndvi.get_orthogonal_selection((slice(None), chunk_pixels))
     else:
+
+        # shape is (pixel, time)
+
         ndvi_subset = ndvi.get_orthogonal_selection((chunk_pixels, slice(None))).T
+        
+    ndvi_subset = ndvi_subset.astype(np.int16)
+
 
     daily_ndvi = np.full((n_times, len(chunk_pixels)), 32767, dtype=np.int16)
     for i, day in enumerate(daily_dates):
@@ -151,7 +113,7 @@ for idx, chunk_pixels in enumerate(chunks):
     params_lower_subset = params_lower.get_orthogonal_selection((chunk_pixels, slice(None)))
     params_upper_subset = params_upper.get_orthogonal_selection((chunk_pixels, slice(None)))
 
-    ndvi_ds[:, col_start:col_end] = daily_ndvi
+    ndvi_ds[:, col_start:col_end] = daily_ndvi.astype(np.int16)
     params_lower_ds[col_start:col_end, :] = params_lower_subset
     params_upper_ds[col_start:col_end, :] = params_upper_subset
     last_dates_ds[:, col_start:col_end] = np.full((8, len(chunk_pixels)), 19000101, dtype=np.int32)
@@ -161,11 +123,11 @@ for idx, chunk_pixels in enumerate(chunks):
 # ---------- Add coordinate metadata ----------
 pixel_coord = root.create_array(
     name="pixel",
-    shape=(n_pixels,),
-    chunks=(min(CHUNK_PIXELS, n_pixels),),
+    shape=(MAX_PIXELS,),
+    chunks=(min(CHUNK_PIXELS, MAX_PIXELS),),
     dtype=np.int64
 )
-pixel_coord[:] = np.arange(n_pixels, dtype=np.int64)
+pixel_coord[:] = np.arange(MAX_PIXELS, dtype=np.int64)
 
 root["dates"].attrs["_ARRAY_DIMENSIONS"] = ["time"]
 root["pixel"].attrs["_ARRAY_DIMENSIONS"] = ["pixel"]
@@ -186,7 +148,7 @@ root.attrs.update({
 zarr.consolidate_metadata(OUT_ZARR)
 
 total_time = time.time() - start_time
-print(f"\n✅ Finished writing {n_pixels} pixels into {OUT_ZARR} in {total_time:.1f} s")
+print(f"\n✅ Finished writing {MAX_PIXELS} pixels into {OUT_ZARR} in {total_time:.1f} s")
 
 # ---------- Quick verification ----------
 import xarray as xr

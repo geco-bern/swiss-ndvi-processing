@@ -1,4 +1,4 @@
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/benchmark__function_xarray.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/benchmark_function_xarray.log &
+# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/benchmark__function_xarray.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/log/benchmark_function_xarray_2.log &
 
 import os
 import time
@@ -10,14 +10,14 @@ import torch
 import statsmodels.api as sm
 import dask.array as da
 from zarr.storage import LocalStore as FSStore
-import xarray as xr 
 import timeit
 import socket
 from dask.distributed import Client
 import xarray as xr
-from matplotlib import pyplot as plt
+from dask import delayed, compute
 
 
+T_SCALE = 1 / 365.0
 
 
 def unwrap_scalar(x):
@@ -89,7 +89,7 @@ def double_logistic_function(t, params):
     sigmoid_sen_eos = torch.sigmoid(-2 * (2 * sen + eos_minus_sen - 2 * t_t[:, None]) / (eos_minus_sen + 1e-10))
     return (M - m) * (sigmoid_sos_mat - sigmoid_sen_eos) + m
 
-def calculate_median(doys, params_lower, params_upper, device=torch.device("cpu")):
+def calculate_median(doys,params_lower, params_upper, device=torch.device("cpu")):
 
     doys = np.asarray(doys, dtype=np.float32)
     t = torch.tensor(doys * T_SCALE, dtype=torch.float32, device=device)
@@ -282,7 +282,7 @@ def L2_smoothing(init_position, params_lower, params_upper, ndvi_arr, last_dates
     ndvi_arr[base_idx_start:base_idx_end + 1] = smoothed_scaled[: base_idx_end - base_idx_start + 1]
 
 
-def continous_ndvi(day_date, ndvi_arr, last_dates_arr, params_lower, params_upper, dates_list, device):
+def continous_ndvi( day_date, ndvi_arr, last_dates_arr, params_lower, params_upper, dates_list, device):
 
     base_date = dates_list[0]
 
@@ -429,21 +429,190 @@ def continous_ndvi(day_date, ndvi_arr, last_dates_arr, params_lower, params_uppe
 
     return ndvi_arr, last_dates_arr
 
+def find_free_port(default_port=1234):
+    """Find an available dashboard port (use default if possible)."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind(("", default_port))
+        port = s.getsockname()[1]
+    except OSError:
+        s.bind(("", 0))
+        port = s.getsockname()[1]
+    finally:
+        s.close()
+    return port
+
+
+def compute_ndvi(ndvi_da, last_dates_da, params_lower_da, params_upper_da, dates_list, DEVICE):
+
+    # Convert xarray.DataArrays to numpy arrays
+    ndvi_arr = ndvi_da.values.copy()
+    last_dates_arr = last_dates_da.values.copy()
+    params_lower_arr = params_lower_da.values.copy()
+    params_upper_arr = params_upper_da.values.copy()
+
+    n_time, n_pixel = ndvi_arr.shape
+
+    # Loop through each pixel
+    for pix in range(n_pixel):
+        ndvi_pixel = ndvi_arr[:, pix].copy()
+        last_dates_pixel = last_dates_arr[:, pix].copy()
+        params_lower_pixel = params_lower_arr[pix]
+        params_upper_pixel = params_upper_arr[pix]
+
+        # Run continous_ndvi() for every date
+        for day_date in dates_list:
+            ndvi_pixel, last_dates_pixel = continous_ndvi(
+                day_date=day_date,
+                ndvi_arr=ndvi_pixel,
+                last_dates_arr=last_dates_pixel,
+                params_lower=params_lower_pixel,
+                params_upper=params_upper_pixel,
+                dates_list=dates_list,
+                device=DEVICE
+            )
+
+        ndvi_arr[:, pix] = ndvi_pixel  # store updated pixel
+
+    # Return result as DataArray
+    result = xr.DataArray(
+        ndvi_arr,
+        dims=ndvi_da.dims,
+        coords=ndvi_da.coords,
+        name="ndvi_processed"
+    )
+
+    return result
+
+
+
+
+def benchmark(ds_main, INPUT_DIR,pixel_sizes, csv_path, dates_list):
+
+    results = []
+
+    print("\n--- Starting Benchmarks ---")
+
+    for size in pixel_sizes:
+        print(f"Benchmarking {size} pixels...")
+
+        # Measure loading time
+        t_load = timeit.timeit(
+            lambda: ds_main["ndvi"].isel(pixel=slice(0, size)).load(),
+            number=1
+        )
+
+        # Measure compute time 
+        ndvi_data = ds_main["ndvi"].isel(pixel=slice(0, size)).load()
+
+        params_ds = xr.open_zarr(os.path.join(INPUT_DIR, "params"),consolidated=False, chunks="auto")
+        params_lower_da = params_ds["params_lower"].isel(pixel=slice(0, size)).load()
+        params_upper_da = params_ds["params_upper"].isel(pixel=slice(0, size)).load()
+        
+        t_compute = timeit.timeit(
+
+        lambda: compute_ndvi(
+            ndvi_da = ndvi_data,
+            last_dates_da = ds_main["last_dates"].isel(pixel=slice(0, size)).load(),
+            params_lower_da = params_lower_da,
+            params_upper_da = params_upper_da,
+            dates_list = dates_list,
+            DEVICE = "cpu"
+        ),
+        number=1
+        )
+
+        results.append({
+            "pixels": size,
+            "loading":  round(t_load, 3),
+            "computing": round(t_compute, 3)
+        })
+
+        print(f"  Loading: {t_load:.3f}s, Computing: {t_compute:.3f}s")
+
+    # Create a DataFrame and save to CSV
+    df = pd.DataFrame(results)
+    df.to_csv(csv_path, index=False)
+
+    print(f"\nBenchmark complete. Results saved to: {csv_path}")
+    print(df)
+
+    return df
+
+def main():
+    INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_pixel_chunked_10000.zarr/"
+    DEVICE = "cpu"
+    N_WORKERS = 20
+    PIXEL_SIZES = [1, 10, 100]
+    OUTPUT_CSV = "/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/benchmark_results_ndvi_chunk_10000_pixels_chunked.csv"
+    
+
+    port = find_free_port(1234)
+
+
+    client = Client(
+    n_workers=N_WORKERS,
+    threads_per_worker=1,
+    memory_limit="120GB",
+    processes=True,
+    dashboard_address=f":{port}",
+    )
+
+    
+    print(f"Dask dashboard running on port {port}")
+
+
+    ds_main = xr.open_zarr(INPUT_DIR, chunks="auto")
+
+    dates_int = ds_main["dates"].values.astype(np.int32)
+    dates_list = [datetime.strptime(str(d), "%Y%m%d").date() for d in dates_int]
+
+    benchmark(ds_main, INPUT_DIR = INPUT_DIR, pixel_sizes=PIXEL_SIZES, csv_path= OUTPUT_CSV, dates_list = dates_list)
+    client.close()
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+"""
+def main():
+    T_SCALE = 1.0 / 365.0
+    INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_pixel_chunked_10000.zarr/"
+    DEVICE = "cpu"
+    N_WORKERS = 10
+    PIXEL_SIZES = [1, 10, 100, 1000]  # sizes to benchmark
+    OUTPUT_CSV = "/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/benchmark_results_chink_1'000_pixels.csv"
+
+    port = find_free_port(1234)
+
+    client = Client(
+        n_workers=N_WORKERS,
+        threads_per_worker=1,
+        memory_limit="240GB",
+        processes=True,
+        dashboard_address=f":{port}",
+    )
+
+    ds_main = xr.open_zarr(INPUT_DIR, chunks="auto")
+
+    # Run benchmarks
+    benchmark(ds_main)
+
+
 # -------------------
 # CONFIGURATION
 # -------------------
-T_SCALE = 1.0 / 365.0
-INPUT_DIR = "/data_3/scratch/francesco/zarr_demo_pixel_chunked_4000.zarr/"
-DEVICE = "cpu"
-PIXEL_SIZES = [1, 10, 100, 999]  # sizes to benchmark
-OUTPUT_CSV = "/home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/output/benchmark_results_chink_4000_pixels.csv"
 
-# -------------------
-# LOAD ONCE
-# -------------------
-print("ciao")
+# lazy loading
+
+t_start_lazy_load = time.perf_counter()
 ds = xr.open_zarr(INPUT_DIR, consolidated=True)
 params = xr.open_zarr(INPUT_DIR, group="params", consolidated=False)
+
 
 ndvi_da = ds["ndvi"]
 last_dates_da = ds["last_dates"]
@@ -452,6 +621,10 @@ params_upper_da = params["params_upper"]
 
 dates_int = ds["dates"].values.astype(np.int32)
 dates_list = [datetime.strptime(str(d), "%Y%m%d").date() for d in dates_int]
+
+t_end_lazy_load = time.perf_counter() - t_start_lazy_load
+
+print(f"alzy laoidng: {t_end_lazy_load:.2}s")
 
 results = []
 
@@ -465,7 +638,7 @@ for size in PIXEL_SIZES:
     if size > len(all_pixels):
         print(f"Requested {size} pixels but only {len(all_pixels)} available. Skipping.")
         continue
-    pixels = np.random.choice(all_pixels, size=size, replace=False).astype(np.int_)
+    pixels = np.random.choice(3999, size=size, replace=False).astype(np.int_)
 
     timing = {"loading": 0.0, "computing": 0.0}
 
@@ -527,42 +700,4 @@ try:
     print(f"\n Saved benchmark results to {OUTPUT_CSV}")
 except Exception as e:
     print(" Could not save results to CSV:", e)
-
-
-
-def find_free_port(default_port=1234):
-    """Find an available dashboard port (use default if possible)."""
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.bind(("", default_port))
-        port = s.getsockname()[1]
-    except OSError:
-        s.bind(("", 0))
-        port = s.getsockname()[1]
-    finally:
-        s.close()
-    return port
-
-
-def main():
-    
-    N_WORKERS = 10
-
-    port = find_free_port(1234)
-
-    client = Client(
-        n_workers=N_WORKERS,
-        threads_per_worker=1,
-        memory_limit="24GB",
-        processes=True,
-        dashboard_address=f":{port}",
-    )
-
-    ds_main = xr.open_zarr(INPUT_DIR, chunks="auto")
-
-    # Run benchmarks
-    benchmark(ds_main)
-
-
-if __name__ == "__main__":
-    main()
+"""
