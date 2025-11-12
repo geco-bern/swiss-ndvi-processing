@@ -1,0 +1,84 @@
+{
+  "metadata": {
+    ".zgroup": {
+      "zarr_format": 2
+    },
+    ".zattrs": {},
+    "ndvi_processed/.zattrs": {
+      "_ARRAY_DIMENSIONS": [
+        "pixel",
+        "time"
+      ]
+    },
+    "ndvi_processed/.zarray": {
+      "shape": [
+        1000000,
+        3073
+      ],
+      "chunks": [
+        5000,
+        3073
+      ],
+      "fill_value": "NaN",
+      "order": "C",
+      "filters": null,
+      "dimension_separator": ".",
+      "compressor": null,
+      "zarr_format": 2,
+      "dtype": "<f4"
+    },
+    "pixel/.zattrs": {
+      "_ARRAY_DIMENSIONS": [
+        "pixel"
+      ]
+    },
+    "pixel/.zarray": {
+      "shape": [
+        1000000
+      ],
+      "chunks": [
+        5000
+      ],
+      "fill_value": 0,
+      "order": "C",
+      "filters": null,
+      "dimension_separator": ".",
+      "compressor": {
+        "id": "blosc",
+        "cname": "lz4",
+        "clevel": 5,
+        "shuffle": 1,
+        "blocksize": 0
+      },
+      "zarr_format": 2,
+      "dtype": "<i8"
+    },
+    "time/.zattrs": {
+      "_ARRAY_DIMENSIONS": [
+        "time"
+      ]
+    },
+    "time/.zarray": {
+      "shape": [
+        3073
+      ],
+      "chunks": [
+        3073
+      ],
+      "fill_value": 0,
+      "order": "C",
+      "filters": null,
+      "dimension_separator": ".",
+      "compressor": {
+        "id": "blosc",
+        "cname": "lz4",
+        "clevel": 5,
+        "shuffle": 1,
+        "blocksize": 0
+      },
+      "zarr_format": 2,
+      "dtype": "<i4"
+    }
+  },
+  "zarr_consolidated_format": 1
+}
