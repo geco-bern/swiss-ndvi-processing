@@ -187,7 +187,7 @@ full_index = pd.date_range(min(dates_sorted), max(dates_sorted), freq="D")
 
 start_date = "2021-02-01"
 
-end_date = "2023-01-01"
+end_date = "2025-08-01"
 
 full_index = full_index[(full_index >= start_date) & (full_index <= end_date)]
 
@@ -257,7 +257,7 @@ for i, pixel in enumerate(sel):
 
         df.index.name = "date"
 
-        spinup = "2021-01-01"
+        spinup = "2018-01-01"
         # remove uninteresting data
         df = df.loc[df.index >= pd.Timestamp(spinup)]
 
