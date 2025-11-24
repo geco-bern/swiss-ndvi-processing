@@ -1,255 +1,316 @@
-from datetime import datetime, date
 import numpy as np
-import statsmodels.api as sm
-from dask.distributed import Client
 import xarray as xr
-import math
-
-def continous_ndvi(pixel,current_date,last_dates_array,first_date):
-
-    idx_current_date = (current_date - first_date)  / np.timedelta64(1, 'D')
-    idx_last_date =  (last_dates_array[6] - first_date)  / np.timedelta64(1, 'D')
-
-    current_ndvi_value = ds["ndvi"].isel(pixel=pixel, time =idx_current_date ).load()
-    last_ndvi_value =  ds["ndvi"].isel(pixel=pixel, time =idx_last_date).load()
-
-    current_ndvi_value = current_ndvi_value / 10000
-
-    median_current_value =  ds["median_ndvi"].isel(pixel=pixel, time =idx_current_date).load()
-    median_last_value =  ds["median_ndvi"].isel(pixel=pixel, time =idx_last_date).load()
-    last_delta = last_ndvi_value - median_current_value
-
-    # check if the current ndvi value is an obs. or not
-
-    if (current_ndvi_value > 0) & (current_ndvi_value < 1):
-             
-        # check if it is a potential outlier or not
-        current_delta = current_ndvi_value - median_current_value
-        delta_delta = current_delta - last_delta
-
-        if ((abs(current_delta) > 0.05) & (abs(delta_delta) > 0.05)):
-                 
-            # the value is a potential outlier that will be checked as soon a new observation will be avaible
-            last_dates_array[7] = current_date
-
-            return last_dates_array
-            
-        else:
-                 
-            # check if a potential outlier is pending or not. 
-            # If there is no potential outlier the last dates will have a placehodler value of 1900-01-01
-
-            if last_dates_array[7] != date(1900,1,1):
-                    
-                potential_idx = (last_dates_array[7] - first_date)  / np.timedelta64(1, 'D')
-                potential_ndvi_value = ds["ndvi"].isel(pixel=pixel, time = potential_idx).load()
-                potential_median_value = ds["median_ndvi"].isel(pixel=pixel, time = potential_idx).load()
-
-                potential_delta = potential_ndvi_value - potential_median_value
-                potential_delta_delta = potential_delta - current_delta
-
-                if abs(potential_delta_delta) < 0.05:
-
-                    # the potential outlier is NOT a true outlier but it is an observation
-                    # since it is an obseravtion was not process before, the L1 and L2 must be done twice
-                    days_diff_array = ((np.arange(last_dates_array[6],current_date + 1) - first_date)  / np.timedelta64(1, 'D'))
-                    median_array =  ds["median_ndvi"].isel(pixel=pixel)[idx_last_date:].load()
-
-                    idx_to_interpolate = np.concatenate(last_dates_array[6],last_dates_array[7],current_date)
-                    delta_to_interpolate = np.concatenate(last_delta,potential_delta,current_delta)
-
-                    interpolation = np.interp(days_diff_array,idx_to_interpolate,delta_to_interpolate)
-                    L1_interpolated = median_array + interpolation
-                    # write it back to ndvi array
-
-                    # load the past 6 values to perform the smoothing (since we already loaded the last value)
-                    idx_last_date_arr = (last_dates_array[:6] - first_date)  / np.timedelta64(1, 'D')
-                    last_ndvi_arr = ds["ndvi"].isel(pixel=pixel, time = idx_last_date_arr).load()
-                    last_median_arr =  ds["median_ndvi"].isel(pixel=pixel, time = idx_last_date_arr).load()
-
-                    last_delta_arr = last_ndvi_arr - last_median_arr
-
-                    # concatenate the apst value with last delta and current delta
-                        
-                    delta_to_smooth = np.concatenate(last_delta_arr, last_delta,potential_delta,current_delta)
-                    idx = np.arange(1,9) # having the potential outlier as obs gives one more value
-                    loess =  sm.nonparametric.lowess(delta_to_smooth, idx, frac= 1, it=3, return_sorted=False)
-
-                    # the smoothed value to write are the third and FIFTH values instead of fourth (since we have an extra value)
-                    idx_to_smooth = ((np.arange(last_dates_array[2],last_dates_array[4] + 1) - first_date)  / np.timedelta64(1, 'D')) 
-
-                    median_array_to_smooth =  ds["median_ndvi"].isel(pixel=pixel, time = idx_to_smooth)
-                    idx_to_interp = ((np.concatenate(last_dates_array[2],last_dates_array[3],last_dates_array[4] + 1)) - first_date)  / np.timedelta64(1, 'D')
-                        
-                    interpolated_smoothed_values = np.interp(idx_to_smooth,idx_to_interp,loess[2:5])
-                    ndvi_smoothed_value = interpolated_smoothed_values + median_array_to_smooth
-
-                    # write it back to ndvi array
-
-                    # update last date array with the new dates as shown above, INCLUDING the potential date (at 8th position)
-                    last_dates_array = np.concatenate(last_dates_array[2:],current_date,date(1900,1,1))
-
-                    return last_dates_array 
+import dask.array as da
+from dask.distributed import Client
+import statsmodels.api as sm
+import os
+import shutil
 
 
-                else:
+def smoothing_and_gapfilling(ndvi_arr, median_ndvi_arr, last_array_dates_idx,
+                             last_delta, current_delta, deltas_arr,current_date_idx, pot_outlier_present):
 
-                    # the potential outlier is a true outlier but it is an observation
-                    # this block of code and the following one are identical, maybe wrap in a function in the future
+    if pot_outlier_present:
 
-                    # perform the L1 linear interpolation between current date and last date
-                    days_diff_array = ((np.arange(last_dates_array[6],current_date + 1) - first_date)  / np.timedelta64(1, 'D')) 
+        pot_date_idx = int(last_array_dates_idx[7])
 
-                    median_array =  ds["median_ndvi"].isel(pixel=pixel)[idx_last_date:].load()
-                    interpolation = np.linspace(last_delta, current_delta,num = len(median_array))
-                    L1_interpolated = median_array + interpolation
-                    # write it back to ndvi array
+        pot_ndvi = ndvi_arr[pot_date_idx] / 10000.0
+        pot_median_ndvi = median_ndvi_arr[pot_date_idx] / 10000.0
+        pot_delta = pot_ndvi - pot_median_ndvi
 
-                    # load the past 6 values to perform the smoothing (since we already loaded the last value)
-                    idx_last_date_arr = (last_dates_array[:6] - first_date)  / np.timedelta64(1, 'D')
-                    last_ndvi_arr = ds["ndvi"].isel(pixel=pixel, time = idx_last_date_arr).load()
-                    last_median_arr =  ds["median_ndvi"].isel(pixel=pixel, time = idx_last_date_arr).load()
+        # L1
+        idx_to_interpolate = np.arange(int(last_array_dates_idx[6]),current_date_idx +1)
 
-                    last_delta_arr = last_ndvi_arr - last_median_arr
+        deltas_L1 = np.array([last_delta, pot_delta, current_delta])
+        deltas_L1_idx = np.array([int(last_array_dates_idx[6]), int(last_array_dates_idx[7]), current_date_idx +1])
 
-                    # concatenate the apst value with last delta and current delta
-                        
-                    delta_to_smooth = np.concatenate(last_delta_arr, last_delta,current_delta)
-                    idx = np.arange(1,8) # having the potential outlier as obs gives one more value
-                    loess =  sm.nonparametric.lowess(delta_to_smooth, idx, frac= 1, it=3, return_sorted=False)
+        deltas_interpolated = np.interp(idx_to_interpolate, deltas_L1_idx, deltas_L1)
+        L1_ndvi = deltas_interpolated + median_ndvi_arr[int(last_array_dates_idx[6]) :current_date_idx +1] / 10000.0
 
-                    # the smoothed value to write are the third and fourth values
-                    idx_to_smooth = ((np.arange(last_dates_array[2],last_dates_array[3] + 1) - first_date)  / np.timedelta64(1, 'D')) 
+        ndvi_arr[int(last_array_dates_idx[6]) :current_date_idx +1] = L1_ndvi
 
-                    median_array_to_smooth =  ds["median_ndvi"].isel(pixel=pixel, time = idx_to_smooth).load()
+        # L2 smoothing
 
-                        
-                    interpolated_smoothed_values = np.linspace(loess[2], loess[3], num = len(idx_to_smooth))
-                    ndvi_smoothed_value = interpolated_smoothed_values + median_array_to_smooth
+        deltas_L2 = np.concatenate([deltas_arr, np.array([current_delta])])
 
-                    # write it back to ndvi array
+        smoothed_deltas = sm.nonparametric.lowess(deltas_L2, np.arange(1, len(deltas_L2) + 1),
+                                                  frac=1, it=3, return_sorted=False)
+        idx_to_interpolate = np.arange(int(last_array_dates_idx[2]), int(last_array_dates_idx[4]) + 1)
+        deltas_L2_idx = last_array_dates_idx[2:5]
+        deltas_interpolated = np.interp(idx_to_interpolate,
+                                       deltas_L2_idx, smoothed_deltas[2:5])
+        
+        L2_ndvi = deltas_interpolated + median_ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[4]) + 1] / 10000.0
 
-                    # update the last date array
-                    # after an observation is met, it is not possible to have a potential outlier so it must se to the placehodler value
-
-                    last_dates_array = np.concatenate(last_dates_array[1:7],current_date,date(1900,1,1))
-
-                    return last_dates_array 
-
-            else:
-
-                # perform the L1 linear interpolation between current date and last date
-                days_diff_array = ((np.arange(last_dates_array[6],current_date + 1) - first_date)  / np.timedelta64(1, 'D')) 
-
-                median_array =  ds["median_ndvi"].isel(pixel=pixel)[idx_last_date:].load()
-                interpolation = np.linspace(last_delta, current_delta,num = len(median_array))
-                L1_interpolated = median_array + interpolation
-                # write it back to ndvi array
-
-                # load the past 6 values to perform the smoothing (since we already loaded the last value)
-                idx_last_date_arr = (last_dates_array[:6] - first_date)  / np.timedelta64(1, 'D')
-                last_ndvi_arr = ds["ndvi"].isel(pixel=pixel, time = idx_last_date_arr).load()
-                last_median_arr =  ds["median_ndvi"].isel(pixel=pixel, time = idx_last_date_arr).load()
-
-                last_delta_arr = last_ndvi_arr - last_median_arr
-
-                # concatenate the apst value with last delta and current delta
-                    
-                delta_to_smooth = np.concatenate(last_delta_arr, last_delta,current_delta)
-                idx = np.arange(1,8)
-                loess =  sm.nonparametric.lowess(delta_to_smooth, idx, frac= 1, it=3, return_sorted=False)
-
-                # the smoothed value to write are the third and fourth values
-                idx_to_smooth = ((np.arange(last_dates_array[2],last_dates_array[3] + 1) - first_date)  / np.timedelta64(1, 'D')) 
-
-                median_array_to_smooth =  ds["median_ndvi"].isel(pixel=pixel, time = idx_to_smooth).load()
-                interpolated_smoothed_values = np.linspace(loess[2], loess[3], num = len(idx_to_smooth))
-                ndvi_smoothed_value = interpolated_smoothed_values + median_array_to_smooth
-
-                # write it back to ndvi array
-                    
-                # update last date array with the new dates as shown above
-                last_dates_array = np.concatenate(last_dates_array[1:7],current_date,date(1900,1,1))
-
-                return last_dates_array 
+        ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[4]) + 1] = L2_ndvi
 
     else:
-             
-        # perform the L0 estimation based on the last delta avaible
-        days_diff = (last_dates_array[6] - current_date)  / np.timedelta64(1, 'D')
 
-        decrease_factor = math.exp(-math.log(2) * (days_diff / 15.0))
-        ndvi_estimated = median_last_value + last_delta * decrease_factor
-        # write it back to ndvi array
+        # L1 linear
+        idx_to_interpolate = np.arange(int(last_array_dates_idx[6]), current_date_idx +1)
+        deltas_interpolated = np.linspace(last_delta, current_delta, num=len(idx_to_interpolate))
+        L1_ndvi = deltas_interpolated + median_ndvi_arr[int(last_array_dates_idx[6]) :current_date_idx +1] / 10000.0
+        ndvi_arr[int(last_array_dates_idx[6]) :current_date_idx +1] = L1_ndvi
 
-        # here no need to update the last dates array
+        # L2 smoothing
+        smoothed_deltas = sm.nonparametric.lowess(deltas_arr, np.arange(1, len(deltas_arr) + 1),
+                                                  frac=1, it=3, return_sorted=False)
 
-        return last_dates_array
+        idx_to_interpolate = np.arange(int(last_array_dates_idx[2]), int(last_array_dates_idx[3]) + 1)
+        deltas_L2_idx = last_array_dates_idx[2:4]
+        deltas_interpolated = np.interp(idx_to_interpolate,
+                                       deltas_L2_idx, smoothed_deltas[2:4])
+
+        L2_ndvi = deltas_interpolated + median_ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[3]) + 1] / 10000.0
+
+        ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[3]) + 1] = L2_ndvi
+
+    return ndvi_arr
 
 
+def continuous_ndvi(ndvi_arr, median_arr,*, dates_arr, bool_dates, current_date):
+
+    # coerce shapes: ensure 1D
+    ndvi_arr_2 = np.asarray(ndvi_arr).copy().ravel()
+    median_arr = np.asarray(median_arr).ravel()
+    dates_arr = np.asarray(dates_arr).astype("datetime64[D]").ravel()
+    bool_dates = np.asarray(bool_dates).ravel()
 
 
+    #current_date = current_date.astype("datetime64[D]")
+    first_date = dates_arr[0].astype("datetime64[D]")
+    current_date_idx = ((current_date - first_date) / np.timedelta64(1, "D")).astype(int)
+
+    # spinup here
+    
+    ndvi_subset = ndvi_arr_2[:current_date_idx]
+    median_subset = median_arr[:current_date_idx]
+    date_subset = dates_arr[:current_date_idx]
+    bool_subset = bool_dates[:current_date_idx] # this array contains the true obs. of the original dataset
+
+    ndvi_subset = ndvi_subset[bool_subset]
+    date_subset = date_subset[bool_subset]
+    median_subset = median_subset[bool_subset]
+
+    # valid mask
+    valid_mask = (ndvi_subset > 0) & (ndvi_subset < 10000)
+
+    if np.sum(valid_mask) > 6:
+
+        # check if the obs. are outlier, pot. out. or true obs.
+        last_ndvi_arr = ndvi_subset[valid_mask] / 100000
+        last_median_arr = median_subset[valid_mask] / 100000
+
+        delta = last_ndvi_arr - last_median_arr
+
+        # check last position alone beacuse does not have 2 neighbour
+
+        delta_last = delta[-1]
+        delta_delta_last = delta[-1] - delta[-2]
+
+        pot = False
+
+        if (abs(delta_last) > 0.1 and abs(delta_delta_last)> 0.1):
+            pot = True
+
+        delta_delta_left = delta[2:]
+        delta_delta_rigth = delta[:-2]
+        outlier_mask = ((abs(delta[1:-1]) > 0.1) & (abs(delta_delta_left) > 0.1) & (abs(delta_delta_rigth) > 0.1))
+
+        # last 7 valid dates
+        last_dates = date_subset[valid_mask][1:-1]
+
+        if pot == False:
+
+            last_valid_dates = last_dates[~outlier_mask][-6:]
+            # append last dates
+            last_valid_dates = np.append(last_valid_dates,date_subset[valid_mask][-1])
+            last_valid_dates = last_valid_dates[-7:]
+            # always output 8 slots
+            last_dates_array = np.full(8, np.datetime64("1900-01-01", "D"), dtype="datetime64[D]")
+            last_dates_array[:len(last_valid_dates)] = last_valid_dates
+
+        else:
+
+            last_valid_dates = last_dates[~outlier_mask][-7:]
+            # always output 8 slots
+            last_dates_array = np.full(8, np.datetime64("1900-01-01", "D"), dtype="datetime64[D]")
+            last_dates_array[:len(last_valid_dates)] = last_valid_dates
+            last_dates_array[-1] = date_subset[valid_mask][-1]
+
+        # finished last dates array generation
+
+        last_dates_array = last_dates_array.astype("datetime64[D]")
+
+        last_array_dates_idx =  ((last_dates_array - first_date) / np.timedelta64(1, "D")).astype(int)
+
+    else:
+        # no enough date
+        return ndvi_arr_2
+
+    
+
+    # if not enough valid dates (any of first 7 < 0) -> skip
+    if np.any(last_array_dates_idx[:7] < 0):
+        
+        last_dates_array = last_dates_array.astype("datetime64[D]")
+
+        return ndvi_arr_2
+
+    # compute values
+    current_ndvi = ndvi_arr_2[current_date_idx] / 10000.0
+    median_current = median_arr[current_date_idx] / 10000.0
+
+    last_idx = int(last_array_dates_idx[6])
+    last_ndvi = ndvi_arr_2[last_idx] / 10000.0
+    last_median = median_arr[last_idx] / 10000.0
+
+    last_delta = last_ndvi - last_median
+    current_delta = current_ndvi - median_current
+    delta_delta = current_delta - last_delta
+
+    if (current_ndvi > 0) and (current_ndvi < 1):
+
+        if (abs(delta_delta) > 0.1) and (abs(current_delta) > 0.1):
+
+            last_dates_array[7] = current_date  
+            last_dates_array = last_dates_array.astype("datetime64[D]")
+
+            return ndvi_arr_2
+
+        deltas_arr = (ndvi_arr_2[last_array_dates_idx[:7].astype(int)] - median_arr[last_array_dates_idx[:7].astype(int)]) / 10000.0
+
+        if last_array_dates_idx[7] > 0:
+
+            pot_idx = int(last_array_dates_idx[7])
+            pot_delta = (ndvi_arr_2[pot_idx] - median_arr[pot_idx]) / 10000.0
+
+            if abs(pot_delta) < 0.1:
+
+                pot_deltas_arr = (ndvi_arr_2[last_array_dates_idx.astype(int)] - median_arr[last_array_dates_idx.astype(int)]) / 10000.0
+
+                ndvi_arr_2 = smoothing_and_gapfilling(ndvi_arr_2, median_arr, last_array_dates_idx, last_delta, current_delta, pot_deltas_arr,current_date_idx, pot_outlier_present=True)
+
+                return ndvi_arr_2
+            
+            else:
+
+                ndvi_arr_2 = smoothing_and_gapfilling(ndvi_arr_2, median_arr, last_array_dates_idx, last_delta, current_delta, deltas_arr,current_date_idx, pot_outlier_present=False)
+
+                return ndvi_arr_2
+        else:
+
+            ndvi_arr_2 = smoothing_and_gapfilling(ndvi_arr_2, median_arr, last_array_dates_idx, last_delta, current_delta, deltas_arr,current_date_idx, pot_outlier_present=False)
+
+            return ndvi_arr_2
+    else:
+
+        # no observation -> estimate
+        tau = 2#len(ndvi_subset) - last_idx
+        estimated_delta = last_delta * np.exp(- tau / 45.0)
+        ndvi_arr_2[current_date_idx] = estimated_delta + median_current
+        last_dates_array = last_dates_array.astype("datetime64[D]")
+
+        return ndvi_arr_2
 
 
+# -----------------------------
+# 1) Setup Dask client
+# -----------------------------
 
-# this part after is not changed from historic ndvi so it won't work
+local_tmp = "/data_3/tmp_dask"
 
+if os.path.exists(local_tmp):
+    shutil.rmtree(local_tmp)
 
-
+os.makedirs(local_tmp, exist_ok=True)
 
 N_WORKERS = 50
-
 client = Client(
-n_workers=N_WORKERS,
-threads_per_worker=1,
-#memory_limit='24GB',
-processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
-dashboard_address=':12345')  
+    n_workers=N_WORKERS,
+    threads_per_worker=1,
+    processes=True,
+    dashboard_address=":12345",
+    local_directory= local_tmp
+)
+client.dashboard_link
 
-# already having medians computed
-
-INPUT_ZARR = "/data_3/scratch/francesco/zarr_demo_daily_v2.zarr/"
+# -----------------------------
+# 2) Open Zarr dataset
+# -----------------------------
+INPUT_ZARR = "/data_3/scratch/francesco/new_zarr_bol.zarr"
 ds = xr.open_zarr(INPUT_ZARR, chunks={"time": -1, "pixel": 5000})
-ndvi_array = ds["ndvi"].isel(pixel=slice(0, 999999))            # dims ("time","pixel")
-median_array = ds["median_ndvi"].isel(pixel=slice(0, 999999))    # dims ("time","pixel") 
-dates_int = ds["dates"].values.astype(np.int32)
-dates_array = np.array([datetime.strptime(str(d), "%Y%m%d").date() for d in dates_int], dtype="datetime64[D]")
 
-# call gufunc where core dim is "time" (1D arrays per pixel)
-result = xr.apply_ufunc(
-    historical_ndvi,
+dates = ds["date"] #.astype("datetime64[D]")
+bool_array = ds["obs"]
+bool_array = bool_array.chunk({"date": -1})
+spinup = 750
+current_date_pos = spinup + 14
+
+current_date = np.array(dates[current_date_pos].values).astype("datetime64[D]")
+
+ndvi_array = ds["ndvi"]#.isel(pixel=slice(0, 1000000)) # , date = slice(0,current_date_pos)
+median_array = ds["median_ndvi"]#.isel(pixel=slice(0, 1000000))
+
+ndvi_array = ndvi_array.chunk({"date": -1, "pixel": 5000})
+median_array = median_array.chunk({"date": -1, "pixel": 5000})
+
+
+out_ds_path = "/data_3/scratch/francesco/prova_ndvi_continous.zarr"
+
+if os.path.exists(out_ds_path):
+    shutil.rmtree(out_ds_path)
+
+dates = dates.load().values.astype("datetime64[D]")
+bool_array = bool_array.load().values
+
+# print valid obs to check
+ndvi_test = ds["ndvi"].isel(date = current_date_pos).values
+print(np.sum((ndvi_test > 0)&(ndvi_test < 10000)))
+
+ndvi_arr = xr.apply_ufunc(
+    continuous_ndvi,
     ndvi_array,
     median_array,
-    input_core_dims=[["time"], ["time"]],    # each call gets 1D time arrays
-    output_core_dims=[["time"]],
-    vectorize=True, 
+    input_core_dims=[["date"],["date"]],
+    output_core_dims=[["date"]],
+    vectorize=True,
     dask="parallelized",
-    kwargs={"dates": dates_array},
-    output_dtypes=[ndvi_array.dtype],
+    kwargs={
+        "dates_arr" : dates,
+        "bool_dates" : bool_array,
+        "current_date": current_date
+    },
+    output_dtypes=ndvi_array.dtype,
     dask_gufunc_kwargs={"allow_rechunk": True},
 )
 
-client.dashboard_link
+# check the time
 
-# create the dataset to write 
+import time
 
-out_ds = xr.Dataset({"ndvi_processed": result}, coords={"time": ds["dates"], "pixel": ds["pixel"]})
-out_ds = out_ds.chunk({"pixel": 5000, "time": -1})
+start = time.perf_counter()
 
-# Remove any incompatible 'compressor' metadata left over from the source dataset
-for v in list(out_ds.data_vars):
+out_ds = xr.Dataset({
+    "ndvi_processed": ndvi_arr
+}, coords={"date": ds["date"], "pixel": ds["pixel"]})
+
+# Chunk explicitly to avoid Dask graph explosion
+out_ds = out_ds.chunk({"pixel": 5000, "date": -1})
+
+# Remove leftover compressor info if copying from another dataset
+for v in out_ds.data_vars:
     out_ds[v].encoding.pop("compressor", None)
-    # ensure chunks entry exists to avoid surprises
     out_ds[v].encoding.setdefault("chunks", None)
 
-for c in list(out_ds.coords):
-    out_ds[c].encoding.pop("compressor", None)
-    out_ds[c].encoding.setdefault("chunks", None)
+# Write to Zarr
+out_ds.to_zarr(out_ds_path, mode="w", consolidated=True, compute=True)
 
-# Explicit encoding: no compressor for each data var
-encoding = {v: {"compressor": None} for v in out_ds.data_vars}
 
-# Write using zarr version 2 to avoid new v3 codec/BytesBytesCodec mismatch
-out_ds.to_zarr("ndvi_processed.zarr", mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=2)
+end = time.perf_counter()
+print(f"Execution time: {end - start:.2f} seconds")
 
-client.close
+
+client.close()
+
+shutil.rmtree(local_tmp)

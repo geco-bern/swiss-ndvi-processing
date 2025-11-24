@@ -104,6 +104,6 @@ for c in list(out_ds.coords):
 encoding = {v: {"compressor": None} for v in out_ds.data_vars}
 
 # Write using zarr version 2 to avoid new v3 codec/BytesBytesCodec mismatch
-out_ds.to_zarr("ndvi_processed.zarr", mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=2)
+out_ds.to_zarr("/data_3/scratch/francesco/ndvi_processed.zarr", mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=2)
 
 client.close
