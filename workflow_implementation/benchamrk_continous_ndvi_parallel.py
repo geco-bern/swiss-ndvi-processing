@@ -238,7 +238,7 @@ client.dashboard_link
 # -----------------------------
 # 2) Open Zarr dataset
 # -----------------------------
-INPUT_ZARR = "/data_3/scratch/francesco/new_zarr_bol.zarr"
+INPUT_ZARR = "/data_3/scratch/francesco/transposed_zarr_prova" #"/data_3/scratch/francesco/new_zarr_bol.zarr"
 ds = xr.open_zarr(INPUT_ZARR, chunks={"time": -1, "pixel": 5000})
 
 dates = ds["date"] #.astype("datetime64[D]")

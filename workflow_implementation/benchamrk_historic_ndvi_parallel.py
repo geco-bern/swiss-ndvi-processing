@@ -7,6 +7,8 @@ import xarray as xr
 def historical_ndvi(ndvi_arr, medians,dates):
 
         days_diff = (dates- dates[0])  / np.timedelta64(1, 'D')
+
+        delta_ndvi = np.array([0])
      
         ndvi_arr = ndvi_arr / 10000
         medians  = medians  / 10000
@@ -62,20 +64,19 @@ dashboard_address=':12345')
 
 # already having medians computed
 
-INPUT_ZARR = "/data_3/scratch/francesco/zarr_demo_daily_v2.zarr/"
-ds = xr.open_zarr(INPUT_ZARR, chunks={"time": -1, "pixel": 5000})
+INPUT_ZARR = "/data_3/scratch/francesco/new_zarr_bol.zarr" #"/data_3/scratch/francesco/zarr_demo_daily_v2.zarr/"
+ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 5000})
 ndvi_array = ds["ndvi"].isel(pixel=slice(0, 999999))            # dims ("time","pixel")
 median_array = ds["median_ndvi"].isel(pixel=slice(0, 999999))    # dims ("time","pixel") 
-dates_int = ds["dates"].values.astype(np.int32)
-dates_array = np.array([datetime.strptime(str(d), "%Y%m%d").date() for d in dates_int], dtype="datetime64[D]")
+dates_array = ds["date"].values.astype("datetime64[D]").ravel()   #.values.astype(np.int32)
 
 # call gufunc where core dim is "time" (1D arrays per pixel)
 result = xr.apply_ufunc(
     historical_ndvi,
     ndvi_array,
     median_array,
-    input_core_dims=[["time"], ["time"]],    # each call gets 1D time arrays
-    output_core_dims=[["time"]],
+    input_core_dims=[["date"], ["date"]],    # each call gets 1D time arrays
+    output_core_dims=[["date"]],
     vectorize=True, 
     dask="parallelized",
     kwargs={"dates": dates_array},
@@ -87,8 +88,8 @@ client.dashboard_link
 
 # create the dataset to write 
 
-out_ds = xr.Dataset({"ndvi_processed": result}, coords={"time": ds["dates"], "pixel": ds["pixel"]})
-out_ds = out_ds.chunk({"pixel": 5000, "time": -1})
+out_ds = xr.Dataset({"ndvi_processed": result}, coords={"date": ds["date"], "pixel": ds["pixel"]})
+out_ds = out_ds.chunk({"pixel": 5000, "date": -1})
 
 # Remove any incompatible 'compressor' metadata left over from the source dataset
 for v in list(out_ds.data_vars):
@@ -104,6 +105,6 @@ for c in list(out_ds.coords):
 encoding = {v: {"compressor": None} for v in out_ds.data_vars}
 
 # Write using zarr version 2 to avoid new v3 codec/BytesBytesCodec mismatch
-out_ds.to_zarr("/data_3/scratch/francesco/ndvi_processed.zarr", mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=2)
+out_ds.to_zarr("/data_3/scratch/francesco/ndvi_processed2.zarr", mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=3)
 
 client.close
