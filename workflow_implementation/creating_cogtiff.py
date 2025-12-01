@@ -20,7 +20,7 @@ pixel = ds_p["pixel"].values
 
 pixel = pixel[:1000000]
 
-ndvi_layer =  ds["ndvi_processed"].isel(time = 100).values
+ndvi_layer =  ds["ndvi_processed"].isel(time = 1100).values
 
 zarr_path = "/data_2/scratch/sbiegel/processed/ndvi_dataset.zarr/ndvi"
 mask_path = "/data_2/scratch/sbiegel/processed/forest_mask.npy"
@@ -159,4 +159,3 @@ with rasterio.open(cog_tif) as src:
 plt.imshow(arr, cmap='viridis')
 plt.colorbar()
 plt.show()
-

@@ -8,9 +8,12 @@ import time
 from dask.distributed import Client, LocalCluster
 import xarray as xr
 import dask.array as da
+from datetime import datetime, date
 
-SRC_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr"
-OUT_ZARR  = "/data_3/scratch/francesco/new_zarr_bol_small.zarr"
+
+
+SRC_ZARR = "/data_3/scratch/francesco/processed/ndvi_dataset_temporal.zarr"
+OUT_ZARR  = "/data_3/scratch/francesco/demo.zarr"
 
 
 # SETUP PARALLELIZATION CLUSTER
@@ -75,34 +78,18 @@ sel_1 = extract_pixel_index(
 
 ds0 = zarr.open_group(SRC_ZARR, mode="r")
 
-# Lazy dask arrays from zarr
 ndvi_z = ds0["ndvi"]
-pl_z   = ds0["params"]["params_lower"]
-pu_z   = ds0["params"]["params_upper"]
-
 ndvi_da = da.from_zarr(ndvi_z)     # lazy
-pl_da   = da.from_zarr(pl_z)       # lazy
-pu_da   = da.from_zarr(pu_z)       # lazy
+         # equivalently sel() but much slower
 
-# Decode dates into a small in-memory coordinate
-dates = pd.to_datetime([d.decode("utf-8") for d in ds0["dates"][:]])
+dates = da.from_zarr(ds0["date"]).astype("datetime64[D]")
 
-# Build xarray objects with explicit dims/coords (still lazy)
-param_labels = ['par0', 'par1', 'par2', 'par3', 'par4', 'par5'] # TODO: what are param names from Samanthas model?
-ndvi_xr         = xr.DataArray(ndvi_da, dims=("pixel", "date"),  coords={"date": dates, "pixel": np.arange(pl_da.shape[0])})
-params_lower_xr = xr.DataArray(pl_da,   dims=("pixel", "param"), coords={               "pixel": np.arange(pl_da.shape[0]), "param": param_labels})
-params_upper_xr = xr.DataArray(pu_da,   dims=("pixel", "param"), coords={               "pixel": np.arange(pl_da.shape[0]), "param": param_labels})
+dates = dates.compute()
 
-# dims/coords are used as following:
-# params_upper_xr.sel(param = 'par1') # sel uses label
-# params_upper_xr.isel(param = 0)     # isel uses integer
+start_dates = np.datetime64("2018-06-01", "D")
+end_dates = np.datetime64("2018-06-05", "D")
 
-print(f"Loaded NDVI lazily with shape {tuple(ndvi_xr.shape)}, {len(dates)} unique dates.")
-
-# =====================================================
-#  Generate Daily Date Range (in-memory index only)
-# =====================================================
-daily_dates = pd.date_range(start=dates.min(), end=dates.max(), freq="D")
+daily_dates = pd.date_range(start=start_dates, end=end_dates, freq="D")
 print(f"Generated {len(daily_dates)} daily dates from {daily_dates.min().date()} to {daily_dates.max().date()}")
 
 obs_dates = daily_dates.isin(dates)
@@ -113,17 +100,13 @@ obs_dates = daily_dates.isin(dates)
 # =====================================================
 n_pixels = len(sel_1)
 print(f"Subset has {n_pixels} pixels.")
-
-# Lazy subset for selected pixels
-ndvi_sel = ndvi_xr.isel(pixel=sel_1)         # equivalently sel() but much slower
-pl_sel   = params_lower_xr.isel(pixel=sel_1) # equivalently sel() but much slower
-pu_sel   = params_upper_xr.isel(pixel=sel_1) # equivalently sel() but much slower
+ndvi_xr = xr.DataArray(ndvi_da, dims=("pixel", "date"),  coords={"date": dates, "pixel": np.arange(ndvi_da.shape[0])})
+ndvi_sel = ndvi_xr.isel(pixel=sel_1)
 
 # =====================================================
 #  Reindex NDVI to daily (lazy), fill with 32767 (int16)
 # =====================================================
 # NOTE: issue that there are duplicate dates:
-dates.values
 np.unique(dates)
 # TODO: understand why we have this issue of repeated indices
 #       in the output of Samanthas code
@@ -156,55 +139,6 @@ ndvi_sel_nodup = _dedup_date_coord(ndvi_sel, how="first")
 ndvi_daily = ndvi_sel_nodup.astype(np.int16).reindex(date=daily_dates, method=None, fill_value=np.int16(32767))
 
 
-
-# Build auxiliary lazy arrays
-counter_da = xr.DataArray(
-    da.zeros(ndvi_daily.sizes["date"], dtype=np.int16),
-    dims=("date",),
-    coords={"date": ndvi_daily["date"]},
-)
-
-
-# =====================================================
-#  Compute median_ndvi (lazy, same shape as ndvi_daily)
-# =====================================================
-
-def double_logistic(t, params):
-    sos, mat_minus_sos, sen, eos_minus_sen, M, m = np.split(params, 6, axis=-1)
-    mat_minus_sos = np.log1p(np.exp(mat_minus_sos))
-    eos_minus_sen = np.log1p(np.exp(eos_minus_sen))
-    t = t[None, :]  # shape (1, date)
-    sigmoid_sos_mat = 1 / (1 + np.exp(2 * (2 * sos + mat_minus_sos - 2 * t) / (mat_minus_sos + 1e-10)))
-    sigmoid_sen_eos = 1 / (1 + np.exp(2 * (2 * sen + eos_minus_sen - 2 * t) / (eos_minus_sen + 1e-10)))
-    return (M - m) * (sigmoid_sos_mat - sigmoid_sen_eos) + m
-
-# get numpy array of scaled time (same as before)
-doy = np.array([d.timetuple().tm_yday for d in daily_dates], dtype=np.float32)
-doy[doy == 366] = 365
-t_scaled = doy / 365.0  # shape (date,)
-
-# Compute median lazily pixel-wise
-def build_median_ndvi_block(pl_block, pu_block):
-    ndvi_lower = double_logistic(t_scaled, pl_block)
-    ndvi_upper = double_logistic(t_scaled, pu_block)
-    return ((ndvi_lower + ndvi_upper) / 2.0 * 10000).astype(np.int16)
-
-# dask.map_blocks over first axis (pixel)
-median_da = da.map_blocks(
-    build_median_ndvi_block,
-    pl_sel.data,
-    pu_sel.data,
-    dtype=np.int16,
-    chunks=(pl_sel.chunks[0], (len(daily_dates),))
-)
-
-median_ndvi_xr = xr.DataArray(
-    median_da,
-    dims=("pixel", "date"),
-    coords={"pixel": pl_sel["pixel"], "date": ndvi_daily["date"]},
-    name="median_ndvi",
-)
-
 obs_dates_xr = xr.DataArray(
     obs_dates,
     dims=("date",),
@@ -218,31 +152,14 @@ obs_dates_xr = xr.DataArray(
 out_ds = xr.Dataset(
     {
         "ndvi": ndvi_daily,
-        "median_ndvi": median_ndvi_xr,
-        "counter": counter_da,
-        "params_lower": pl_sel,
-        "params_upper": pu_sel,
         "obs" : obs_dates_xr
     }
 )
 
-# Optional encodings (Zarr chunks and dtypes)
 
-# Optional IO-friendly chunking: write one day per task
-# ndvi_daily = ndvi_daily.chunk({"date": 1})
-# Optional IO-friendly chunking
-# ndvi_daily = ndvi_daily.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-# Optional IO-friendly chunking
-DATE_CHUNKS = 365
-PIXEL_CHUNKS = 100
+DATE_CHUNKS = min(len(daily_dates),365)
+PIXEL_CHUNKS = min( len(sel_1),4000)
 out_ds = out_ds.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-
-# Ensure correct encoding (is written to the metadata???)
-# out_ds["ndvi"].encoding.update({"dtype": "int16"})
-# out_ds["counter"].encoding.update({"dtype": "int16"})
-# out_ds["params_lower"].encoding.update({"dtype": "float32"})
-# out_ds["params_upper"].encoding.update({"dtype": "float32"})
-# out_ds["last_dates"].encoding.update({"dtype": "S10"})
 
 
 # Write to Zarr
@@ -251,18 +168,81 @@ print(f"Writing lazily computed Dataset to {OUT_ZARR} with Dask...")
 out_ds.to_zarr(OUT_ZARR, mode="w", consolidated=True)
 print("✅ Done")
 
+# merge with historical ndvi (TODO)
 
-"""
-# How to use?
-# a) with integers:
-out_ds['ndvi'][13,13]
-out_ds['ndvi'][{'pixel':13, 'date':13}]
-out_ds['ndvi'][{'date':13, 'pixel':13}]
-out_ds['ndvi'].isel(pixel=13, date=13)
-# a) with coordinate values (i.e. labels):
-out_ds['ndvi'].sel(pixel=85668629, date='2017-04-16')
-out_ds['params_lower'].sel(pixel=85668629, param='par0').load()
+# slice the historical ndvi data (not to do in future)
 
-out_ds['params_lower'].isel(pixel=slice(0,10)).load()
 
-# zarr_written = xr.open_zarr(OUT_ZARR, chunks='auto', mask_and_scale=True)"""
+historical_ndvi_src = "/data_3/scratch/francesco/ndvi_processed2.zarr"
+historical_ndvi = xr.open_zarr(historical_ndvi_src)
+
+# historical filtered
+ndvi_historic = historical_ndvi["ndvi_processed"].sel(
+    pixel=sel_1,
+    date= slice(None, "2018-05-31")
+).rename("ndvi")
+
+obs_date_historical = historical_ndvi["obs_date"].sel( date= slice(None, "2018-05-31"))
+
+
+# new data
+ds_to_stack = xr.open_zarr(OUT_ZARR)
+ndvi_new = ds_to_stack["ndvi"].sel(pixel=sel_1).rename("ndvi")  # <── match pixel subset
+obs_date_new = ds_to_stack["obs"].rename("obs_date")
+
+# stack along time
+ndvi_stack = xr.concat([ndvi_historic, ndvi_new], dim="date").sortby("date")
+
+obs_date_stack = xr.concat([obs_date_historical, obs_date_new], dim="date").sortby("date")
+
+
+date_stack =  xr.concat([historical_ndvi["date"].sel(date= slice(None, "2018-05-31")), ds_to_stack["date"]], dim="date").sortby("date")
+
+date_stack = date_stack.astype("datetime64[D]")
+
+# extract the mean of lower and upper bands
+
+lookuptable_src = "/data_3/francesco/lookup_table_median_ndvi.zarr"
+
+lookuptable = xr.open_zarr(lookuptable_src)
+
+lookuptable_arr = lookuptable["median_ndvi"].sel(pixel = sel_1)
+
+doy = date_stack.dt.dayofyear
+
+# remove leap year if encountered
+doy_array_fixed = np.where(doy.values == 366, 365, doy.values)
+
+median_ndvi = lookuptable.sel(doy=xr.DataArray(doy_array_fixed, dims="date"), pixel = sel_1)
+
+
+DATE_CHUNKS = min(len(ndvi_stack.date), 2000)
+PIXEL_CHUNKS = min(len(ndvi_stack.pixel), 4000)
+
+
+ndvi_stack = ndvi_stack.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+median_ndvi = median_ndvi.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+obs_date_stack = obs_date_stack.chunk({"date": DATE_CHUNKS})
+
+out_ds = xr.Dataset({
+    "ndvi": ndvi_stack,
+    "median_ndvi": median_ndvi["median_ndvi"],
+    "obs_date": obs_date_stack
+},
+coords={
+    "pixel": ndvi_stack.pixel,
+    "date": date_stack
+})
+
+for v in out_ds.data_vars:
+    out_ds[v].encoding.pop("compressor", None)
+    out_ds[v].encoding.setdefault("chunks", None)
+for c in out_ds.coords:
+    out_ds[c].encoding.pop("compressor", None)
+    out_ds[c].encoding.setdefault("chunks", None)
+
+OUT_ZARR = "/data_3/scratch/francesco/demo_stacked.zarr"
+out_ds.to_zarr(OUT_ZARR, mode="w", consolidated=True)
+
+print("✅ Done")
+

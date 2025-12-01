@@ -107,4 +107,24 @@ encoding = {v: {"compressor": None} for v in out_ds.data_vars}
 # Write using zarr version 2 to avoid new v3 codec/BytesBytesCodec mismatch
 out_ds.to_zarr("/data_3/scratch/francesco/ndvi_processed2.zarr", mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=3)
 
+# add the array of obs dates
+ds2 = xr.open_zarr("/data_3/scratch/francesco/ndvi_processed2.zarr", chunks={"date": -1, "pixel": 5000})
+
+arr_to_insert = ds["obs"].values
+
+obs_da = xr.DataArray(
+    arr_to_insert,
+    dims=("date",),
+    coords={"date": ds2["date"]},
+    name="obs_date"
+)
+
+# add to dataset
+ds2["obs_date"] = obs_da
+
+# write back in r+ mode (modify existing store)
+ds2.to_zarr("/data_3/scratch/francesco/ndvi_processed2.zarr",
+            mode="a",
+            consolidated=True)
+
 client.close

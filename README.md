@@ -72,3 +72,75 @@ It provides the full gapfilling using:
 - **L1**: linear interpolation  
 - **L2**: smoothing with Savitzky–Golay  
 - **Continuous integration setup**: L1, then smoothed with L2  
+
+
+# How to process the NDVI data
+
+Here I'll show how to process the NDVI data for a small subset of pixel.
+THIS SCRIPT WON'T WORK OUTSIDE WORKSTATION, IT NEEDS THE FOREST MASK ()
+AND PRECOMPUTED LOOKUPTABLE
+
+## Prerequisites
+
+To process the data, 2 dataset are needed. 
+
+- The first is the historical NDVI processing with all the past observation.
+- The lookup table containg the means upper and lower precomputed per doy for each pixels
+
+For a small demo of 2000 pixels, the 2 dataset can be found inside this repo. we select the area of 300m by 3oom aorund this location and the historical ndvi will cover a time period from 2018-06-01 to 2018-06-05 (Three satellite images).
+
+## Simulate the continous NDVI processing
+
+To simulate the continous NDVI processing, the first step is to download the data.
+
+### Donwload the data
+
+The script [1_extract_swisstopo_dataset.py](workflow_implementation/demo/1_extract_swisstopo_dataset.py)
+ will download the data, in [line 124](workflow_implementation/demo/1_extract_swisstopo_dataset.py#L124)
+ is it possible to select the time window to simulate the continous ingestion. I select to ingest data from 2018-06-01 to 2018-06-05 (TODO: understand how the starting and ending dates can be passed automatically).
+
+#### Required parameter to modify inside the script
+  - the starting and ending date in [line 124](workflow_implementation/demo/1_extract_swisstopo_dataset.py#L124)
+  - the outputpath in [line 142 and 153](workflow_implementation/demo/1_extract_swisstopo_dataset.py#L142)
+
+### Transpose the data from time-wise to space-wise chunking
+
+The following step are to transpose the dataset from time-wise chunking to space-wise chunking, the script [2_transpose_swisstopo_dataset.py](workflow_implementation/demo/2_transpose_swisstopo_dataset.py) will do that.
+
+#### Required parameter to modify inside the script
+
+- the input path in [line 11](workflow_implementation/demo/2_transpose_swisstopo_dataset.py#L11). !!! IMPORTANT Must be equal to the output path of the previous step.
+- the output path in [line 13](workflow_implementation/demo/2_transpose_swisstopo_dataset.py#L13).
+
+### Add the new date
+
+The script (3_add_dates.py)[workflow_implementation/demo/3_add_dates.py] will download the new date where an observation in present, extented to be evenly spacing at daily resoultion and create the mask of where an observation is found (this mask in used in continous ndvi setup). Here there is nothing to change and can be run immidiately.
+
+### Merge the historical dataset with the new data set
+
+To run the analysis, it is encessary to have the historical analysis and the newly acquired data. The script [4_merge_zarr.py](workflow_implementation/demo/4_merge_zarr.py) will load both dataset and merged togheter.
+
+#### Required parameter to modify inside the script
+
+- The path of input new data in line 15. This must be the same path as the output file in the previous script. 
+- The path of temporary output befoire the merging
+- The path of the historical analysis
+- The path of the definitive merged dataset
+
+### Run the analysis
+
+After the merging, it is possible to run the analysis with the script [5_analyse_demo.py](workflow_implementation/demo/5_analyse_demo.py). 
+
+#### Required parameter to modify inside the script
+
+- The input path of the merged dataset
+- The output path of the processed dataset
+- The temporay path for dask memory managment
+
+### Create COG tiff
+
+TODO
+
+#### Required parameter to modify inside the script
+
+TODO

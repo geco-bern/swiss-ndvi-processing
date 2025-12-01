@@ -1,8 +1,11 @@
-#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/00_donwload_swisstopo.py >  /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/donwload_swisstopo.log &
-
 """
 Extract Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI time series for forested areas.
 """
+
+#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/1_extract_swisstopo_dataset.py >  /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/donwload_swisstopo.log &
+
+
+
 import pystac_client
 import rasterio
 from rasterio.coords import BoundingBox
@@ -12,7 +15,6 @@ import numcodecs
 from tqdm import tqdm
 from rasterio.windows import from_bounds
 from rasterio.warp import reproject, Resampling
-import shutil
 
 
 # Connect to Swisstopo STAC API
@@ -24,12 +26,6 @@ service.add_conforms_to("ITEM_SEARCH")
 # WGS 84
 # Swiss bounds: left, bottom, right, top
 bbox_swiss_4326 = [5.70, 45.8, 10.6, 47.95]
-
-src = "/data_3/scratch/francesco/download_zarr_prova"
-dst = "/data_3/scratch/francesco/download_zarr_prova_v2"
-
-shutil.rmtree(dst, ignore_errors=True)
-shutil.rmtree(src, ignore_errors=True)
 
 # Retrieve the spatial coverage (bounds) of all 4 possible orbits covering Switzerland
 def collect_bounds_all_orbits():
@@ -125,7 +121,7 @@ index_map[forest_flat_indices] = np.arange(len(forest_flat_indices))
 # Search all images for the full CH bounding box for the whole time period
 item_search = service.search(
     bbox=bbox_swiss_4326,
-    datetime='2018-01-01/2018-05-31',
+    datetime='2017-04-01/2025-11-30',
     collections=['ch.swisstopo.swisseo_s2-sr_v100']
 )
 s2_files = list(item_search.items())
@@ -143,7 +139,7 @@ NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
 compressors = zarr.codecs.BloscCodec(cname='zstd', clevel=3, shuffle=zarr.codecs.BloscShuffle.bitshuffle)
 ndvi_ds = zarr.create_array(
     name="ndvi",
-    store='/data_3/scratch/francesco/download_zarr_prova',
+    store='/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr',
     shape=(T, N),
     chunks=(1, N),
     dtype="int16",
@@ -154,7 +150,7 @@ ndvi_ds = zarr.create_array(
 
 ndsi_ds = zarr.create_array(
     name="ndsi",
-    store='/data_3/scratch/francesco/download_zarr_prova',
+    store='/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr',
     shape=(T, N),
     chunks=(1, N),
     dtype="int16",
@@ -293,147 +289,3 @@ if failed_timesteps:
         except Exception as e:
             print(f"Time step {t} retry failed: {e}")
             continue  # skip to the next time step
-
-
-"""
-Fetch acquisition dates from Swisstopo STAC API and add them to the Zarr dataset.
-"""
-import requests
-import pandas as pd
-import pystac_client
-import zarr
-
-def get_swisstopo_sentinel_dates(start='2018-04-01', end='2028-05-31'):
-    # Connect to Swisstopo STAC API
-    service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
-    service.add_conforms_to("COLLECTIONS")
-    service.add_conforms_to("ITEM_SEARCH")
-
-    bbox_swiss_4326 = [5.70, 45.8, 10.6, 47.95]
-
-    item_search = service.search(
-        bbox=bbox_swiss_4326,
-        datetime=f'{start}/{end}',
-        collections=['ch.swisstopo.swisseo_s2-sr_v100']
-    )
-    s2_files = list(item_search.items())
-
-    dates = []
-    for item in s2_files:
-        assets = item.assets
-        asset_key_metadata = next((key for key in assets.keys() if key.endswith('metadata.json')), None)
-        metadata_asset = assets[asset_key_metadata]
-        json_link_metadata = metadata_asset.href
-        response = requests.get(json_link_metadata)
-        metadata_json = response.json()
-        dates.append(metadata_json['BANDS-10M']['SOURCE_COLLECTION_PROPERTIES']['date'])
-    pd_dates = pd.to_datetime(dates)
-    pd_dates_str = pd_dates.strftime('%Y-%m-%d')
-
-    root = zarr.open_group("/data_3/scratch/francesco/download_zarr_prova", mode='a', zarr_format=3)
-    root.create_array(
-        name='dates',
-        dtype='S10',
-        shape=(len(pd_dates_str),),
-        chunks=(len(pd_dates_str),),
-    )
-    root['dates'][:] = pd_dates_str.values.astype('S10')
-    
-get_swisstopo_sentinel_dates(start='2018-04-01', end='2028-05-31')
-print("Dates added to Zarr dataset.")
-
-# convert from zarr v3 to zarr v2 (necessary because xarray do not supprort zarr v3)
-
-import shutil
-import zarr
-import numpy as np
-import xarray as xr
-from datetime import datetime, date
-
-src = "/data_3/scratch/francesco/download_zarr_prova"
-dst = "/data_3/scratch/francesco/download_zarr_prova_v2"
-
-
-# Remove dst if it exists
-shutil.rmtree(dst, ignore_errors=True)
-
-import os
-import math
-import itertools
-import zarr
-from zarr.storage import LocalStore   # <= THIS IS CORRECT FOR ZARR 3
-import numcodecs
-import numpy as np
-
-src_root = "/data_3/scratch/francesco/download_zarr_prova"
-dst_root = "/data_3/scratch/francesco/download_zarr_v2"
-
-vars_to_copy = ["ndvi", "ndsi", "dates"]
-
-os.makedirs(dst_root, exist_ok=True)
-
-# Open v3 arrays
-src_arrays = {}
-for v in vars_to_copy:
-    path = os.path.join(src_root, v)
-    src_arrays[v] = zarr.open(path, mode="r")
-
-# Create v2 store
-store = LocalStore(dst_root)             # Zarr v3 local filesystem store
-root = zarr.group(store=store, overwrite=True, zarr_version=2)
-
-compressor = numcodecs.Blosc(cname="zstd", clevel=3, shuffle=numcodecs.Blosc.SHUFFLE)
-
-def create_dst_array(name, src_a):
-    shape = tuple(src_a.shape)
-    chunks = src_a.chunks or None
-    dtype = src_a.dtype
-    fill_value = getattr(src_a, "fill_value", None)
-
-    if chunks is None:
-        if len(shape) == 1:
-            chunks = (min(1024, shape[0]),)
-        else:
-            chunks = (1, min(65536, shape[-1]))
-
-    dst = root.create_dataset(
-        name,
-        shape=shape,
-        chunks=chunks,
-        dtype=dtype,
-        compressor=compressor,
-        fill_value=fill_value,
-        overwrite=True,
-    )
-    return dst
-
-def chunked_copy(src_a, dst_a):
-    shape = dst_a.shape
-    chunks = dst_a.chunks
-    ranges = [range(0, shape[i], chunks[i]) for i in range(len(shape))]
-    total = math.prod([math.ceil(shape[i] / chunks[i]) for i in range(len(shape))])
-    done = 0
-
-    for start_indices in itertools.product(*ranges):
-        slices = tuple(slice(s, min(s + chunks[i], shape[i])) for i, s in enumerate(start_indices))
-        dst_a[slices] = np.asarray(src_a[slices])
-        done += 1
-        if done % 50 == 0 or done == total:
-            print(f"{dst_a.name}: {done}/{total} chunks copied")
-
-for name, src_a in src_arrays.items():
-    print(f"Creating {name}, shape={src_a.shape}, chunks={src_a.chunks}")
-    dst = create_dst_array(name, src_a)
-    chunked_copy(src_a, dst)
-
-print("DONE. Zarr v2 store is at:", dst_root)
-
-
-
-
-# extended the dataset to be evenly spaced
-
-ds = xr.open_zarr(dst)
-
-first_date = date(2018,1,1)
-last_date = date(2018,5,31)
