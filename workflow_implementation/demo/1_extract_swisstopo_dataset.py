@@ -27,6 +27,8 @@ service.add_conforms_to("ITEM_SEARCH")
 # Swiss bounds: left, bottom, right, top
 bbox_swiss_4326 = [5.70, 45.8, 10.6, 47.95]
 
+OUTPUT_PATH = "/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr"
+
 # Retrieve the spatial coverage (bounds) of all 4 possible orbits covering Switzerland
 def collect_bounds_all_orbits():
     """
@@ -139,7 +141,7 @@ NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
 compressors = zarr.codecs.BloscCodec(cname='zstd', clevel=3, shuffle=zarr.codecs.BloscShuffle.bitshuffle)
 ndvi_ds = zarr.create_array(
     name="ndvi",
-    store='/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr',
+    store= OUTPUT_PATH,
     shape=(T, N),
     chunks=(1, N),
     dtype="int16",
@@ -150,7 +152,7 @@ ndvi_ds = zarr.create_array(
 
 ndsi_ds = zarr.create_array(
     name="ndsi",
-    store='/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr',
+    store= OUTPUT_PATH,
     shape=(T, N),
     chunks=(1, N),
     dtype="int16",

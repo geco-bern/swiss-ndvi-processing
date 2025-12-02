@@ -76,9 +76,11 @@ It provides the full gapfilling using:
 
 # How to process the NDVI data
 
-Here I'll show how to process the NDVI data for a small subset of pixel.
-THIS SCRIPT WON'T WORK OUTSIDE WORKSTATION, IT NEEDS THE FOREST MASK ()
-AND PRECOMPUTED LOOKUPTABLE
+Here I'll show how to process the NDVI data for a small subset of pixel. The analysis can be already run with this [script](workflow_implementation/demo/5_analyse_demo.py) without changing anything. 
+
+If someone wants to try the entire workflow from downloading the satellite images to the NDVI processing, it must follows the script from 1 to 5 in [this folder](workflow_implementation/demo).
+
+The script 0 contains the code to generate the means of upper and lower bands using the Samantha's model. In order to reproduce the dataset, is necessary to follows her instruction in [this folder](processing). We already have generated the lookup table for all doy and pixels, in [this folder](data_for_demo/lookup_table.zarr) are stored the values for the subset of pixels used in the demo.
 
 ## Prerequisites
 
@@ -87,7 +89,9 @@ To process the data, 2 dataset are needed.
 - The first is the historical NDVI processing with all the past observation.
 - The lookup table containg the means upper and lower precomputed per doy for each pixels
 
-For a small demo of 2000 pixels, the 2 dataset can be found inside this repo. we select the area of 300m by 3oom aorund this location and the historical ndvi will cover a time period from 2018-06-01 to 2018-06-05 (Three satellite images).
+Both dataset are already generated and are stored inside the workstation. We upload the dataset for the demo in [this folder](data_for_demo).
+
+Below I'll explain how to use the demo. The intermediate data generated from step 1 to step 3 contains all the pixels (105M) and cannot be uploaded on Github. For this reason the only lines of code to change are the ones used to store the intermediate files.
 
 ## Simulate the continous NDVI processing
 
@@ -122,10 +126,8 @@ To run the analysis, it is encessary to have the historical analysis and the new
 
 #### Required parameter to modify inside the script
 
-- The path of input new data in line 15. This must be the same path as the output file in the previous script. 
-- The path of temporary output befoire the merging
-- The path of the historical analysis
-- The path of the definitive merged dataset
+- The path of input new data in [line 15](workflow_implementation/demo/4_merge_zarr.py#15). This must be the same path as the output file in the previous script. 
+- The path of temporary output in the following line before the merging.
 
 ### Run the analysis
 
@@ -133,14 +135,11 @@ After the merging, it is possible to run the analysis with the script [5_analyse
 
 #### Required parameter to modify inside the script
 
-- The input path of the merged dataset [line 257](workflow_implementation/demo/5_analyse_demo.py#257)
-- The output path of the processed dataset [line 258](workflow_implementation/demo/5_analyse_demo.py#258)
-- The temporay path for dask memory managment in [line 237](workflow_implementation/demo/5_analyse_demo.py#237)
+There is nothing to modify here.
 
 ### Create COG tiff
 
-TODO
-
+The 
 #### Required parameter to modify inside the script
 
-TODO
+Once the forset pixel mask is avaible nothing, since it will use the data from [here](data_for_demo/processed_ndvi.zarr)

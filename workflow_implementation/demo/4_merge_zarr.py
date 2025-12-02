@@ -13,7 +13,10 @@ from datetime import datetime, date
 
 
 SRC_ZARR = "/data_3/scratch/francesco/processed/ndvi_dataset_temporal.zarr"
-OUT_ZARR  = "/data_3/scratch/francesco/demo.zarr"
+OUT_ZARR_TMP  = "/data_3/scratch/francesco/demo.zarr"
+historical_ndvi_src = "data_for_demo/historic_ndvi.zarr"
+OUT_ZARR = "data_for_demo/merged_ndvi.zarr"
+lookuptable_src = "data_for_demo/lookup_table.zarr"
 
 
 # SETUP PARALLELIZATION CLUSTER
@@ -34,7 +37,7 @@ def extract_pixel_index(UL_x, UL_y, BR_x, BR_y):
     left, bottom = 2474090.0, 1065110.0
     px = 10.0
     top = bottom + height * px
-    mask_path = "/data_2/scratch/sbiegel/processed/forest_mask.npy"
+    mask_path = "/data_2/scratch/sbiegel/processed/forest_mask.npy" # needs to be loaded somewhere
 
     x_min, x_max = min(UL_x, BR_x), max(UL_x, BR_x)
     y_min, y_max = min(UL_y, BR_y), max(UL_y, BR_y)
@@ -70,14 +73,13 @@ def extract_pixel_index(UL_x, UL_y, BR_x, BR_y):
 center_x, center_y = 2694491.82, 1126023.20
 sel_1 = extract_pixel_index(
     center_x - 300, center_y - 300, # TODO: if x and y are Swiss coordinates they increas north and eastward.
-    center_x + 300, center_y + 300) #       Thus the provided coordinates are lower-left (SW) and upper-right (NE).
+    center_x + 300, center_y + 300) #       Thus the provided coordinates are lower-left (SW) and upper-right (NE)."""
 
 # =====================================================
 #  Load Source Dataset lazily (no xarray metadata needed)
 # =====================================================
 
 ds0 = zarr.open_group(SRC_ZARR, mode="r")
-
 ndvi_z = ds0["ndvi"]
 ndvi_da = da.from_zarr(ndvi_z)     # lazy
          # equivalently sel() but much slower
@@ -163,9 +165,9 @@ out_ds = out_ds.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
 
 
 # Write to Zarr
-os.makedirs(OUT_ZARR, exist_ok=True)
-print(f"Writing lazily computed Dataset to {OUT_ZARR} with Dask...")
-out_ds.to_zarr(OUT_ZARR, mode="w", consolidated=True)
+os.makedirs(OUT_ZARR_TMP, exist_ok=True)
+print(f"Writing lazily computed Dataset to {OUT_ZARR_TMP} with Dask...")
+out_ds.to_zarr(OUT_ZARR_TMP, mode="w", consolidated=True)
 print("✅ Done")
 
 # merge with historical ndvi (TODO)
@@ -173,7 +175,6 @@ print("✅ Done")
 # slice the historical ndvi data (not to do in future)
 
 
-historical_ndvi_src = "/data_3/scratch/francesco/ndvi_processed2.zarr"
 historical_ndvi = xr.open_zarr(historical_ndvi_src)
 
 # historical filtered
@@ -186,8 +187,8 @@ obs_date_historical = historical_ndvi["obs_date"].sel( date= slice(None, "2018-0
 
 
 # new data
-ds_to_stack = xr.open_zarr(OUT_ZARR)
-ndvi_new = ds_to_stack["ndvi"].sel(pixel=sel_1).rename("ndvi")  # <── match pixel subset
+ds_to_stack = xr.open_zarr(OUT_ZARR_TMP)
+ndvi_new = ds_to_stack["ndvi"].sel(pixel=sel_1).rename("ndvi") 
 obs_date_new = ds_to_stack["obs"].rename("obs_date")
 
 # stack along time
@@ -202,7 +203,6 @@ date_stack = date_stack.astype("datetime64[D]")
 
 # extract the mean of lower and upper bands
 
-lookuptable_src = "/data_3/francesco/lookup_table_median_ndvi.zarr"
 
 lookuptable = xr.open_zarr(lookuptable_src)
 
@@ -241,7 +241,7 @@ for c in out_ds.coords:
     out_ds[c].encoding.pop("compressor", None)
     out_ds[c].encoding.setdefault("chunks", None)
 
-OUT_ZARR = "/data_3/scratch/francesco/demo_stacked.zarr"
+OUT_ZARR = "data_for_demo/merged_ndvi.zarr"
 out_ds.to_zarr(OUT_ZARR, mode="w", consolidated=True)
 
 print("✅ Done")

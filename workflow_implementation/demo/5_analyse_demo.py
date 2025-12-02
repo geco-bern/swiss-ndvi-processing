@@ -112,6 +112,8 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
         # last 7 valid dates
         last_dates = date_subset[valid_mask][1:-1]
 
+        last_dates_smoothed = last_dates[~outlier_mask][-4]
+
         if pot == False:
 
             last_valid_dates = last_dates[~outlier_mask][-6:]
@@ -206,7 +208,6 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
         return ndvi_arr_2
 
 
-
 def continuous_ndvi(ndvi_arr, median_arr,*, dates_arr, bool_dates, start_date, end_date =  np.datetime64("1900-01-01")):
 
     # coerce shapes: ensure 1D
@@ -254,8 +255,11 @@ client.dashboard_link
 # -----------------------------
 # 2) Open Zarr dataset
 # -----------------------------
-INPUT_ZARR = "/data_3/scratch/francesco/demo_stacked.zarr" 
-OUTPUT_ZARR = "/data_3/scratch/francesco/demo_ndvi_continous2.zarr"
+INPUT_ZARR = "data_for_demo/merged_ndvi.zarr" 
+OUTPUT_ZARR = "data_for_demo/processed_ndvi.zarr"
+
+if os.path.exists(OUTPUT_ZARR):
+    shutil.rmtree(OUTPUT_ZARR)
 
 ds = xr.open_zarr(INPUT_ZARR)
 
@@ -311,6 +315,8 @@ for v in out_ds.data_vars:
 
 # Write to Zarr
 out_ds.to_zarr(OUTPUT_ZARR, mode="w", consolidated=True, compute=True)
+
+
 
 client.close()
 

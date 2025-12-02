@@ -3,6 +3,8 @@ import numpy as np
 import statsmodels.api as sm
 from dask.distributed import Client
 import xarray as xr
+import os
+import shutil
 
 def historical_ndvi(ndvi_arr, medians,dates):
 
@@ -23,7 +25,7 @@ def historical_ndvi(ndvi_arr, medians,dates):
         delta_ndvi = ndvi_valid - median_valid
         delta_delta_left = delta_ndvi[2:]
         delta_delta_rigth = delta_ndvi[:-2]
-        outlier_mask = ((abs(delta_ndvi[1:-1]) > 0.05) & (abs(delta_delta_left) > 0.05) & (abs(delta_delta_rigth) > 0.05))
+        outlier_mask = ((abs(delta_ndvi[1:-1]) > 0.1) & (abs(delta_delta_left) > 0.1) & (abs(delta_delta_rigth) > 0.1))
         ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
         delta_ndvi = delta_ndvi[1:-1][~outlier_mask]
         days_diff_2 = days_diff_2[1:-1][~outlier_mask]
@@ -39,18 +41,18 @@ def historical_ndvi(ndvi_arr, medians,dates):
             # combine smoothed value with values yet to smooth, after that linearly interpolate everything
 
             ndvi_to_interpolate = np.concatenate([np.array([0]),loess[:-4],delta_ndvi[-4:],np.array([0])]) 
-            dates_to_interpolate = np.concatenate([np.array([0]),days_diff_2,np.array([3072])]) # hardcoded, should be days_diff[-1]
+            dates_to_interpolate = np.concatenate([np.array([0]),days_diff_2,np.array([days_diff[-1]])]) 
 
             interpolated_values = np.interp(days_diff,dates_to_interpolate,ndvi_to_interpolate)
 
-            final_ndvi_value = interpolated_values + medians
+            final_ndvi_value = 10000 * (interpolated_values + medians)
 
 
             return final_ndvi_value
         
         else:
 
-            return ndvi_arr
+            return 10000 * ndvi_arr
 
 
 N_WORKERS = 50
@@ -61,13 +63,14 @@ threads_per_worker=1,
 #memory_limit='24GB',
 processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
 dashboard_address=':12345')  
+client.dashboard_link
 
 # already having medians computed
 
 INPUT_ZARR = "/data_3/scratch/francesco/new_zarr_bol.zarr" #"/data_3/scratch/francesco/zarr_demo_daily_v2.zarr/"
 ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 5000})
-ndvi_array = ds["ndvi"].isel(pixel=slice(0, 999999))            # dims ("time","pixel")
-median_array = ds["median_ndvi"].isel(pixel=slice(0, 999999))    # dims ("time","pixel") 
+ndvi_array = ds["ndvi"]           # dims ("time","pixel")
+median_array = ds["median_ndvi"]    # dims ("time","pixel") 
 dates_array = ds["date"].values.astype("datetime64[D]").ravel()   #.values.astype(np.int32)
 
 # call gufunc where core dim is "time" (1D arrays per pixel)
@@ -84,7 +87,6 @@ result = xr.apply_ufunc(
     dask_gufunc_kwargs={"allow_rechunk": True},
 )
 
-client.dashboard_link
 
 # create the dataset to write 
 
@@ -104,11 +106,16 @@ for c in list(out_ds.coords):
 # Explicit encoding: no compressor for each data var
 encoding = {v: {"compressor": None} for v in out_ds.data_vars}
 
+OUT_PATH = "/data_3/scratch/francesco/ndvi_processed.zarr"
+
+if os.path.exists(OUT_PATH):
+    shutil.rmtree(OUT_PATH)
+
 # Write using zarr version 2 to avoid new v3 codec/BytesBytesCodec mismatch
-out_ds.to_zarr("/data_3/scratch/francesco/ndvi_processed2.zarr", mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=3)
+out_ds.to_zarr(OUT_PATH, mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=3)
 
 # add the array of obs dates
-ds2 = xr.open_zarr("/data_3/scratch/francesco/ndvi_processed2.zarr", chunks={"date": -1, "pixel": 5000})
+ds2 = xr.open_zarr(OUT_PATH, chunks={"date": -1, "pixel": 5000})
 
 arr_to_insert = ds["obs"].values
 
@@ -123,7 +130,7 @@ obs_da = xr.DataArray(
 ds2["obs_date"] = obs_da
 
 # write back in r+ mode (modify existing store)
-ds2.to_zarr("/data_3/scratch/francesco/ndvi_processed2.zarr",
+ds2.to_zarr(OUT_PATH,
             mode="a",
             consolidated=True)
 
