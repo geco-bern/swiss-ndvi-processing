@@ -254,10 +254,12 @@ client.dashboard_link
 # -----------------------------
 # 2) Open Zarr dataset
 # -----------------------------
-INPUT_ZARR = "/data_3/scratch/francesco/demo_stacked.zarr" #"/data_3/scratch/francesco/new_zarr_bol.zarr"
-ds = xr.open_zarr(INPUT_ZARR) # , chunks={"time": -1, "pixel": 5000}
+INPUT_ZARR = "/data_3/scratch/francesco/demo_stacked.zarr" 
+OUTPUT_ZARR = "/data_3/scratch/francesco/demo_ndvi_continous2.zarr"
 
-dates = ds["date"] #.astype("datetime64[D]")
+ds = xr.open_zarr(INPUT_ZARR)
+
+dates = ds["date"] 
 bool_array = ds["obs_date"]
 bool_array = bool_array.chunk({"date": -1})
 
@@ -265,22 +267,17 @@ bool_array = bool_array.chunk({"date": -1})
 current_date = np.datetime64("2018-06-01")
 end_date = np.datetime64("2011-06-01")
 
-ndvi_array = ds["ndvi"]#.isel(pixel=slice(0, 1000000)) # , date = slice(0,current_date_pos)
-median_array = ds["median_ndvi"]#.isel(pixel=slice(0, 1000000))
-
+ndvi_array = ds["ndvi"]
+median_array = ds["median_ndvi"]
 ndvi_array = ndvi_array.chunk({"date": -1})
 median_array = median_array.chunk({"date": -1})
 
 
-out_ds_path = "/data_3/scratch/francesco/demo_ndvi_continous2.zarr"
-
-if os.path.exists(out_ds_path):
-    shutil.rmtree(out_ds_path)
+if os.path.exists(OUTPUT_ZARR):
+    shutil.rmtree(OUTPUT_ZARR)
 
 dates = dates.load().values.astype("datetime64[D]")
 bool_array = bool_array.load().values
-
-# print valid obs to check
 
 ndvi_arr = xr.apply_ufunc(
     continuous_ndvi,
@@ -313,7 +310,7 @@ for v in out_ds.data_vars:
     out_ds[v].encoding.setdefault("chunks", None)
 
 # Write to Zarr
-out_ds.to_zarr(out_ds_path, mode="w", consolidated=True, compute=True)
+out_ds.to_zarr(OUTPUT_ZARR, mode="w", consolidated=True, compute=True)
 
 client.close()
 

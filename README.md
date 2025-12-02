@@ -133,9 +133,9 @@ After the merging, it is possible to run the analysis with the script [5_analyse
 
 #### Required parameter to modify inside the script
 
-- The input path of the merged dataset
-- The output path of the processed dataset
-- The temporay path for dask memory managment
+- The input path of the merged dataset [line 257](workflow_implementation/demo/5_analyse_demo.py#257)
+- The output path of the processed dataset [line 258](workflow_implementation/demo/5_analyse_demo.py#258)
+- The temporay path for dask memory managment in [line 237](workflow_implementation/demo/5_analyse_demo.py#237)
 
 ### Create COG tiff
 
