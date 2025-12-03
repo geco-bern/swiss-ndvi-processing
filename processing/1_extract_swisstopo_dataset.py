@@ -116,7 +116,7 @@ index_map[forest_flat_indices] = np.arange(len(forest_flat_indices))
 # Search all images for the full CH bounding box for the for an incremental download
 item_search = service.search(
     bbox=bbox_swiss_4326,
-    datetime='2017-04-01/2025-11-30',
+    datetime='2025-08-31/2025-11-30',
     collections=['ch.swisstopo.swisseo_s2-sr_v100']
 )
 s2_files = list(item_search.items())
@@ -134,7 +134,7 @@ NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
 compressors = zarr.codecs.BloscCodec(cname='zstd', clevel=3, shuffle=zarr.codecs.BloscShuffle.bitshuffle)
 ndvi_ds = zarr.create_array(
     name="ndvi",
-    store='/storage/capacity/occr_geco/data_2/scratch/fbernhard/swiss-ndvi-processing/processed/ndvi_dataset_spatial_Apr2017-Nov2025.zarr',
+    store='/storage/capacity/occr_geco/data_2/scratch/fbernhard/swiss-ndvi-processing/processed/ndvi_dataset_spatial_Sep2025-Nov2025.zarr',
     shape=(T, N),
     chunks=(1, N),
     dtype="int16",
@@ -146,7 +146,7 @@ ndvi_ds = zarr.create_array(
 
 ndsi_ds = zarr.create_array(
     name="ndsi",
-    store='/storage/capacity/occr_geco/data_2/scratch/fbernhard/swiss-ndvi-processing/processed/ndvi_dataset_spatial_Apr2017-Nov2025.zarr',
+    store='/storage/capacity/occr_geco/data_2/scratch/fbernhard/swiss-ndvi-processing/processed/ndvi_dataset_spatial_Sep2025-Nov2025.zarr',
     shape=(T, N),
     chunks=(1, N),
     dtype="int16",
