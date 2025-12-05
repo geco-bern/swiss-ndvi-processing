@@ -71,31 +71,34 @@ def smoothing_and_gapfilling(ndvi_arr, median_ndvi_arr, last_array_dates_idx,
 def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates, current_date):
         
     # placeholder for dates to generate the tiff
-    last_dates_smoothed = np.datetime64("1900-01-01")
+    mask_ndvi_arr_2 = np.zeros_like(bool_dates)
 
     current_date_idx = ((current_date - first_date) / np.timedelta64(1, "D")).astype(int)
 
     # spinup here
-    
+    mask_ndvi_arr = mask_ndvi_arr_2[:current_date_idx]
     ndvi_subset = ndvi_arr_2[:current_date_idx]
+    ndvi_subset_mask = ndvi_arr_2[:current_date_idx]
     median_subset = median_arr[:current_date_idx]
     date_subset = dates_arr[:current_date_idx]
-    bool_subset = bool_dates[:current_date_idx] # this array contains the true obs. of the original dataset
+    bool_subset = bool_dates[:current_date_idx]
+    bool_arr_mask = bool_dates[:current_date_idx]
 
     ndvi_subset = ndvi_subset[bool_subset]
     date_subset = date_subset[bool_subset]
     median_subset = median_subset[bool_subset]
 
+
     # valid mask
-    valid_mask = (ndvi_subset > 0) & (ndvi_subset < 10000)
+    valid_mask = (ndvi_subset > 0) & (ndvi_subset < 10000.0)
 
     #outlier detection
     
     if np.sum(valid_mask) > 6:
 
         # check if the obs. are outlier, pot. out. or true obs.
-        last_ndvi_arr = ndvi_subset[valid_mask] / 100000
-        last_median_arr = median_subset[valid_mask] / 100000
+        last_ndvi_arr = ndvi_subset[valid_mask] / 10000.0
+        last_median_arr = median_subset[valid_mask] / 10000.0
 
         delta = last_ndvi_arr - last_median_arr
 
@@ -116,28 +119,56 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
         # last 7 valid dates
         last_dates = date_subset[valid_mask][1:-1]
 
-        
-
         if pot == False:
 
             last_valid_dates = last_dates[~outlier_mask][-6:]
+            
+
             # append last dates
             last_valid_dates = np.append(last_valid_dates,date_subset[valid_mask][-1])
             last_valid_dates = last_valid_dates[-7:]
             # always output 8 slots
             last_dates_array = np.full(8, np.datetime64("1900-01-01", "D"), dtype="datetime64[D]")
             last_dates_array[:len(last_valid_dates)] = last_valid_dates
-            last_dates_smoothed = last_valid_dates[-5].astype("datetime64[D]")
 
+            obs_mask = (ndvi_subset_mask > 0) & (ndvi_subset_mask < 10000.0) & bool_arr_mask # this wil filter all the observation
+            filter_obs_to_smooth = obs_mask
+            filter_obs_smooted = obs_mask
+
+            idx = ((last_dates_array[3] - first_date) / np.timedelta64(1, "D")).astype(int) + 1
+
+            filter_obs_to_smooth[idx:] = False
+            filter_obs_smooted[:idx] = False
+
+            mask_ndvi_arr[:idx] = 1 # all value before this date are smoothed
+            mask_ndvi_arr[filter_obs_to_smooth] = 2
+            mask_ndvi_arr[filter_obs_smooted] = 3
+            #mask_ndvi_arr[outlier_mask] = 4
+            mask_ndvi_arr_2[:len(mask_ndvi_arr)] = mask_ndvi_arr
 
         else:
 
             last_valid_dates = last_dates[~outlier_mask][-7:]
-            last_dates_smoothed = last_valid_dates[-4].astype("datetime64[D]")
             # always output 8 slots
             last_dates_array = np.full(8, np.datetime64("1900-01-01", "D"), dtype="datetime64[D]")
             last_dates_array[:len(last_valid_dates)] = last_valid_dates
             last_dates_array[-1] = date_subset[valid_mask][-1]
+
+            obs_mask = (ndvi_subset_mask > 0) & (ndvi_subset_mask < 10000.0) & bool_arr_mask # this wil filter all the observation
+            filter_obs_to_smooth = obs_mask
+            filter_obs_smooted = obs_mask
+
+            idx = ((last_dates_array[3] - first_date) / np.timedelta64(1, "D")).astype(int) + 1
+
+            filter_obs_to_smooth[idx:] = False
+            filter_obs_smooted[:idx] = False
+
+            mask_ndvi_arr[:idx] = 1 # all value before this date are smoothed
+            mask_ndvi_arr[filter_obs_to_smooth] = 2
+            mask_ndvi_arr[filter_obs_smooted] = 3
+            #mask_ndvi_arr[outlier_mask] = 4
+
+            mask_ndvi_arr_2[:len(mask_ndvi_arr)] = mask_ndvi_arr
 
         # finished last dates array generation
 
@@ -147,7 +178,7 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
 
     else:
         # no enough date
-        return ndvi_arr_2, last_dates_smoothed
+        return ndvi_arr_2, mask_ndvi_arr_2
 
     
 
@@ -156,7 +187,7 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
         
         last_dates_array = last_dates_array.astype("datetime64[D]")
 
-        return ndvi_arr_2, last_dates_smoothed
+        return ndvi_arr_2, mask_ndvi_arr_2
 
     # compute values
     current_ndvi = ndvi_arr_2[current_date_idx] / 10000.0
@@ -177,7 +208,7 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
             last_dates_array[7] = current_date  
             last_dates_array = last_dates_array.astype("datetime64[D]")
 
-            return ndvi_arr_2, last_dates_smoothed
+            return ndvi_arr_2, mask_ndvi_arr_2
 
         deltas_arr = (ndvi_arr_2[last_array_dates_idx[:7].astype(int)] - median_arr[last_array_dates_idx[:7].astype(int)]) / 10000.0
 
@@ -192,18 +223,18 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
 
                 ndvi_arr_2 = smoothing_and_gapfilling(ndvi_arr_2, median_arr, last_array_dates_idx, last_delta, current_delta, pot_deltas_arr,current_date_idx, pot_outlier_present=True)
 
-                return ndvi_arr_2, last_dates_smoothed
+                return ndvi_arr_2, mask_ndvi_arr_2
             
             else:
 
                 ndvi_arr_2 = smoothing_and_gapfilling(ndvi_arr_2, median_arr, last_array_dates_idx, last_delta, current_delta, deltas_arr,current_date_idx, pot_outlier_present=False)
 
-                return ndvi_arr_2, last_dates_smoothed
+                return ndvi_arr_2, mask_ndvi_arr_2
         else:
 
             ndvi_arr_2 = smoothing_and_gapfilling(ndvi_arr_2, median_arr, last_array_dates_idx, last_delta, current_delta, deltas_arr,current_date_idx, pot_outlier_present=False)
 
-            return ndvi_arr_2, last_dates_smoothed
+            return ndvi_arr_2, mask_ndvi_arr_2
     else:
 
         # no observation -> estimate
@@ -212,7 +243,7 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
         ndvi_arr_2[current_date_idx] = estimated_delta + median_current
         last_dates_array = last_dates_array.astype("datetime64[D]")
 
-        return ndvi_arr_2, last_dates_smoothed
+        return ndvi_arr_2, mask_ndvi_arr_2
 
 
 def continuous_ndvi(ndvi_arr, median_arr,*, dates_arr, bool_dates, start_date, end_date =  np.datetime64("1900-01-01")):
@@ -228,15 +259,15 @@ def continuous_ndvi(ndvi_arr, median_arr,*, dates_arr, bool_dates, start_date, e
     if end_date <= start_date:
 
         current_date = start_date
-        ndvi_arr_2,last_dates_smoothed = continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates, current_date)
+        ndvi_arr_2,mask_ndvi_arr = continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates, current_date)
 
     else:
         days_arr = np.arange(start_date,end_date +1)
         for day in days_arr:
             current_date = day
-            ndvi_arr_2, last_dates_smoothed = continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates, current_date)
+            ndvi_arr_2, mask_ndvi_arr = continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates, current_date)
 
-    return ndvi_arr_2, last_dates_smoothed
+    return ndvi_arr_2, mask_ndvi_arr
 
 # -----------------------------
 # 1) Setup Dask client
@@ -283,19 +314,15 @@ median_array = ds["median_ndvi"]
 ndvi_array = ndvi_array.chunk({"date": -1})
 median_array = median_array.chunk({"date": -1})
 
-
-if os.path.exists(OUTPUT_ZARR):
-    shutil.rmtree(OUTPUT_ZARR)
-
 dates = dates.load().values.astype("datetime64[D]")
 bool_array = bool_array.load().values
 
-ndvi_arr,last_dates_smoothed = xr.apply_ufunc(
+ndvi_arr, mask_ndvi_arr = xr.apply_ufunc(
     continuous_ndvi,
     ndvi_array,
     median_array,
     input_core_dims=[["date"],["date"]],
-    output_core_dims=[["date"]],
+    output_core_dims=[["date"],["date"]],
     vectorize=True,
     dask="parallelized",
     kwargs={
@@ -304,13 +331,20 @@ ndvi_arr,last_dates_smoothed = xr.apply_ufunc(
         "start_date": current_date,
         "end_date" : end_date
     },
-    output_dtypes=ndvi_array.dtype,
+    output_dtypes=[ndvi_array.dtype,ndvi_array.dtype],
     dask_gufunc_kwargs={"allow_rechunk": True},
 )
 
-out_ds = xr.Dataset({
-    "ndvi_processed": ndvi_arr
-}, coords={"date": ds["date"], "pixel": ds["pixel"]})
+out_ds = xr.Dataset(
+    {
+        "ndvi_processed": ndvi_arr,
+        "mask_array": mask_ndvi_arr
+    },
+    coords={
+        "date": ds["date"],
+        "pixel": ds["pixel"]
+    }
+)
 
 # Chunk explicitly to avoid Dask graph explosion
 out_ds = out_ds.chunk({"pixel": 5000, "date": -1})
@@ -322,8 +356,6 @@ for v in out_ds.data_vars:
 
 # Write to Zarr
 out_ds.to_zarr(OUTPUT_ZARR, mode="w", consolidated=True, compute=True)
-
-
 
 client.close()
 
