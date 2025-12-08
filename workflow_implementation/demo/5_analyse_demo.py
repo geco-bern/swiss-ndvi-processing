@@ -71,7 +71,8 @@ def smoothing_and_gapfilling(ndvi_arr, median_ndvi_arr, last_array_dates_idx,
 def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates, current_date):
         
     # placeholder for dates to generate the tiff
-    mask_ndvi_arr_2 = np.zeros_like(bool_dates)
+    mask_ndvi_arr_2  = np.empty(len(bool_dates), dtype=object)
+    mask_ndvi_arr_2.fill(0)
 
     current_date_idx = ((current_date - first_date) / np.timedelta64(1, "D")).astype(int)
 
@@ -88,6 +89,7 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
     date_subset = date_subset[bool_subset]
     median_subset = median_subset[bool_subset]
 
+    obs_mask = (ndvi_subset_mask > 0) & (ndvi_subset_mask < 10000.0) & bool_arr_mask # this wil filter all the observation
 
     # valid mask
     valid_mask = (ndvi_subset > 0) & (ndvi_subset < 10000.0)
@@ -140,11 +142,22 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
             filter_obs_to_smooth[idx:] = False
             filter_obs_smooted[:idx] = False
 
-            mask_ndvi_arr[:idx] = 1 # all value before this date are smoothed
-            mask_ndvi_arr[filter_obs_to_smooth] = 2
-            mask_ndvi_arr[filter_obs_smooted] = 3
-            #mask_ndvi_arr[outlier_mask] = 4
+            obs_mask = (ndvi_subset_mask > 0) & (ndvi_subset_mask < 10000.0) & bool_arr_mask
+
+            mask_ndvi_arr = np.zeros(len(bool_dates[:current_date_idx]), dtype=np.int8) 
+
+            idx = ((last_dates_array[3] - first_date) / np.timedelta64(1, "D")).astype(int) + 1
+
+            idx = max(0, min(idx, len(mask_ndvi_arr)))
+
+            mask_ndvi_arr[obs_mask] = 2
+
+            before = np.arange(len(mask_ndvi_arr)) < idx
+
+            mask_ndvi_arr[ before & obs_mask ] = 3
+            mask_ndvi_arr[ before & (~obs_mask) ] = 1
             mask_ndvi_arr_2[:len(mask_ndvi_arr)] = mask_ndvi_arr
+
 
         else:
 
@@ -154,20 +167,23 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
             last_dates_array[:len(last_valid_dates)] = last_valid_dates
             last_dates_array[-1] = date_subset[valid_mask][-1]
 
-            obs_mask = (ndvi_subset_mask > 0) & (ndvi_subset_mask < 10000.0) & bool_arr_mask # this wil filter all the observation
             filter_obs_to_smooth = obs_mask
             filter_obs_smooted = obs_mask
 
             idx = ((last_dates_array[3] - first_date) / np.timedelta64(1, "D")).astype(int) + 1
-
             filter_obs_to_smooth[idx:] = False
             filter_obs_smooted[:idx] = False
 
-            mask_ndvi_arr[:idx] = 1 # all value before this date are smoothed
-            mask_ndvi_arr[filter_obs_to_smooth] = 2
-            mask_ndvi_arr[filter_obs_smooted] = 3
-            #mask_ndvi_arr[outlier_mask] = 4
+            obs_mask = (ndvi_subset_mask > 0) & (ndvi_subset_mask < 10000.0) & bool_arr_mask
+            mask_ndvi_arr = np.zeros(len(bool_dates[:current_date_idx]), dtype=np.int8)  # length = window length you're working with
 
+            idx = ((last_dates_array[3] - first_date) / np.timedelta64(1, "D")).astype(int) + 1
+            idx = max(0, min(idx, len(mask_ndvi_arr)))
+            mask_ndvi_arr[obs_mask] = 2
+
+            before = np.arange(len(mask_ndvi_arr)) < idx
+            mask_ndvi_arr[ before & obs_mask ] = 3
+            mask_ndvi_arr[ before & (~obs_mask) ] = 1
             mask_ndvi_arr_2[:len(mask_ndvi_arr)] = mask_ndvi_arr
 
         # finished last dates array generation

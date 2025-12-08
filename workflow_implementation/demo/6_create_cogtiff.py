@@ -7,6 +7,7 @@ from rasterio.enums import Resampling
 from rasterio.shutil import copy as rio_copy
 import zarr
 import math
+import os
 
 INPUT_ZARR = "data_for_demo/processed_ndvi.zarr"
 COG_TIFF_FOLDER = "data_for_demo/output_cogtiff/"
@@ -15,111 +16,129 @@ ds = xr.open_zarr(INPUT_ZARR)
 
 pixel = ds["pixel"].values
 
-# Just for the first time, select the spinup (2018-01-01)
+first_date = ds["date"].isel(date = 0).values
 
-select_date_str = "2018-02-01"
+threshold = 0.9
 
-select_date = np.datetime64(select_date_str)
+# read the filename and select the date with highest value
 
-select_date_arr = np.array([select_date])
+dates_done = os.listdir("data_for_demo/output_cogtiff")
+
+# crop the date
+substring_list = [s[:10] for s in dates_done]
+# transform as datime object
+dates_as_dt = [np.datetime64(d) for d in substring_list]
+
+# Get the latest date
+last_date_created = max(dates_as_dt,np.datetime64("2018-01-01")) # placeholder in case the list in empty
+
+pos_idx = ((last_date_created - first_date) / np.timedelta64(1, "D")).astype(int)
+
+end_idx = ds.dims["date"] -100 #I put -100 to have something for the working demo
+
+dates_to_check = np.arange(pos_idx+1,end_idx-1) # -1 is for indexing
 
 mask_path = "/data_2/scratch/sbiegel/processed/forest_mask.npy"
 
-for day in select_date_arr:
+dates = ds["date"].astype("datetime64[D]").values
 
-    ndvi_layer =  ds["ndvi_processed"].sel(date = day).values
+for idx in dates_to_check:
 
-    # Raster info
-    height, width = 24542, 37728
-    left, bottom = 2474090.0, 1065110.0
-    px = 10.0
-    top = bottom + height * px
+    ndvi_layer =  ds["ndvi_processed"].isel(date = idx).values
+    mask = ds["mask_array"].isel(date = idx).values
 
-    # ----- center cooridnates  -----
-    center_x, center_y = 2694491.82, 1126023.20
-    # Rectangle corners (UL and BR)
-    UL_x, UL_y = center_x - 300, center_y - 300 
-    BR_x, BR_y = center_x + 300, center_y + 300
+    if (np.sum((mask == 3)|(mask == 1))/ len(mask)) > 0.9:
 
+        # Raster info
+        height, width = 24542, 37728
+        left, bottom = 2474090.0, 1065110.0
+        px = 10.0
+        top = bottom + height * px
 
-    # ----- compute pixel window (row 0 = top) -----
-    x_min, x_max = min(UL_x, BR_x), max(UL_x, BR_x)
-    y_min, y_max = min(UL_y, BR_y), max(UL_y, BR_y)
-
-    col_min = int(math.floor((x_min - left) / px))
-    col_max = int(math.floor((x_max - left) / px))
-
-    row_min = int(math.floor((top - y_max) / px))
-    row_max = int(math.floor((top - y_min) / px))
-
-    # clip to bounds
-    col_min = max(0, min(width - 1, col_min))
-    col_max = max(0, min(width - 1, col_max))
-    row_min = max(0, min(height - 1, row_min))
-    row_max = max(0, min(height - 1, row_max))
-
-    win_cols = col_max - col_min + 1
-    win_rows = row_max - row_min + 1
-    print(f"Window cols {col_min}..{col_max} ({win_cols}), rows {row_min}..{row_max} ({win_rows})")
-
-    # ----- load mask -----
-    mask = np.load(mask_path)
-    assert mask.shape == (height, width), f"Mask shape {mask.shape} != raster {(height, width)}"
-
-    mask_flat = mask.ravel(order="C")
-    masked_positions = np.flatnonzero(mask_flat)
-    n_masked = masked_positions.size
-    print(f"Mask has {n_masked} True pixels.")
-
-    # build index map from full array -> masked array
-    idx_map = np.full(mask_flat.shape[0], -1, dtype=np.int64)
-    idx_map[masked_positions] = np.arange(n_masked, dtype=np.int64)
-
-    # ----- compute flat indices in window -----
-    rows = np.arange(row_min, row_max + 1, dtype=np.int64)
-    cols = np.arange(col_min, col_max + 1, dtype=np.int64)
-    rr, cc = np.meshgrid(rows, cols, indexing="ij")
-    full_flat_idx = (rr * width + cc).ravel()
-
-    masked_idx_in_window = idx_map[full_flat_idx]
-    is_masked = masked_idx_in_window >= 0
-    n_masked_in_window = is_masked.sum()
-    print(f"Pixels in window: {full_flat_idx.size}, masked pixels: {n_masked_in_window}")
-
-    sel = masked_idx_in_window[is_masked].tolist()
-
-    values = np.empty(n_masked_in_window, dtype=float)
-    window = np.full(win_rows * win_cols, np.nan, dtype=float)
+        # ----- center cooridnates  -----
+        center_x, center_y = 2694491.82, 1126023.20
+        # Rectangle corners (UL and BR)
+        UL_x, UL_y = center_x - 300, center_y - 300 
+        BR_x, BR_y = center_x + 300, center_y + 300
 
 
-    window[is_masked] = ndvi_layer
-    window = window.reshape((win_rows, win_cols))
+        # ----- compute pixel window (row 0 = top) -----
+        x_min, x_max = min(UL_x, BR_x), max(UL_x, BR_x)
+        y_min, y_max = min(UL_y, BR_y), max(UL_y, BR_y)
+
+        col_min = int(math.floor((x_min - left) / px))
+        col_max = int(math.floor((x_max - left) / px))
+
+        row_min = int(math.floor((top - y_max) / px))
+        row_max = int(math.floor((top - y_min) / px))
+
+        # clip to bounds
+        col_min = max(0, min(width - 1, col_min))
+        col_max = max(0, min(width - 1, col_max))
+        row_min = max(0, min(height - 1, row_min))
+        row_max = max(0, min(height - 1, row_max))
+
+        win_cols = col_max - col_min + 1
+        win_rows = row_max - row_min + 1
+
+        # ----- load mask -----
+        mask = np.load(mask_path)
+        assert mask.shape == (height, width), f"Mask shape {mask.shape} != raster {(height, width)}"
+
+        mask_flat = mask.ravel(order="C")
+        masked_positions = np.flatnonzero(mask_flat)
+        n_masked = masked_positions.size
+
+        # build index map from full array -> masked array
+        idx_map = np.full(mask_flat.shape[0], -1, dtype=np.int64)
+        idx_map[masked_positions] = np.arange(n_masked, dtype=np.int64)
+
+        # ----- compute flat indices in window -----
+        rows = np.arange(row_min, row_max + 1, dtype=np.int64)
+        cols = np.arange(col_min, col_max + 1, dtype=np.int64)
+        rr, cc = np.meshgrid(rows, cols, indexing="ij")
+        full_flat_idx = (rr * width + cc).ravel()
+
+        masked_idx_in_window = idx_map[full_flat_idx]
+        is_masked = masked_idx_in_window >= 0
+        n_masked_in_window = is_masked.sum()
+
+        sel = masked_idx_in_window[is_masked].tolist()
+
+        values = np.empty(n_masked_in_window, dtype=float)
+        window = np.full(win_rows * win_cols, np.nan, dtype=float)
 
 
-    arr = window.astype('int16')
+        window[is_masked] = ndvi_layer
+        window = window.reshape((win_rows, win_cols))
 
+        arr = np.nan_to_num(window, nan=-9999).astype('int16')
 
-    x_min = 2694491 - 300
-    y_max = 1126023 - 300
-    pixel_width = 10
-    pixel_height = 10
+        x_min = 2694491 - 300
+        y_max = 1126023 - 300
+        pixel_width = 10
+        pixel_height = 10
 
-    transform = from_origin(x_min, y_max, pixel_width, pixel_height)
+        date_to_tiff = dates[idx].astype("str")[:10]
 
-    COG_TIFF_OUTPUT = COG_TIFF_FOLDER + day.astype(str) + ".tif"
+        transform = from_origin(x_min, y_max, pixel_width, pixel_height)
 
-    with rasterio.open(
-        COG_TIFF_OUTPUT,
-        'w',
-        driver='COG',
-        height=arr.shape[0],
-        width=arr.shape[1],
-        count=1,
-        dtype=arr.dtype,
-        crs='EPSG:2056', 
-        transform=transform,
-        nodata=np.nan,
-        compress='deflate',
-        tiled=True
-    ) as dst:
-        dst.write(arr, 1) 
+        COG_TIFF_OUTPUT = COG_TIFF_FOLDER + date_to_tiff + ".tif"
+
+        print(COG_TIFF_OUTPUT)
+
+        with rasterio.open(
+            COG_TIFF_OUTPUT,
+            'w',
+            driver='COG',
+            height=arr.shape[0],
+            width=arr.shape[1],
+            count=1,
+            dtype=arr.dtype,
+            crs='EPSG:2056', 
+            transform=transform,
+            nodata=np.nan,
+            compress='deflate',
+            tiled=True
+        ) as dst:
+            dst.write(arr, 1) 
