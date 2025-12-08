@@ -108,11 +108,6 @@ ndvi_sel = ndvi_xr.isel(pixel=sel_1)
 # =====================================================
 #  Reindex NDVI to daily (lazy), fill with 32767 (int16)
 # =====================================================
-# NOTE: issue that there are duplicate dates:
-np.unique(dates)
-# TODO: understand why we have this issue of repeated indices
-#       in the output of Samanthas code
-#       and then check if below workaround treats this correctly (this is currently just an unverified AI solution)
 
 def _dedup_date_coord(da: xr.DataArray, how: str = "first") -> xr.DataArray:
     """
@@ -169,10 +164,6 @@ os.makedirs(OUT_ZARR_TMP, exist_ok=True)
 print(f"Writing lazily computed Dataset to {OUT_ZARR_TMP} with Dask...")
 out_ds.to_zarr(OUT_ZARR_TMP, mode="w", consolidated=True)
 print("✅ Done")
-
-# merge with historical ndvi (TODO)
-
-# slice the historical ndvi data (not to do in future)
 
 
 historical_ndvi = xr.open_zarr(historical_ndvi_src)

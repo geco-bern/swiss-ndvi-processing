@@ -262,7 +262,7 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
         return ndvi_arr_2, mask_ndvi_arr_2
 
 
-def continuous_ndvi(ndvi_arr, median_arr,*, dates_arr, bool_dates, start_date, end_date =  np.datetime64("1900-01-01")):
+def continuous_ndvi(ndvi_arr, median_arr,*, dates_arr, bool_dates, current_date):
 
     # coerce shapes: ensure 1D
     ndvi_arr_2 = np.asarray(ndvi_arr).copy().ravel()
@@ -271,17 +271,7 @@ def continuous_ndvi(ndvi_arr, median_arr,*, dates_arr, bool_dates, start_date, e
     bool_dates = np.asarray(bool_dates).ravel()
     first_date = dates_arr[0].astype("datetime64[D]")
 
-
-    if end_date <= start_date:
-
-        current_date = start_date
-        ndvi_arr_2,mask_ndvi_arr = continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates, current_date)
-
-    else:
-        days_arr = np.arange(start_date,end_date +1)
-        for day in days_arr:
-            current_date = day
-            ndvi_arr_2, mask_ndvi_arr = continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates, current_date)
+    ndvi_arr_2,mask_ndvi_arr = continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates, current_date)
 
     return ndvi_arr_2, mask_ndvi_arr
 
@@ -344,7 +334,7 @@ ndvi_arr, mask_ndvi_arr = xr.apply_ufunc(
     kwargs={
         "dates_arr" : dates,
         "bool_dates" : bool_array,
-        "start_date": current_date,
+        "current_date": current_date,
         "end_date" : end_date
     },
     output_dtypes=[ndvi_array.dtype,ndvi_array.dtype],

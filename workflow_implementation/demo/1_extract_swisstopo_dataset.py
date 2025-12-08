@@ -123,7 +123,7 @@ index_map[forest_flat_indices] = np.arange(len(forest_flat_indices))
 # Search all images for the full CH bounding box for the whole time period
 item_search = service.search(
     bbox=bbox_swiss_4326,
-    datetime='2017-04-01/2025-11-30',
+    datetime='2018-06-01/2018-06-05',
     collections=['ch.swisstopo.swisseo_s2-sr_v100']
 )
 s2_files = list(item_search.items())
