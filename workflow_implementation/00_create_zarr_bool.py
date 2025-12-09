@@ -10,7 +10,7 @@ import xarray as xr
 import dask.array as da
 
 SRC_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr"
-OUT_ZARR  = "/data_3/scratch/francesco/new_zarr_bol_small.zarr"
+OUT_ZARR  = "/data_3/scratch/francesco/zarr_ready_all_pixels.zarr"
 
 
 # SETUP PARALLELIZATION CLUSTER
@@ -233,8 +233,8 @@ out_ds = xr.Dataset(
 # Optional IO-friendly chunking
 # ndvi_daily = ndvi_daily.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
 # Optional IO-friendly chunking
-DATE_CHUNKS = 365
-PIXEL_CHUNKS = 100
+DATE_CHUNKS = 1600
+PIXEL_CHUNKS = 4000
 out_ds = out_ds.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
 
 # Ensure correct encoding (is written to the metadata???)

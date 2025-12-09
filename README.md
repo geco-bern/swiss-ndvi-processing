@@ -9,6 +9,10 @@ To use the package, you have to download the required libraries using **Conda** 
 conda env create -f environment.yml --name ndvi
 ```
 
+# Requirements
+
+Big storage capacity are needed to store the intermediate results (see **prerequisites**) section. Using the workstation, (256GB RAM; 80 CPU) each passages expect for the first and last takes a couple of minutes maximum using 10 CPUs.
+
 
 # How to process the NDVI data
 
@@ -27,7 +31,7 @@ To process the data, 2 dataset are needed.
 
 Both dataset are already generated and are stored inside the workstation. We upload the dataset for the demo in [data folder](data_for_demo).
 
-Below I'll explain how to use the demo. The intermediate data generated from step 1 to step 3 contains all the pixels (105M) and cannot be uploaded on Github. For this reason the only lines of code to change are the ones used to store the intermediate files.
+Below I'll explain how to use the demo. The intermediate data generated from step 1 to step 3 contains all the pixels (105M) and cannot be uploaded on Github. For this reason the only lines of code to change are the ones used to store the intermediate files. The storage size needed is in order of hundreds of GB.
 
 ## Simulate the continous NDVI processing
 
@@ -41,7 +45,7 @@ The script [1_extract_swisstopo_dataset.py](workflow_implementation/demo/1_extra
 
 #### Required parameter to modify inside the script
 
-- the outputpath in [line 30](workflow_implementation/demo/1_extract_swisstopo_dataset.py#30)
+- the output path in [line 30](workflow_implementation/demo/1_extract_swisstopo_dataset.py#30)
 - the starting and ending date in [line 124](workflow_implementation/demo/1_extract_swisstopo_dataset.py#L124), if needed.
 
 ### Transpose the data from time-wise to space-wise chunking
@@ -63,14 +67,14 @@ There is nothing to modify here
 
 ### Merge the historical dataset with the new data set
 
-To run the analysis, it is encessary to have the historical analysis and the newly acquired data. The script [4_merge_zarr.py](workflow_implementation/demo/4_merge_zarr.py) will load both dataset and merged togheter.
+To run the analysis, it is encessary to have the historical analysis and the newly acquired data. The script [4_merge_zarr.py](workflow_implementation/demo/4_merge_zarr.py) will load both dataset and merged togheter. The new median ndvi data will be added using the lookup table.
 
 #### Required parameter to modify inside the script
 
 - The path of input new data in [line 15](workflow_implementation/demo/4_merge_zarr.py#15). This must be the same path as the output file in the previous script. 
 - The path of temporary output in the following line before the merging.
 
-If the starting end ending date in [1_extract_swisstopo_dataset.py](workflow_implementation/demo/1_extract_swisstopo_dataset.py) have been changed, it is also necessary to change it in line 91, 92, 177, 191
+If the starting end ending dates in [1_extract_swisstopo_dataset.py](workflow_implementation/demo/1_extract_swisstopo_dataset.py) have been changed, it is also necessary to change them in line 91, 92, 177, 191
 
 
 ### Run the analysis
@@ -99,4 +103,4 @@ The tiff generation can be run it as it is.
 
 #### Required parameter to modify inside the script
 
-There is nothing to modify here.
+In [line 37](workflow_implementation/demo/6_create_cogtiff.py#L37)is it possible to remove the -100 create more tiff files

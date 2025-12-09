@@ -6,7 +6,9 @@ import xarray as xr
 import os
 import shutil
 
-def historical_ndvi(ndvi_arr, medians,dates):
+#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/benchamrk_historic_ndvi_parallel.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/historic_analysis.log &
+
+def historical_ndvi(ndvi_arr, medians,obs_dates,dates):
 
         days_diff = (dates- dates[0])  / np.timedelta64(1, 'D')
 
@@ -19,6 +21,14 @@ def historical_ndvi(ndvi_arr, medians,dates):
         ndvi_valid = ndvi_arr[mask_valid_ndvi]
         median_valid = medians[mask_valid_ndvi]
         days_diff_2 = days_diff[mask_valid_ndvi]
+
+        original_idx = np.arange(len(ndvi_arr)) # used to keep track of delta ndvi position and the outlier position
+        original_idx = original_idx[mask_valid_ndvi]
+
+        mask_array  = np.empty(len(obs_dates), dtype=object)
+        mask_array.fill(0)
+
+        obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & obs_dates
         
         # outlier detection
 
@@ -29,6 +39,9 @@ def historical_ndvi(ndvi_arr, medians,dates):
         ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
         delta_ndvi = delta_ndvi[1:-1][~outlier_mask]
         days_diff_2 = days_diff_2[1:-1][~outlier_mask]
+
+        original_idx_2 = original_idx[1:-1][~outlier_mask]
+        
 
         # some sites do not have any observation or very few
         if len(delta_ndvi) > 6:
@@ -47,91 +60,118 @@ def historical_ndvi(ndvi_arr, medians,dates):
 
             final_ndvi_value = 10000 * (interpolated_values + medians)
 
+            # indexing of array mask
+            mask_array[obs_mask] = 2
+            before = np.arange(len(mask_array)) < original_idx_2[-4]
 
-            return final_ndvi_value
+            outlier_idx = original_idx[1:-1][outlier_mask]
+            valid_outlier_idx = outlier_idx[obs_dates[outlier_idx] == 1]
+
+            mask_array[ before & obs_mask ] = 3
+            mask_array[ before & (~obs_mask) ] = 1
+
+            mask_array[valid_outlier_idx] = 4
+
+            return final_ndvi_value, mask_array
         
         else:
 
-            return 10000 * ndvi_arr
+            return 10000 * ndvi_arr, mask_array
+
+# used with nohup (ni idea why)
+
+if __name__ == "__main__":
 
 
-N_WORKERS = 50
+    N_WORKERS = 50
 
-client = Client(
-n_workers=N_WORKERS,
-threads_per_worker=1,
-#memory_limit='24GB',
-processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
-dashboard_address=':12345')  
-client.dashboard_link
+    client = Client(
+    n_workers=N_WORKERS,
+    threads_per_worker=1,
+    memory_limit='200GB',
+    processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
+    dashboard_address=':1234')  
+    print(client.dashboard_link)
 
-# already having medians computed
+    # already having medians computed
 
-INPUT_ZARR = "/data_3/scratch/francesco/new_zarr_bol.zarr" #"/data_3/scratch/francesco/zarr_demo_daily_v2.zarr/"
-ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 5000})
-ndvi_array = ds["ndvi"]           # dims ("time","pixel")
-median_array = ds["median_ndvi"]    # dims ("time","pixel") 
-dates_array = ds["date"].values.astype("datetime64[D]").ravel()   #.values.astype(np.int32)
+    INPUT_ZARR = "/data_3/scratch/francesco/zarr_to_historical_all_pixels.zarr" #"/data_3/scratch/francesco/zarr_demo_daily_v2.zarr/"
+    ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 5000})
+    ndvi_array = ds["ndvi"]           # dims ("time","pixel")
+    median_array = ds["median_ndvi"]    # dims ("time","pixel") 
+    dates_array = ds["date"].values.astype("datetime64[D]").ravel()   #.values.astype(np.int32)
+    obs_dates = ds["obs_date"]
 
-# call gufunc where core dim is "time" (1D arrays per pixel)
-result = xr.apply_ufunc(
-    historical_ndvi,
-    ndvi_array,
-    median_array,
-    input_core_dims=[["date"], ["date"]],    # each call gets 1D time arrays
-    output_core_dims=[["date"]],
-    vectorize=True, 
-    dask="parallelized",
-    kwargs={"dates": dates_array},
-    output_dtypes=[ndvi_array.dtype],
-    dask_gufunc_kwargs={"allow_rechunk": True},
+    # call gufunc where core dim is "time" (1D arrays per pixel)
+    ndvi_processed, mask_array = xr.apply_ufunc(
+        historical_ndvi,
+        ndvi_array,
+        median_array,
+        obs_dates,
+        input_core_dims=[["date"], ["date"],["date"]],    # each call gets 1D time arrays
+        output_core_dims=[["date"],["date"]],
+        vectorize=True, 
+        dask="parallelized",
+        kwargs={"dates": dates_array},
+        output_dtypes=[ndvi_array.dtype, obs_dates.dtype],
+        dask_gufunc_kwargs={"allow_rechunk": True},
+    )
+
+
+    # create the dataset to write 
+
+    out_ds = xr.Dataset(
+    {
+        "ndvi_processed": ndvi_processed,
+        "mask_array": mask_array
+    },
+    coords={
+        "date": ds["date"],
+        "pixel": ds["pixel"]
+    }
 )
+    out_ds = out_ds.chunk({"pixel": 5000, "date": -1})
 
+    # Remove any incompatible 'compressor' metadata left over from the source dataset
+    for v in list(out_ds.data_vars):
+        out_ds[v].encoding.pop("compressor", None)
+        # ensure chunks entry exists to avoid surprises
+        out_ds[v].encoding.setdefault("chunks", None)
 
-# create the dataset to write 
+    for c in list(out_ds.coords):
+        out_ds[c].encoding.pop("compressor", None)
+        out_ds[c].encoding.setdefault("chunks", None)
 
-out_ds = xr.Dataset({"ndvi_processed": result}, coords={"date": ds["date"], "pixel": ds["pixel"]})
-out_ds = out_ds.chunk({"pixel": 5000, "date": -1})
+    # Explicit encoding: no compressor for each data var
+    encoding = {v: {"compressor": None} for v in out_ds.data_vars}
 
-# Remove any incompatible 'compressor' metadata left over from the source dataset
-for v in list(out_ds.data_vars):
-    out_ds[v].encoding.pop("compressor", None)
-    # ensure chunks entry exists to avoid surprises
-    out_ds[v].encoding.setdefault("chunks", None)
+    OUT_PATH = "/data_3/scratch/francesco/ndvi_processed_all_pixels_with_mask.zarr"
 
-for c in list(out_ds.coords):
-    out_ds[c].encoding.pop("compressor", None)
-    out_ds[c].encoding.setdefault("chunks", None)
+    if os.path.exists(OUT_PATH):
+        shutil.rmtree(OUT_PATH)
 
-# Explicit encoding: no compressor for each data var
-encoding = {v: {"compressor": None} for v in out_ds.data_vars}
+    # Write using zarr version 2 to avoid new v3 codec/BytesBytesCodec mismatch
+    out_ds.to_zarr(OUT_PATH, mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=3)
 
-OUT_PATH = "/data_3/scratch/francesco/ndvi_processed.zarr"
+    """# add the array of obs dates
+    ds2 = xr.open_zarr(OUT_PATH, chunks={"date": -1, "pixel": 5000})
 
-if os.path.exists(OUT_PATH):
-    shutil.rmtree(OUT_PATH)
+    arr_to_insert = ds["obs_date"].values
 
-# Write using zarr version 2 to avoid new v3 codec/BytesBytesCodec mismatch
-out_ds.to_zarr(OUT_PATH, mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=3)
+    obs_da = xr.DataArray(
+        arr_to_insert,
+        dims=("date",),
+        coords={"date": ds2["date"]},
+        name="obs_date"
+    )
 
-# add the array of obs dates
-ds2 = xr.open_zarr(OUT_PATH, chunks={"date": -1, "pixel": 5000})
+    # add to dataset
+    ds2["obs_date"] = obs_da
 
-arr_to_insert = ds["obs"].values
+    # write back in r+ mode (modify existing store)
+    ds2.to_zarr(OUT_PATH,
+                mode="a",
+                consolidated=True)"""
 
-obs_da = xr.DataArray(
-    arr_to_insert,
-    dims=("date",),
-    coords={"date": ds2["date"]},
-    name="obs_date"
-)
-
-# add to dataset
-ds2["obs_date"] = obs_da
-
-# write back in r+ mode (modify existing store)
-ds2.to_zarr(OUT_PATH,
-            mode="a",
-            consolidated=True)
-
-client.close
+    print("done")
+    client.close
