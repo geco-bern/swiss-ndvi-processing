@@ -8,8 +8,8 @@ from dask.distributed import Client, LocalCluster
 import shutil
 import os
 
-SOURCE_ZARR = "/data_3/scratch/francesco/processed/ndvi_dataset_spatial.zarr"
-TRANSPOSED_ZARR = "/data_3/scratch/francesco/processed/ndvi_dataset_temporal.zarr"
+SOURCE_ZARR = "/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr"
+TRANSPOSED_ZARR = "/data_3/scratch/francesco/processed/all_ndvi_dataset_temporal.zarr"
 DASK_LOCAL_DIRECTORY = "/data_3/francesco/dask_worker_space"
 
 if os.path.exists(TRANSPOSED_ZARR):

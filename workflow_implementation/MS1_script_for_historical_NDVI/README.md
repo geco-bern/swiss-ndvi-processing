@@ -1,0 +1,1 @@
+This workflow is used to do the historical NDVI processing, tested and it should give the desired output
