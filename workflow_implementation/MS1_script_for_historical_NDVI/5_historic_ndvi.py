@@ -32,10 +32,13 @@ def historical_ndvi(ndvi_arr, medians,obs_dates,dates):
         
         # outlier detection
 
+        delta_threshold = 0.1 
+        delta_delta_threshold = 0.1
+
         delta_ndvi = ndvi_valid - median_valid
         delta_delta_left = delta_ndvi[2:]
         delta_delta_rigth = delta_ndvi[:-2]
-        outlier_mask = ((abs(delta_ndvi[1:-1]) > 0.1) & (abs(delta_delta_left) > 0.1) & (abs(delta_delta_rigth) > 0.1))
+        outlier_mask = ((abs(delta_ndvi[1:-1]) > delta_threshold) & (abs(delta_delta_left) > delta_delta_threshold) & (abs(delta_delta_rigth) > delta_delta_threshold))
         ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
         delta_ndvi = delta_ndvi[1:-1][~outlier_mask]
         days_diff_2 = days_diff_2[1:-1][~outlier_mask]

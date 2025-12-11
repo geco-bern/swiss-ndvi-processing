@@ -66,3 +66,13 @@ The two parameters, distance from the median (delta) and distance with the neigh
 After the outlier detection is performed, if a timeserie have at least 7 observation, we perform the smoothing of the deltas using the LOESS function as described in the method report. We smooth the delta values from the first deltas to the last-fourth deltas, then we combined the smoothed deltas with the remaning deltas (the last three) and we linearly interpolate the deltas in the dates with no observation.
 
 Aftetr the NdVI processing is performed, we generate the mask array according to the logic explained before.
+
+# Milestone 2: continous NDVI setup
+
+The continous NDVI processing follows the same step of historical NDVI processing from script 0 to 3, of course there is no need to create tow separate lookup table. For this reason, we documented the last three script.
+
+## 4_merge_zarr.py
+
+## 5_continous_NDVI.py
+
+## 6_create_cogtiff.py

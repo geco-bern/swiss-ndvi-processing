@@ -303,7 +303,7 @@ def run_benchmark(date):
         n_workers=N_WORKERS,
         threads_per_worker=1,
         processes=True,
-        memory_limit='2GB',
+        memory_limit='8GB',
         dashboard_address=":12345",
         local_directory= local_tmp
     )
