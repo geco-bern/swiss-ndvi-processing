@@ -6,7 +6,7 @@ import xarray as xr
 import os
 import shutil
 
-#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/benchamrk_historic_ndvi_parallel.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/historic_analysis.log &
+#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/5_historic_ndvi.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/historic_analysis.log &
 
 def historical_ndvi(ndvi_arr, medians,obs_dates,dates):
 
@@ -51,13 +51,33 @@ def historical_ndvi(ndvi_arr, medians,obs_dates,dates):
         
             # L2 smoothing
 
-            idx = np.arange(len(delta_ndvi))
-            loess =  sm.nonparametric.lowess(delta_ndvi, idx, frac= 7 / len(delta_ndvi), it=3, return_sorted=False)
+            # loop over the 7 rolling deltas. If the deltas are too large (extreme events as fire) 
+            # or the original values too close to the boundaries condition (0.9 and 0.1) we do linear fit
+
+            smoothed_delta = np.empty(len(delta_ndvi) -6, dtype=float)
+
+            for i in np.arange(len(delta_ndvi)-6):
+
+                idx = np.arange(7)
+                delta_window_to_smooth = delta_ndvi[i:i+7] # window to smotth, the center value will be appended
+                ndvi_valid_to_check = ndvi_valid[i:i+7] # this will be used to check if the absolute value is close to the boundaries condition
+
+                if (np.any((ndvi_valid_to_check < 0.05) | (ndvi_valid_to_check > 0.95))or (np.sum(delta_window_to_smooth < -0.2) >= 5)): 
+                    # here, check for the NDVI close to the boundaries or extreme negative NDVI values (fire but not drought)
+                     
+                    # in case this conditions are met, skip the smoothing and keep the non-smoothed delta
+                    smoothed_delta[i] = delta_window_to_smooth[3]
+
+                else:
+
+                    loess =  sm.nonparametric.lowess(delta_window_to_smooth, idx, frac= 1, it=3, return_sorted=False)
+                    smoothed_delta[i] = loess[3]
 
             # combine smoothed value with values yet to smooth, after that linearly interpolate everything
 
-            ndvi_to_interpolate = np.concatenate([np.array([0]),loess[:-4],delta_ndvi[-4:],np.array([0])]) 
-            dates_to_interpolate = np.concatenate([np.array([0]),days_diff_2,np.array([days_diff[-1]])]) 
+            # here we linearly interpolate the smoothed and non-smoothed delta, assuming the first and last delta to be 0
+            ndvi_to_interpolate = np.concatenate([np.array([0]),delta_ndvi[:3],smoothed_delta,delta_ndvi[-3:],np.array([0])]) 
+            dates_to_interpolate =  np.concatenate([np.array([0]),days_diff_2,np.array([days_diff[-1]])]) 
 
             interpolated_values = np.interp(days_diff,dates_to_interpolate,ndvi_to_interpolate)
 
@@ -91,15 +111,15 @@ if __name__ == "__main__":
     client = Client(
     n_workers=N_WORKERS,
     threads_per_worker=1,
-    memory_limit='200GB',
+    memory_limit='8GB',
     processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
     dashboard_address=':1234')  
     print(client.dashboard_link)
 
     # already having medians computed
 
-    INPUT_ZARR = "/data_3/scratch/francesco/zarr_to_historical_all_pixels.zarr" #"/data_3/scratch/francesco/zarr_demo_daily_v2.zarr/"
-    ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 5000})
+    INPUT_ZARR = "/data_3/scratch/francesco/zarr_to_historical_all_pixels.zarr" 
+    ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 4000})
     ndvi_array = ds["ndvi"]           # dims ("time","pixel")
     median_array = ds["median_ndvi"]    # dims ("time","pixel") 
     dates_array = ds["date"].values.astype("datetime64[D]").ravel()   #.values.astype(np.int32)
@@ -148,7 +168,7 @@ if __name__ == "__main__":
     # Explicit encoding: no compressor for each data var
     encoding = {v: {"compressor": None} for v in out_ds.data_vars}
 
-    OUT_PATH = "/data_3/scratch/francesco/ndvi_processed_all_pixels_with_mask.zarr"
+    OUT_PATH = "/data_3/scratch/francesco/ndvi_processed_all_pixels.zarr"
 
     if os.path.exists(OUT_PATH):
         shutil.rmtree(OUT_PATH)

@@ -11,6 +11,8 @@ import shutil
 
 def smoothing_and_gapfilling(ndvi_arr, median_ndvi_arr, last_array_dates_idx,
                              last_delta, current_delta, deltas_arr,current_date_idx, pot_outlier_present):
+    
+    ndvi_to_check = ndvi_arr[last_array_dates_idx.astype(int)] 
 
     if pot_outlier_present:
 
@@ -33,18 +35,22 @@ def smoothing_and_gapfilling(ndvi_arr, median_ndvi_arr, last_array_dates_idx,
 
         # L2 smoothing
 
+        # check smoothing conditions
+
         deltas_L2 = np.concatenate([deltas_arr, np.array([current_delta])])
 
-        smoothed_deltas = sm.nonparametric.lowess(deltas_L2, np.arange(1, len(deltas_L2) + 1),
-                                                  frac=1, it=3, return_sorted=False)
-        idx_to_interpolate = np.arange(int(last_array_dates_idx[2]), int(last_array_dates_idx[4]) + 1)
-        deltas_L2_idx = last_array_dates_idx[2:5]
-        deltas_interpolated = np.interp(idx_to_interpolate,
-                                       deltas_L2_idx, smoothed_deltas[2:5])
-        
-        L2_ndvi = deltas_interpolated + median_ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[4]) + 1] / 10000.0
+        if (np.any((ndvi_to_check < 0.05) | (ndvi_to_check > 0.95))or (np.sum(deltas_L2 < -0.2) >= 5)):
 
-        ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[4]) + 1] = L2_ndvi
+            smoothed_deltas = sm.nonparametric.lowess(deltas_L2, np.arange(1, len(deltas_L2) + 1),
+                                                    frac=1, it=3, return_sorted=False)
+            idx_to_interpolate = np.arange(int(last_array_dates_idx[2]), int(last_array_dates_idx[4]) + 1)
+            deltas_L2_idx = last_array_dates_idx[2:5]
+            deltas_interpolated = np.interp(idx_to_interpolate,
+                                        deltas_L2_idx, smoothed_deltas[2:5])
+            
+            L2_ndvi = deltas_interpolated + median_ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[4]) + 1] / 10000.0
+
+            ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[4]) + 1] = L2_ndvi
 
     else:
 
@@ -55,17 +61,21 @@ def smoothing_and_gapfilling(ndvi_arr, median_ndvi_arr, last_array_dates_idx,
         ndvi_arr[int(last_array_dates_idx[6]) :current_date_idx +1] = L1_ndvi
 
         # L2 smoothing
-        smoothed_deltas = sm.nonparametric.lowess(deltas_arr, np.arange(1, len(deltas_arr) + 1),
-                                                  frac=1, it=3, return_sorted=False)
 
-        idx_to_interpolate = np.arange(int(last_array_dates_idx[2]), int(last_array_dates_idx[3]) + 1)
-        deltas_L2_idx = last_array_dates_idx[2:4]
-        deltas_interpolated = np.interp(idx_to_interpolate,
-                                       deltas_L2_idx, smoothed_deltas[2:4])
+        # check smoothing conditions
+        if (np.any((ndvi_to_check < 0.05) | (ndvi_to_check > 0.95))or (np.sum(deltas_arr < -0.2) >= 5)):
 
-        L2_ndvi = deltas_interpolated + median_ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[3]) + 1] / 10000.0
+            smoothed_deltas = sm.nonparametric.lowess(deltas_arr, np.arange(1, len(deltas_arr) + 1),
+                                                    frac=1, it=3, return_sorted=False)
 
-        ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[3]) + 1] = L2_ndvi
+            idx_to_interpolate = np.arange(int(last_array_dates_idx[2]), int(last_array_dates_idx[3]) + 1)
+            deltas_L2_idx = last_array_dates_idx[2:4]
+            deltas_interpolated = np.interp(idx_to_interpolate,
+                                        deltas_L2_idx, smoothed_deltas[2:4])
+
+            L2_ndvi = deltas_interpolated + median_ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[3]) + 1] / 10000.0
+
+            ndvi_arr[int(last_array_dates_idx[2]) : int(last_array_dates_idx[3]) + 1] = L2_ndvi
 
     return ndvi_arr
 
@@ -198,15 +208,6 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
         # no enough date
         return ndvi_arr_2, mask_ndvi_arr_2
 
-    
-
-    # if not enough valid dates (any of first 7 < 0) -> skip
-    if np.any(last_array_dates_idx[:7] < 0):
-        
-        last_dates_array = last_dates_array.astype("datetime64[D]")
-
-        return ndvi_arr_2, mask_ndvi_arr_2
-
     # compute values
     current_ndvi = ndvi_arr_2[current_date_idx] / 10000.0
     median_current = median_arr[current_date_idx] / 10000.0
@@ -222,6 +223,7 @@ def continous_analysis(ndvi_arr_2, median_arr,first_date, dates_arr, bool_dates,
     if (current_ndvi > 0) and (current_ndvi < 1):
 
         if (abs(delta_delta) > 0.1) and (abs(current_delta) > 0.1):
+            # potential outlier, skip the computation
 
             last_dates_array[7] = current_date  
             last_dates_array = last_dates_array.astype("datetime64[D]")

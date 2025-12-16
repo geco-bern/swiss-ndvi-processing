@@ -29,53 +29,6 @@ client10 = Client(
 client10.dashboard_link
 
 # =====================================================
-#  Load Forest Mask for Pixel Selection
-# =====================================================
-
-def extract_pixel_index(UL_x, UL_y, BR_x, BR_y):
-    height, width = 24542, 37728
-    left, bottom = 2474090.0, 1065110.0
-    px = 10.0
-    top = bottom + height * px
-    mask_path = "/data_2/scratch/sbiegel/processed/forest_mask.npy" # needs to be loaded somewhere
-
-    x_min, x_max = min(UL_x, BR_x), max(UL_x, BR_x)
-    y_min, y_max = min(UL_y, BR_y), max(UL_y, BR_y)
-    col_min = int(math.floor((x_min - left) / px))
-    col_max = int(math.floor((x_max - left) / px))
-    row_min = int(math.floor((top - y_max) / px))
-    row_max = int(math.floor((top - y_min) / px))
-    col_min = max(0, min(width - 1, col_min))
-    col_max = max(0, min(width - 1, col_max))
-    row_min = max(0, min(height - 1, row_min))
-    row_max = max(0, min(height - 1, row_max))
-
-    print(f"Window cols {col_min}..{col_max}, rows {row_min}..{row_max}")
-
-    mask = np.load(mask_path)
-    mask_flat = mask.ravel(order="C")
-    masked_positions = np.flatnonzero(mask_flat)
-    idx_map = np.full(mask_flat.shape[0], -1, dtype=np.int64)
-    idx_map[masked_positions] = np.arange(masked_positions.size, dtype=np.int64)
-
-    rows = np.arange(row_min, row_max + 1, dtype=np.int64)
-    cols = np.arange(col_min, col_max + 1, dtype=np.int64)
-    rr, cc = np.meshgrid(rows, cols, indexing="ij")
-    full_flat_idx = (rr * width + cc).ravel()
-    masked_idx_in_window = idx_map[full_flat_idx]
-    sel = masked_idx_in_window[masked_idx_in_window >= 0].tolist()
-    print(f"Selected {len(sel)} masked pixels")
-    return sel
-
-# =====================================================
-#  Extract subset (pixel indices) and subset lazily
-# =====================================================
-center_x, center_y = 2694491.82, 1126023.20
-sel_1 = extract_pixel_index(
-    center_x - 300, center_y - 300, # TODO: if x and y are Swiss coordinates they increas north and eastward.
-    center_x + 300, center_y + 300) #       Thus the provided coordinates are lower-left (SW) and upper-right (NE)."""
-
-# =====================================================
 #  Load Source Dataset lazily (no xarray metadata needed)
 # =====================================================
 
@@ -97,13 +50,21 @@ print(f"Generated {len(daily_dates)} daily dates from {daily_dates.min().date()}
 obs_dates = daily_dates.isin(dates)
 
 
-# =====================================================
-#  Forest Pixel Selection
-# =====================================================
-n_pixels = len(sel_1)
-print(f"Subset has {n_pixels} pixels.")
 ndvi_xr = xr.DataArray(ndvi_da, dims=("pixel", "date"),  coords={"date": dates, "pixel": np.arange(ndvi_da.shape[0])})
-ndvi_sel = ndvi_xr.isel(pixel=sel_1)
+ndsi_xr = xr.DataArray(ndsi_da, dims=("pixel", "date"),  coords={"date": dates, "pixel": np.arange(ndsi_da.shape[0])})
+
+# =====================================================
+# Filter NDVI using NDSI > 0.43
+# Set NDVI = 32767 where NDSI > 0.43
+# =====================================================
+
+MASK_VALUE = np.int16(32767)
+
+# Apply mask lazily with Dask
+ndvi_xr_filtered = ndvi_xr.where(ndsi_xr <= 0.43, other=MASK_VALUE)
+
+# Replace main NDVI with filtered version
+ndvi_xr = ndvi_xr_filtered
 
 # =====================================================
 #  Reindex NDVI to daily (lazy), fill with 32767 (int16)
@@ -132,7 +93,7 @@ def _dedup_date_coord(da: xr.DataArray, how: str = "first") -> xr.DataArray:
 
 # Deduplicate time first, then reindex to daily
 # Change how='first' to 'mean'/'median'/'max' as needed
-ndvi_sel_nodup = _dedup_date_coord(ndvi_sel, how="first")
+ndvi_sel_nodup = _dedup_date_coord(ndvi_xr, how="first")
 ndvi_daily = ndvi_sel_nodup.astype(np.int16).reindex(date=daily_dates, method=None, fill_value=np.int16(32767))
 
 
@@ -154,8 +115,8 @@ out_ds = xr.Dataset(
 )
 
 
-DATE_CHUNKS = min(len(daily_dates),365)
-PIXEL_CHUNKS = min( len(sel_1),4000)
+DATE_CHUNKS = len(daily_dates)
+PIXEL_CHUNKS = 4000
 out_ds = out_ds.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
 
 
@@ -170,7 +131,6 @@ historical_ndvi = xr.open_zarr(historical_ndvi_src)
 
 # historical filtered
 ndvi_historic = historical_ndvi["ndvi_processed"].sel(
-    pixel=sel_1,
     date= slice(None, "2018-05-31")
 ).rename("ndvi")
 
@@ -179,7 +139,7 @@ obs_date_historical = historical_ndvi["obs_date"].sel( date= slice(None, "2018-0
 
 # new data
 ds_to_stack = xr.open_zarr(OUT_ZARR_TMP)
-ndvi_new = ds_to_stack["ndvi"].sel(pixel=sel_1).rename("ndvi") 
+ndvi_new = ds_to_stack["ndvi"].rename("ndvi") 
 obs_date_new = ds_to_stack["obs"].rename("obs_date")
 
 # stack along time
@@ -197,18 +157,18 @@ date_stack = date_stack.astype("datetime64[D]")
 
 lookuptable = xr.open_zarr(lookuptable_src)
 
-lookuptable_arr = lookuptable["median_ndvi"].sel(pixel = sel_1)
+lookuptable_arr = lookuptable["median_ndvi"]
 
 doy = date_stack.dt.dayofyear
 
 # remove leap year if encountered
 doy_array_fixed = np.where(doy.values == 366, 365, doy.values)
 
-median_ndvi = lookuptable.sel(doy=xr.DataArray(doy_array_fixed, dims="date"), pixel = sel_1)
+median_ndvi = lookuptable.sel(doy=xr.DataArray(doy_array_fixed, dims="date"))
 
 
-DATE_CHUNKS = min(len(ndvi_stack.date), 2000)
-PIXEL_CHUNKS = min(len(ndvi_stack.pixel), 4000)
+DATE_CHUNKS = len(ndvi_stack.date)
+PIXEL_CHUNKS = 4000
 
 
 ndvi_stack = ndvi_stack.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})

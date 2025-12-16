@@ -73,11 +73,11 @@ px = 10.0
 top = bottom + height * px
 
 # ----- center cooridnates  -----
-center_x, center_y =   2694491.82, 1126023.20
+center_x, center_y =   2694451.82, 1126023.20
 
 # Rectangle corners (UL and BR)
-UL_x, UL_y = center_x - 200, center_y - 200 
-BR_x, BR_y = center_x + 200, center_y + 200
+UL_x, UL_y = center_x - 1400, center_y - 1400 
+BR_x, BR_y = center_x + 1400, center_y + 1400
 
 
 # ----- compute pixel window (row 0 = top) -----
@@ -169,6 +169,7 @@ sel = masked_idx_in_window[is_masked].tolist()
 print("Window extent:", extent)
 print("win_rows, win_cols:", win_rows, win_cols)
 print("Masked pixels in window:", n_masked_in_window)
+print("sel ", sel)
 
 
 # ----- open Zarr -----
@@ -185,9 +186,9 @@ extent = (
 
 full_index = pd.date_range(min(dates_sorted), max(dates_sorted), freq="D")
 
-start_date = "2018-04-01"
+start_date = "2018-01-01"
 
-end_date = "2025-01-01"
+end_date = "2018-10-01"
 
 full_index = full_index[(full_index >= start_date) & (full_index <= end_date)]
 
@@ -202,6 +203,10 @@ d_frames = min(3000, T)
 # ----- open new zarr output -----
 ndvi_chunk = np.empty((len(masked_idx_in_window[is_masked]), T), dtype=np.float32)
 ndvi_chuck_smoothed = np.empty((len(masked_idx_in_window[is_masked]), T), dtype=np.float32)
+
+print("len masked_idx_in_window")
+print(len(masked_idx_in_window))
+print(len())
 
 # ----- GAPFILLING LOOP -----
 for i, pixel in enumerate(sel):
@@ -332,7 +337,7 @@ for i, pixel in enumerate(sel):
 print("finished gapfilling")
 
 # !!! is mp4 not gif becuase gif is limtied t0 1000 frames
-out_gif_combined_1 = "/home/francesco/data_scratch/swiss-ndvi-processing/demo/output/gif/lowland_broadleaf.mp4"
+out_gif_combined_1 = "/home/francesco/data_scratch/swiss-ndvi-processing/demo/output/gif/lowland_broadleaf.gif"
 
 # Prepare writers (stream to disk instead of keeping frames in memory)
 writer1 = imageio.get_writer(out_gif_combined_1, fps=30, format='ffmpeg', codec='libx264', ffmpeg_params=['-pix_fmt','yuv420p','-crf','18','-preset','fast'], quality = 8)

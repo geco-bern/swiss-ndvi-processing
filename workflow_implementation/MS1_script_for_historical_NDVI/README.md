@@ -63,6 +63,13 @@ The output is composed by two arrays for each pixels, the first is the processed
 The processing starts with the outlier detection, we filter the outlier based on the same method as in the method report.
 The two parameters, distance from the median (delta) and distance with the neighbouring deltas (delta_delta) are set to 0.1 but it can be changed in line 35 and 36.
 
-After the outlier detection is performed, if a timeserie have at least 7 observation, we perform the smoothing of the deltas using the LOESS function as described in the method report. We smooth the delta values from the first deltas to the last-fourth deltas, then we combined the smoothed deltas with the remaning deltas (the last three) and we linearly interpolate the deltas in the dates with no observation.
+After the outlier detection is performed, if a timeserie have at least 7 observation, we perform the smoothing of the deltas using the LOESS function as described in the method report. We avoid to perform the smoothing if one of the 2 following cases are encountered
+
+- extreme negative NDVI deltas: at least 5 out 7 deltas have values lower than -0.2
+    - this will include only the extreme negative events (fire, non drought)
+- at least one value is close to the boundaries conditions (0.95, 0.05)
+    - this will prevent the processed NDVI to be outside the boundaries condition
+
+If the window data to smooth doesn't fall in these tow categories, we smooth the delta values from the first deltas to the last-fourth deltas, then we combined the smoothed deltas with the remaning deltas (the last three) and we linearly interpolate the deltas in the dates with no observation.
 
 Aftetr the NdVI processing is performed, we generate the mask array according to the logic explained before.

@@ -9,6 +9,8 @@ from dask.distributed import Client, LocalCluster
 import xarray as xr
 import dask.array as da
 
+# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/4_create_zarr_for_analysis.py >  /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/create_historical_zarr.log &
+
 
 # !!! IMPORTANT for some unkown reason, there are no data in swisstopo for 2021-02-05, 
 # the NDVI will not be downloaded but the date is still considered (see fabian log)
@@ -16,8 +18,8 @@ import dask.array as da
 # does not exist in the file system, and is not recognized as a supported dataset name.
 
 # NOT RUN THIS COMMENTED PART (already fix it)
-
-"""import zarr
+"""
+import zarr
 import numpy as np
 import pandas as pd
 
@@ -50,8 +52,8 @@ root.create_array(
 
 root["date"][:] = dates_filtered
 
-print("Removed date 2021-02-05 successfully.")
-"""
+print("Removed date 2021-02-05 successfully.")"""
+
 
 SRC_ZARR = "/data_3/scratch/francesco/processed/all_ndvi_dataset_temporal.zarr"
 OUT_ZARR  = "/data_3/scratch/francesco/zarr_ready_all_pixels.zarr"
@@ -60,17 +62,20 @@ OUT_ZARR  = "/data_3/scratch/francesco/zarr_ready_all_pixels.zarr"
 
 
 # SETUP PARALLELIZATION CLUSTER
-client10 = Client(
-    n_workers=30,
+client = Client(
+    n_workers=50,
     threads_per_worker=1,
     processes=True,  # Use separate processes (not threads, this appears to be much faster (even though using non-shared memory))
     dashboard_address=':2231'
 )  # start distributed scheduler locally.
-client10.dashboard_link
+client.dashboard_link
 
 ds0 = zarr.open_group(SRC_ZARR, mode="r")
 ndvi_z = ds0["ndvi"]
 ndvi_da = da.from_zarr(ndvi_z) 
+
+ndsi_z= ds0["ndsi"]
+ndsi_da = da.from_zarr(ndsi_z) 
 
 
 # Decode dates into a small in-memory coordinate
@@ -86,6 +91,22 @@ obs_dates = daily_dates.isin(dates)
 
 
 ndvi_xr = xr.DataArray(ndvi_da, dims=("pixel", "date"),  coords={"date": dates, "pixel": np.arange(ndvi_da.shape[0])})
+ndsi_xr = xr.DataArray(ndsi_da, dims=("pixel", "date"),  coords={"date": dates, "pixel": np.arange(ndsi_da.shape[0])})
+
+# =====================================================
+# Filter NDVI using NDSI > 0.43
+# Set NDVI = 32767 where NDSI > 0.43
+# =====================================================
+
+MASK_VALUE = np.int16(32767)
+
+# Apply mask lazily with Dask
+ndvi_xr_filtered = ndvi_xr.where(ndsi_xr <= 0.43, other=MASK_VALUE)
+
+# Replace main NDVI with filtered version
+ndvi_xr = ndvi_xr_filtered
+
+
 
 # =====================================================
 #  Reindex NDVI to daily (lazy), fill with 32767 (int16)

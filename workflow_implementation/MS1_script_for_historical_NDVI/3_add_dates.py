@@ -1,7 +1,7 @@
 """
 Fetch acquisition dates from Swisstopo STAC API and add them to the Zarr dataset.
 """
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/3_add_dates.py >  /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/add_dates_swisstopo.log &
+# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/3_add_dates.py >  /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/add_dates_swisstopo.log &
 
 
 import requests
