@@ -131,7 +131,7 @@ Aftetr the NdVI processing is performed, we generate the mask array according to
 
 # Milestone 2: continous NDVI setup
 
-The continous NDVI processing follows the same step of historical NDVI processing from script 0 to 3, of course there is no need to create tow separate lookup table. For this reason, we documented the last three script.
+The continous NDVI processing follows the same step of historical NDVI processing from script 0 to 3, there is no need to create tow separate lookup table. For this reason, we documented the last three script. The main differences here are the starting and ending date in which the analysis is performed. Both can be find and the top of the script right after the library loading except for **5_continous_NDVI.py** where they are located at the bottom of the script inside the **__main__** module
 
 <a name = "merge_zarr"></a>
 
@@ -141,6 +141,7 @@ The first part of this script is identical to the generation of the zarr folder 
 The differences between the two scripts are found in the second half on this script. Here we stack the new obtained data to the previous "historic" zarr folder.
 
 <a name = "continous"></a>
+
 ## 5_continous_NDVI.py
 
 The processing of NDVI on continous setup is identical to the historical processing. IN this case however there are some notable differences.

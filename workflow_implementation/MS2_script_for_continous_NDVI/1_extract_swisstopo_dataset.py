@@ -16,6 +16,9 @@ from tqdm import tqdm
 from rasterio.windows import from_bounds
 from rasterio.warp import reproject, Resampling
 
+start_date = "2018-06-01"
+end_date = "2018-06-05"
+
 
 # Connect to Swisstopo STAC API
 service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
@@ -123,7 +126,7 @@ index_map[forest_flat_indices] = np.arange(len(forest_flat_indices))
 # Search all images for the full CH bounding box for the whole time period
 item_search = service.search(
     bbox=bbox_swiss_4326,
-    datetime='2018-06-01/2018-06-05',
+    datetime=start_date + "/" + end_date,
     collections=['ch.swisstopo.swisseo_s2-sr_v100']
 )
 s2_files = list(item_search.items())

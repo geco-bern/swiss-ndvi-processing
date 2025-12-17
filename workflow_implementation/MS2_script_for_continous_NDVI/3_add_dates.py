@@ -9,7 +9,10 @@ import pandas as pd
 import pystac_client
 import zarr
 
-def get_swisstopo_sentinel_dates(start='2018-06-01', end='2018-06-05'):
+start_date = '2018-06-01'
+end_date = '2018-06-05'
+
+def get_swisstopo_sentinel_dates(start=start_date, end=end_date):
     # Connect to Swisstopo STAC API
     service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
     service.add_conforms_to("COLLECTIONS")

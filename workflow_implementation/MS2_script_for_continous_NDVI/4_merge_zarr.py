@@ -18,6 +18,8 @@ historical_ndvi_src = "data_for_demo/historic_ndvi.zarr"
 OUT_ZARR = "data_for_demo/merged_ndvi.zarr"
 lookuptable_src = "data_for_demo/lookup_table.zarr"
 
+start_date = np.datetime64("2018-06-01", "D")
+end_date = np.datetime64("2018-06-05", "D")
 
 # SETUP PARALLELIZATION CLUSTER
 client10 = Client(
@@ -35,16 +37,16 @@ client10.dashboard_link
 ds0 = zarr.open_group(SRC_ZARR, mode="r")
 ndvi_z = ds0["ndvi"]
 ndvi_da = da.from_zarr(ndvi_z)     # lazy
-         # equivalently sel() but much slower
+ndsi_z= ds0["ndsi"]
+ndsi_da = da.from_zarr(ndsi_z) 
 
 dates = da.from_zarr(ds0["date"]).astype("datetime64[D]")
 
 dates = dates.compute()
 
-start_dates = np.datetime64("2018-06-01", "D")
-end_dates = np.datetime64("2018-06-05", "D")
 
-daily_dates = pd.date_range(start=start_dates, end=end_dates, freq="D")
+
+daily_dates = pd.date_range(start=start_date, end=end_date, freq="D")
 print(f"Generated {len(daily_dates)} daily dates from {daily_dates.min().date()} to {daily_dates.max().date()}")
 
 obs_dates = daily_dates.isin(dates)
@@ -131,10 +133,10 @@ historical_ndvi = xr.open_zarr(historical_ndvi_src)
 
 # historical filtered
 ndvi_historic = historical_ndvi["ndvi_processed"].sel(
-    date= slice(None, "2018-05-31")
+    date= slice(None, start_date - 1)
 ).rename("ndvi")
 
-obs_date_historical = historical_ndvi["obs_date"].sel( date= slice(None, "2018-05-31"))
+obs_date_historical = historical_ndvi["obs_date"].sel( date= slice(None, start_date - 1))
 
 
 # new data
@@ -148,7 +150,7 @@ ndvi_stack = xr.concat([ndvi_historic, ndvi_new], dim="date").sortby("date")
 obs_date_stack = xr.concat([obs_date_historical, obs_date_new], dim="date").sortby("date")
 
 
-date_stack =  xr.concat([historical_ndvi["date"].sel(date= slice(None, "2018-05-31")), ds_to_stack["date"]], dim="date").sortby("date")
+date_stack =  xr.concat([historical_ndvi["date"].sel(date= slice(None, start_date - 1)), ds_to_stack["date"]], dim="date").sortby("date")
 
 date_stack = date_stack.astype("datetime64[D]")
 

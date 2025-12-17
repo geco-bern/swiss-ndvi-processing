@@ -380,11 +380,14 @@ def run_benchmark(date):
     print("- %s seconds -" % (time.time() - start_time))
 
     shutil.rmtree(local_tmp)
-    shutil.rmtree(OUTPUT_ZARR)
+    shutil.rmtree(OUTPUT_ZARR) # THIS MUST BE COMMENTED FOR THE FINAL PRODUCT
 
 if __name__ == "__main__":
 
-    day_array = np.array(['2018-06-01', '2018-06-02', '2018-06-03','2018-06-04','2018-06-05'], dtype='datetime64')
+    start_date = np.datetime64("2018-06-01", "D")
+    end_date = np.datetime64("2018-06-05", "D")
+
+    day_array = np.arange(start_date,end_date + 1, dtype='datetime64')
 
     for date in day_array:
         run_benchmark(date)
