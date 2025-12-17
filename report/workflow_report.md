@@ -9,16 +9,19 @@ The model used can be found in detail in the method report. Here we explaiined h
 0. [Summary of method](#method)
 
 1. [Milestone 1: historical NDVI processing](#MS1)
-    0. [Create lookup table](#lookptable)
-    1. [Download satellite images](#donwload)
-    2. [Tranpose zarr folder](#transponse)
-    3. [Add dates](#add_dates)
-    4. [Create zarr folder for historical analysis](#create_zarr)
-    5. [Run historical NDVI processing](#historic)
+
+    1. [Create lookup table](#lookptable)
+    2. [Download satellite images](#donwload)
+    3. [Tranpose zarr folder](#transponse)
+    4. [Add dates](#add_dates)
+    5. [Create zarr folder for historical analysis](#create_zarr)
+    6. [Run historical NDVI processing](#historic)
+
 2. [Milestone 2: continous NDVI processing](#MS2)
-    4. [Merge historical and aquired NDVI](#merge_zarr)
-    5. [Run continous NDVI processing](#continous)
-    6. [Genreate TIFF files](#tiff)
+
+    1. [Merge historical and aquired NDVI](#merge_zarr)
+    2. [Run continous NDVI processing](#continous)
+    3. [Genreate TIFF files](#tiff)
 
 <a name = "method"></a>
 
