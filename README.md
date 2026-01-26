@@ -2,12 +2,12 @@
 
 ## How to Use the Package
 
-To use the package, you have to download the required libraries using **Conda** or **Miniconda**.
+To use the package, you have to install the required libraries using pip
 
-### Setup with Conda
-```bash
-conda env create -f environment.yml --name ndvi
-```
+### Setup with pip
+Follow the steps outlined in `workflow_implementation/demo/00_setup.sh`.
+They create a new virtual environment `ndvi` and install the necessary packages
+with `pip`.
 
 # Requirements
 
