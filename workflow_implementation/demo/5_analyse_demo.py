@@ -6,6 +6,10 @@ import statsmodels.api as sm
 import os
 import shutil
 
+INPUT_ZARR = "data_for_demo/merged_ndvi.zarr" 
+OUTPUT_ZARR = "data_for_demo/processed_ndvi.zarr"
+local_tmp = "/home/Shared/UniBe-swiss-ndvi/data/tmp_dask"
+
 
 def smoothing_and_gapfilling(ndvi_arr, median_ndvi_arr, last_array_dates_idx,
                              last_delta, current_delta, deltas_arr,current_date_idx, pot_outlier_present):
@@ -279,8 +283,6 @@ def continuous_ndvi(ndvi_arr, median_arr,*, dates_arr, bool_dates, current_date)
 # 1) Setup Dask client
 # -----------------------------
 
-local_tmp = "/data_3/tmp_dask"
-
 if os.path.exists(local_tmp):
     shutil.rmtree(local_tmp)
 
@@ -291,7 +293,7 @@ client = Client(
     n_workers=N_WORKERS,
     threads_per_worker=1,
     processes=True,
-    dashboard_address=":12345",
+    dashboard_address=":33345",
     local_directory= local_tmp
 )
 client.dashboard_link
@@ -299,9 +301,6 @@ client.dashboard_link
 # -----------------------------
 # 2) Open Zarr dataset
 # -----------------------------
-INPUT_ZARR = "data_for_demo/merged_ndvi.zarr" 
-OUTPUT_ZARR = "data_for_demo/processed_ndvi.zarr"
-
 if os.path.exists(OUTPUT_ZARR):
     shutil.rmtree(OUTPUT_ZARR)
 
