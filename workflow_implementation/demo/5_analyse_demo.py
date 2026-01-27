@@ -334,8 +334,8 @@ ndvi_arr, mask_ndvi_arr = xr.apply_ufunc(
     kwargs={
         "dates_arr" : dates,
         "bool_dates" : bool_array,
-        "current_date": current_date,
-        "end_date" : end_date
+        "current_date": current_date
+        # "end_date" : end_date
     },
     output_dtypes=[ndvi_array.dtype,ndvi_array.dtype],
     dask_gufunc_kwargs={"allow_rechunk": True},
