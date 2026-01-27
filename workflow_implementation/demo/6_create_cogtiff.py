@@ -11,6 +11,7 @@ import os
 
 INPUT_ZARR = "data_for_demo/processed_ndvi.zarr"
 COG_TIFF_FOLDER = "data_for_demo/output_cogtiff/"
+os.makedirs(COG_TIFF_FOLDER, exist_ok=True)
 
 def create_tiff(map_array, map_mask, pixel,threshold, mask):
 
@@ -116,7 +117,7 @@ threshold = 0.9
 
 # read the filename and select the date with highest value
 
-dates_done = os.listdir("data_for_demo/output_cogtiff")
+dates_done = os.listdir(COG_TIFF_FOLDER)
 
 # crop the date
 substring_list = [s[:10] for s in dates_done]
@@ -124,7 +125,10 @@ substring_list = [s[:10] for s in dates_done]
 dates_as_dt = [np.datetime64(d) for d in substring_list]
 
 # Get the latest date
-last_date_created = max(dates_as_dt,np.datetime64("2018-01-01")) # placeholder in case the list in empty
+if len(dates_as_dt) == 0:
+    last_date_created = np.datetime64("2018-01-01") # placeholder in case the list in empty
+else:
+    last_date_created = max(dates_as_dt)
 
 pos_idx = ((last_date_created - first_date) / np.timedelta64(1, "D")).astype(int)
 
