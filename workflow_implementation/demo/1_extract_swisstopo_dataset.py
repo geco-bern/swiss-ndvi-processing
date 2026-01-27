@@ -3,6 +3,7 @@ Extract Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI t
 """
 #  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/1_extract_swisstopo_dataset.py >  /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/donwload_swisstopo.log &
 
+# NOTE: on Tunder with slow network speed this can take up to 100 minutes for '2018-06-01/2018-06-05'
 # TODO: note: would it make sense to combine scripts 1,2,3 ?
 
 import pystac_client
@@ -10,13 +11,12 @@ import rasterio
 from rasterio.coords import BoundingBox
 import numpy as np
 import zarr
-import numcodecs
 from tqdm import tqdm
 from rasterio.windows import from_bounds
 from rasterio.warp import reproject, Resampling
 
 # OUTPUT_PATH = "/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr"
-OUTPUT_PATH = "../../data/output/01_all_ndvi_dataset_spatial.zarr"     # TODO: why is this called all? It is not all time steps, but only newly downloaded data.
+OUTPUT_PATH = "../../data/output/01_all_ndvi_dataset_spatial.zarr"     # TODO: why is this called 'all_'? It is not all time steps, but only newly downloaded data.
 
 # Connect to Swisstopo STAC API
 service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
@@ -122,7 +122,7 @@ index_map[forest_flat_indices] = np.arange(len(forest_flat_indices))
 # Search all images for the full CH bounding box for the whole time period
 item_search = service.search(
     bbox=bbox_swiss_4326,
-    datetime='2018-06-01/2018-06-05',
+    datetime='2018-06-01/2018-06-05',                # TODO: un-hardcode this
     collections=['ch.swisstopo.swisseo_s2-sr_v100']
 )
 s2_files = list(item_search.items())

@@ -5,13 +5,10 @@ import numpy as np
 import math
 import zarr
 import pandas as pd
-import torch
 import os
-import time
-from dask.distributed import Client, LocalCluster
+from dask.distributed import Client
 import xarray as xr
 import dask.array as da
-from datetime import datetime, date
 
 # Two inputs from outside the workflow: # TODO: replace these two with data from the workflow.
 historical_ndvi_src = "data_for_demo/historic_ndvi.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?

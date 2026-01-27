@@ -1,6 +1,5 @@
 import numpy as np
 import xarray as xr
-import dask.array as da
 from dask.distributed import Client
 import statsmodels.api as sm
 import os

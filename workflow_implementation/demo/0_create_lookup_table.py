@@ -1,22 +1,22 @@
 
 import numpy as np
-import math
 import zarr
-import pandas as pd
-import torch
-import os
-import time
-from dask.distributed import Client, LocalCluster
+from dask.distributed import Client
 import xarray as xr
 import dask.array as da
 
 SRC_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr"
+# SRC_ZARR = "../../data/output/02-03_ndvi_dataset_temporal.zarr" # TODO: can we use this instead? It appears not, since this is missing 'params'
+OUT_ZARR = "../../data/output/00_lookup_table_median_ndvi.zarr"
+
+N_WORKERS = 10
+
 ds0 = zarr.open_group(SRC_ZARR, mode="r")
 
 
 # SETUP PARALLELIZATION CLUSTER
 client = Client(
-    n_workers=30,
+    n_workers=N_WORKERS,
     threads_per_worker=1,
     processes=True,  # Use separate processes (not threads, this appears to be much faster (even though using non-shared memory))
     dashboard_address=':2231'
@@ -78,7 +78,4 @@ median_ndvi_xr = xr.DataArray(
     name="median_ndvi",
 )
 
-OUT = "/data_3/francesco/lookup_table_median_ndvi.zarr"
-
-median_ndvi_xr.to_dataset().to_zarr(OUT, mode="w", consolidated=True)
-
+median_ndvi_xr.to_dataset().to_zarr(OUT_ZARR, mode="w", consolidated=True)
