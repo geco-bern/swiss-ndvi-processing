@@ -5,9 +5,9 @@
 #git clone https://github.com/geco-bern/swiss-ndvi-processing.git
 #cd swiss-ndvi-processing
 #sudo apt install python3-virtualenv # instead of pip install virtualenv
-#virtualenv ndvi
-#source ndvi/bin/activate
-#pip install -r requirements.txt
+#virtualenv .env/ndvi
+#source .env/ndvi/bin/activate
+#pip install -r requirements.txt     # Note that this can easily take 1h depending on the internet connection.
 
 
 # B) Only needed for development to setup git and GitHub user:
@@ -32,4 +32,13 @@
 # # git config --global user.name "fabern"
 # # git config --global user.email "10245680+fabern@users.noreply.github.com"   # get it from: https://github.com/settings/emails
 
-# C) 
+# C) Check system specifications agree with below:
+# (ndvi) fabian-bernhard@tunder:/home/Shared/UniBe-swiss-ndvi/data$ uname -or
+# 6.8.0-90-generic GNU/Linux
+# (ndvi) fabian-bernhard@tunder:/home/Shared/UniBe-swiss-ndvi/data$ lsb_release -irc
+# No LSB modules are available.
+# Distributor ID: Ubuntu
+# Release:        24.04
+# Codename:       noble
+
+# D)

@@ -4,3 +4,5 @@ demo/output/gif/*.gif
 *.log
 *.tif
 *.egg-info
+
+.venv*
