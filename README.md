@@ -37,7 +37,7 @@ Below I'll explain how to use the demo. The intermediate data generated from ste
 
 To simulate the continous NDVI processing, the first step is to download the data.
 
-### Donwload the data
+### Download the data
 
 The script [1_extract_swisstopo_dataset.py](workflow_implementation/demo/1_extract_swisstopo_dataset.py)
  will download the data, in [line 124](workflow_implementation/demo/1_extract_swisstopo_dataset.py#L124)
@@ -67,7 +67,7 @@ There is nothing to modify here
 
 ### Merge the historical dataset with the new data set
 
-To run the analysis, it is encessary to have the historical analysis and the newly acquired data. The script [4_merge_zarr.py](workflow_implementation/demo/4_merge_zarr.py) will load both dataset and merged togheter. The new median ndvi data will be added using the lookup table.
+To run the analysis, it is necessary to have the historical analysis and the newly acquired data. The script [4_merge_zarr.py](workflow_implementation/demo/4_merge_zarr.py) will load both dataset and merged togheter. The new median ndvi data will be added using the lookup table.
 
 #### Required parameter to modify inside the script
 

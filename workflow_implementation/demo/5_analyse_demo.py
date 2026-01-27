@@ -6,10 +6,11 @@ import statsmodels.api as sm
 import os
 import shutil
 
-INPUT_ZARR = "data_for_demo/merged_ndvi.zarr" 
-OUTPUT_ZARR = "data_for_demo/processed_ndvi.zarr"
-local_tmp = "/home/Shared/UniBe-swiss-ndvi/data/tmp_dask"
+SOURCE_ZARR = "../../data/output/04_merged_ndvi.zarr"  # This is the OUT_ZARR from script 4
+OUTPUT_ZARR = "../../data/output/05_processed_ndvi.zarr"
+local_tmp = "../../data/temporary"
 
+N_WORKERS = 2
 
 def smoothing_and_gapfilling(ndvi_arr, median_ndvi_arr, last_array_dates_idx,
                              last_delta, current_delta, deltas_arr,current_date_idx, pot_outlier_present):
@@ -288,7 +289,6 @@ if os.path.exists(local_tmp):
 
 os.makedirs(local_tmp, exist_ok=True)
 
-N_WORKERS = 2
 client = Client(
     n_workers=N_WORKERS,
     threads_per_worker=1,
@@ -304,15 +304,15 @@ client.dashboard_link
 if os.path.exists(OUTPUT_ZARR):
     shutil.rmtree(OUTPUT_ZARR)
 
-ds = xr.open_zarr(INPUT_ZARR)
+ds = xr.open_zarr(SOURCE_ZARR)
 
 dates = ds["date"] 
 bool_array = ds["obs_date"]
 bool_array = bool_array.chunk({"date": -1})
 
 
-current_date = np.datetime64("2018-06-01")
-end_date = np.datetime64("2011-06-01")
+current_date = np.datetime64("2018-06-01") # TODO: what values should we specify here? What does current_date represent?
+end_date = np.datetime64("2011-06-01")     # TODO: what values should we specify here? What does end_date represent?
 
 ndvi_array = ds["ndvi"]
 median_array = ds["median_ndvi"]

@@ -1,10 +1,9 @@
 """
 Extract Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI time series for forested areas.
 """
-
 #  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/1_extract_swisstopo_dataset.py >  /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/donwload_swisstopo.log &
 
-
+# TODO: note: would it make sense to combine scripts 1,2,3 ?
 
 import pystac_client
 import rasterio
@@ -16,6 +15,8 @@ from tqdm import tqdm
 from rasterio.windows import from_bounds
 from rasterio.warp import reproject, Resampling
 
+# OUTPUT_PATH = "/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr"
+OUTPUT_PATH = "../../data/output/01_all_ndvi_dataset_spatial.zarr"     # TODO: why is this called all? It is not all time steps, but only newly downloaded data.
 
 # Connect to Swisstopo STAC API
 service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
@@ -26,8 +27,6 @@ service.add_conforms_to("ITEM_SEARCH")
 # WGS 84
 # Swiss bounds: left, bottom, right, top
 bbox_swiss_4326 = [5.70, 45.8, 10.6, 47.95]
-
-OUTPUT_PATH = "/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr"
 
 # Retrieve the spatial coverage (bounds) of all 4 possible orbits covering Switzerland
 def collect_bounds_all_orbits():
@@ -282,7 +281,7 @@ for t, path in tqdm(enumerate(s2_files), total=len(s2_files)):
         continue  # skip to the next time step
 
 # Retry the failed time steps
-if failed_timesteps:
+if failed_timesteps:    
     print(f"Retrying {len(failed_timesteps)} failed time steps...")
     for t, path in tqdm(failed_timesteps):
         try:

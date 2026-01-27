@@ -1,17 +1,13 @@
-from datetime import datetime, date
 import numpy as np
 import xarray as xr
 import rasterio
 from rasterio.transform import from_origin
-from rasterio.enums import Resampling
-from rasterio.shutil import copy as rio_copy
-import zarr
 import math
 import os
 
-INPUT_ZARR = "data_for_demo/processed_ndvi.zarr"
-COG_TIFF_FOLDER = "data_for_demo/output_cogtiff/"
-mask_path = "../../data/forest_mask.npy"
+INPUT_ZARR = "../../data/output/05_processed_ndvi.zarr"
+COG_TIFF_FOLDER = "../../data/output/06_output_cogtiff/"
+mask_path = "../../data/input/forest_mask.npy"
 
 os.makedirs(COG_TIFF_FOLDER, exist_ok=True)
 

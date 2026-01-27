@@ -1,3 +1,6 @@
+"""
+Merge newly downloaded NDVI data to the all-time (historic) record
+"""
 import numpy as np
 import math
 import zarr
@@ -10,18 +13,24 @@ import xarray as xr
 import dask.array as da
 from datetime import datetime, date
 
+# Two inputs from outside the workflow: # TODO: replace these two with data from the workflow.
+historical_ndvi_src = "data_for_demo/historic_ndvi.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+lookuptable_src = "data_for_demo/lookup_table.zarr" # TODO: can we replace this with:  "../../data/output/00_lookup_table_median_ndvi.zarr" ?
+# historical_ndvi_src = "../../data/output/04_merged_ndvi.zarr" # TODO: I guess this would be what we want. Right Francesco ??
+# lookuptable_src = "../../data/output/00_lookup_table_median_ndvi.zarr" # TODO: can we replace this with:  "../../data/output/00_lookup_table_median_ndvi.zarr" ?
+# TODO: should we: check if 00_lookup_table_median_ndvi.zarr exists? If it doesn't then run 1x a function that replaces 0_create_lookup_table.py ?
 
+SOURCE_ZARR = "../../data/output/02-03_ndvi_dataset_temporal.zarr" # the zarr from script 3
+OUT_ZARR_TMP = "../../data/temporary_demo.zarr"          # TODO: what does this file represent?
+OUT_ZARR = "../../data/output/04_merged_ndvi.zarr"       # TODO: what does this file represent? Is it the updated historical_ndvi ? So in the real workflow this is the same as SOURCE_ZARR?
 
-SRC_ZARR = "/data_3/scratch/francesco/processed/ndvi_dataset_temporal.zarr"
-OUT_ZARR_TMP  = "/data_3/scratch/francesco/demo.zarr"
-historical_ndvi_src = "data_for_demo/historic_ndvi.zarr"
-OUT_ZARR = "data_for_demo/merged_ndvi.zarr"
-lookuptable_src = "data_for_demo/lookup_table.zarr"
+MASK_PATH = "../../data/input/forest_mask.npy"
 
+N_WORKERS = 10
 
 # SETUP PARALLELIZATION CLUSTER
 client10 = Client(
-    n_workers=10,
+    n_workers=N_WORKERS,
     threads_per_worker=1,
     processes=True,  # Use separate processes (not threads, this appears to be much faster (even though using non-shared memory))
     dashboard_address=':2231'
@@ -37,7 +46,7 @@ def extract_pixel_index(UL_x, UL_y, BR_x, BR_y):
     left, bottom = 2474090.0, 1065110.0
     px = 10.0
     top = bottom + height * px
-    mask_path = "/data_2/scratch/sbiegel/processed/forest_mask.npy" # needs to be loaded somewhere
+    mask_path = MASK_PATH
 
     x_min, x_max = min(UL_x, BR_x), max(UL_x, BR_x)
     y_min, y_max = min(UL_y, BR_y), max(UL_y, BR_y)
@@ -79,14 +88,14 @@ sel_1 = extract_pixel_index(
 #  Load Source Dataset lazily (no xarray metadata needed)
 # =====================================================
 
-ds0 = zarr.open_group(SRC_ZARR, mode="r")
+ds0 = zarr.open_group(SOURCE_ZARR, mode="r")
 ndvi_z = ds0["ndvi"]
 ndvi_da = da.from_zarr(ndvi_z)     # lazy
          # equivalently sel() but much slower
 
-dates = da.from_zarr(ds0["date"]).astype("datetime64[D]")
+dates = da.from_zarr(ds0["date"]).astype("datetime64[D]") # lazy
 
-dates = dates.compute()
+dates = dates.compute()            # non-lazy
 
 start_dates = np.datetime64("2018-06-01", "D")
 end_dates = np.datetime64("2018-06-05", "D")
@@ -232,8 +241,8 @@ for c in out_ds.coords:
     out_ds[c].encoding.pop("compressor", None)
     out_ds[c].encoding.setdefault("chunks", None)
 
-OUT_ZARR = "data_for_demo/merged_ndvi.zarr"
 out_ds.to_zarr(OUT_ZARR, mode="w", consolidated=True)
 
+# TODO: don't we need to delete: OUT_ZARR_TMP ? e.g. shutil.rmtree(OUT_ZARR_TMP) ?
 print("✅ Done")
 

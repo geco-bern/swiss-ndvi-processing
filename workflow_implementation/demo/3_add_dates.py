@@ -3,11 +3,12 @@ Fetch acquisition dates from Swisstopo STAC API and add them to the Zarr dataset
 """
 # nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/3_add_dates.py >  /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/add_dates_swisstopo.log &
 
-
 import requests
 import pandas as pd
 import pystac_client
 import zarr
+
+SOURCE_ZARR = "../../data/output/02-03_ndvi_dataset_temporal.zarr" # the transposed zarr from script 2. Will be modified by script 3.
 
 def get_swisstopo_sentinel_dates(start='2018-06-01', end='2018-06-05'):
     # Connect to Swisstopo STAC API
@@ -36,7 +37,7 @@ def get_swisstopo_sentinel_dates(start='2018-06-01', end='2018-06-05'):
     pd_dates = pd.to_datetime(dates)
     pd_dates_str = pd_dates.strftime('%Y-%m-%d')
 
-    root = zarr.open_group("/data_3/scratch/francesco/processed/ndvi_dataset_temporal.zarr", mode='a', zarr_format=3)
+    root = zarr.open_group(SOURCE_ZARR, mode='a', zarr_format=3)
     root.create_array(
         name='date',
         dtype='S10',
