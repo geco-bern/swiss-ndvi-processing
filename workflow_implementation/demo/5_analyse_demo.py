@@ -11,7 +11,7 @@ SOURCE_ZARR = "../../data/output/04_merged_ndvi.zarr"  # This is the OUT_ZARR fr
 OUTPUT_ZARR = "../../data/output/05_processed_ndvi.zarr"
 local_tmp = "../../data/temporary"
 
-N_WORKERS = 2
+# N_WORKERS = 2
 
 def smoothing_and_gapfilling(ndvi_arr, median_ndvi_arr, last_array_dates_idx,
                              last_delta, current_delta, deltas_arr,current_date_idx, pot_outlier_present):
@@ -290,14 +290,14 @@ if os.path.exists(local_tmp):
 
 os.makedirs(local_tmp, exist_ok=True)
 
-client = Client(
-    n_workers=N_WORKERS,
-    threads_per_worker=1,
-    processes=True,
-    dashboard_address=":33345",
-    local_directory= local_tmp
-)
-client.dashboard_link
+# client = Client(
+#     n_workers=N_WORKERS,
+#     threads_per_worker=1,
+#     processes=True,
+#     dashboard_address=":33345",
+#     local_directory= local_tmp
+# )
+# client.dashboard_link
 
 # -----------------------------
 # 2) Open Zarr dataset
@@ -363,6 +363,6 @@ for v in out_ds.data_vars:
 # Write to Zarr
 out_ds.to_zarr(OUTPUT_ZARR, mode="w", consolidated=True, compute=True)
 
-client.close()
+# client.close()
 
 shutil.rmtree(local_tmp)
