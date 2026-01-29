@@ -1,3 +1,5 @@
+# "Run Python File" in VSCode
+
 import numpy as np
 import xarray as xr
 import rasterio

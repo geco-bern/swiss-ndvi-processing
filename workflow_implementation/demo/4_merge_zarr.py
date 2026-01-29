@@ -1,6 +1,7 @@
 """
 Merge newly downloaded NDVI data to the all-time (historic) record
 """
+# "Run Python File" in VSCode # TODO get this working
 import numpy as np
 import math
 import zarr

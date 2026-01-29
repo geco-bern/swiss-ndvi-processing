@@ -1,7 +1,7 @@
 """
 Transpose Swisstopo NDVI/NDSI dataset from (T, N) to (N, T) layout using Dask.
 """
-# nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/2_transpose_swisstopo_dataset.py >  /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/transpose_swisstopo.log &
+# "Run Python File" in VSCode
 
 import dask.array as da
 from dask.distributed import Client, LocalCluster

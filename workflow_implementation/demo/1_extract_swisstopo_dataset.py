@@ -1,7 +1,7 @@
 """
 Extract Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI time series for forested areas.
 """
-#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/1_extract_swisstopo_dataset.py >  /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/donwload_swisstopo.log &
+# "Run Python File" in VSCode
 
 # NOTE: on Tunder with slow network speed this can take up to 100 minutes for '2018-06-01/2018-06-05'
 # TODO: note: would it make sense to combine scripts 1,2,3 ?
