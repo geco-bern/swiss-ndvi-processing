@@ -1,13 +1,12 @@
 """
 Merge newly downloaded NDVI data to the all-time (historic) record
 """
-# "Run Python File" in VSCode # TODO get this working
+# "Run Python File" in VSCode
 import numpy as np
 import math
 import zarr
 import pandas as pd
 import os
-from dask.distributed import Client
 import xarray as xr
 import dask.array as da
 
@@ -23,17 +22,6 @@ OUT_ZARR_TMP = "../../data/temporary_demo.zarr"          # TODO: what does this 
 OUT_ZARR = "../../data/output/04_merged_ndvi.zarr"       # TODO: what does this file represent? Is it the updated historical_ndvi ? So in the real workflow this is the same as SOURCE_ZARR?
 
 MASK_PATH = "../../data/input/forest_mask.npy"
-
-N_WORKERS = 10
-
-# SETUP PARALLELIZATION CLUSTER
-client10 = Client(
-    n_workers=N_WORKERS,
-    threads_per_worker=1,
-    processes=True,  # Use separate processes (not threads, this appears to be much faster (even though using non-shared memory))
-    dashboard_address=':2231'
-)  # start distributed scheduler locally.
-client10.dashboard_link
 
 # =====================================================
 #  Load Forest Mask for Pixel Selection

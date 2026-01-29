@@ -14,8 +14,8 @@ SOURCE_ZARR = "../../data/output/01_all_ndvi_dataset_spatial.zarr"    # from the
 TRANSPOSED_ZARR = "../../data/output/02-03_ndvi_dataset_temporal.zarr"
 DASK_TEMP_DIR = "../../data/temporary"
 
-if os.path.exists(TRANSPOSED_ZARR):
-    shutil.rmtree(TRANSPOSED_ZARR)
+#if os.path.exists(TRANSPOSED_ZARR):
+#    shutil.rmtree(TRANSPOSED_ZARR)
 
 N_WORKERS = 40
 MEMORY_LIMIT = "100GB"
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     transpose_zarr(SOURCE_ZARR, TRANSPOSED_ZARR, component="ndsi")
     print("done ndsi")
 
-    if os.path.exists(SOURCE_ZARR):
-        shutil.rmtree(SOURCE_ZARR)
+    #if os.path.exists(SOURCE_ZARR):
+    #    shutil.rmtree(SOURCE_ZARR)
 
     shutil.rmtree(DASK_TEMP_DIR)
