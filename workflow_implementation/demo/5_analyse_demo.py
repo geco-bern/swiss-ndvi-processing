@@ -279,90 +279,94 @@ def continuous_ndvi(ndvi_arr, median_arr,*, dates_arr, bool_dates, current_date)
 # 1) Setup Dask client
 # -----------------------------
 
-local_tmp = "/data_3/tmp_dask"
+def main():
 
-if os.path.exists(local_tmp):
-    shutil.rmtree(local_tmp)
+    local_tmp = "./temp_data"
 
-os.makedirs(local_tmp, exist_ok=True)
+    if os.path.exists(local_tmp):
+        shutil.rmtree(local_tmp, ignore_errors=True)
 
-N_WORKERS = 2
-client = Client(
-    n_workers=N_WORKERS,
-    threads_per_worker=1,
-    processes=True,
-    dashboard_address=":12345",
-    local_directory= local_tmp
-)
-client.dashboard_link
+    os.makedirs(local_tmp, exist_ok=True)
 
-# -----------------------------
-# 2) Open Zarr dataset
-# -----------------------------
-INPUT_ZARR = "data_for_demo/merged_ndvi.zarr" 
-OUTPUT_ZARR = "data_for_demo/processed_ndvi.zarr"
+    N_WORKERS = 2
+    client = Client(
+        n_workers=N_WORKERS,
+        threads_per_worker=1,
+        processes=True,
+        dashboard_address=":12345",
+        local_directory= local_tmp
+    )
+    client.dashboard_link
 
-if os.path.exists(OUTPUT_ZARR):
-    shutil.rmtree(OUTPUT_ZARR)
+    # -----------------------------
+    # 2) Open Zarr dataset
+    # -----------------------------
+    INPUT_ZARR = "swiss-ndvi-processing/data_for_demo/merged_ndvi.zarr" 
+    OUTPUT_ZARR = "data_for_demo_2/processed_ndvi.zarr"
 
-ds = xr.open_zarr(INPUT_ZARR)
+    if os.path.exists(OUTPUT_ZARR):
+        shutil.rmtree(OUTPUT_ZARR)
 
-dates = ds["date"] 
-bool_array = ds["obs_date"]
-bool_array = bool_array.chunk({"date": -1})
+    ds = xr.open_zarr(INPUT_ZARR)
+
+    dates = ds["date"] 
+    bool_array = ds["obs_date"]
+    bool_array = bool_array.chunk({"date": -1})
 
 
-current_date = np.datetime64("2018-06-01")
-end_date = np.datetime64("2011-06-01")
+    current_date = np.datetime64("2018-06-01")
+    #end_date = np.datetime64("2011-06-01")
 
-ndvi_array = ds["ndvi"]
-median_array = ds["median_ndvi"]
-ndvi_array = ndvi_array.chunk({"date": -1})
-median_array = median_array.chunk({"date": -1})
+    ndvi_array = ds["ndvi"]
+    median_array = ds["median_ndvi"]
+    ndvi_array = ndvi_array.chunk({"date": -1})
+    median_array = median_array.chunk({"date": -1})
 
-dates = dates.load().values.astype("datetime64[D]")
-bool_array = bool_array.load().values
+    dates = dates.load().values.astype("datetime64[D]")
+    bool_array = bool_array.load().values
 
-ndvi_arr, mask_ndvi_arr = xr.apply_ufunc(
-    continuous_ndvi,
-    ndvi_array,
-    median_array,
-    input_core_dims=[["date"],["date"]],
-    output_core_dims=[["date"],["date"]],
-    vectorize=True,
-    dask="parallelized",
-    kwargs={
-        "dates_arr" : dates,
-        "bool_dates" : bool_array,
-        "current_date": current_date,
-        "end_date" : end_date
-    },
-    output_dtypes=[ndvi_array.dtype,ndvi_array.dtype],
-    dask_gufunc_kwargs={"allow_rechunk": True},
-)
+    ndvi_arr, mask_ndvi_arr = xr.apply_ufunc(
+        continuous_ndvi,
+        ndvi_array,
+        median_array,
+        input_core_dims=[["date"],["date"]],
+        output_core_dims=[["date"],["date"]],
+        vectorize=True,
+        dask="parallelized",
+        kwargs={
+            "dates_arr" : dates,
+            "bool_dates" : bool_array,
+            "current_date": current_date  #,"end_date" : end_date
+        },
+        output_dtypes=[ndvi_array.dtype,ndvi_array.dtype],
+        dask_gufunc_kwargs={"allow_rechunk": True},
+    )
 
-out_ds = xr.Dataset(
-    {
-        "ndvi_processed": ndvi_arr,
-        "mask_array": mask_ndvi_arr
-    },
-    coords={
-        "date": ds["date"],
-        "pixel": ds["pixel"]
-    }
-)
+    out_ds = xr.Dataset(
+        {
+            "ndvi_processed": ndvi_arr,
+            "mask_array": mask_ndvi_arr
+        },
+        coords={
+            "date": ds["date"],
+            "pixel": ds["pixel"]
+        }
+    )
 
-# Chunk explicitly to avoid Dask graph explosion
-out_ds = out_ds.chunk({"pixel": 5000, "date": -1})
+    # Chunk explicitly to avoid Dask graph explosion
+    out_ds = out_ds.chunk({"pixel": 5000, "date": -1})
 
-# Remove leftover compressor info if copying from another dataset
-for v in out_ds.data_vars:
-    out_ds[v].encoding.pop("compressor", None)
-    out_ds[v].encoding.setdefault("chunks", None)
+    # Remove leftover compressor info if copying from another dataset
+    for v in out_ds.data_vars:
+        out_ds[v].encoding.pop("compressor", None)
+        out_ds[v].encoding.setdefault("chunks", None)
 
-# Write to Zarr
-out_ds.to_zarr(OUTPUT_ZARR, mode="w", consolidated=True, compute=True)
+    # Write to Zarr
+    out_ds.to_zarr(OUTPUT_ZARR, mode="w", consolidated=True, compute=True)
 
-client.close()
+    client.close()
 
-shutil.rmtree(local_tmp)
+    shutil.rmtree(local_tmp, ignore_errors=True)
+
+if __name__ == "__main__":
+    main()

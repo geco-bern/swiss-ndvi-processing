@@ -9,8 +9,10 @@ import zarr
 import math
 import os
 
-INPUT_ZARR = "data_for_demo/processed_ndvi.zarr"
+INPUT_ZARR = "swiss-ndvi-processing/data_for_demo/processed_ndvi.zarr"
 COG_TIFF_FOLDER = "data_for_demo/output_cogtiff/"
+
+os.makedirs(COG_TIFF_FOLDER, exist_ok=True)
 
 def create_tiff(map_array, map_mask, pixel,threshold, mask):
 
@@ -116,7 +118,7 @@ threshold = 0.9
 
 # read the filename and select the date with highest value
 
-dates_done = os.listdir("data_for_demo/output_cogtiff")
+dates_done = os.listdir("swiss-ndvi-processing/data_for_demo/output_cogtiff")
 
 # crop the date
 substring_list = [s[:10] for s in dates_done]
@@ -124,7 +126,10 @@ substring_list = [s[:10] for s in dates_done]
 dates_as_dt = [np.datetime64(d) for d in substring_list]
 
 # Get the latest date
-last_date_created = max(dates_as_dt,np.datetime64("2018-01-01")) # placeholder in case the list in empty
+if dates_as_dt:
+    last_date_created = max(dates_as_dt)
+else:
+    last_date_created = np.datetime64("2018-01-01")  # placeholder in case the list in empty
 
 pos_idx = ((last_date_created - first_date) / np.timedelta64(1, "D")).astype(int)
 
@@ -132,7 +137,7 @@ end_idx = ds.dims["date"] -100 #I put -100 to have something for the working dem
 
 dates_to_check = np.arange(pos_idx+1,end_idx-1) # -1 is for indexing
 
-mask_path = "/data_2/scratch/sbiegel/processed/forest_mask.npy"
+mask_path = "forest_mask.npy"
 
 mask = np.load(mask_path)
 
