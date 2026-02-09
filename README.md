@@ -1,13 +1,26 @@
 # Gapfill NDVI
 
+The workflow implementation (milestone 2) can be found in [this folder](workflow_implementation/demo). The folder contains all the steps to run the continous integration setup for a small subset of pixels (2000).
+
 ## How to Use the Package
 
-To use the package, you have to download the required libraries using **Conda** or **Miniconda**.
+To use the package, you have to create the envrioment. The envrioment can be created either using **conda** or **pip**
+
+It is necessary to have the file forest_mask.npy. At the moment can be found in my folder
 
 ### Setup with Conda
 ```bash
 conda env create -f environment.yml --name ndvi
 ```
+
+### Setup with pip
+
+```bash
+python3 -m venv ndvi
+source ndvi/bin/activate
+pip install -r requirements.txt
+```
+
 
 # Requirements
 
