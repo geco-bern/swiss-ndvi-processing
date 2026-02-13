@@ -313,7 +313,6 @@ bool_array = bool_array.chunk({"date": -1})
 
 
 current_date = np.datetime64("2018-06-01") # TODO: what values should we specify here? What does current_date represent?
-end_date = np.datetime64("2011-06-01")     # TODO: what values should we specify here? What does end_date represent?
 
 ndvi_array = ds["ndvi"]
 median_array = ds["median_ndvi"]
@@ -335,7 +334,6 @@ ndvi_arr, mask_ndvi_arr = xr.apply_ufunc(
         "dates_arr" : dates,
         "bool_dates" : bool_array,
         "current_date": current_date
-        # "end_date" : end_date
     },
     output_dtypes=[ndvi_array.dtype,ndvi_array.dtype],
     dask_gufunc_kwargs={"allow_rechunk": True},

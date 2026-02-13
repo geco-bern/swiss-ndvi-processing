@@ -7,6 +7,8 @@ import dask.array as da
 
 SRC_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr"
 # SRC_ZARR = "../../data/output/02-03_ndvi_dataset_temporal.zarr" # TODO: can we use this instead? It appears not, since this is missing 'params'
+                                                                # NOTE: Francesco: No.The parameters area calcualted follwoing the processing by Samantha
+                                                                # NOTE: Fabian: This is low priority. But, it would be good (after all other tasks), if we could include this in this repo. But let's discuss this with Samantha.
 OUT_ZARR = "../../data/output/00_lookup_table_median_ndvi.zarr"
 
 N_WORKERS = 10

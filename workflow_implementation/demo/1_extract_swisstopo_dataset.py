@@ -4,6 +4,8 @@ Extract Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI t
 # "Run Python File" in VSCode
 
 # NOTE: on Tunder with slow network speed this can take up to 100 minutes for '2018-06-01/2018-06-05'
+# NOTE Francesco: When I try to run with noup I get an error
+# NOTE Fabian: for me it works in the Terminal with `python workflow_implementation/demo/1_extract_swisstopo_dataset.py` with the activated environment `.venv`. What error do you get?
 # TODO: note: would it make sense to combine scripts 1,2,3 ?
 
 import pystac_client
@@ -16,8 +18,7 @@ from rasterio.windows import from_bounds
 from rasterio.warp import reproject, Resampling
 
 # OUTPUT_PATH = "/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr"
-OUTPUT_PATH = "../../data/output/01_all_ndvi_dataset_spatial.zarr"     # TODO: why is this called 'all_'? It is not all time steps, but only newly downloaded data.
-
+OUTPUT_PATH = "../../data/output/01_all_ndvi_dataset_spatial.zarr"     # TODO: why is this called 'all_'? It is not all time steps, but only newly downloaded data. NOTE: all refers to "pixel"
 # Connect to Swisstopo STAC API
 service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
 service.add_conforms_to("COLLECTIONS")

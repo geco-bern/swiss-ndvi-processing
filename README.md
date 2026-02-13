@@ -39,8 +39,11 @@ To simulate the continous NDVI processing, the first step is to download the dat
 
 ### Download the data
 
-The script [1_extract_swisstopo_dataset.py](workflow_implementation/demo/1_extract_swisstopo_dataset.py)
- will download the data, in [line 124](workflow_implementation/demo/1_extract_swisstopo_dataset.py#L124)
+The script [1_extract_swisstopo_dataset.py](workflow_implementation/demo/1_extract_swisstopo_dataset.py) download the satellite images from https://data.geo.admin.ch/api/stac/v0.9/ using pystac_client. 
+ 
+The script download the forest mask and the satellite bands to compute NDVI and NDSI.
+ 
+in [line 124](workflow_implementation/demo/1_extract_swisstopo_dataset.py#L124)
  is it possible to select the time window to simulate the continous ingestion. I select to ingest data from 2018-06-01 to 2018-06-05.
 
 #### Required parameter to modify inside the script
@@ -50,7 +53,7 @@ The script [1_extract_swisstopo_dataset.py](workflow_implementation/demo/1_extra
 
 ### Transpose the data from time-wise to space-wise chunking
 
-The following step are to transpose the dataset from time-wise chunking to space-wise chunking, the script [2_transpose_swisstopo_dataset.py](workflow_implementation/demo/2_transpose_swisstopo_dataset.py) will do that.
+The script step [2_transpose_swisstopo_dataset.py](workflow_implementation/demo/2_transpose_swisstopo_dataset.py) transpose the dataset from time-wise chunking to space-wise chunking.
 
 #### Required parameter to modify inside the script
 
@@ -59,7 +62,7 @@ The following step are to transpose the dataset from time-wise chunking to space
 
 ### Add the new date
 
-The script (3_add_dates.py)[workflow_implementation/demo/3_add_dates.py] will download the new date where an observation in present, extented to be evenly spacing at daily resoultion and create the mask of where an observation is found (this mask in used in continous ndvi setup). Here there is nothing to change and can be run immidiately.
+The script (3_add_dates.py)[workflow_implementation/demo/3_add_dates.py] will download the new date where an observation in present, extented to be evenly spacing at daily resoultion and create the mask of where an observation is found (this mask in used in continous ndvi setup)
 
 #### Required parameter to modify inside the script
 
