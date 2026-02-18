@@ -18,7 +18,7 @@ from rasterio.windows import from_bounds
 from rasterio.warp import reproject, Resampling
 
 # OUTPUT_PATH = "/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr"
-OUTPUT_PATH = "../../data/output/01_all_ndvi_dataset_spatial.zarr"     # TODO: why is this called 'all_'? It is not all time steps, but only newly downloaded data. NOTE: all refers to "pixel"
+OUTPUT_PATH = "../../data/output/01_all_ndvi_dataset_spatial_2.zarr"     # TODO: why is this called 'all_'? It is not all time steps, but only newly downloaded data. NOTE: all refers to "pixel"
 # Connect to Swisstopo STAC API
 service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
 service.add_conforms_to("COLLECTIONS")
