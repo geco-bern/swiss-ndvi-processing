@@ -50,7 +50,7 @@ We lastly combined altogheter and save the zarr folder in the V2 format. We didn
 
 ## 5_historic_NDVI.py
 
-In this scirpt, we run the historical NDVI analysis.
+In this script, we run the historical NDVI analysis.
 
 The output is composed by two arrays for each pixels, the first is the processed NDVI array and the second is the mask indicating the nature of each NDVI value. The mask will have integer values from 0 to 4 according to this list
 
@@ -72,4 +72,10 @@ After the outlier detection is performed, if a timeserie have at least 7 observa
 
 If the window data to smooth doesn't fall in these tow categories, we smooth the delta values from the first deltas to the last-fourth deltas, then we combined the smoothed deltas with the remaning deltas (the last three) and we linearly interpolate the deltas in the dates with no observation.
 
-Aftetr the NdVI processing is performed, we generate the mask array according to the logic explained before.
+After the NdVI processing is performed, we generate the mask array according to the logic explained before.
+
+## 6_append_coords_to_historic_ndvi.py
+This simplifies use of the historic NDVI data set by
+- appending x and y coordinates
+- reduces file size by using compression
+- and uses a better chunking structure to facilitate appending new NDVI data
