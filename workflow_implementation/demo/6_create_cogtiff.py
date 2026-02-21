@@ -13,7 +13,7 @@ mask_path = "../../data/input/forest_mask.npy"
 
 os.makedirs(COG_TIFF_FOLDER, exist_ok=True)
 
-def create_tiff(map_array, map_mask, pixel,threshold, mask):
+def create_tiff(map_array, map_mask, pixel,threshold, mask): # TODO: this is not used. Please ensure code below uses this.
 
     if (np.sum((map_mask == 3)|(map_mask == 1))/ len(mask)) > threshold:
 

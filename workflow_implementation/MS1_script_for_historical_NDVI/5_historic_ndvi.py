@@ -173,7 +173,7 @@ if __name__ == "__main__":
     if os.path.exists(OUT_PATH):
         shutil.rmtree(OUT_PATH)
 
-    # Write using zarr version 2 to avoid new v3 codec/BytesBytesCodec mismatch
+    # Write using zarr version 2 to avoid new v3 codec/BytesBytesCodec mismatch # TODO: note below is still specifying v3
     out_ds.to_zarr(OUT_PATH, mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=3)
 
     print("done")

@@ -10,7 +10,7 @@ import os
 
 # SOURCE_ZARR = "/data_3/scratch/francesco/processed/ndvi_dataset_spatial.zarr" # TODO ==> appears renamed to all_ndvi_dataset_spatial.zarr
 # TRANSPOSED_ZARR = "/data_3/scratch/francesco/processed/ndvi_dataset_temporal.zarr"
-SOURCE_ZARR = "../../data/output/01_all_ndvi_dataset_spatial_2.zarr"    # from the script 1, will be deleted
+SOURCE_ZARR = "../../data/output/01_all_ndvi_dataset_spatial_2.zarr"    # from the script 1, will be deleted (if line 58 uncommented)
 TRANSPOSED_ZARR = "../../data/output/02-03_ndvi_dataset_temporal.zarr"
 DASK_TEMP_DIR = "../../data/temporary"
 
