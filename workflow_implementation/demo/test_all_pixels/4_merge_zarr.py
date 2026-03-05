@@ -12,23 +12,12 @@ import dask.array as da
 import shutil
 from dask.distributed import Client
 import multiprocessing
-import dask
-from zarr.codecs import ZstdCodec
 
 #  nohup python -u /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py > /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.log 2>&1 &
 
 
 if __name__ == "__main__":
     
-    n_workers = 20
-    client = Client(
-        n_workers=n_workers,
-        threads_per_worker=1,
-        memory_limit="8GB",  
-        dashboard_address=":8787"
-    )
-    print(client.dashboard_link)
-
     # Two inputs from outside the workflow: # TODO: replace these two with data from the workflow.
     historical_ndvi_src = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_processed_all_pixels_v3_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
     lookuptable_src = "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/data_for_demo/lookup_table.zarr" # TODO: can we replace this with:  "../../data/output/00_lookup_table_median_ndvi.zarr" ?
@@ -37,8 +26,8 @@ if __name__ == "__main__":
     # TODO: should we: check if 00_lookup_table_median_ndvi.zarr exists? If it doesn't then run 1x a function that replaces 0_create_lookup_table.py ?
 
     SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" # the zarr from script 3
-    OUT_ZARR_TMP = "../../data/temporary_demo.zarr"          # TODO: what does this file represent?
-    OUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi_compressed.zarr"       # TODO: what does this file represent? Is it the updated historical_ndvi ? So in the real workflow this is the same as SOURCE_ZARR?
+    OUT_ZARR_TMP = "/mnt/data1/UniBe-swiss-ndvi/data/temporary_demo.zarr"          # TODO: what does this file represent?
+    base_out_dir = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi"       # TODO: what does this file represent? Is it the updated historical_ndvi ? So in the real workflow this is the same as SOURCE_ZARR?
 
     # =====================================================
     #  Load Source Dataset lazily (no xarray metadata needed)
@@ -46,9 +35,6 @@ if __name__ == "__main__":
 
     DATE_CHUNKS = 365
     PIXEL_CHUNKS = 5000
-
-    if os.path.exists(OUT_ZARR):
-        shutil.rmtree(OUT_ZARR, ignore_errors=True)
 
     last_date_historical = "2025-11-30"
     start_dates = np.datetime64("2025-12-01", "D")
@@ -138,7 +124,7 @@ if __name__ == "__main__":
 
 
     # --- load historic dataset and drop doy ------------------------------------
-    historical_ndvi = xr.open_zarr(historical_ndvi_src).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+    historical_ndvi = xr.open_zarr(historical_ndvi_src, chunks={})
 
     # Keep only dates up to last_date_historical
     historic_ds = historical_ndvi.sel(date=slice(None, last_date_historical))
@@ -156,7 +142,8 @@ if __name__ == "__main__":
     )
 
     # --- load new daily data ---------------------------------------------------
-    ds_to_stack = xr.open_zarr(OUT_ZARR_TMP).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+    ds_to_stack = xr.open_zarr(OUT_ZARR_TMP, chunks={})  # NO chunking
+
 
     # ds_to_stack has: coords pixel, date; vars ndvi, obs
     # Rename obs -> obs_date so names match historic
@@ -178,72 +165,40 @@ if __name__ == "__main__":
 
     date_stack = merged_ds["date"].astype("datetime64[D]")
 
-    lookuptable = xr.open_zarr(lookuptable_src).chunk({
-    "pixel": PIXEL_CHUNKS, 
-    "doy": DATE_CHUNKS })
+    years = pd.DatetimeIndex(date_stack).year   
 
-    doy = date_stack.dt.dayofyear
-    doy_array_fixed = np.where(doy.values == 366, 365, doy.values)
-    median_ndvi = lookuptable.sel(doy=xr.DataArray(doy_array_fixed, dims="date"))
+    # Years: 2017-2026
+    YEARS = list(range(2017, 2027))
 
-    merged_ds = merged_ds.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+    for year in YEARS:
 
+        year_dates = merged_ds.date.dt.year == year
+        year_ds = merged_ds.isel(date=year_dates)
 
-    # =====================================================
-    # Build final dataset (unchanged)
-    # =====================================================
-    out_ds = xr.Dataset(
-        {
-            "ndvi": merged_ds["ndvi"],
-            "median_ndvi": median_ndvi["median_ndvi"],
-            "obs_date": merged_ds["obs_date"],
-        },
-        coords={
-            "pixel": merged_ds.pixel,
-            "date": date_stack,
-            "x": merged_ds["x"],
-            "y": merged_ds["y"],
-        },
-    )
+        year_ds = year_ds.load()
 
-    # Drop doy if present
-    if "doy" in out_ds.coords:
-        out_ds = out_ds.drop_vars("doy")
-    if "doy" in out_ds.data_vars:
-        out_ds = out_ds.drop_vars("doy")
-
-    # =====================================================
-    # V3-ONLY COMPRESSION 
-    # =====================================================
-
-    for var_name in ["ndvi", "median_ndvi"]:
-        out_ds[var_name].encoding = {
-            "dtype": "int16",
-            "scale_factor": 0.001,
-            "add_offset": 0,
-            "_FillValue": -32768,
-            "compressors": [ZstdCodec(level=15)]
-        }
-
-    out_ds["obs_date"].encoding = {
-    "dtype": "bool",
-    "compressors": [ZstdCodec(level=15)]
-    }
-
-    for coord in ["x", "y", "pixel", "date"]:
-        if coord in out_ds.coords:
-            out_ds[coord].encoding = {}
-
-    # WRITE
-    with dask.config.set({"array.chunk-size": "128MB"}):
-        out_ds.to_zarr(
-            OUT_ZARR,
-            mode="w",
-            consolidated=True,
-            safe_chunks=False
+        out_ds_year = xr.Dataset(
+            {
+                "ndvi": year_ds["ndvi"], 
+                "obs_date": year_ds["obs_date"],
+            },
+            coords={
+                "pixel": year_ds.pixel,
+                "date": year_ds.date,
+                "x": year_ds["x"],
+                "y": year_ds["y"],
+            },
         )
-    print("Done")
+        
+        out_ds_year["obs_date"].encoding = {"dtype": "bool"}
+        
+        for coord in ["x", "y", "pixel", "date"]:
+            out_ds_year[coord].encoding = {}
+        
+        # Write to year-specific folder
+        year_out_zarr = f"{base_out_dir}/{year}.zarr"
+        print(f"Writing {year}: {len(year_ds.date)} dates to {year_out_zarr}")
 
-    # clean
-    client.close()
-    shutil.rmtree(OUT_ZARR_TMP)
+        out_ds_year.to_zarr(year_out_zarr, mode="w", consolidated=True)
+
+    print("All done")

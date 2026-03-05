@@ -10,9 +10,10 @@ import statsmodels.api as sm
 import os
 import shutil
 
-SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi_compressed.zarr"  # This is the OUT_ZARR from script 4
+SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi/"  # This is the OUT_ZARR from script 4
 OUTPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed_ndvi.zarr"
-local_tmp = "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/data/temporary"
+local_tmp  = "/mnt/data1/UniBe-swiss-ndvi/data/temporary_demo.zarr" 
+lookuptable_src = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
 
 # N_WORKERS = 2
 
@@ -295,7 +296,6 @@ if __name__ == '__main__':
     except FileNotFoundError:
         pass
     except OSError:
-        # If not empty or in use, leave it
         pass
 
     os.makedirs(local_tmp, exist_ok=True)
@@ -319,11 +319,45 @@ if __name__ == '__main__':
     #if os.path.exists(OUTPUT_ZARR):
     #    shutil.rmtree(OUTPUT_ZARR)
 
-    ds = xr.open_zarr(SOURCE_ZARR, consolidated=True)
+    start_date = "2025-12-01"
+    end_date = "2026-02-16"
+
+    start_year = int(start_date[:4])
+    end_year = int(end_date[:4])
+    years = [start_year] if start_year == end_year else [start_year, end_year]
+
+    if len(years) == 1:
+        source_zarr = os.path.join(SOURCE_ZARR, f"{years[0]}.zarr")
+        ds = xr.open_zarr(source_zarr, consolidated=True)
+
+    else:
+        source_zarr_1 = os.path.join(SOURCE_ZARR, f"{years[0]}.zarr")
+        source_zarr_2 = os.path.join(SOURCE_ZARR, f"{years[1]}.zarr")
+
+        zarr_1 = xr.open_zarr(source_zarr_1, consolidated=True)
+        zarr_2 = xr.open_zarr(source_zarr_2, consolidated=True)
+
+        ds = xr.concat(
+            [zarr_1, zarr_2],
+            dim="date",
+        ).sortby("date")
+
+    # align median NDVI to the observed NDVI
+
+    lookuptable = xr.open_zarr(lookuptable_src, consolidated=False)
+
+    print(lookuptable)
+
+    doy = ds["date"].dt.dayofyear
+
+    doy_fixed = xr.where(doy == 366, 365, doy)
+
+    median_ndvi = lookuptable["median_ndvi"].sel(doy=doy_fixed)
+
+    ds["median_ndvi"] = median_ndvi
 
     dates = ds["date"] 
     bool_dates = ds["obs_date"].chunk({"date": -1})
-
 
     current_date = dates[-1] #np.datetime64("2025-12-01") # TODO: what values should we specify here? What does current_date represent?
 
@@ -364,12 +398,12 @@ if __name__ == '__main__':
     )
 
     # Chunk explicitly to avoid Dask graph explosion
-    out_ds = out_ds.chunk({"pixel": 5000, "date": -1})
+    out_ds = out_ds.chunk({"pixel": 10000, "date": -1})
 
     # Remove leftover compressor info if copying from another dataset
-    for v in out_ds.data_vars:
-        out_ds[v].encoding.pop("compressor", None)
-        out_ds[v].encoding.setdefault("chunks", None)
+    for var in out_ds.variables:
+        out_ds[var].encoding.pop("compressor", None)
+        out_ds[var].encoding.pop("chunks", None)
 
     # Write to Zarr
     #
