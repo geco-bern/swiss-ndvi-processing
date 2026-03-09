@@ -7,6 +7,7 @@ import requests
 import pandas as pd
 import pystac_client
 import zarr
+import argparse
 
 SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" # the transposed zarr from script 2. Will be modified by script 3.
 
@@ -47,5 +48,14 @@ def get_swisstopo_sentinel_dates(start='2025-12-01', end='2026-02-16'):
     root['date'][:] = pd_dates_str.values.astype('S10')
     
 if __name__ == "__main__":
-    get_swisstopo_sentinel_dates()
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
+    parser.add_argument("end_date", help="End date in YYYY-MM-DD")
+    args = parser.parse_args()
+
+    start_date = args.start_date
+    end_date = args.end_date
+
+    get_swisstopo_sentinel_dates(start=start_date, end=end_date)
     print("Dates added to Zarr dataset.")

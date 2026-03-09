@@ -9,6 +9,10 @@ from dask.distributed import Client
 import statsmodels.api as sm
 import os
 import shutil
+import requests
+import pandas as pd
+import pystac_client
+import argparse
 
 SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi/"  # This is the OUT_ZARR from script 4
 OUTPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed_ndvi.zarr"
@@ -16,6 +20,40 @@ local_tmp  = "/mnt/data1/UniBe-swiss-ndvi/data/temporary_demo.zarr"
 lookuptable_src = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
 
 # N_WORKERS = 2
+
+# return the dates to analyse
+
+def get_swisstopo_sentinel_dates(start='2025-12-01', end='2026-02-16'):
+
+    # Connect to Swisstopo STAC API
+    service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
+    service.add_conforms_to("COLLECTIONS")
+    service.add_conforms_to("ITEM_SEARCH")
+
+    bbox_swiss_4326 = [5.70, 45.8, 10.6, 47.95]
+
+    item_search = service.search(
+        bbox=bbox_swiss_4326,
+        datetime=f'{start}/{end}',
+        collections=['ch.swisstopo.swisseo_s2-sr_v100']
+    )
+    s2_files = list(item_search.items())
+
+    dates = []
+    for item in s2_files:
+        assets = item.assets
+        asset_key_metadata = next((key for key in assets.keys() if key.endswith('metadata.json')), None)
+        metadata_asset = assets[asset_key_metadata]
+        json_link_metadata = metadata_asset.href
+        response = requests.get(json_link_metadata)
+        metadata_json = response.json()
+        dates.append(metadata_json['BANDS-10M']['SOURCE_COLLECTION_PROPERTIES']['date'])
+
+    # Convert to datetime64[D] array
+    pd_dates = pd.to_datetime(dates)
+    dates_array = pd_dates.values.astype('datetime64[D]')
+
+    return dates_array
 
 def smoothing_and_gapfilling(ndvi_arr, median_ndvi_arr, last_array_dates_idx,
                              last_delta, current_delta, deltas_arr,current_date_idx, pot_outlier_present):
@@ -78,7 +116,7 @@ def smoothing_and_gapfilling(ndvi_arr, median_ndvi_arr, last_array_dates_idx,
     return ndvi_arr
 
 
-def continous_analysis(ndvi_arr_2, median_arr,bool_dates,first_date, dates_arr, current_date):
+def continous_analysis(ndvi_arr_2, median_arr,bool_dates,first_date, full_dates, current_date):
         
     # placeholder for dates to generate the tiff
     mask_ndvi_arr_2  = np.empty(len(bool_dates), dtype=np.int8)
@@ -91,7 +129,7 @@ def continous_analysis(ndvi_arr_2, median_arr,bool_dates,first_date, dates_arr, 
     ndvi_subset = ndvi_arr_2[:int(current_date_idx)]
     ndvi_subset_mask = ndvi_arr_2[:int(current_date_idx)]
     median_subset = median_arr[:int(current_date_idx)]
-    date_subset = dates_arr[:int(current_date_idx)]
+    date_subset = full_dates[:int(current_date_idx)]
     bool_subset = bool_dates[:int(current_date_idx)]
     bool_arr_mask = bool_dates[:int(current_date_idx)]
 
@@ -272,16 +310,24 @@ def continous_analysis(ndvi_arr_2, median_arr,bool_dates,first_date, dates_arr, 
         return ndvi_arr_2, mask_ndvi_arr_2
 
 
-def continuous_ndvi(ndvi_arr, median_arr,bool_dates,*, dates_arr, current_date):
+def continuous_ndvi(ndvi_arr, median_arr,bool_dates,*, full_dates, dates_array):
 
     # coerce shapes: ensure 1D
     ndvi_arr_2 = np.asarray(ndvi_arr).copy().ravel()
     median_arr = np.asarray(median_arr).ravel()
-    dates_arr = np.asarray(dates_arr).astype("datetime64[D]").ravel()
+    full_dates = np.asarray(full_dates).astype("datetime64[D]").ravel()
     bool_dates = np.asarray(bool_dates).ravel()
-    first_date = dates_arr[0].astype("datetime64[D]")
+    first_date = full_dates[0].astype("datetime64[D]")
+    mask_ndvi_arr = np.zeros_like(ndvi_arr_2, dtype=np.int8)
 
-    ndvi_arr_2,mask_ndvi_arr = continous_analysis(ndvi_arr_2, median_arr,bool_dates,first_date, dates_arr, current_date)
+    for current_date in np.sort(dates_array):
+
+        ndvi_arr_2,mask_for_date = continous_analysis(ndvi_arr_2, median_arr,bool_dates,first_date, full_dates, current_date)
+
+        current_date_idx = int((current_date - first_date) / np.timedelta64(1, "D"))
+
+        # in this way it updates only the current value
+        mask_ndvi_arr[current_date_idx] = mask_for_date[current_date_idx]
 
     return ndvi_arr_2, mask_ndvi_arr
 
@@ -319,8 +365,16 @@ if __name__ == '__main__':
     #if os.path.exists(OUTPUT_ZARR):
     #    shutil.rmtree(OUTPUT_ZARR)
 
-    start_date = "2025-12-01"
-    end_date = "2026-02-16"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
+    parser.add_argument("end_date", help="End date in YYYY-MM-DD")
+    args = parser.parse_args()
+
+    start_date = args.start_date
+    end_date = args.end_date
+
+    # get the array date to loop
+    dates_array = get_swisstopo_sentinel_dates(start=start_date, end=end_date)
 
     start_year = int(start_date[:4])
     end_year = int(end_date[:4])
@@ -346,8 +400,6 @@ if __name__ == '__main__':
 
     lookuptable = xr.open_zarr(lookuptable_src, consolidated=False)
 
-    print(lookuptable)
-
     doy = ds["date"].dt.dayofyear
 
     doy_fixed = xr.where(doy == 366, 365, doy)
@@ -359,14 +411,12 @@ if __name__ == '__main__':
     dates = ds["date"] 
     bool_dates = ds["obs_date"].chunk({"date": -1})
 
-    current_date = dates[-1] #np.datetime64("2025-12-01") # TODO: what values should we specify here? What does current_date represent?
-
     ndvi_array = ds["ndvi"]
     median_array = ds["median_ndvi"]
     ndvi_array = ndvi_array.chunk({"date": -1})
     median_array = median_array.chunk({"date": -1})
 
-
+    
     ndvi_arr, mask_ndvi_arr = xr.apply_ufunc(
         continuous_ndvi,
         ndvi_array,
@@ -377,8 +427,8 @@ if __name__ == '__main__':
         vectorize=True,
         dask="parallelized",
         kwargs={
-            "dates_arr" : dates,
-            "current_date": current_date
+            "full_dates" : dates,
+            "dates_array": dates_array
         },
         output_dtypes=[ndvi_array.dtype,ndvi_array.dtype],
         dask_gufunc_kwargs={"allow_rechunk": True},

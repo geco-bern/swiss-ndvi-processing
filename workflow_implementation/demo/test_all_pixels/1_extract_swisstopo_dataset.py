@@ -16,13 +16,20 @@ import zarr
 from tqdm import tqdm
 from rasterio.windows import from_bounds
 from rasterio.warp import reproject, Resampling
+import argparse
 
-start_date = "2025-12-01"
-end_date = "2026-02-16"
+parser = argparse.ArgumentParser()
+parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
+parser.add_argument("end_date", help="End date in YYYY-MM-DD")
+args = parser.parse_args()
+
+start_date = args.start_date
+end_date = args.end_date
+
 date_range = f"{start_date}/{end_date}"
 
 # OUTPUT_PATH = "/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr"
-OUTPUT_PATH = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/01_ndvi_dataset_spatial_.zarr"     # TODO: why is this called 'all_'? It is not all time steps, but only newly downloaded data. NOTE: all refers to "pixel"
+OUTPUT_PATH = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/01_ndvi_dataset_spatial_.zarr"
 # Connect to Swisstopo STAC API
 service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
 service.add_conforms_to("COLLECTIONS")

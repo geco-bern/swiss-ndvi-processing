@@ -12,6 +12,7 @@ import dask.array as da
 import shutil
 from dask.distributed import Client
 import multiprocessing
+import argparse
 
 #  nohup python -u /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py > /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.log 2>&1 &
 
@@ -20,11 +21,6 @@ if __name__ == "__main__":
     
     # Two inputs from outside the workflow: # TODO: replace these two with data from the workflow.
     historical_ndvi_src = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_processed_all_pixels_v3_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
-    lookuptable_src = "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/data_for_demo/lookup_table.zarr" # TODO: can we replace this with:  "../../data/output/00_lookup_table_median_ndvi.zarr" ?
-    # historical_ndvi_src = "../../data/output/04_merged_ndvi.zarr" # TODO: I guess this would be what we want. Right Francesco ??
-    # lookuptable_src = "../../data/output/00_lookup_table_median_ndvi.zarr" # TODO: can we replace this with:  "../../data/output/00_lookup_table_median_ndvi.zarr" ?
-    # TODO: should we: check if 00_lookup_table_median_ndvi.zarr exists? If it doesn't then run 1x a function that replaces 0_create_lookup_table.py ?
-
     SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" # the zarr from script 3
     OUT_ZARR_TMP = "/mnt/data1/UniBe-swiss-ndvi/data/temporary_demo.zarr"          # TODO: what does this file represent?
     base_out_dir = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi"       # TODO: what does this file represent? Is it the updated historical_ndvi ? So in the real workflow this is the same as SOURCE_ZARR?
@@ -37,8 +33,18 @@ if __name__ == "__main__":
     PIXEL_CHUNKS = 5000
 
     last_date_historical = "2025-11-30"
-    start_dates = np.datetime64("2025-12-01", "D")
-    end_dates = np.datetime64("2026-02-12", "D")
+    
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
+    parser.add_argument("end_date", help="End date in YYYY-MM-DD")
+    args = parser.parse_args()
+
+    start_date = args.start_date
+    end_date = args.end_date
+
+    start_date = np.datetime64(start_date, "D")
+    end_date = np.datetime64(end_date, "D")
 
     ds0 = zarr.open_group(SOURCE_ZARR, mode="r")
     ndvi_z = ds0["ndvi"]
@@ -50,7 +56,7 @@ if __name__ == "__main__":
     dates = dates.compute()  # non-lazy
 
 
-    daily_dates = pd.date_range(start=start_dates, end=end_dates, freq="D")
+    daily_dates = pd.date_range(start=start_date, end=end_date, freq="D")
     print(f"Generated {len(daily_dates)} daily dates from {daily_dates.min().date()} to {daily_dates.max().date()}")
 
     obs_dates = daily_dates.isin(dates)
@@ -168,9 +174,11 @@ if __name__ == "__main__":
     years = pd.DatetimeIndex(date_stack).year   
 
     # Years: 2017-2026
-    YEARS = list(range(2017, 2027))
+    start_year = int(start_date[:4])
+    end_year = int(end_date[:4])
+    years = [start_year] if start_year == end_year else [start_year, end_year]
 
-    for year in YEARS:
+    for year in years:
 
         year_dates = merged_ds.date.dt.year == year
         year_ds = merged_ds.isel(date=year_dates)
