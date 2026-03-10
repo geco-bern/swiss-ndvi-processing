@@ -4,5 +4,12 @@
     "python.defaultInterpreterPath": "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python3",
     "python.useEnvironmentsExtension": true,
     "python.terminal.activateEnvironment": true,
-    "python.terminal.activateEnvInCurrentTerminal": true
+    "python.terminal.activateEnvInCurrentTerminal": true,
+    "cSpell.words": [
+        "NDVI",
+        "swisstopo",
+        "tunder",
+        "cogtiff",
+        "zarr"
+    ]
 }

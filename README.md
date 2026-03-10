@@ -6,7 +6,7 @@ To use the package, you have to install the required libraries using pip
 
 ### Setup with pip
 Follow the steps outlined in `workflow_implementation/demo/00_setup.sh`.
-They create a new virtual environment `ndvi` and install the necessary packages
+They create a new virtual environment `NDVI` and install the necessary packages
 with `pip`.
 
 # Requirements
@@ -27,15 +27,15 @@ The script 0 contains the code to generate the means of upper and lower bands us
 To process the data, 2 dataset are needed. 
 
 - The historical NDVI processing with all the past observation.
-- The lookup table containg the means upper and lower precomputed per doy for each pixels
+- The lookup table contains the means upper and lower precomputed per doy for each pixels
 
 Both dataset are already generated and are stored inside the workstation. We upload the dataset for the demo in [data folder](data_for_demo).
 
 Below I'll explain how to use the demo. The intermediate data generated from step 1 to step 3 contains all the pixels (105M) and cannot be uploaded on Github. For this reason the only lines of code to change are the ones used to store the intermediate files. The storage size needed is in order of hundreds of GB.
 
-## Simulate the continous NDVI processing
+## Simulate the continuous NDVI processing
 
-To simulate the continous NDVI processing, the first step is to download the data.
+To simulate the continuous NDVI processing, the first step is to download the data.
 
 ### Download the data
 
@@ -44,7 +44,7 @@ The script [1_extract_swisstopo_dataset.py](workflow_implementation/demo/1_extra
 The script download the forest mask and the satellite bands to compute NDVI and NDSI.
  
 in [line 124](workflow_implementation/demo/1_extract_swisstopo_dataset.py#L124)
- is it possible to select the time window to simulate the continous ingestion. I select to ingest data from 2018-06-01 to 2018-06-05.
+ is it possible to select the time window to simulate the continuous ingestion. I select to ingest data from 2018-06-01 to 2018-06-05.
 
 #### Required parameter to modify inside the script
 
@@ -62,7 +62,7 @@ The script step [2_transpose_swisstopo_dataset.py](workflow_implementation/demo/
 
 ### Add the new date
 
-The script (3_add_dates.py)[workflow_implementation/demo/3_add_dates.py] will download the new date where an observation in present, extented to be evenly spacing at daily resoultion and create the mask of where an observation is found (this mask in used in continous ndvi setup)
+The script (3_add_dates.py)[workflow_implementation/demo/3_add_dates.py] will download the new date where an observation in present, extended to be evenly spacing at daily resolution and create the mask of where an observation is found (this mask in used in continuous NDVI setup)
 
 #### Required parameter to modify inside the script
 
@@ -70,7 +70,7 @@ There is nothing to modify here
 
 ### Merge the historical dataset with the new data set
 
-To run the analysis, it is necessary to have the historical analysis and the newly acquired data. The script [4_merge_zarr.py](workflow_implementation/demo/4_merge_zarr.py) will load both dataset and merged togheter. The new median ndvi data will be added using the lookup table.
+To run the analysis, it is necessary to have the historical analysis and the newly acquired data. The script [4_merge_zarr.py](workflow_implementation/demo/4_merge_zarr.py) will load both dataset and merged together. The new median NDVI data will be added using the lookup table.
 
 #### Required parameter to modify inside the script
 
