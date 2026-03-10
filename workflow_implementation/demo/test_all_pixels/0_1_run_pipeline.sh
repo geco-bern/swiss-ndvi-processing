@@ -40,16 +40,6 @@ format_seconds() {
   printf "%02d:%02d:%02d" $((s/3600)) $(((s%3600)/60)) $((s%60))
 }
 
-# This function will check if there are new satellite images.
-# No satellite images -> folder empty
-
-is_directory_empty() {
-  local dir="$1"
-  # Check if directory exists and is empty (excluding . and ..)
-  [ -d "$dir" ] && [ -z "$(find "$dir" -mindepth 1 -print -quit 2>/dev/null)" ]
-}
-
-
 
 # ============================================================
 # Start pipeline
@@ -75,11 +65,6 @@ echo "Python executable: $(which python)"
 echo "Python version: $(python --version)"
 echo
 
-# remove all the data 
-
-rm -rf /mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr
-rm -rf /mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/01_ndvi_dataset_spatial_.zarr
-
 # ============================================================
 # Run scripts sequentially
 # ============================================================
@@ -89,79 +74,97 @@ PIPELINE_START=$(date +%s)
 # Define start and end
 # ============================================================
 # Read previous start date from file, or use default
-START_DATE=$(python "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/00_get_last_date.py")
-END_DATE="${2:-$(date +%Y-%m-%d)}"
+START_DATE=$(python "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/0_2_get_last_date.py")
+echo $START_DATE
+# END_DATE="${2:-$(date +%Y-%m-%d)}" # TODO activate this for
+END_DATE="2025-12-12" # TODO: deactivate this
 
-
-# ============================================================
-# Run script 1 and check results
-# ============================================================
-CURRENT_SCRIPT="${SCRIPTS[0]}"
+echo "Running: with arguments: $START_DATE $END_DATE"
 echo "------------------------------------------------------------"
-echo "Running: $CURRENT_SCRIPT"
-echo "Start time: $(timestamp)"
-echo
 
+# ============================================================
+# run script 01 and check results
+echo "------------------------------------------------------------"
+echo "Running: $SCRIPTS[0]"; echo "Start time: $(timestamp)"
 START_TIME=$(date +%s)
-python "$CURRENT_SCRIPT" "$START_DATE" "$END_DATE"
+echo python "${SCRIPTS[0]}" "$START_DATE" "$END_DATE" # TODO: remove echo to activate python script
 END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
-
-echo "Finished: $CURRENT_SCRIPT"
-echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+echo "Finished: $SCRIPTS[0]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 echo
 
+
+# ============================================================
+# Run scripts 2-6
+# ============================================================
 # Check if data directory is empty (no satellite images found)
-if is_directory_empty "$DATA_DIR"; then
-  echo "------------------------------------------------------------"
-  echo "NO SATELLITE IMAGES FOUND for $START_DATE/$END_DATE"
-  echo "Data directory is empty: $DATA_DIR"
-  echo "Skipping scripts 2-6 and updating date for next run"
-  echo "------------------------------------------------------------"
+if [ -z "$(find /mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_01_downloadedA.zarr -mindepth 1 -print -quit)" ]; then
+    echo "------------------------------------------------------------"
+    echo "NO SATELLITE IMAGES FOUND for $START_DATE/$END_DATE"
+    echo "Data directory is empty: /mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_01_downloadedA.zarr"
+    echo "Skipping execution of scripts 2-6"
+    echo "------------------------------------------------------------"
 else
   echo "Satellite images found. Continuing with full pipeline..."
   echo
 
-  # ============================================================
-  # Run scripts 2-6
-  # ============================================================
-  for i in {1..5}; do
-    SCRIPT="${SCRIPTS[$i]}"
-    CURRENT_SCRIPT="$SCRIPT"
-
-    if [[ ! -f "$SCRIPT" ]]; then
-      echo "[ERROR] Script not found: $SCRIPT"
-      exit 1
-    fi
-
-    echo "------------------------------------------------------------"
-    echo "Running: $SCRIPT"
-    echo "Start time: $(timestamp)"
-
-    START_TIME=$(date +%s)
-
-    case "$SCRIPT" in
-      *"/3_add_dates.py" | *"/4_merge_zarr.py" | *"/5_analyse_demo.py" | *"/6_create_cogtiff.py")
-        python "$SCRIPT" "$START_DATE" "$END_DATE"
-        ;;
-      *)
-        python "$SCRIPT"
-        ;;
-    esac
-
-
+  # run script 02
+  echo "------------------------------------------------------------"
+  echo "Running: $SCRIPTS[1]"; echo "Start time: $(timestamp)"
+  START_TIME=$(date +%s)
+  echo python "${SCRIPTS[1]}" # TODO: remove echo to activate python script
   END_TIME=$(date +%s)
-
-
   ELAPSED=$((END_TIME - START_TIME))
+  echo "Finished: $SCRIPTS[1]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 
-  echo "Finished: $SCRIPT"
-  echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
-  echo
-done
+  # run script 03
+  echo "------------------------------------------------------------"
+  echo "Running: $SCRIPTS[2]"; echo "Start time: $(timestamp)"
+  START_TIME=$(date +%s)
+  echo python "${SCRIPTS[2]}" "$START_DATE" "$END_DATE" # TODO: remove echo to activate python script
+  END_TIME=$(date +%s)
+  ELAPSED=$((END_TIME - START_TIME))
+  echo "Finished: $SCRIPTS[2]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+
+  # run script 04
+  echo "------------------------------------------------------------"
+  echo "Running: $SCRIPTS[3]"; echo "Start time: $(timestamp)"
+  START_TIME=$(date +%s)
+  echo python "${SCRIPTS[3]}" "$START_DATE" "$END_DATE" # TODO: remove echo to activate python script
+  END_TIME=$(date +%s)
+  ELAPSED=$((END_TIME - START_TIME))
+  echo "Finished: $SCRIPTS[3]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+
+  # run script 05
+  echo "------------------------------------------------------------"
+  echo "Running: $SCRIPTS[4]"; echo "Start time: $(timestamp)"
+  START_TIME=$(date +%s)
+  echo python "${SCRIPTS[4]}" "$START_DATE" "$END_DATE" # TODO: remove echo to activate python script
+  END_TIME=$(date +%s)
+  ELAPSED=$((END_TIME - START_TIME))
+  echo "Finished: $SCRIPTS[4]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+
+  # run script 06
+  echo "------------------------------------------------------------"
+  echo "Running: $SCRIPTS[5]"; echo "Start time: $(timestamp)"
+  START_TIME=$(date +%s)
+  echo python "${SCRIPTS[5]}" "$START_DATE" "$END_DATE" # TODO: remove echo to activate python script
+  END_TIME=$(date +%s)
+  ELAPSED=$((END_TIME - START_TIME))
+  echo "Finished: $SCRIPTS[5]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+fi
 
 PIPELINE_END=$(date +%s)
 PIPELINE_TIME=$((PIPELINE_END - PIPELINE_START))
+
+# ============================================================
+# Clean up temporary output data
+# ============================================================
+
+# TODO: rm -rf /mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr
+# TODO: rm -rf /mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/tmp_ndvi_02-03_downloadedB.zarr
+# TODO: rm -rf /mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/01_ndvi_dataset_spatial_.zarr
+# TODO: rm -rf /mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_01_downloadedA.zarr # not needed if we store into /var/tmp/
 
 # ============================================================
 # Finish pipeline
