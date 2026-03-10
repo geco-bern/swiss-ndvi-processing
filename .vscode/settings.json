@@ -1,6 +1,12 @@
 {
-    "python-envs.pythonProjects": [],
-    "python.REPL.sendToNativeREPL": false,
+    "python-envs.pythonProjects": [
+        {
+            "path": ".",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ],
+    "python.REPL.sendToNativeREPL": true,
     "python.defaultInterpreterPath": "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python3",
     "python.useEnvironmentsExtension": true,
     "python.terminal.activateEnvironment": true,

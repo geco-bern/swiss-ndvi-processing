@@ -20,7 +20,7 @@ import argparse
 if __name__ == "__main__":
     
     # Two inputs from outside the workflow: # TODO: replace these two with data from the workflow.
-    historical_ndvi_src = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_processed_all_pixels_v3_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+    historical_ndvi_src = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v3_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
     SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" # the zarr from script 3
     OUT_ZARR_TMP = "/mnt/data1/UniBe-swiss-ndvi/data/temporary_demo.zarr"          # TODO: what does this file represent?
     base_out_dir = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi"       # TODO: what does this file represent? Is it the updated historical_ndvi ? So in the real workflow this is the same as SOURCE_ZARR?
