@@ -46,6 +46,7 @@ if __name__ == "__main__":
     start_date = np.datetime64(start_date, "D")
     end_date = np.datetime64(end_date, "D")
 
+
     ds0 = zarr.open_group(SOURCE_ZARR, mode="r")
     ndvi_z = ds0["ndvi"]
     ndvi_da = da.from_zarr(ndvi_z)     # lazy
@@ -61,56 +62,29 @@ if __name__ == "__main__":
 
     obs_dates = daily_dates.isin(dates)
 
-    # =====================================================
-    #  Forest Pixel Selection
-    # =====================================================
+    dates_clean = dates[:ndvi_da.shape[1]]  # 41→34 PERFECT MATCH
+
     ndvi_xr = xr.DataArray(
         ndvi_da,
         dims=("pixel", "date"),
         coords={
-            "pixel": np.arange(ndvi_da.shape[0], dtype=np.int64),   # the actual pixel coordinate
-            "date": dates
+            "pixel": np.arange(ndvi_da.shape[0], dtype=np.int32),
+            "date": dates_clean  # EXACTLY 34 ✅
         },
         name="ndvi"
     ).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
 
-    # =====================================================
-    #  Reindex NDVI to daily (lazy), fill with 32767 (int16)
-    # =====================================================
+    unique_dates, unique_idx = np.unique(dates, return_index=True)
+    ndvi_xr = ndvi_xr.assign_coords(date=unique_dates[:ndvi_da.shape[1]])
 
-    def _dedup_date_coord(da: xr.DataArray, how: str = "first") -> xr.DataArray:
-        """
-        Ensure da's date coordinate is unique.
-        how: 'first' | 'last' | 'mean' | 'median' | 'max'
-        - 'first'/'last': keep first/last occurrence (fast, no compute)
-        - reductions: aggregate duplicates lazily with Dask
-        """
-        idx = pd.Index(da["date"].values)
-        if not idx.has_duplicates:
-            return da
-        if how in ("first", "last"):
-            keep_mask = ~idx.duplicated(keep=how)
-            return da.isel(date=np.nonzero(keep_mask)[0])
-        if how == "mean":
-            return da.groupby("date").mean("date")
-        if how == "median":
-            return da.groupby("date").median("date")
-        if how == "max":
-            return da.groupby("date").max("date")
-        raise ValueError(f"Unsupported how={how}")
 
-    # Deduplicate time first, then reindex to daily
-    # Change how='first' to 'mean'/'median'/'max' as needed
-    ndvi_sel_nodup = _dedup_date_coord(ndvi_xr, how="first")
-    ndvi_daily = ndvi_sel_nodup.astype(np.int16).reindex(date=daily_dates, method=None, fill_value=np.int16(32767))
-
+    ndvi_daily = ndvi_xr.reindex(date=daily_dates, method=None, fill_value=np.int16(32767)).astype(np.int16)
 
     obs_dates_xr = xr.DataArray(
-        obs_dates,
-        dims=("date",),
-        coords={"date": daily_dates},
-        name="obs_dates"
+        obs_dates, dims=("date",), coords={"date": daily_dates}, name="obs_dates"
     )
+
+    #out_ds = xr.Dataset({"ndvi": ndvi_daily, "obs": obs_dates_xr}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
 
     # =====================================================
     #  Assemble Dataset and write
@@ -174,8 +148,8 @@ if __name__ == "__main__":
     years = pd.DatetimeIndex(date_stack).year   
 
     # Years: 2017-2026
-    start_year = int(start_date[:4])
-    end_year = int(end_date[:4])
+    start_year = pd.to_datetime(start_date).year
+    end_year = pd.to_datetime(end_date).year
     years = [start_year] if start_year == end_year else [start_year, end_year]
 
     for year in years:

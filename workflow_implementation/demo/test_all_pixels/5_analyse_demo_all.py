@@ -1,6 +1,6 @@
-# "Run Python File" in VSCode
+# This script is jsut to ensure that the data is collected as the step 4 and the mask_array is present in all the dates
 
-# nohup python -u /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo.py > /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo.log 2>&1 &
+# nohup python -u /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_all.py > /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_all.log 2>&1 &
 
 
 import numpy as np
@@ -16,10 +16,11 @@ import argparse
 
 SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi/"  # This is the OUT_ZARR from script 4
 OUTPUT_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/"
-OUTPUT_BASE_tmp = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/tmp.zarr" # here the computation will be written and then stacked to the OUTPUT_BSAE folder
+OUTPUT_BASE_tmp = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/tmp.zarr"
 local_tmp  = "/mnt/data1/UniBe-swiss-ndvi/data/temporary_demo.zarr" 
 lookuptable_src = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
 
+# N_WORKERS = 2
 
 # return the dates to analyse
 
@@ -365,46 +366,20 @@ if __name__ == '__main__':
     #if os.path.exists(OUTPUT_ZARR):
     #    shutil.rmtree(OUTPUT_ZARR)
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
-    parser.add_argument("end_date", help="End date in YYYY-MM-DD")
-    args = parser.parse_args()
+    years = list(range(2017, 2027))  # 2017-2026
+    zarr_list = [xr.open_zarr(os.path.join(SOURCE_ZARR, f"{y}.zarr"), consolidated=True) for y in years]
+    ds = xr.concat(zarr_list, dim="date").sortby("date")  # Combines all
 
-    start_date = args.start_date
-    end_date = args.end_date
+    # For dates_array, use full range:
+    dates_array = get_swisstopo_sentinel_dates(start="2017-01-01", end="2025-12-31")
 
-    # Left here just for quick debug = no shell
-    """start_date =  "2025-12-01"
-    end_date = "2026-03-09"""
-
-    start_date = np.datetime64(start_date, "D")
-    end_date = np.datetime64(end_date, "D")
-
-    # get the array date to loop
-    dates_array = get_swisstopo_sentinel_dates(start=start_date, end=end_date)
+    # append the last dates if not present
+    if dates_array[-1].astype('datetime64[D]') != np.datetime64('2025-12-31', 'D'):
+        dates_array = np.append(dates_array, np.datetime64('2025-12-31', 'D'))
 
     dates_array = np.sort(np.unique(dates_array))
 
-    end_year = int(end_date[:4])
-    start_year = end_year -1
-    
-    years = [start_year] if start_year == end_year else [start_year, end_year]
-
-    if len(years) == 1:
-        source_zarr = os.path.join(SOURCE_ZARR, f"{years[0]}.zarr")
-        ds = xr.open_zarr(source_zarr, consolidated=True)
-
-    else:
-        source_zarr_1 = os.path.join(SOURCE_ZARR, f"{years[0]}.zarr")
-        source_zarr_2 = os.path.join(SOURCE_ZARR, f"{years[1]}.zarr")
-
-        zarr_1 = xr.open_zarr(source_zarr_1, consolidated=True)
-        zarr_2 = xr.open_zarr(source_zarr_2, consolidated=True)
-
-        ds = xr.concat(
-            [zarr_1, zarr_2],
-            dim="date",
-        ).sortby("date")
+    print(len(dates_array))
 
     # align median NDVI to the observed NDVI
 
@@ -465,40 +440,43 @@ if __name__ == '__main__':
         out_ds[var].encoding.pop("compressor", None)
         out_ds[var].encoding.pop("chunks", None)
 
+    os.makedirs(OUTPUT_BASE, exist_ok=True)
     os.makedirs(OUTPUT_BASE_tmp, exist_ok=True)
     
     out_ds.to_zarr(OUTPUT_BASE_tmp, mode="w", consolidated=True, compute=True)
 
-    #  append new processed data to already present data
     tmp_ds = xr.open_zarr(OUTPUT_BASE_tmp, consolidated=True)
+
+
+    # slice results into years
+    start_year = 2017
+    end_year = 2026
+    years = list(range(start_year, end_year + 1))
 
     for year in years:
 
         year_output = os.path.join(OUTPUT_BASE, f"{year}.zarr")
 
-        year_dates = tmp_ds.date.where(tmp_ds.date.dt.year == year, drop=True)
-        
+        year_dates = tmp_ds.date.dt.year == year
+        year_ds = tmp_ds.isel(date=year_dates)
 
-        existing_ds = xr.open_zarr(year_output, consolidated=True)
-                
-        # Find dates in tmp that don't exist in target
-        existing_dates = set(existing_ds.date.values)
-        combined_ds = xr.concat([existing_ds, tmp_ds], dim="date").sortby("date")
-                    
-        # Clean encoding and save full combined dataset
-        combined_ds = combined_ds.chunk({"pixel": 10000, "date": -1})
-        for var in combined_ds.variables:
-            combined_ds[var].encoding.pop("compressor", None)
-            combined_ds[var].encoding.pop("chunks", None)
-                    
-        combined_ds.to_zarr(year_output, mode="w", consolidated=True, compute=True)
+        year_ds = year_ds.load()
+
+        year_ds = year_ds.chunk({"pixel": 10000, "date": -1})
+        
+        # Remove leftover compressor info if copying from another dataset
+        for var in year_ds.variables:
+            year_ds[var].encoding.pop("compressor", None)
+            year_ds[var].encoding.pop("chunks", None)
+        
+        # Write to year-specific folder
+        year_ds.to_zarr(year_output, mode="w", consolidated=True, compute=True)
 
     # Clean up tmp
-    try:
+    """try:
         shutil.rmtree(OUTPUT_BASE_tmp)
     except:
-        pass
-
+        pass"""
 
     print("Done")
 

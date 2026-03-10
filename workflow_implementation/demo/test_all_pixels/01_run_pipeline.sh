@@ -49,6 +49,17 @@ format_seconds() {
   printf "%02d:%02d:%02d" $((s/3600)) $(((s%3600)/60)) $((s%60))
 }
 
+# This function will check if there are new satellite images.
+# No satellite images -> folder empty
+
+is_directory_empty() {
+  local dir="$1"
+  # Check if directory exists and is empty (excluding . and ..)
+  [ -d "$dir" ] && [ -z "$(find "$dir" -mindepth 1 -print -quit 2>/dev/null)" ]
+}
+
+
+
 # ============================================================
 # Start pipeline
 # ============================================================
@@ -75,38 +86,71 @@ echo
 
 # remove all the data 
 
-rm -rf /mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/
+rm -rf /mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr
+rm -rf /mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/01_ndvi_dataset_spatial_.zarr
 
 # ============================================================
 # Run scripts sequentially
 # ============================================================
 PIPELINE_START=$(date +%s)
 
-for SCRIPT in "${SCRIPTS[@]}"; do
-  CURRENT_SCRIPT="$SCRIPT"
 
-  if [[ ! -f "$SCRIPT" ]]; then
-    echo "[ERROR] Script not found: $SCRIPT"
-    exit 1
-  fi
+# ============================================================
+# Run script 1 and check results
+# ============================================================
+CURRENT_SCRIPT="${SCRIPTS[0]}"
+echo "------------------------------------------------------------"
+echo "Running: $CURRENT_SCRIPT"
+echo "Start time: $(timestamp)"
+echo
 
+START_TIME=$(date +%s)
+python "$CURRENT_SCRIPT" "$START_DATE" "$END_DATE"
+END_TIME=$(date +%s)
+ELAPSED=$((END_TIME - START_TIME))
+
+echo "Finished: $CURRENT_SCRIPT"
+echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+echo
+
+# Check if data directory is empty (no satellite images found)
+if is_directory_empty "$DATA_DIR"; then
   echo "------------------------------------------------------------"
-  echo "Running: $SCRIPT"
-  echo "Start time: $(timestamp)"
+  echo "NO SATELLITE IMAGES FOUND for $START_DATE/$END_DATE"
+  echo "Data directory is empty: $DATA_DIR"
+  echo "Skipping scripts 2-6 and updating date for next run"
+  echo "------------------------------------------------------------"
+else
+  echo "Satellite images found. Continuing with full pipeline..."
+  echo
 
-  START_TIME=$(date +%s)
+  # ============================================================
+  # Run scripts 2-6
+  # ============================================================
+  for i in {1..5}; do
+    SCRIPT="${SCRIPTS[$i]}"
+    CURRENT_SCRIPT="$SCRIPT"
 
-  case "$SCRIPT" in
-    *"/1_extract_swisstopo_dataset.py" \
-    | *"/3_add_dates.py" \
-    | *"/4_merge_zarr.py" \
-    | *"/5_analyse_demo.py")
-      python "$SCRIPT" "$START_DATE" "$END_DATE"
-      ;;
-    *)
-      python "$SCRIPT"
-      ;;
-  esac
+    if [[ ! -f "$SCRIPT" ]]; then
+      echo "[ERROR] Script not found: $SCRIPT"
+      exit 1
+    fi
+
+    echo "------------------------------------------------------------"
+    echo "Running: $SCRIPT"
+    echo "Start time: $(timestamp)"
+
+    START_TIME=$(date +%s)
+
+    case "$SCRIPT" in
+      *"/3_add_dates.py" | *"/4_merge_zarr.py" | *"/5_analyse_demo.py" | *"/6_create_cogtiff.py")
+        python "$SCRIPT" "$START_DATE" "$END_DATE"
+        ;;
+      *)
+        python "$SCRIPT"
+        ;;
+    esac
+
 
   END_TIME=$(date +%s)
 

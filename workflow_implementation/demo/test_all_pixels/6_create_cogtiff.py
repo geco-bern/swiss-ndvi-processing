@@ -7,6 +7,9 @@ import dask.array as da
 import requests
 import pandas as pd
 import pystac_client
+import os
+import argparse
+
 
 # nohup python -u /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/6_create_cogtiff.py > /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/6_tiff.log 2>&1 &
 def get_swisstopo_sentinel_dates(start='2025-12-01', end='2026-02-16'):
@@ -43,64 +46,75 @@ def get_swisstopo_sentinel_dates(start='2025-12-01', end='2026-02-16'):
 
 
 # Paths
-INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed_ndvi.zarr"
-OUTPUT_NC = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/2018-06-01.nc"
+INPUT_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/"
+OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/tiffs/"
+
+os.makedirs(OUTPUT_TIFF_BASE, exist_ok=True)
 
 
-store = zarr.open(INPUT_ZARR, mode='r')
+parser = argparse.ArgumentParser()
+parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
+parser.add_argument("end_date", help="End date in YYYY-MM-DD")
+args = parser.parse_args()
 
+start_date = args.start_date
+end_date = args.end_date
 
-start_date = "2018-01-01"
-end_date = "2026-02-16"
+start_date = np.datetime64(start_date, "D")
+end_date = np.datetime64(end_date, "D")
 
 dates_array = get_swisstopo_sentinel_dates(start=start_date, end=end_date)
 
-start_tiff_date = dates_array[-4]
-end_tiff_date = dates_array[-3]
+dates_array = np.sort(np.unique(dates_array))
 
-target_date_idx = 180
-print(f"Loading ONLY date index {target_date_idx}...")
+start_tiff_date = dates_array[-5] # TODO: Fabian: why did you limit to only four (two?) dates? # NOTE: Francesco according to the workflow, we create the tiff when an observation has at least three value before and after, for this reason each time we'll create the tiff between the lsat foruth and last third obs. date obtained with the previous function
+end_tiff_date = dates_array[-4] # TODO: Fabian: why did you limit to only four (two?) dates?
 
-# CORRECT SLICING for (pixels, dates) shape
-ndvi_array = store['ndvi_processed']
+dates_tiff_array = np.arange(start_tiff_date, end_tiff_date + np.timedelta64(1, 'D'), dtype='datetime64[D]')
 
-# all pixels, date 365
-ndvi_single_date = da.from_array(ndvi_array[:, target_date_idx], chunks=100000)
-x_da = da.from_array(store['x'][:], chunks=100000)
-y_da = da.from_array(store['y'][:], chunks=100000)
-date_da = da.from_array(store['date'][:], chunks='auto')
+for date in dates_tiff_array:
+    # Get year for input zarr
+    year = pd.to_datetime(date).year
+    input_zarr = f"{INPUT_BASE}{year}.zarr"
 
-mask_array = store['mask_array']
+    store = zarr.open(input_zarr, mode='r')
+    
+    # Find date index in this year's data
+    dates_store = store['date']
+    date_idx = np.where((dates_store[:] == date).astype(bool))[0]
 
-mask_array_single_date = da.from_array(mask_array[:, target_date_idx], chunks=100000)
+    date_idx = date_idx[0]
+    
+    # Load single date slice
+    ndvi_array = store['ndvi_processed'][:, date_idx]
+    mask_array = store['mask_array'][:, date_idx]
+    x_array = store['x'][:]
+    y_array = store['y'][:]
 
-# Build single-date Dataset
-ds_single = xr.Dataset({
-    'ndvi': (['pixel'], ndvi_single_date),
-    "mask": (['pixel'], ndvi_single_date),
-    'x': (['pixel'], x_da),
-    'y': (['pixel'], y_da)
-})
+    ds_single = xr.Dataset({
+        'ndvi': (['pixel'], ndvi_array),
+        'mask': (['pixel'], mask_array),
+        'x': (['pixel'], x_array),
+        'y': (['pixel'], y_array)
+    })
 
-selected_date = int(date_da[target_date_idx].compute().item())
-print(f"Date {target_date_idx} = day {selected_date}")
-print(f"Pixels: {len(ds_single.pixel):,}")
+    # Metadata
+    ds_single.attrs = {
+        'crs': 'EPSG:2056',
+        'date_value': date,
+        'total_pixels': len(ds_single.pixel)
+    }
 
-# Metadata
-ds_single.attrs = {
-    'crs': 'EPSG:2056',
-    'date_idx': target_date_idx,
-    'date_value': selected_date,
-    'total_pixels': len(ds_single.pixel)
-}
+    # dtypes
+    encoding = {
+        'ndvi': {'zlib': True, 'complevel': 5, 'dtype': np.int16},
+        'mask': {'zlib': True, 'complevel': 5, 'dtype': np.int8},
+        'x': {'zlib': True, 'dtype': np.int32},
+        'y': {'zlib': True, 'dtype': np.int32}
+    }
+    output_tiff = f"{OUTPUT_TIFF_BASE}{pd.to_datetime(date).strftime('%Y%m%d')}.tiff"
 
-# Your exact dtypes
-encoding = {
-    'ndvi': {'zlib': True, 'complevel': 5, 'dtype': np.int16},
-    'mask': {'zlib': True, 'complevel': 5, 'dtype': np.int8},
-    'x': {'zlib': True, 'dtype': np.int32},
-    'y': {'zlib': True, 'dtype': np.int32}
-}
+    ds_single.to_netcdf(output_tiff, encoding=encoding)
+    print(f"Created {output_tiff}")
+    store.close()
 
-ds_single.to_netcdf(OUTPUT_NC, encoding=encoding)
-print("saved")
