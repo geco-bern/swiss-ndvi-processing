@@ -5,16 +5,7 @@ set -Eeuo pipefail
 # Configuration
 # ============================================================
 VENV_PATH="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv"
-LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/pipeline.log"
-
-# Read previous start date from file, or use default
-if [[ -f /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/next_start_date.txt ]]; then
-    START_DATE=$(cat /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/next_start_date.txt )
-else
-    START_DATE="${1:-2025-12-01}"
-fi
-
-END_DATE="${2:-$(date +%Y-%m-%d)}"
+LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/pipeline_FB.log"
 
 SCRIPTS=(
   /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
@@ -94,6 +85,13 @@ rm -rf /mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/01_ndvi_dataset_spatial_.
 # ============================================================
 PIPELINE_START=$(date +%s)
 
+# ============================================================
+# Define start and end
+# ============================================================
+# Read previous start date from file, or use default
+START_DATE=$(python "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/00_get_last_date.py")
+END_DATE="${2:-$(date +%Y-%m-%d)}"
+
 
 # ============================================================
 # Run script 1 and check results
@@ -166,18 +164,10 @@ PIPELINE_END=$(date +%s)
 PIPELINE_TIME=$((PIPELINE_END - PIPELINE_START))
 
 # ============================================================
-# Update start_date for next run (save to file)
-# ============================================================
-NEW_START_DATE=$(date -d "$END_DATE + 1 day" +%Y-%m-%d)
-echo "$NEW_START_DATE" > /tmp/pipeline_next_start_date.txt
-
-# ============================================================
 # Finish pipeline
 # ============================================================
 echo "============================================================"
 echo "Pipeline completed successfully"
 echo "End time: $(timestamp)"
 echo "Total runtime: $(format_seconds "$PIPELINE_TIME") (hh:mm:ss)"
-echo "Next pipeline will use start_date: $NEW_START_DATE"
-echo "Saved to: /tmp/pipeline_next_start_date.txt"
 echo "============================================================"
