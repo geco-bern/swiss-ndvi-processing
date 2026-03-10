@@ -1,12 +1,7 @@
 """
 Extract Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI time series for forested areas.
 """
-# "Run Python File" in VSCode
-
-# NOTE: on Tunder with slow network speed this can take up to 100 minutes for '2018-06-01/2018-06-05'
-# NOTE Francesco: When I try to run with noup I get an error
-# NOTE Fabian: for me it works in the Terminal with `python workflow_implementation/demo/1_extract_swisstopo_dataset.py` with the activated environment `.venv`. What error do you get?
-# TODO: note: would it make sense to combine scripts 1,2,3 ?
+# TODO: note: would it make sense to combine scripts 1,2,3 ? Yes it would make sense.
 
 import pystac_client
 import rasterio
@@ -17,7 +12,14 @@ from tqdm import tqdm
 from rasterio.windows import from_bounds
 from rasterio.warp import reproject, Resampling
 import argparse
+import os, shutil
 
+# CONFIGURE:
+OUTPUT_ZARR_TEMP = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_01_downloadedA.zarr" # or store into /var/tmp/
+if os.path.exists(OUTPUT_ZARR_TEMP):
+    shutil.rmtree(OUTPUT_ZARR_TEMP)
+
+# PARSE ARGUMENTS:
 parser = argparse.ArgumentParser()
 parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
 parser.add_argument("end_date", help="End date in YYYY-MM-DD")
@@ -25,11 +27,16 @@ args = parser.parse_args()
 
 start_date = args.start_date
 end_date = args.end_date
+# if running interactively use e.g.:
+# start_date = "2025-11-30" # for the pipeline this should correspond to 
+#                           # the last date in the historic NDVI data set
+# end_date = "2026-03-10"
 
+# ==============================================================================
+
+# Start script:
 date_range = f"{start_date}/{end_date}"
 
-# OUTPUT_PATH = "/data_3/scratch/francesco/processed/all_ndvi_dataset_spatial.zarr"
-OUTPUT_PATH = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/01_ndvi_dataset_spatial_.zarr"
 # Connect to Swisstopo STAC API
 service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
 service.add_conforms_to("COLLECTIONS")
@@ -99,7 +106,7 @@ def get_forest_mask():
     """
     item_search = service.search(
         bbox=bbox_swiss_4326,
-        datetime='2025-05-01/2025-05-01',
+        datetime='2025-05-01/2025-05-01', # use the forest mask of a hardcoded date
         collections=['ch.swisstopo.swisseo_vhi_v100']
     )
     items = list(item_search.items())
@@ -152,7 +159,7 @@ NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
 compressors = zarr.codecs.BloscCodec(cname='zstd', clevel=3, shuffle=zarr.codecs.BloscShuffle.bitshuffle)
 ndvi_ds = zarr.create_array(
     name="ndvi",
-    store= OUTPUT_PATH,
+    store= OUTPUT_ZARR_TEMP,
     shape=(T, N),
     chunks=(1, N),
     dtype="int16",
@@ -163,7 +170,7 @@ ndvi_ds = zarr.create_array(
 
 ndsi_ds = zarr.create_array(
     name="ndsi",
-    store= OUTPUT_PATH,
+    store= OUTPUT_ZARR_TEMP,
     shape=(T, N),
     chunks=(1, N),
     dtype="int16",

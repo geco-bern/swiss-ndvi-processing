@@ -5,21 +5,17 @@ Transpose Swisstopo NDVI/NDSI dataset from (T, N) to (N, T) layout using Dask.
 
 import dask.array as da
 from dask.distributed import Client, LocalCluster
-import shutil
-import os
 
-# SOURCE_ZARR = "/data_3/scratch/francesco/processed/ndvi_dataset_spatial.zarr" # TODO ==> appears renamed to all_ndvi_dataset_spatial.zarr
-# TRANSPOSED_ZARR = "/data_3/scratch/francesco/processed/ndvi_dataset_temporal.zarr"
-SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/01_ndvi_dataset_spatial_.zarr"    # from the script 1, will be deleted (if line 58 uncommented)
-TRANSPOSED_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr"
-DASK_TEMP_DIR = "../../data/temporary"
+INPUT_ZARR_TEMP = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_01_downloadedA.zarr" # or store into /var/tmp/
+OUTPUT_ZARR_TEMP = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_02-03_downloadedB.zarr" # or store into /var/tmp/
 
+DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data"
 os.makedirs(DASK_TEMP_DIR, exist_ok=True)
 
 N_WORKERS = 40
 MEMORY_LIMIT = "300GB"
 
-def transpose_zarr(source_zarr, target_zarr, component="ndvi"):
+def transpose_zarr(src, trgt, component="ndvi"):
 
     cluster = LocalCluster(
         n_workers=N_WORKERS,
@@ -31,16 +27,17 @@ def transpose_zarr(source_zarr, target_zarr, component="ndvi"):
     client = Client(cluster)
     print(client.dashboard_link) # use this dashboard to follow progress
 
-    src = da.from_zarr(source_zarr, component=component)
+    src = da.from_zarr(src, component=component)
     T, N = src.shape
 
+    # TODO: transpose and rechunk directly after download to remove this whole script
     # transpose to (N, T)
     dst = src.T
 
     dst_rechunked = dst.rechunk(chunks=(4000, T))
 
     dst_rechunked.to_zarr(
-        target_zarr,
+        trgt,
         component=component,
         overwrite=True,
         compute=True
@@ -51,8 +48,8 @@ def transpose_zarr(source_zarr, target_zarr, component="ndvi"):
 
 if __name__ == "__main__":
 
-    transpose_zarr(SOURCE_ZARR, TRANSPOSED_ZARR, component="ndvi")
+    transpose_zarr(INPUT_ZARR_TEMP, OUTPUT_ZARR_TEMP, component="ndvi")
     print("done ndvi")
 
-    transpose_zarr(SOURCE_ZARR, TRANSPOSED_ZARR, component="ndsi")
+    transpose_zarr(INPUT_ZARR_TEMP, OUTPUT_ZARR_TEMP, component="ndsi")
     print("done ndsi")
