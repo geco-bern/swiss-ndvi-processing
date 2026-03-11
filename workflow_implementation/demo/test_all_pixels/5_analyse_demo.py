@@ -20,19 +20,20 @@ warnings.filterwarnings(
     module="numcodecs.zarr3"
 )
 
+INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
 SOURCE_ZARR_MERGED = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi/"  # This is the OUT_ZARR from script 4
-# OUTPUT_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/"
-OUTPUT_BASE = "/mnt/data1/UniBe-swiss-ndvi/tmp_ndvi_05_processed.zarr"
+
+OUTPUT_BASE        = "/mnt/data1/UniBe-swiss-ndvi/tmp_ndvi_05_processed.zarr"
 #TODO: try to remove this: OUTPUT_BASE_tmp = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/tmp.zarr" # here the computation will be written and then stacked to the OUTPUT_BSAE folder
 DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data/"
 os.makedirs(DASK_TEMP_DIR, exist_ok=True)
 
-lookuptable_src = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
 
 # TODO: this script 5 has been written with script 4 merging a copy of the historic NDVI together with newly downloaded data.
 #       This is not needed and we should be able to use the freshly downloaded data directly: TODO use below SOURCE_ZARR
 # SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" # the zarr from script 3
-
+# new_ds.to_zarr("/mnt/data1/UniBe-swiss-ndvi/TODO_FB.zarr", mode="w", consolidated=True)
+    # TODO: or alternatively use this TODO_FB.zarr
 
 # return the dates to analyse
 
@@ -350,9 +351,10 @@ def continuous_ndvi(ndvi_arr, median_arr,bool_dates,*, full_dates, dates_array):
 
 if __name__ == '__main__':
 
-    N_WORKERS = 150 # TODO reactivate
-    N_WORKERS = 50 # NOTE: going above 20 seems to lead to communication issues
-    MEMORY_PER_WORKER = "24GB"
+    #N_WORKERS = 150 # TODO reactivate
+    # N_WORKERS = 50 # NOTE: going above 50 seems to lead to communication issues
+    N_WORKERS = 100
+    MEMORY_PER_WORKER = "36GB"
 
     client = Client(
         n_workers=N_WORKERS,
@@ -372,9 +374,9 @@ if __name__ == '__main__':
     
     SOURCE_ZARR_MERGED_LIST = [entry.path for entry in os.scandir(SOURCE_ZARR_MERGED) if entry.is_dir()]
     ds = xr.open_mfdataset(SOURCE_ZARR_MERGED_LIST)
-    ds = ds.isel(pixel = slice(0, 10**6)) # TODO: generate here a small example on the fly. 
-    ds = ds.isel(pixel=slice(0,100)) # TODO: generate here a small example on the fly
-    # TODO: this is for development: .isel(pixel=slice(0,1)),
+    #ds = ds.isel(pixel = slice(0, 10**6)) # TODO: generate here a small example on the fly. 
+    #ds = ds.isel(pixel=slice(0,3000)) # TODO: generate here a small example on the fly
+    #ds = ds.isel(pixel=slice(0,100)) # TODO: generate here a small example on the fly
 
     #ds_to_use_in_future = xr.open_zarr(SOURCE_ZARR) # TODO: directly load this instead of SOURCE_ZARR_MERGED
     #ds_to_use_in_future = zarr.open_group(SOURCE_ZARR, mode="r")
@@ -382,11 +384,11 @@ if __name__ == '__main__':
     #  # TODO: directly load SOURCE_ZARR and ds_hist instead of SOURCE_ZARR_MERGED (avoiding script 4 entirely)
     
     # append median NDVI to the observed NDVI
-    lookuptable = xr.open_zarr(lookuptable_src, consolidated=False)
+    lookuptable  = xr.open_zarr(INPUT_LOOKUPTABLE, consolidated=False)
     doy = ds["date"].dt.dayofyear
     doy_noLeap = xr.where(doy == 366, 365, doy) # remove leap year if encountered
     median_ndvi = lookuptable["median_ndvi"].sel(doy=doy_noLeap)
-    ds["median_ndvi"] = median_ndvi
+    ds["median_ndvi"] = median_ndvi # add as variable to ds
     # NOTE: now we have in ds: 'obs_date', 'ndvi' and 'median_ndvi'
     #       TODO: will we now add mask_array (from 0 to 4) ???
 
@@ -399,14 +401,14 @@ if __name__ == '__main__':
     dates        = ds["date"] 
 
     # For dates_array, use full range:
-    #TODO: uncomment dates_array = get_swisstopo_sentinel_dates(start="2017-01-01", end="2025-12-31")    # TODO: what happens with this in the future? Will this break? Will this slow down?
-    #TODO: uncomment # dates_array_orig = dates_array
-    #TODO: uncomment # append the last dates if not present
-    #TODO: uncomment if dates_array[-1].astype('datetime64[D]') != np.datetime64('2025-12-31', 'D'):     # TODO: what happens with this in the future? Will this break? Will this slow down?
-    #TODO: uncomment     dates_array = np.append(dates_array, np.datetime64('2025-12-31', 'D'))
-    #TODO: uncomment dates_array = np.sort(np.unique(dates_array))
+    dates_array = get_swisstopo_sentinel_dates(start="2017-01-01", end="2025-12-31")    # TODO: what happens with this in the future? Will this break? Will this slow down?
+    # dates_array_orig = dates_array
+    # append the last dates if not present
+    if dates_array[-1].astype('datetime64[D]') != np.datetime64('2025-12-31', 'D'):     # TODO: what happens with this in the future? Will this break? Will this slow down?
+        dates_array = np.append(dates_array, np.datetime64('2025-12-31', 'D'))
+    dates_array = np.sort(np.unique(dates_array))
     #np.save("/mnt/data1/UniBe-swiss-ndvi/data/temp_dates_array.npy", dates_array)
-    dates_array = np.load("/mnt/data1/UniBe-swiss-ndvi/data/temp_dates_array.npy")
+    #dates_array = np.load("/mnt/data1/UniBe-swiss-ndvi/data/temp_dates_array.npy")
 
 
     # Run continuous_ndvi
@@ -449,18 +451,8 @@ if __name__ == '__main__':
         out_ds[var].encoding.pop("compressor", None)
         out_ds[var].encoding.pop("chunks", None)
 
-    #TODO: try to remove this: os.makedirs(OUTPUT_BASE_tmp, exist_ok=True)
-    #TODO: try to remove this: out_ds.to_zarr(OUTPUT_BASE_tmp, mode="w", consolidated=True, compute=True)
-
     # Write to Zarr
     out_ds.to_zarr(OUTPUT_BASE, mode="w", consolidated=True, compute=True) # TODO: ideally here we would just append
-
-    #TODO: try to remove this: # Clean up tmp
-    #TODO: try to remove this: try:
-    #TODO: try to remove this:     shutil.rmtree(OUTPUT_BASE_tmp)
-    #TODO: try to remove this: except:
-    #TODO: try to remove this:     pass
-
 
     print("Done")
 
