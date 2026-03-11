@@ -1,5 +1,4 @@
-# "Run Python File" in VSCode
-
+# This script is jsut to ensure that the data is collected as the step 4 and the mask_array is present in all the dates
 # nohup python -u /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo.py > /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo.log 2>&1 &
 
 
@@ -13,17 +12,31 @@ import requests
 import pandas as pd
 import pystac_client
 import argparse
+import warnings
+# import zarr
+warnings.filterwarnings(
+    "ignore", 
+    message="Numcodecs codecs are not in the Zarr version 3 specification",
+    module="numcodecs.zarr3"
+)
 
-SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi/"  # This is the OUT_ZARR from script 4
-OUTPUT_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/"
-OUTPUT_BASE_tmp = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/tmp.zarr" # here the computation will be written and then stacked to the OUTPUT_BSAE folder
-local_tmp  = "/mnt/data1/UniBe-swiss-ndvi/data/temporary_demo.zarr" 
+SOURCE_ZARR_MERGED = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi/"  # This is the OUT_ZARR from script 4
+# OUTPUT_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/"
+OUTPUT_BASE = "/mnt/data1/UniBe-swiss-ndvi/tmp_ndvi_05_processed.zarr"
+#TODO: try to remove this: OUTPUT_BASE_tmp = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/tmp.zarr" # here the computation will be written and then stacked to the OUTPUT_BSAE folder
+DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data/"
+os.makedirs(DASK_TEMP_DIR, exist_ok=True)
+
 lookuptable_src = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
+
+# TODO: this script 5 has been written with script 4 merging a copy of the historic NDVI together with newly downloaded data.
+#       This is not needed and we should be able to use the freshly downloaded data directly: TODO use below SOURCE_ZARR
+# SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" # the zarr from script 3
 
 
 # return the dates to analyse
 
-def get_swisstopo_sentinel_dates(start='2025-12-01', end='2026-02-16'):
+def get_swisstopo_sentinel_dates(start='2025-12-01', end='2026-02-16'): # TODO: we have a similar (but different) code in 3_add_dates. TODO: consolidate.
 
     # Connect to Swisstopo STAC API
     service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
@@ -337,25 +350,17 @@ def continuous_ndvi(ndvi_arr, median_arr,bool_dates,*, full_dates, dates_array):
 
 if __name__ == '__main__':
 
-    try:
-        shutil.rmtree(local_tmp)
-    except FileNotFoundError:
-        pass
-    except OSError:
-        pass
-
-    os.makedirs(local_tmp, exist_ok=True)
-
-    N_WORKERS = 50
-    MEMORY_PER_WORKER = "16GB"
+    N_WORKERS = 150 # TODO reactivate
+    N_WORKERS = 50 # NOTE: going above 20 seems to lead to communication issues
+    MEMORY_PER_WORKER = "24GB"
 
     client = Client(
         n_workers=N_WORKERS,
         threads_per_worker=1,
         processes=True,
         memory_limit=MEMORY_PER_WORKER,
-        dashboard_address=":33345",
-        local_directory= local_tmp
+        dashboard_address=":8345",
+        local_directory= DASK_TEMP_DIR
     )
     print(client.dashboard_link)
 
@@ -364,69 +369,47 @@ if __name__ == '__main__':
     # -----------------------------
     #if os.path.exists(OUTPUT_ZARR):
     #    shutil.rmtree(OUTPUT_ZARR)
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
-    parser.add_argument("end_date", help="End date in YYYY-MM-DD")
-    args = parser.parse_args()
-
-    start_date = args.start_date
-    end_date = args.end_date
-
-    # Left here just for quick debug = no shell
-    """start_date =  "2025-12-01"
-    end_date = "2026-03-09"""
-
-    start_date = np.datetime64(start_date, "D")
-    end_date = np.datetime64(end_date, "D")
-
-    # get the array date to loop
-    dates_array = get_swisstopo_sentinel_dates(start=start_date, end=end_date)
-
-    dates_array = np.sort(np.unique(dates_array))
-
-    end_year = int(end_date[:4])
-    start_year = end_year -1
     
-    years = [start_year] if start_year == end_year else [start_year, end_year]
+    SOURCE_ZARR_MERGED_LIST = [entry.path for entry in os.scandir(SOURCE_ZARR_MERGED) if entry.is_dir()]
+    ds = xr.open_mfdataset(SOURCE_ZARR_MERGED_LIST)
+    ds = ds.isel(pixel = slice(0, 10**6)) # TODO: generate here a small example on the fly. 
+    ds = ds.isel(pixel=slice(0,100)) # TODO: generate here a small example on the fly
+    # TODO: this is for development: .isel(pixel=slice(0,1)),
 
-    if len(years) == 1:
-        source_zarr = os.path.join(SOURCE_ZARR, f"{years[0]}.zarr")
-        ds = xr.open_zarr(source_zarr, consolidated=True)
-
-    else:
-        source_zarr_1 = os.path.join(SOURCE_ZARR, f"{years[0]}.zarr")
-        source_zarr_2 = os.path.join(SOURCE_ZARR, f"{years[1]}.zarr")
-
-        zarr_1 = xr.open_zarr(source_zarr_1, consolidated=True)
-        zarr_2 = xr.open_zarr(source_zarr_2, consolidated=True)
-
-        ds = xr.concat(
-            [zarr_1, zarr_2],
-            dim="date",
-        ).sortby("date")
-
-    # align median NDVI to the observed NDVI
-
+    #ds_to_use_in_future = xr.open_zarr(SOURCE_ZARR) # TODO: directly load this instead of SOURCE_ZARR_MERGED
+    #ds_to_use_in_future = zarr.open_group(SOURCE_ZARR, mode="r")
+    # ds_hist = xr.open_dataset("/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v3_compr.zarr").isel(pixel = slice(0, 10**6)) # TODO: remove again
+    #  # TODO: directly load SOURCE_ZARR and ds_hist instead of SOURCE_ZARR_MERGED (avoiding script 4 entirely)
+    
+    # append median NDVI to the observed NDVI
     lookuptable = xr.open_zarr(lookuptable_src, consolidated=False)
-
     doy = ds["date"].dt.dayofyear
-
-    doy_fixed = xr.where(doy == 366, 365, doy)
-
-    median_ndvi = lookuptable["median_ndvi"].sel(doy=doy_fixed)
-
+    doy_noLeap = xr.where(doy == 366, 365, doy) # remove leap year if encountered
+    median_ndvi = lookuptable["median_ndvi"].sel(doy=doy_noLeap)
     ds["median_ndvi"] = median_ndvi
+    # NOTE: now we have in ds: 'obs_date', 'ndvi' and 'median_ndvi'
+    #       TODO: will we now add mask_array (from 0 to 4) ???
 
-    dates = ds["date"] 
-    bool_dates = ds["obs_date"].chunk({"date": -1})
+    # Apply continuous ndvi function:
 
-    ndvi_array = ds["ndvi"]
-    median_array = ds["median_ndvi"]
-    ndvi_array = ndvi_array.chunk({"date": -1})
-    median_array = median_array.chunk({"date": -1})
+    # Prepare arguments
+    ndvi_array   = ds["ndvi"].chunk({"date": -1})
+    median_array = ds["median_ndvi"].chunk({"date": -1})
+    bool_dates   = ds["obs_date"].chunk({"date": -1})
+    dates        = ds["date"] 
 
-    
+    # For dates_array, use full range:
+    #TODO: uncomment dates_array = get_swisstopo_sentinel_dates(start="2017-01-01", end="2025-12-31")    # TODO: what happens with this in the future? Will this break? Will this slow down?
+    #TODO: uncomment # dates_array_orig = dates_array
+    #TODO: uncomment # append the last dates if not present
+    #TODO: uncomment if dates_array[-1].astype('datetime64[D]') != np.datetime64('2025-12-31', 'D'):     # TODO: what happens with this in the future? Will this break? Will this slow down?
+    #TODO: uncomment     dates_array = np.append(dates_array, np.datetime64('2025-12-31', 'D'))
+    #TODO: uncomment dates_array = np.sort(np.unique(dates_array))
+    #np.save("/mnt/data1/UniBe-swiss-ndvi/data/temp_dates_array.npy", dates_array)
+    dates_array = np.load("/mnt/data1/UniBe-swiss-ndvi/data/temp_dates_array.npy")
+
+
+    # Run continuous_ndvi
     ndvi_arr, mask_ndvi_arr = xr.apply_ufunc(
         continuous_ndvi,
         ndvi_array,
@@ -436,6 +419,7 @@ if __name__ == '__main__':
         output_core_dims=[["date"],["date"]],
         vectorize=True,
         dask="parallelized",
+        #dask = "forbidden", # TODO: this is for development
         kwargs={
             "full_dates" : dates,
             "dates_array": dates_array
@@ -443,7 +427,7 @@ if __name__ == '__main__':
         output_dtypes=[ndvi_array.dtype,ndvi_array.dtype],
         dask_gufunc_kwargs={"allow_rechunk": True},
     )
-
+    
     out_ds = xr.Dataset(
         {
             "ndvi_processed": ndvi_arr,
@@ -458,46 +442,24 @@ if __name__ == '__main__':
     )
 
     # Chunk explicitly to avoid Dask graph explosion
-    out_ds = out_ds.chunk({"pixel": 10000, "date": -1})
+    out_ds = out_ds.chunk({"pixel": 100000, "date": 365})
 
     # Remove leftover compressor info if copying from another dataset
-    for var in out_ds.variables:
+    for var in out_ds.variables: # TODO: here should we go over .data_vars only or over .variables???
         out_ds[var].encoding.pop("compressor", None)
         out_ds[var].encoding.pop("chunks", None)
 
-    os.makedirs(OUTPUT_BASE_tmp, exist_ok=True)
-    
-    out_ds.to_zarr(OUTPUT_BASE_tmp, mode="w", consolidated=True, compute=True)
+    #TODO: try to remove this: os.makedirs(OUTPUT_BASE_tmp, exist_ok=True)
+    #TODO: try to remove this: out_ds.to_zarr(OUTPUT_BASE_tmp, mode="w", consolidated=True, compute=True)
 
-    #  append new processed data to already present data
-    tmp_ds = xr.open_zarr(OUTPUT_BASE_tmp, consolidated=True)
+    # Write to Zarr
+    out_ds.to_zarr(OUTPUT_BASE, mode="w", consolidated=True, compute=True) # TODO: ideally here we would just append
 
-    for year in years:
-
-        year_output = os.path.join(OUTPUT_BASE, f"{year}.zarr")
-
-        year_dates = tmp_ds.date.where(tmp_ds.date.dt.year == year, drop=True)
-        
-
-        existing_ds = xr.open_zarr(year_output, consolidated=True)
-                
-        # Find dates in tmp that don't exist in target
-        existing_dates = set(existing_ds.date.values)
-        combined_ds = xr.concat([existing_ds, tmp_ds], dim="date").sortby("date")
-                    
-        # Clean encoding and save full combined dataset
-        combined_ds = combined_ds.chunk({"pixel": 10000, "date": -1})
-        for var in combined_ds.variables:
-            combined_ds[var].encoding.pop("compressor", None)
-            combined_ds[var].encoding.pop("chunks", None)
-                    
-        combined_ds.to_zarr(year_output, mode="w", consolidated=True, compute=True)
-
-    # Clean up tmp
-    try:
-        shutil.rmtree(OUTPUT_BASE_tmp)
-    except:
-        pass
+    #TODO: try to remove this: # Clean up tmp
+    #TODO: try to remove this: try:
+    #TODO: try to remove this:     shutil.rmtree(OUTPUT_BASE_tmp)
+    #TODO: try to remove this: except:
+    #TODO: try to remove this:     pass
 
 
     print("Done")
