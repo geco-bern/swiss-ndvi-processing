@@ -3,10 +3,10 @@ Add forest mix rate from Swiss National Forest Inventory to the dataset.
 """
 import numpy as np
 import rasterio
-from config import DATASET_ZARR, CHUNK_SIZE, FOREST_MASK, REF_BBOX, REF_BBOX_4326, SERVICE_URL
 import zarr
 import pystac_client
-from tqdm import tqdm
+
+from config import TEMPORAL_DATASET_ZARR, CHUNK_SIZE, FOREST_MASK, REF_BBOX, REF_BBOX_4326, SERVICE_URL
 
 service = pystac_client.Client.open(SERVICE_URL)
 service.add_conforms_to("COLLECTIONS")
@@ -30,7 +30,7 @@ wm_flat = wm.ravel()
 wm_flat_forest = wm_flat[forest_flat_indices]
 wm_flat_forest[wm_flat_forest == src_nodata] = -1
 
-group = zarr.open_group(DATASET_ZARR, mode='a')
+group = zarr.open_group(TEMPORAL_DATASET_ZARR, mode='a')
 feat_grp = group.require_group('features')
 
 feat_grp.create_array(

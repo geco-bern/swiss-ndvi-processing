@@ -3,7 +3,7 @@ Compute median vegetation height from annual Sentinel-2 based height models and 
 """
 import numpy as np
 import rasterio
-from config import DATASET_ZARR, CHUNK_SIZE, FOREST_MASK, REF_BBOX, REF_BBOX_4326, SERVICE_URL
+from config import TEMPORAL_DATASET_ZARR, CHUNK_SIZE, FOREST_MASK, REF_BBOX, REF_BBOX_4326, SERVICE_URL
 import zarr
 import pystac_client
 from tqdm import tqdm
@@ -43,7 +43,7 @@ median_per_pixel[median_per_pixel == -9999] = np.nan
 mean_fh = np.nanmean(median_per_pixel)
 median_per_pixel[np.isnan(median_per_pixel)] = mean_fh
 
-group = zarr.open_group(DATASET_ZARR, mode='a')
+group = zarr.open_group(TEMPORAL_DATASET_ZARR, mode='a')
 feat_grp = group.require_group('features')
 
 feat_grp.create_array(

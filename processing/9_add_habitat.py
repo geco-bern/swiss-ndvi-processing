@@ -3,7 +3,6 @@ Add habitat type frequencies from habitat map to the dataset.
 """
 import rasterio
 import numpy as np
-from processing.config import REF_BBOX, REF_WIDTH, REF_HEIGHT, CHUNK_SIZE, DATASET_ZARR, FOREST_MASK
 import subprocess
 from numba.typed import Dict
 from numba import types
@@ -12,9 +11,9 @@ import zarr
 from rasterio.windows import Window
 from tqdm import tqdm
 
+from processing.config import REF_BBOX, REF_WIDTH, REF_HEIGHT, CHUNK_SIZE, TEMPORAL_DATASET_ZARR, FOREST_MASK, DATA_DIR
 
 NODATA_VAL = 65535
-
 
 def align_habitat_map(habitat_path, aligned_path):
     cmd = [
@@ -106,8 +105,8 @@ def collect_habitat_frequencies(array_group, habitat1m_path, forest_mask, code_d
             forest_pixel_insert_pos += nr_pixels_added
 
 if __name__ == "__main__":
-    habitat_path = "/data_2/scratch/sbiegel/habitatmap_v1_1_20241025.tif"
-    aligned_path = "/data_2/scratch/sbiegel/tmp/habitat_aligned_1m_to_refgrid.tif"
+    habitat_path = f"{DATA_DIR}/habitatmap_v1_1_20241025.tif"
+    aligned_path = f"{DATA_DIR}/tmp/habitat_aligned_1m_to_refgrid.tif"
 
     align_habitat_map(habitat_path, aligned_path)
 
@@ -120,7 +119,7 @@ if __name__ == "__main__":
     N_forest_pixels = int(np.sum(forest_mask))
     N_habitat_codes = len(habitat_codes)
 
-    group = zarr.open_group(DATASET_ZARR, mode='a')
+    group = zarr.open_group(TEMPORAL_DATASET_ZARR, mode='a')
     feat_grp = group.require_group('features')
 
     feat_grp.create_array(

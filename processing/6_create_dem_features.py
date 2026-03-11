@@ -9,12 +9,11 @@ from rasterio.warp import reproject, Resampling
 import zarr
 import shutil
 from whitebox.whitebox_tools import WhiteboxTools
-from config import REF_TRANSFORM, REF_CRS, REF_WIDTH, REF_HEIGHT, FOREST_MASK, CHUNK_SIZE
+from config import FOREST_MASK, CHUNK_SIZE, DATA_DIR, TEMPORAL_DATASET_ZARR
 
-TMPDIR = "/data_2/scratch/sbiegel/tmp"
-OUT_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset.zarr"
-DEM_2M = "/data_2/scratch/sbiegel/processed/dem2m.tif"
-DEM_10M = os.path.join(TMPDIR, "dem10m.tif")
+TMPDIR = f"{DATA_DIR}/tmp"
+DEM_2M = f"{TMPDIR}/dem2m.tif"
+DEM_10M = f"{TMPDIR}/dem10m.tif"
 
 wbt = WhiteboxTools()
 wbt.set_working_dir(TMPDIR)
@@ -121,5 +120,5 @@ if __name__ == "__main__":
     print("Topographic features resampled to 10m resolution", flush=True)
     create_hydrological_features_10m(DEM_10M)
     print("Hydrological features created at 10m resolution", flush=True)
-    write_features_to_zarr(TMPDIR, forest_mask, OUT_ZARR)
+    write_features_to_zarr(TMPDIR, forest_mask, TEMPORAL_DATASET_ZARR)
     print("All features written to Zarr store", flush=True)

@@ -6,9 +6,7 @@ import dask.array as da
 import zarr
 import os
 
-SOURCE_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr"
-TARGET_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr"
-DASK_LOCAL_DIRECTORY = "/data_2/scratch/sbiegel/dask_worker_space"
+from config import TEMPORAL_DATASET_ZARR, DASK_LOCAL_DIRECTORY
 
 def merge_features_to_single_array(source_zarr_path, target_zarr_path):
     cluster = LocalCluster(
@@ -67,4 +65,4 @@ def merge_features_to_single_array(source_zarr_path, target_zarr_path):
     merged_array.attrs["feature_columns"] = feature_column_map
 
 if __name__ == "__main__":
-    merge_features_to_single_array(SOURCE_ZARR, TARGET_ZARR)
+    merge_features_to_single_array(TEMPORAL_DATASET_ZARR, TEMPORAL_DATASET_ZARR)

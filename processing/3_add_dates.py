@@ -6,9 +6,11 @@ import pandas as pd
 import pystac_client
 import zarr
 
+from config import TEMPORAL_DATASET_ZARR, SERVICE_URL
+
 def get_swisstopo_sentinel_dates(start='2017-04-01', end='2025-08-31'):
     # Connect to Swisstopo STAC API
-    service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
+    service = pystac_client.Client.open(SERVICE_URL)
     service.add_conforms_to("COLLECTIONS")
     service.add_conforms_to("ITEM_SEARCH")
 
@@ -33,7 +35,7 @@ def get_swisstopo_sentinel_dates(start='2017-04-01', end='2025-08-31'):
     pd_dates = pd.to_datetime(dates)
     pd_dates_str = pd_dates.strftime('%Y-%m-%d')
 
-    root = zarr.open_group("/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr", mode='a', zarr_format=3)
+    root = zarr.open_group(TEMPORAL_DATASET_ZARR, mode='a', zarr_format=3)
     root.create_array(
         name='dates',
         dtype='S10',

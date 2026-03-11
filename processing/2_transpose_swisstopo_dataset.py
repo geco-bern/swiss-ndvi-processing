@@ -4,9 +4,7 @@ Transpose Swisstopo NDVI/NDSI dataset from (T, N) to (N, T) layout using Dask.
 import dask.array as da
 from dask.distributed import Client, LocalCluster
 
-SOURCE_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset_spatial.zarr"
-TRANSPOSED_ZARR = "/data_2/scratch/sbiegel/processed/ndvi_dataset_temporal.zarr"
-DASK_LOCAL_DIRECTORY = "/data_2/scratch/sbiegel/dask_worker_space"
+from config import TEMPORAL_DATASET_ZARR, SPATIAL_DATASET_ZARR, DASK_LOCAL_DIRECTORY
 
 def transpose_zarr(source_zarr, target_zarr, component="ndvi"):
     cluster = LocalCluster(
@@ -34,5 +32,5 @@ def transpose_zarr(source_zarr, target_zarr, component="ndvi"):
     )
 
 if __name__ == "__main__":
-    transpose_zarr(SOURCE_ZARR, TRANSPOSED_ZARR, component="ndvi")
-    transpose_zarr(SOURCE_ZARR, TRANSPOSED_ZARR, component="ndsi")
+    transpose_zarr(SPATIAL_DATASET_ZARR, TEMPORAL_DATASET_ZARR, component="ndvi")
+    transpose_zarr(SPATIAL_DATASET_ZARR, TEMPORAL_DATASET_ZARR, component="ndsi")

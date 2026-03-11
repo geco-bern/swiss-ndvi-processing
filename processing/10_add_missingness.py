@@ -6,9 +6,9 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from config import DATASET_ZARR, CHUNK_SIZE
+from config import TEMPORAL_DATASET_ZARR, CHUNK_SIZE
 
-root = zarr.open_group(DATASET_ZARR, mode="a")
+root = zarr.open_group(TEMPORAL_DATASET_ZARR, mode="a")
 ndvi = root["ndvi"]
 ndsi = root["ndsi"]
 dates = pd.to_datetime([d.decode("utf-8") for d in root["dates"][:]])

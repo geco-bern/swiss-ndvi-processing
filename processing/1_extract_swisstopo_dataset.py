@@ -11,16 +11,13 @@ from tqdm import tqdm
 from rasterio.windows import from_bounds
 from rasterio.warp import reproject, Resampling
 
+from config import REF_BBOX_4326, SPATIAL_DATASET_ZARR, FOREST_MASK, SERVICE_URL, INVALID, NO_COVERAGE
+
 
 # Connect to Swisstopo STAC API
-service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
+service = pystac_client.Client.open(SERVICE_URL)
 service.add_conforms_to("COLLECTIONS")
 service.add_conforms_to("ITEM_SEARCH")
-
-# EPSG: 4326
-# WGS 84
-# Swiss bounds: left, bottom, right, top
-bbox_swiss_4326 = [5.70, 45.8, 10.6, 47.95]
 
 # Retrieve the spatial coverage (bounds) of all 4 possible orbits covering Switzerland
 def collect_bounds_all_orbits():
@@ -29,7 +26,7 @@ def collect_bounds_all_orbits():
     Returns a list of BoundingBox objects.
     """
     item_search = service.search(
-        bbox=bbox_swiss_4326,
+        bbox=REF_BBOX_4326,
         datetime='2025-04-30/2025-05-02',
         collections=['ch.swisstopo.swisseo_s2-sr_v100']
     )
@@ -80,7 +77,7 @@ def get_forest_mask():
     Also returns the metadata for the reference raster.
     """
     item_search = service.search(
-        bbox=bbox_swiss_4326,
+        bbox=REF_BBOX_4326,
         datetime='2025-05-01/2025-05-01',
         collections=['ch.swisstopo.swisseo_vhi_v100']
     )
@@ -115,7 +112,7 @@ index_map[forest_flat_indices] = np.arange(len(forest_flat_indices))
 
 # Search all images for the full CH bounding box for the whole time period
 item_search = service.search(
-    bbox=bbox_swiss_4326,
+    bbox=REF_BBOX_4326,
     datetime='2017-04-01/2025-08-31',
     collections=['ch.swisstopo.swisseo_s2-sr_v100']
 )
@@ -124,8 +121,6 @@ s2_files = list(item_search.items())
 # Prepare constants
 N = len(forest_flat_indices)
 T = len(s2_files)
-INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
-NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
 
 # Define the datasets for NDVI and NDSI values
 # Shape is (T, N) where T is the number of time steps and N is the number of forest pixels
@@ -134,7 +129,7 @@ NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
 compressors = zarr.codecs.BloscCodec(cname='zstd', clevel=3, shuffle=zarr.codecs.BloscShuffle.bitshuffle)
 ndvi_ds = zarr.create_array(
     name="ndvi",
-    store='/data_2/scratch/sbiegel/processed/ndvi_dataset_spatial.zarr',
+    store=SPATIAL_DATASET_ZARR,
     shape=(T, N),
     chunks=(1, N),
     dtype="int16",
@@ -145,7 +140,7 @@ ndvi_ds = zarr.create_array(
 
 ndsi_ds = zarr.create_array(
     name="ndsi",
-    store='/data_2/scratch/sbiegel/processed/ndvi_dataset_spatial.zarr',
+    store=SPATIAL_DATASET_ZARR,
     shape=(T, N),
     chunks=(1, N),
     dtype="int16",

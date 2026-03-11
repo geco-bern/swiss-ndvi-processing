@@ -7,20 +7,20 @@ import rasterio
 from tqdm import tqdm
 from rasterio.transform import Affine
 from rasterio.coords import BoundingBox
-import config
+
+from config import REF_BBOX, DATA_DIR
 
 # Reference raster metadata with 2m resolution
-ref_bounds = config.REF_BBOX
-ref_height_2m = int((ref_bounds.top - ref_bounds.bottom) / 2.0)
-ref_width_2m = int((ref_bounds.right - ref_bounds.left) / 2.0)
-ref_transform_2m = Affine(2.0, 0.0, ref_bounds.left,
-                       0.0, -2.0, ref_bounds.top)
+ref_height_2m = int((REF_BBOX.top - REF_BBOX.bottom) / 2.0)
+ref_width_2m = int((REF_BBOX.right - REF_BBOX.left) / 2.0)
+ref_transform_2m = Affine(2.0, 0.0, REF_BBOX.left,
+                       0.0, -2.0, REF_BBOX.top)
 
 # Create a Zarr array to store the DEM data
 compressors = zarr.codecs.BloscCodec(cname='zstd', clevel=3, shuffle=zarr.codecs.BloscShuffle.bitshuffle)
 zarr_array = zarr.create_array(
     name="dem_2m",
-    store="/data_2/scratch/sbiegel/processed/full_dem_2m.zarr",
+    store=f"{DATA_DIR}/full_dem_2m.zarr",
     shape=(ref_height_2m, ref_width_2m),
     chunks=(500, 500),
     dtype="float32",
@@ -41,7 +41,7 @@ with open("ch.swisstopo.swissalti3d-cZXsLw7Q.csv") as f:
 
 for url in tqdm(urls, desc="Processing DEM tiles"):
     with rasterio.open(url) as src:
-        if not bounds_intersect(src.bounds, ref_bounds):
+        if not bounds_intersect(src.bounds, REF_BBOX):
             continue
 
         data = src.read(1)

@@ -6,11 +6,11 @@ import rasterio
 from rasterio.windows import Window
 from affine import Affine
 from tqdm import tqdm
-from config import REF_BBOX as bbox_swisstopo_2056
+from config import REF_BBOX, DATA_DIR
 
 if __name__ == "__main__":
     root = zarr.open(
-        "/data_2/scratch/sbiegel/processed/full_dem_2m.zarr",
+        f"{DATA_DIR}/full_dem_2m.zarr",
         mode="r",
         zarr_format=3
     )
@@ -20,11 +20,10 @@ if __name__ == "__main__":
     ny, nx = dem2m.shape
     chunk_h, chunk_w = dem2m.chunks
 
-    ref_bounds   = bbox_swisstopo_2056
-    ref_h_2m     = int((ref_bounds.top - ref_bounds.bottom) / 2.0)
-    ref_w_2m     = int((ref_bounds.right - ref_bounds.left) / 2.0)
-    transform_2m = Affine(2.0, 0.0, ref_bounds.left,
-                        0.0,-2.0, ref_bounds.top)
+    ref_h_2m     = int((REF_BBOX.top - REF_BBOX.bottom) / 2.0)
+    ref_w_2m     = int((REF_BBOX.right - REF_BBOX.left) / 2.0)
+    transform_2m = Affine(2.0, 0.0, REF_BBOX.left,
+                        0.0,-2.0, REF_BBOX.top)
 
     profile = {
         "driver":     "COG",
@@ -41,7 +40,7 @@ if __name__ == "__main__":
         "BIGTIFF":   "YES",
     }
 
-    cog_path = "/data_2/scratch/sbiegel/processed/dem2m.tif"
+    cog_path = f"{DATA_DIR}/dem2m.tif"
     with rasterio.open(cog_path, "w", **profile) as dst:
 
         nchunks_y = (ny + chunk_h - 1) // chunk_h
