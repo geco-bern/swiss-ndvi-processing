@@ -85,12 +85,12 @@ echo "------------------------------------------------------------"
 # ============================================================
 # run script 01 and check results
 echo "------------------------------------------------------------"
-echo "Running: $SCRIPTS[0]"; echo "Start time: $(timestamp)"
+echo "Running: ${SCRIPTS[0]}"; echo "Start time: $(timestamp)"
 START_TIME=$(date +%s)
-echo python "${SCRIPTS[0]}" "$START_DATE" "$END_DATE" # TODO: remove echo to activate python script
+# python "${SCRIPTS[0]}" "$START_DATE" "$END_DATE"
 END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
-echo "Finished: $SCRIPTS[0]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+echo "Finished: ${SCRIPTS[0]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 echo
 
 
@@ -110,48 +110,48 @@ else
 
   # run script 02
   echo "------------------------------------------------------------"
-  echo "Running: $SCRIPTS[1]"; echo "Start time: $(timestamp)"
+  echo "Running: ${SCRIPTS[1]}"; echo "Start time: $(timestamp)"
   START_TIME=$(date +%s)
-  echo python "${SCRIPTS[1]}" # TODO: remove echo to activate python script
+  # python "${SCRIPTS[1]}"
   END_TIME=$(date +%s)
   ELAPSED=$((END_TIME - START_TIME))
-  echo "Finished: $SCRIPTS[1]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+  echo "Finished: ${SCRIPTS[1]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 
   # run script 03
   echo "------------------------------------------------------------"
-  echo "Running: $SCRIPTS[2]"; echo "Start time: $(timestamp)"
+  echo "Running: ${SCRIPTS[2]}"; echo "Start time: $(timestamp)"
   START_TIME=$(date +%s)
-  echo python "${SCRIPTS[2]}" "$START_DATE" "$END_DATE" # TODO: remove echo to activate python script
+  # python "${SCRIPTS[2]}" "$START_DATE" "$END_DATE"
   END_TIME=$(date +%s)
   ELAPSED=$((END_TIME - START_TIME))
-  echo "Finished: $SCRIPTS[2]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+  echo "Finished: ${SCRIPTS[2]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 
   # run script 04
   echo "------------------------------------------------------------"
-  echo "Running: $SCRIPTS[3]"; echo "Start time: $(timestamp)"
+  echo "Running: ${SCRIPTS[3]}"; echo "Start time: $(timestamp)"
   START_TIME=$(date +%s)
-  echo python "${SCRIPTS[3]}" "$START_DATE" "$END_DATE" # TODO: remove echo to activate python script
+  # python "${SCRIPTS[3]}" "$START_DATE" "$END_DATE"
   END_TIME=$(date +%s)
   ELAPSED=$((END_TIME - START_TIME))
-  echo "Finished: $SCRIPTS[3]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+  echo "Finished: ${SCRIPTS[3]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 
   # run script 05
   echo "------------------------------------------------------------"
-  echo "Running: $SCRIPTS[4]"; echo "Start time: $(timestamp)"
+  echo "Running: ${SCRIPTS[4]}"; echo "Start time: $(timestamp)"
   START_TIME=$(date +%s)
-  echo python "${SCRIPTS[4]}" "$START_DATE" "$END_DATE" # TODO: remove echo to activate python script
+  python "${SCRIPTS[4]}" "$START_DATE" "$END_DATE"
   END_TIME=$(date +%s)
   ELAPSED=$((END_TIME - START_TIME))
-  echo "Finished: $SCRIPTS[4]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+  echo "Finished: ${SCRIPTS[4]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 
   # run script 06
   echo "------------------------------------------------------------"
-  echo "Running: $SCRIPTS[5]"; echo "Start time: $(timestamp)"
+  echo "Running: ${SCRIPTS[5]}"; echo "Start time: $(timestamp)"
   START_TIME=$(date +%s)
-  echo python "${SCRIPTS[5]}" "$START_DATE" "$END_DATE" # TODO: remove echo to activate python script
+  # python "${SCRIPTS[5]}" "$START_DATE" "$END_DATE"
   END_TIME=$(date +%s)
   ELAPSED=$((END_TIME - START_TIME))
-  echo "Finished: $SCRIPTS[5]"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+  echo "Finished: ${SCRIPTS[5]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 fi
 
 PIPELINE_END=$(date +%s)
