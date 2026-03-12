@@ -23,7 +23,7 @@ warnings.filterwarnings(
 INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
 SOURCE_ZARR_MERGED = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/04_merged_ndvi/"  # This is the OUT_ZARR from script 4
 
-OUTPUT_BASE        = "/mnt/data1/UniBe-swiss-ndvi/tmp_ndvi_05_processed.zarr"
+OUTPUT_BASE        = "/mnt/data1/UniBe-swiss-ndvi/tmp_ndvi_05_processed_2026-03-12.zarr"
 #TODO: try to remove this: OUTPUT_BASE_tmp = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/tmp.zarr" # here the computation will be written and then stacked to the OUTPUT_BSAE folder
 DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data/"
 os.makedirs(DASK_TEMP_DIR, exist_ok=True)
@@ -352,8 +352,8 @@ def continuous_ndvi(ndvi_arr, median_arr,bool_dates,*, full_dates, dates_array):
 if __name__ == '__main__':
 
     #N_WORKERS = 150 # TODO reactivate
-    # N_WORKERS = 50 # NOTE: going above 50 seems to lead to communication issues
-    N_WORKERS = 100
+    N_WORKERS = 50
+    # N_WORKERS = 100
     MEMORY_PER_WORKER = "36GB"
 
     client = Client(
@@ -376,7 +376,7 @@ if __name__ == '__main__':
     ds = xr.open_mfdataset(SOURCE_ZARR_MERGED_LIST)
     #ds = ds.isel(pixel = slice(0, 10**6)) # TODO: generate here a small example on the fly. 
     #ds = ds.isel(pixel=slice(0,3000)) # TODO: generate here a small example on the fly
-    #ds = ds.isel(pixel=slice(0,100)) # TODO: generate here a small example on the fly
+    ds = ds.isel(pixel=slice(0,100)) # TODO: generate here a small example on the fly
 
     #ds_to_use_in_future = xr.open_zarr(SOURCE_ZARR) # TODO: directly load this instead of SOURCE_ZARR_MERGED
     #ds_to_use_in_future = zarr.open_group(SOURCE_ZARR, mode="r")
