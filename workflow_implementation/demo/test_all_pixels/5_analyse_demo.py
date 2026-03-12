@@ -351,11 +351,16 @@ def continuous_ndvi(ndvi_arr, median_arr,bool_dates,*, full_dates, dates_array):
 
 if __name__ == '__main__':
 
-    #N_WORKERS = 150 # TODO reactivate
-    N_WORKERS = 50
-    # N_WORKERS = 100
-    MEMORY_PER_WORKER = "36GB"
-
+                                   # ON TUNDER:
+    # N_WORKERS = 150              # A: This takes:                       and 3min51s for 100 pixels and shows communication errors. (when loading dates_array from disk)
+    # MEMORY_PER_WORKER = "24GB"   # A: This takes:                       and 3min51s for 100 pixels and shows communication errors. (when loading dates_array from disk)
+    # N_WORKERS = 100              # B: This takes: 2min20s for 50 pixels and 2min51s for 100 pixels                                 (when loading dates_array from disk)
+    # MEMORY_PER_WORKER = "36GB"   # B: This takes: 2min20s for 50 pixels and 2min51s for 100 pixels                                 (when loading dates_array from disk)
+    # N_WORKERS = 50               # C: This takes:                           2min30s for 100 pixels                                 (when loading dates_array from disk)
+    # MEMORY_PER_WORKER = "36GB"   # C: This takes:                           2min30s for 100 pixels                                 (when loading dates_array from disk)
+    N_WORKERS = 10               # D: This takes: 1min55s for 50 pixels and 2min22s for 100 pixels and 5min43s for 500 pixels (when loading dates_array from disk)
+    MEMORY_PER_WORKER = "12GB"   # D: This takes: 1min55s for 50 pixels and 2min22s for 100 pixels and 5min43s for 500 pixels (when loading dates_array from disk)
+    
     client = Client(
         n_workers=N_WORKERS,
         threads_per_worker=1,
@@ -364,7 +369,8 @@ if __name__ == '__main__':
         dashboard_address=":8345",
         local_directory= DASK_TEMP_DIR
     )
-    print(client.dashboard_link)
+    print(client, flush = True)
+    print(client.dashboard_link, flush = True)
 
     # -----------------------------
     # 2) Open Zarr dataset
@@ -376,7 +382,9 @@ if __name__ == '__main__':
     ds = xr.open_mfdataset(SOURCE_ZARR_MERGED_LIST)
     #ds = ds.isel(pixel = slice(0, 10**6)) # TODO: generate here a small example on the fly. 
     #ds = ds.isel(pixel=slice(0,3000)) # TODO: generate here a small example on the fly
-    ds = ds.isel(pixel=slice(0,100)) # TODO: generate here a small example on the fly
+    #ds = ds.isel(pixel=slice(0,100)) # TODO: generate here a small example on the fly
+    #ds = ds.isel(pixel=slice(0,50)) # TODO: generate here a small example on the fly
+    ds = ds.isel(pixel=slice(0,500)) # TODO: generate here a small example on the fly
 
     #ds_to_use_in_future = xr.open_zarr(SOURCE_ZARR) # TODO: directly load this instead of SOURCE_ZARR_MERGED
     #ds_to_use_in_future = zarr.open_group(SOURCE_ZARR, mode="r")
@@ -401,15 +409,14 @@ if __name__ == '__main__':
     dates        = ds["date"] 
 
     # For dates_array, use full range:
-    dates_array = get_swisstopo_sentinel_dates(start="2017-01-01", end="2025-12-31")    # TODO: what happens with this in the future? Will this break? Will this slow down?
-    # dates_array_orig = dates_array
-    # append the last dates if not present
-    if dates_array[-1].astype('datetime64[D]') != np.datetime64('2025-12-31', 'D'):     # TODO: what happens with this in the future? Will this break? Will this slow down?
-        dates_array = np.append(dates_array, np.datetime64('2025-12-31', 'D'))
-    dates_array = np.sort(np.unique(dates_array))
+    # dates_array = get_swisstopo_sentinel_dates(start="2017-01-01", end="2025-12-31")    # TODO: what happens with this in the future? Will this break? Will this slow down?
+    # # dates_array_orig = dates_array
+    # # append the last dates if not present
+    # if dates_array[-1].astype('datetime64[D]') != np.datetime64('2025-12-31', 'D'):     # TODO: what happens with this in the future? Will this break? Will this slow down?
+    #     dates_array = np.append(dates_array, np.datetime64('2025-12-31', 'D'))
+    # dates_array = np.sort(np.unique(dates_array))
     #np.save("/mnt/data1/UniBe-swiss-ndvi/data/temp_dates_array.npy", dates_array)
-    #dates_array = np.load("/mnt/data1/UniBe-swiss-ndvi/data/temp_dates_array.npy")
-
+    dates_array = np.load("/mnt/data1/UniBe-swiss-ndvi/data/temp_dates_array.npy") # TODO reactivate above code
 
     # Run continuous_ndvi
     ndvi_arr, mask_ndvi_arr = xr.apply_ufunc(
