@@ -1,7 +1,6 @@
 """
 Merge all-time (historic) record onto newly downloaded NDVI data to prepare for script 5
 """
-# "Run Python File" in VSCode
 import numpy as np
 import zarr
 import pandas as pd
@@ -10,6 +9,7 @@ import xarray as xr
 import dask.array as da
 from dask.distributed import Client, LocalCluster
 import argparse
+import datetime
 
 if __name__ == "__main__":
     
@@ -20,11 +20,13 @@ if __name__ == "__main__":
                 #              ).isel(pixel = slice(0, 10**6) # TODO: generate here a small example on the fly.
                 #                     ).to_zarr(TODO_SMALL_HIST_NDVI_TO_UPDATE, mode="w", consolidated=True)
     
-    OUT_ZARR_TMP = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged.zarr" # TODO: do not create this but simply merge in script 5
+    OUT_ZARR_TMP   = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged.zarr" # TODO: do not create this but simply merge in script 5
+    OUT_ZARR_TMPold= "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_2026-03-12/" # TODO: do not create this but simply merge in script 5
+    os.makedirs(OUT_ZARR_TMPold, exist_ok=True)
     DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data/"
     os.makedirs(DASK_TEMP_DIR, exist_ok=True)
 
-    N_WORKERS = 150
+    N_WORKERS = 50
     MEMORY_PER_WORKER = "24GB"
     cluster = LocalCluster(
         n_workers=N_WORKERS,
@@ -35,7 +37,8 @@ if __name__ == "__main__":
         local_directory= DASK_TEMP_DIR,
     )
     client = Client(cluster)
-    print(client.dashboard_link) # use this dashboard to follow progress
+    print(client, flush = True)
+    print(client.dashboard_link, flush = True) # use this dashboard to follow progress
 
 
     # =====================================================
@@ -84,7 +87,7 @@ if __name__ == "__main__":
 
 
     daily_dates = pd.date_range(start=start_date, end=end_date, freq="D")
-    print(f"Generated {len(daily_dates)} daily dates from {daily_dates.min().date()} to {daily_dates.max().date()}")
+    print(f"Generated {len(daily_dates)} daily dates from {daily_dates.min().date()} to {daily_dates.max().date()}", flush = True)
 
     obs_dates = daily_dates.isin(dates)
 
@@ -119,7 +122,7 @@ if __name__ == "__main__":
             "obs" : obs_dates_xr
         }
     ).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-    print("Date added")
+    print("Date added", flush = True)
 
     # out_ds has: coords pixel, date; vars ndvi, obs
     # Rename obs -> obs_date so names match historic
@@ -143,48 +146,56 @@ if __name__ == "__main__":
     # Now merged_ds has variables: ndvi, obs_date (for all time)
     # and coords: pixel, date, x, y
                         # TODO: can we simply write this out in a single (chunked data set instead of manually splitting by year?)
-                        #       It appears that no. 
-    # Write to Zarr
+                        #       I would guess so. But currently first fix script 5 with the yearly files before attempting to make a shortcut here.
+    # Write to Zarr (as single file)
+    _now = datetime.datetime.now()
+    print(f"{_now.strftime("%Y-%m-%d %H:%M:%S")} - Writing single-file data: {OUT_ZARR_TMP}", flush = True)
     merged_ds.to_zarr(OUT_ZARR_TMP, mode="w", consolidated=True, compute=True)
+    _now = datetime.datetime.now()
+    print(f"{_now.strftime("%Y-%m-%d %H:%M:%S")} - Finished writing single-file data: {OUT_ZARR_TMP}", flush = True)
 
-    # TODO: check: date_stack = merged_ds["date"].astype("datetime64[D]")
-# TODO: check: 
-    # TODO: check: years = pd.DatetimeIndex(date_stack).year   
-# TODO: check: 
-    # TODO: check: # Years: 2017-2026
-    # TODO: check: start_year = pd.to_datetime(start_date).year
-    # TODO: check: end_year   = pd.to_datetime(end_date).year
-    # TODO: check: years = [start_year] if start_year == end_year else [start_year, end_year]
-# TODO: check: 
-    # TODO: check: for year in years:
-# TODO: check: 
-    # TODO: check:     year_dates = merged_ds.date.dt.year == year
-    # TODO: check:     year_ds = merged_ds.isel(date=year_dates)
-# TODO: check: 
-    # TODO: check:     year_ds = year_ds.load()
-# TODO: check: 
-    # TODO: check:     out_ds_year = xr.Dataset(
-    # TODO: check:         {
-    # TODO: check:             "ndvi": year_ds["ndvi"], 
-    # TODO: check:             "obs_date": year_ds["obs_date"],
-    # TODO: check:         },
-    # TODO: check:         coords={
-    # TODO: check:             "pixel": year_ds.pixel,
-    # TODO: check:             "date": year_ds.date,
-    # TODO: check:             "x": year_ds["x"],
-    # TODO: check:             "y": year_ds["y"],
-    # TODO: check:         },
-    # TODO: check:     )
-    # TODO: check:     
-    # TODO: check:     out_ds_year["obs_date"].encoding = {"dtype": "bool"}
-    # TODO: check:     
-    # TODO: check:     for coord in ["x", "y", "pixel", "date"]:
-    # TODO: check:         out_ds_year[coord].encoding = {}
-    # TODO: check:     
-    # TODO: check:     # Write to year-specific folder
-    # TODO: check:     year_out_zarr = f"{base_out_dir}/{year}.zarr"
-    # TODO: check:     print(f"Writing {year}: {len(year_ds.date)} dates to {year_out_zarr}")
-# TODO: check: 
-    # TODO: check:     out_ds_year.to_zarr(year_out_zarr, mode="w", consolidated=True)
+    # TODO: IF THAT WORKS FINISH SCRIPT HERE.
+
+    # TODO: OTHERWISE CONTINUE WITH ALTERNATIVE:
+    # OR ALTERNATIVE: Write to Zarr (as yearly files)
+    date_stack = merged_ds["date"].astype("datetime64[D]")
+
+    years = pd.DatetimeIndex(date_stack).year   
+
+    # Years: 2017-2026
+    start_year = pd.to_datetime(start_date).year
+    end_year   = pd.to_datetime(end_date).year
+    years = [start_year] if start_year == end_year else [start_year, end_year]
+
+    for year in years:
+
+        year_dates = merged_ds.date.dt.year == year
+        year_ds = merged_ds.isel(date=year_dates)
+
+        year_ds = year_ds.load()
+
+        out_ds_year = xr.Dataset(
+            {
+                "ndvi": year_ds["ndvi"], 
+                "obs_date": year_ds["obs_date"],
+            },
+            coords={
+                "pixel": year_ds.pixel,
+                "date": year_ds.date,
+                "x": year_ds["x"],
+                "y": year_ds["y"],
+            },
+        )
+        
+        out_ds_year["obs_date"].encoding = {"dtype": "bool"}
+        
+        for coord in ["x", "y", "pixel", "date"]:
+            out_ds_year[coord].encoding = {}
+        
+        # Write to year-specific folder
+        year_out_zarr = f"{OUT_ZARR_TMPold}/{year}.zarr"
+        print(f"Writing {year}: {len(year_ds.date)} dates to {year_out_zarr}", flush = True)
+
+        out_ds_year.to_zarr(year_out_zarr, mode="w", consolidated=True)
 
     print("All done")
