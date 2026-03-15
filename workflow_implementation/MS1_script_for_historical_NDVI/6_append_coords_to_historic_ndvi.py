@@ -13,11 +13,13 @@
 #   * pixel           (pixel) int32 423MB 0 1 2 ... 105715393 105715394 105715395
 #     x               (pixel) int32 423MB dask.array<chunksize=(500000,), meta=np.ndarray>
 #     y               (pixel) int32 423MB dask.array<chunksize=(500000,), meta=np.ndarray>
-#     x_idx           (pixel) int32 423MB 1461 1462 1463 ... 23525 23525 23525
-#     y_idx           (pixel) int32 423MB 21050 21050 21049 ... 24852 24853 24854
+#     x_idx           (pixel) int32 423MB dask.array<chunksize=(500000,), meta=np.ndarray>
+#     y_idx           (pixel) int32 423MB dask.array<chunksize=(500000,), meta=np.ndarray>
 # Data variables:
 #     ndvi_processed  (pixel, date) int16 669GB dask.array<chunksize=(500000, 30), meta=np.ndarray>
 #     mask_array      (pixel, date) bool 334GB dask.array<chunksize=(500000, 30), meta=np.ndarray>
+# Attributes:
+#     note:     \n    # Define grid underlying PixelID and needed transformatio...
 
 #### The input structure was the following:
 # <xarray.Dataset> Size: 1TB
@@ -228,7 +230,7 @@ if __name__ == "__main__":
         # Explicit encoding: simple compressor for each data var
         encoding_compr = {v: {"compressor": compressor} for v in out_ds.data_vars}
         t0=time.perf_counter()
-        out_ds.isel(date = range(-300,-0), pixel = range(0,500)).chunk(           # for  testing add before .chunk(): .isel(pixel = range(0,1000000))
+        out_ds.chunk(           # for  testing add before .chunk(): .isel(date = range(-300,-0), pixel = range(0,500))
             {"pixel": 500000, "date": 30}
             ).to_zarr(
                 OUT_HISTORIC_ZARR_v4_compr,
@@ -239,7 +241,7 @@ if __name__ == "__main__":
                 zarr_version=3)
         print(f"It {it}: Elapsed: {time.perf_counter()-t0:.3f}s")
         # NOTE: for 5000x3164 this takes 2633 secs to write (with 40 workers)
-        # NOTE: for 500000x30 this takes 2825 secs to write (with 35 workers)
+        # NOTE: for 500000x30 this takes 2699 secs to write (with 35 workers)
 
         # Also genereate a spatial subset with a bounding box:
         xmin, xmax = 2600000, 2601000
@@ -265,7 +267,7 @@ if __name__ == "__main__":
                 zarr_version=3)
         print(f"It {it}: Elapsed: {time.perf_counter()-t0:.3f}s")
         # NOTE: for 500000x30 chunking (but only 79 pixels) this takes 1.8 secs to write (with 35 workers)
-        # NOTE: for 500000x30 chunking (but only 4200 pixels) this takes 9.9 secs to write (with 35 workers)
+        # NOTE: for 500000x30 chunking (but only 4200 pixels) this takes 5.5 secs to write (with 35 workers)
 
 
     # =====================================================
@@ -298,7 +300,7 @@ if __name__ == "__main__":
     # do manually in a terminal:
     # ssh dash
     # tmux
-    # rsync --dry-run -a --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v2.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
-    # rsync --dry-run -a --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v4.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
-    # rsync --dry-run -a --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v4_compr.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
-    # rsync --dry-run -a --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v4_compr_1000mX1000m.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
+    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v2.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
+    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v4.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
+    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v4_compr.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
+    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v4_compr_1000mX1000m.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
