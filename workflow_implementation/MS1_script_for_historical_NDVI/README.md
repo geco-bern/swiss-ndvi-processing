@@ -76,6 +76,6 @@ After the NdVI processing is performed, we generate the mask array according to 
 
 ## 6_append_coords_to_historic_ndvi.py
 This simplifies use of the historic NDVI data set by
-- appending x and y coordinates
+- appending x and y coordinates (and x and y index of regular grid for tiff generation and definition of PixelID in NOTE attribute of zarr file)
 - reduces file size by using compression
 - and uses a better chunking structure to facilitate appending new NDVI data
