@@ -102,12 +102,35 @@ compiled = compile(code_str, "<NDVI_historic.note>", "exec")
 exec(compiled, ns)
 trans = ns.get("trans")
 
-# With v4 we now have access to x_idx and y_idx:
-# Define tiff-size:
-rows = NDVI_historic.y_idx.values
-cols = NDVI_historic.x_idx.values
-height = rows.max() + 1 # TODO: actually would need to define window...
-width = cols.max() + 1  # TODO: actually would need to define window...
+# With v4 we now have access to x_idx and y_idx.
+# Compute minimal bounding window that contains all pixels, then shift indices
+# so the grid uses a compact array sized to that window.
+rows = NDVI_historic.y_idx.values.astype(int)
+cols = NDVI_historic.x_idx.values.astype(int)
+
+# bounding box in full-raster coordinates
+min_row = int(rows.min())
+min_col = int(cols.min())
+max_row = int(rows.max())
+max_col = int(cols.max())
+
+# size of the output window
+height = max_row - min_row + 1
+width = max_col - min_col + 1
+
+# local indices inside the compact window
+local_rows = (rows - min_row).astype(int)
+local_cols = (cols - min_col).astype(int)
+
+# Compute affine transform for the compact window by shifting the original transform
+# new_c = c + min_col*a + min_row*b
+# new_f = f + min_col*d + min_row*e
+if trans is None:
+    raise RuntimeError("affine transform 'trans' not found in NDVI_historic.note and is required")
+orig = trans
+new_c = orig.c + min_col * orig.a + min_row * orig.b
+new_f = orig.f + min_col * orig.d + min_row * orig.e
+window_trans = rasterio.Affine(orig.a, orig.b, new_c, orig.d, orig.e, new_f)
 
 # Run tiff-generation for requested date
 dates_done = [s[:8] for s in os.listdir(OUTPUT_TIFF_BASE)]
@@ -117,21 +140,21 @@ for curr_date in [curr_date]:
     if (curr_date_str in dates_done):
         print(f"Skipping file (already exported): {curr_date_str}.tiff")
     else:
-        # Initialize regular grid filled with NaN for tiff to be filled with values
+        # Initialize compact window grid filled with NaN for tiff to be filled with values
         grid_ndvi = np.full((height, width), np.nan) # TODO: add again: , dtype=np.int16
         grid_mask = np.full((height, width), np.nan) # TODO: add again: , dtype=np.int16
 
-        # Fill regular grid with values
-        grid_ndvi[rows, cols] = NDVI_historic.sel(date=curr_date)['ndvi_processed'].values
-        grid_mask[rows, cols] = NDVI_historic.sel(date=curr_date)['mask_array'].values
+        # Fill compact window grid using local indices
+        grid_ndvi[local_rows, local_cols] = NDVI_historic.sel(date=curr_date)['ndvi_processed'].values
+        grid_mask[local_rows, local_cols] = NDVI_historic.sel(date=curr_date)['mask_array'].values
 
-        # Transform back into a xarray/rioxarray DataArray that spans a regular x-y-grid
-        NDVI_processed_curr_date_gridded = xr.DataArray(grid_ndvi,dims=("y", "x"))
-        NDVI_processed_curr_date_gridded = NDVI_processed_curr_date_gridded.rio.write_transform(trans)
+        # Transform back into a xarray/rioxarray DataArray that spans the compact x-y-grid
+        NDVI_processed_curr_date_gridded = xr.DataArray(grid_ndvi, dims=("y", "x"))
+        NDVI_processed_curr_date_gridded = NDVI_processed_curr_date_gridded.rio.write_transform(window_trans)
         NDVI_processed_curr_date_gridded = NDVI_processed_curr_date_gridded.rio.write_crs("EPSG:2056")
 
-        NDVI_status_curr_date_gridded = xr.DataArray(grid_mask,dims=("y", "x"))
-        NDVI_status_curr_date_gridded = NDVI_status_curr_date_gridded.rio.write_transform(trans)
+        NDVI_status_curr_date_gridded = xr.DataArray(grid_mask, dims=("y", "x"))
+        NDVI_status_curr_date_gridded = NDVI_status_curr_date_gridded.rio.write_transform(window_trans)
         NDVI_status_curr_date_gridded = NDVI_status_curr_date_gridded.rio.write_crs("EPSG:2056")
 
         # Output as cloud optimized Geotiff:
@@ -170,3 +193,5 @@ for curr_date in [curr_date]:
 # rsync 
 # rsync -avhz --progress -e 'ssh -p 2222' fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v3_compr/20240722-nonCOG.tiff ~/Downloads/test/tiffs_historic/
 # rsync -avhz --progress -e 'ssh -p 2222' fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v3_compr/20240722.tiff ~/Downloads/test/tiffs_historic/
+# rsync -avhz --progress -e 'ssh -p 2222' fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240722.tiff ~/Downloads/test/tiffs_historic/
+# rsync -avhz --progress -e 'ssh -p 2222' fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240722-nonCOG.tiff ~/Downloads/test/tiffs_historic/
