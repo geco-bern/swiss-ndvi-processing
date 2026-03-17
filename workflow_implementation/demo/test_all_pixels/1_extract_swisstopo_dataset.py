@@ -205,6 +205,12 @@ if (len(s2_files) > 0):
     ndsi_ds.attrs['description'] = 'NDSI (scaled int16: -10000 to 10000)'
     ndvi_ds.attrs['nodata'] = NO_COVERAGE
     ndvi_ds.attrs['cloud_shadow'] = INVALID
+    # FOR INTERACTIVE DEVELOPMENT:
+    #     from time import sleep
+    #     for t, item in tqdm(enumerate(s2_files), total=len(s2_files)):
+    #         print(item)
+    #         print(item.datetime)
+    #         sleep(1)
     def add_timestep_to_zarr(t, item):
         timestep_dttm = item.datetime
         assets = item.assets
@@ -212,6 +218,14 @@ if (len(s2_files) > 0):
         bands20_asset = assets[[k for k in assets if k.endswith('bands-20m.tif')][0]]
         masks_asset = assets[[k for k in assets if k.endswith('masks-10m.tif')][0]]
 
+        # FOR INTERACTIVE DEVELOPMENT
+        #     from contextlib import ExitStack
+
+        #     import rasterio
+        #     stack = ExitStack()
+        #     b10_src = stack.enter_context(rasterio.open(bands10_asset.href))
+        #     b20_src = stack.enter_context(rasterio.open(bands20_asset.href))
+        #     masks_src = stack.enter_context(rasterio.open(masks_asset.href))
         with rasterio.open(bands10_asset.href) as b10_src, \
             rasterio.open(bands20_asset.href) as b20_src, \
             rasterio.open(masks_asset.href) as masks_src:
@@ -236,20 +250,9 @@ if (len(s2_files) > 0):
                 swir = b20_src.read(3, window=b20_window)
                 masks = masks_src.read([1, 2], window=b10_window).astype("uint8")
 
-            terrain_mask, cloud_mask = masks
-            cloud_shadows_mask = (terrain_mask == 100) | (cloud_mask == 1)
-            nodata_mask_ndvi = (red == 9999) | (nir == 9999) | (terrain_mask == 255) | (cloud_mask == 255)
-
-            # Compute NDVI
-            red = red.astype("float32") / 10000.0
-            nir = nir.astype("float32") / 10000.0
-            ndvi = (nir - red) / (nir + red)
-            ndvi = np.clip(ndvi, -1.0, 1.0)
-            ndvi_scaled = (np.nan_to_num(ndvi, nan=NO_COVERAGE / 10000.0) * 10000.0).astype("int16")
-
             # Reproject SWIR to align with green band
             h, w = green.shape
-            src_transform = b20_src.window_transform(b20_window)
+            src_transform    = b20_src.window_transform(b20_window)
             target_transform = b10_src.window_transform(b10_window)
 
             swir_10m = np.full((h, w), 9999, dtype=np.float32)
@@ -265,14 +268,44 @@ if (len(s2_files) > 0):
                 dst_nodata=9999
             )
 
+            # Prepare NDVI and NDSI computation: define masks
+            terrain_mask, cloud_mask = masks
+            cloud_shadows_mask = (terrain_mask == 100) | (cloud_mask == 1)
+            nodata_mask_ndvi = (red == 9999) | (nir == 9999) | (terrain_mask == 255) | (cloud_mask == 255)
             nodata_mask_ndsi = (green == 9999) | (swir_10m == 9999) | (terrain_mask == 255) | (cloud_mask == 255)
 
-            # Compute NDSI
-            green = green.astype("float32") / 10000.0
-            swir_10m = swir_10m.astype("float32") / 10000.0
-            ndsi = (green - swir_10m) / (green + swir_10m)
-            ndsi = np.clip(ndsi, -1.0, 1.0)
-            ndsi_scaled = (np.nan_to_num(ndsi, nan=NO_COVERAGE / 10000.0) * 10000.0).astype("int16")
+            #np.nonzero(~cloud_shadows_mask) # these are row,cols where we do have values
+            #np.nonzero(~nodata_mask_ndvi) # these are row,cols where we do have values
+            #np.nonzero(~nodata_mask_ndsi) # these are row,cols wwhere we do have values
+
+            # Prepare NDVI and NDSI computation (scale bands to [0,1])
+            red01       = red.astype("float32") / 10000.0
+            nir01       = nir.astype("float32") / 10000.0
+            green01     = green.astype("float32") / 10000.0
+            swir_10m_01 = swir_10m.astype("float32") / 10000.0
+            
+            # Compute NDVI and NDSI
+            # Guard against division by zero
+            denom_ndvi = (nir01 + red01)
+            denom_ndsi = (green01 + swir_10m_01)
+
+            # if np.all(denom_ndvi == 0):
+            #     continue
+            with np.errstate(invalid='ignore', divide='ignore'):
+                ndvi = np.where(denom_ndvi != 0, (nir01 - red01) / denom_ndvi, np.nan)
+            # if np.all(np.isnan(ndvi)):
+            #     continue
+            # if np.all(denom_ndsi == 0):
+            #     continue
+            with np.errstate(invalid='ignore', divide='ignore'):
+                ndsi = np.where(denom_ndsi != 0, (green01 - swir_10m_01) / denom_ndsi, np.nan)
+            # if np.all(np.isnan(ndsi)):
+            #     continue
+            
+            ndvi_clipped = np.clip(ndvi, -1.0, 1.0)
+            ndvi_scaled = (np.nan_to_num(ndvi_clipped, nan=NO_COVERAGE / 10000.0) * 10000.0).astype("int16")
+            ndsi_clipped = np.clip(ndsi, -1.0, 1.0)
+            ndsi_scaled = (np.nan_to_num(ndsi_clipped, nan=NO_COVERAGE / 10000.0) * 10000.0).astype("int16")
 
         # Window for slicing forest mask and index map
         window = from_bounds(*b10_src.bounds, transform=ref_meta["transform"]).round_offsets().round_lengths()
@@ -316,6 +349,7 @@ if (len(s2_files) > 0):
         ndsi_row[current_flat_indices[cloud_only_ndsi]] = INVALID
         ndsi_ds[t] = ndsi_row # write to zarr
 
+    print(f"Starting download for:\n{"\n".join([item.datetime.strftime('%Y-%m-%d_%Hh%M') for item in s2_files])}", flush=True)
 
     failed_timesteps = []
     for t, path in tqdm(enumerate(s2_files), total=len(s2_files)):
