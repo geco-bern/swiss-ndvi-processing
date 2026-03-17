@@ -9,11 +9,8 @@ import pystac_client
 import zarr
 import argparse
 
-# Append dates to this (acts as in- and output zarr file)
-IN_OUTPUT_ZARR_TEMP = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_02-03_downloadedB.zarr" # or store into /var/tmp/
-
 #def get_swisstopo_sentinel_dates(start='2025-12-01', end='2026-02-16'):
-def get_swisstopo_sentinel_dates(start, end): # start='2025-12-01', end='2026-02-16'
+def get_swisstopo_sentinel_dates(start, end, zarr_file): # start='2025-12-01', end='2026-02-16'
     # Connect to Swisstopo STAC API
     service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
     service.add_conforms_to("COLLECTIONS")
@@ -40,7 +37,7 @@ def get_swisstopo_sentinel_dates(start, end): # start='2025-12-01', end='2026-02
     pd_dates = pd.to_datetime(dates)
     pd_dates_str = pd_dates.strftime('%Y-%m-%d')
 
-    root = zarr.open_group(IN_OUTPUT_ZARR_TEMP, mode='a', zarr_format=3)
+    root = zarr.open_group(zarr_file, mode='a', zarr_format=3)
     root.create_array(
         name='date',
         dtype='S10',
@@ -54,13 +51,19 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
     parser.add_argument("end_date", help="End date in YYYY-MM-DD")
+    parser.add_argument("IN_OUTPUT_ZARR", help="Full path of Zarr folder, modified with script 2")
     args = parser.parse_args()
 
     start_date = args.start_date
     end_date = args.end_date
     # if running interactively use e.g.:
     # start_date = "2025-11-30" # for dates requested...
-    # end_date = "2026-03-10"   # ...in script 1 when downloading
+    # end_date = "2025-12-12"   # ...in script 1 when downloading
 
-    get_swisstopo_sentinel_dates(start=start_date, end=end_date)
+    # Append dates to this (acts as in- and output zarr file)
+    IN_OUTPUT_ZARR_TEMP = args.IN_OUTPUT_ZARR
+    # if running interactively use e.g.:
+    #   IN_OUTPUT_ZARR_TEMP = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_16h27_ndvi_02-03_downloadedB_2025-11-30_2025-12-12.zarr"
+
+    get_swisstopo_sentinel_dates(start=start_date, end=end_date, zarr_file = IN_OUTPUT_ZARR_TEMP)
     print("Dates added to Zarr dataset.")

@@ -13,17 +13,36 @@ import datetime
 
 if __name__ == "__main__":
     
-    SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" # the zarr from script 3
-    historical_ndvi_src = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v3_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
-                # TODO_SMALL_HIST_NDVI_TO_UPDATE = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v3_compr_subset.zarr" ## TODO: Small example for code development
-                # xr.open_zarr(historical_ndvi_src, chunks={}
-                #              ).isel(pixel = slice(0, 10**6) # TODO: generate here a small example on the fly.
-                #                     ).to_zarr(TODO_SMALL_HIST_NDVI_TO_UPDATE, mode="w", consolidated=True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
+    parser.add_argument("end_date", help="End date in YYYY-MM-DD")
+    parser.add_argument("SOURCE_ZARR", help="Full path of Zarr folder, modified with script 2 and 3")
+    args = parser.parse_args()
+
+    start_date = args.start_date
+    end_date = args.end_date
+    SOURCE_ZARR = args.SOURCE_ZARR
+    # if running interactively use e.g.:
+    #   start_date = "2025-11-30" # for dates requested...
+    #   end_date = "2026-03-10"   # ...in script 1 when downloading
+    #   end_date = "2025-12-12"   # ...in script 1 when downloading
+    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_16h27_ndvi_02-03_downloadedB_2025-11-30_2025-12-12.zarr"
+                    #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" # the zarr from script 3
+                    #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_02-03_downloadedB.zarr" # the zarr from script 3
+                    #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_02-03_downloadedB_2026-03-17.zarr" # the zarr from script 3
+                    #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_16h27_ndvi_02-03_downloadedB_2025-11-30_2025-12-12.zarr"
+                    #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_16h35_ndvi_02-03_downloadedB_2025-11-30_2025-12-06.zarr"
+                    # SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" 
+    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr"
+
+    historical_ndvi_src = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+    #historical_ndvi_src = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v3_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
     
-    OUT_ZARR_TMP   = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged.zarr" # TODO: do not create this but simply merge in script 5
-    OUT_ZARR_TMPold= "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_2026-03-12/" # TODO: do not create this but simply merge in script 5
-    os.makedirs(OUT_ZARR_TMPold, exist_ok=True)
-    DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data/"
+    OUT_ZARR_TMP   = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_3rd.zarr" # TODO: do not create this but simply merge in script 5
+    #OUT_ZARR_TMPold= "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_2026-03-12/" # TODO: do not create this but simply merge in script 5
+    #os.makedirs(OUT_ZARR_TMPold, exist_ok=True)
+    
+    DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data3/"
     os.makedirs(DASK_TEMP_DIR, exist_ok=True)
 
     N_WORKERS = 50
@@ -33,7 +52,7 @@ if __name__ == "__main__":
         threads_per_worker=1,
         processes=True,
         memory_limit=MEMORY_PER_WORKER,
-        dashboard_address=":8345",
+        dashboard_address=":8343",
         local_directory= DASK_TEMP_DIR,
     )
     client = Client(cluster)
@@ -56,25 +75,10 @@ if __name__ == "__main__":
         }
     )
 
-    # DATE_CHUNKS = 365
-    # PIXEL_CHUNKS = 10000
-    DATE_CHUNKS  = historic_ds.chunks['date'][1]  # should be 30 days
-    PIXEL_CHUNKS = historic_ds.chunks['pixel'][1]
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
-    parser.add_argument("end_date", help="End date in YYYY-MM-DD")
-    args = parser.parse_args()
-
-    start_date = args.start_date
-    end_date = args.end_date
-    # if running interactively use e.g.:
-    # start_date = "2025-11-30" # for dates requested...
-    # end_date = "2026-03-10"   # ...in script 1 when downloading
-
-    start_date = np.datetime64(start_date, "D")
-    end_date = np.datetime64(end_date, "D")
-
+    #DATE_CHUNKS = 365
+    #PIXEL_CHUNKS = 10000
+    DATE_CHUNKS  = historic_ds.chunks['date'][0]  # should be 30 days # TODO: why not this?
+    PIXEL_CHUNKS = historic_ds.chunks['pixel'][0]                     # TODO: why not this?
 
     ds0 = zarr.open_group(SOURCE_ZARR, mode="r")
     ndvi_z = ds0["ndvi"]
