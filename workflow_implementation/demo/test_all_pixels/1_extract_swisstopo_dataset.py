@@ -1,7 +1,6 @@
 """
 Extract Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI time series for forested areas.
 """
-# TODO: note: would it make sense to combine scripts 1,2,3 ? Yes it would make sense.
 
 import pystac_client
 import rasterio
@@ -34,9 +33,6 @@ end_date = args.end_date
 # CONFIGURE:
 today = datetime.today().strftime("%Y-%m-%d_%Hh%M")
 OUTPUT_ZARR_TEMP = f"/mnt/data1/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloadedA_{start_date}_{end_date}.zarr"
-if os.path.exists(OUTPUT_ZARR_TEMP):
-    shutil.rmtree(OUTPUT_ZARR_TEMP)
-
 # ==============================================================================
 
 # Start script:
@@ -165,6 +161,11 @@ if (len(s2_files) > 0):
     # Use int16 to save space, with a fill value for no coverage
     # Use compression to save space
     compressors = zarr.codecs.BloscCodec(cname='zstd', clevel=3, shuffle=zarr.codecs.BloscShuffle.bitshuffle)
+
+    # delete Zarr store if it is existing already
+    if os.path.exists(OUTPUT_ZARR_TEMP):
+        shutil.rmtree(OUTPUT_ZARR_TEMP)
+    
     ndvi_ds = zarr.create_array(
         name="ndvi",
         store= OUTPUT_ZARR_TEMP,
@@ -187,9 +188,25 @@ if (len(s2_files) > 0):
         zarr_format=3,
     )
 
-    failed_timesteps = []
+    timesteps_ds = zarr.create_array(
+        name="timestep",
+        store= OUTPUT_ZARR_TEMP,
+        shape=(T,),
+        chunks=(1,),
+        dtype="int64", # use int64 as nanoseconds since 1970. Good until year ~2262.
+        fill_value=np.iinfo(np.int64).min,
+        compressors=compressors,
+        zarr_format=3,
+    )   # np.iinfo(np.int32).max / 3600 / 24 / 365  # = 68 when representing seconds, int32 are only valid until 1970+68=2038
+        # np.iinfo(np.int64).max / 3600 / 24 / 365  # = 292e9 (if seconds => good for 300e9 years, if nanoseconds => good for 300 years)
 
+    timesteps_ds.attrs['description'] = 'Datetime in nanoseconds since 1970-01-01 (int64)'
+    ndvi_ds.attrs['description'] = 'NDVI (scaled int16: -10000 to 10000)'
+    ndsi_ds.attrs['description'] = 'NDSI (scaled int16: -10000 to 10000)'
+    ndvi_ds.attrs['nodata'] = NO_COVERAGE
+    ndvi_ds.attrs['cloud_shadow'] = INVALID
     def add_timestep_to_zarr(t, item):
+        timestep_dttm = item.datetime
         assets = item.assets
         bands10_asset = assets[[k for k in assets if k.endswith('bands-10m.tif')][0]]
         bands20_asset = assets[[k for k in assets if k.endswith('bands-20m.tif')][0]]
@@ -279,25 +296,28 @@ if (len(s2_files) > 0):
         valid_ndsi = ~(cloud_shadows_mask_flat | nodata_mask_flat_ndsi)
         cloud_only_ndsi = cloud_shadows_mask_flat & ~nodata_mask_flat_ndsi
 
+        # Append to Zarr storage:
+        # Write timestep
+        # NOTE: since zarr does not supprt NumPy datetime64[ns] dytpes, we
+        #       store the times as int64 epoch values (seconds since 1970-01-01)
+        timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+
         # Write NDVI
         ndvi_flat = ndvi_scaled[local_rows, local_cols]
         ndvi_row = np.full(N, NO_COVERAGE, dtype="int16")
         ndvi_row[current_flat_indices[valid_ndvi]] = ndvi_flat[valid_ndvi]
         ndvi_row[current_flat_indices[cloud_only_ndvi]] = INVALID
-        ndvi_ds[t] = ndvi_row
+        ndvi_ds[t] = ndvi_row # write to zarr
 
         # Write NDSI
         ndsi_flat = ndsi_scaled[local_rows, local_cols]
         ndsi_row = np.full(N, NO_COVERAGE, dtype="int16")
         ndsi_row[current_flat_indices[valid_ndsi]] = ndsi_flat[valid_ndsi]
         ndsi_row[current_flat_indices[cloud_only_ndsi]] = INVALID
-        ndsi_ds[t] = ndsi_row
+        ndsi_ds[t] = ndsi_row # write to zarr
 
-    ndvi_ds.attrs['description'] = 'NDVI (scaled int16: -10000 to 10000)'
-    ndsi_ds.attrs['description'] = 'NDSI (scaled int16: -10000 to 10000)'
-    ndvi_ds.attrs['nodata'] = NO_COVERAGE
-    ndvi_ds.attrs['cloud_shadow'] = INVALID
 
+    failed_timesteps = []
     for t, path in tqdm(enumerate(s2_files), total=len(s2_files)):
         try:
             add_timestep_to_zarr(t, path)
