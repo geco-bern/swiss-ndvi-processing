@@ -14,9 +14,11 @@ from dask.distributed import Client
 
 
 # Paths
-INPUT_HISTORIC = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr"
-OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m"
-DASK_TEMP_DIR    = "/mnt/data1/UniBe-swiss-ndvi/tmp_data/"
+# INPUT_HISTORIC   = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr"
+# OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m"
+INPUT_HISTORIC   = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr.zarr"
+OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr"
+DASK_TEMP_DIR    = "/mnt/data1/UniBe-swiss-ndvi/tmp_data2/"
 
 os.makedirs(OUTPUT_TIFF_BASE, exist_ok=True)
 
@@ -27,8 +29,7 @@ args = parser.parse_args()
 curr_date = args.date
 # if running interactively use e.g.:
     # curr_date = "2024-07-22" # for dates requested...
-
-curr_date = np.datetime64(curr_date, "D")
+    # curr_date = "2024-07-31" # for dates requested...
 
 
 # Load (processed) NDVI data set to output specific dates
@@ -48,51 +49,7 @@ print(client.dashboard_link, flush = True)
 
 NDVI_historic = xr.open_zarr(INPUT_HISTORIC)
 
-# NOTE: was needed for v3, obsolete for v4: # Define grid underlying PixelID and needed transformations
-# NOTE: was needed for v3, obsolete for v4: # TODO: actually append this similarly to x and y as (x_idx, and y_idx) to historic data set already.
-# NOTE: was needed for v3, obsolete for v4: #       this would simplify handling of historic data set
-# NOTE: was needed for v3, obsolete for v4: 
-# NOTE: was needed for v3, obsolete for v4: # Raster info (of downloaded product)
-# NOTE: was needed for v3, obsolete for v4: height, width = 24542, 37728
-# NOTE: was needed for v3, obsolete for v4: left, bottom = 2474090.0, 1065110.0
-# NOTE: was needed for v3, obsolete for v4: px = 10.0
-# NOTE: was needed for v3, obsolete for v4: top = bottom + height * px
-# NOTE: was needed for v3, obsolete for v4: # NOTE: 24542*37728 # = 925 Mio > 106 Mio pixel in ndvi_hist. This seems correct.
-# NOTE: was needed for v3, obsolete for v4: 
-# NOTE: was needed for v3, obsolete for v4: # Define transform between row,col to coord (upper-left origin, pixel sizes)
-# NOTE: was needed for v3, obsolete for v4: trans = rasterio.transform.from_origin(left, top, px, px)
-# NOTE: was needed for v3, obsolete for v4: 
-# NOTE: was needed for v3, obsolete for v4: # Test how to use this transformation definition:
-# NOTE: was needed for v3, obsolete for v4: # rasterio.transform.xy(trans, [0], [0])    # returns center coordinates of first upper left pixel
-# NOTE: was needed for v3, obsolete for v4: # rasterio.transform.xy(trans, [10], [10])  # returns center coordinates of tenth upper left pixel (i.e. is more east and more south)
-# NOTE: was needed for v3, obsolete for v4: # rasterio.transform.xy(trans, [0, 10], [0, 10]) # this goes from pixel index to coordinate
-# NOTE: was needed for v3, obsolete for v4: 
-# NOTE: was needed for v3, obsolete for v4: # rows, cols = np.nonzero(forest_mask) # forest_mask = np.load(FOREST_MASK) # TODO: FOREST_MASK is unused
-# NOTE: was needed for v3, obsolete for v4: # rows, cols = np.nonzero([[1, 0, 1],[0, 0, 0],[0, 0, 0]]) # returns [0 0] and [0 2]
-# NOTE: was needed for v3, obsolete for v4: # ids = np.arange(len(rows))
-# NOTE: was needed for v3, obsolete for v4: # xs, ys = rasterio.transform.xy(trans, rows, cols) # returns:  (array([2474095., 2474115.]), array([1310525., 1310525.]))
-# NOTE: was needed for v3, obsolete for v4: # rasterio.transform.rowcol(trans, xs, ys)          # recovers: (array([0, 0]), array([0, 2]))
-# NOTE: was needed for v3, obsolete for v4: 
-# NOTE: was needed for v3, obsolete for v4: # coord_lookup = pd.DataFrame({
-# NOTE: was needed for v3, obsolete for v4: #     'pixelID': ids,
-# NOTE: was needed for v3, obsolete for v4: #     'x': xs,
-# NOTE: was needed for v3, obsolete for v4: #     'y': ys
-# NOTE: was needed for v3, obsolete for v4: # })
-# NOTE: was needed for v3, obsolete for v4: 
-# NOTE: was needed for v3, obsolete for v4: # coords = list(zip(xs, ys))
-# NOTE: was needed for v3, obsolete for v4: # plt.plot(xs, ys)
-# NOTE: was needed for v3, obsolete for v4: # plt.plot(coords)
-# NOTE: was needed for v3, obsolete for v4: 
-# NOTE: was needed for v3, obsolete for v4: # Get pixelID locations of regular grid for Tiff generation
-# NOTE: was needed for v3, obsolete for v4: rows, cols = rasterio.transform.rowcol(
-# NOTE: was needed for v3, obsolete for v4:     trans, 
-# NOTE: was needed for v3, obsolete for v4:     NDVI_historic.x.values, 
-# NOTE: was needed for v3, obsolete for v4:     NDVI_historic.y.values)
-# NOTE: was needed for v3, obsolete for v4: 
-# NOTE: was needed for v3, obsolete for v4: height = rows.max() + 1
-# NOTE: was needed for v3, obsolete for v4: width = cols.max() + 1
-
-# With v4 we now have access to trans in the NDVI_historic.not:
+# With v4 we now have access to trans in the NDVI_historic.note:
 # execute in isolated namespace
 code_str = textwrap.dedent(NDVI_historic.note).lstrip("\n")
 ns = { # namespace (including globals the executed code can see)
@@ -127,18 +84,20 @@ local_cols = (cols - min_col).astype(int)
 # new_f = f + min_col*d + min_row*e
 if trans is None:
     raise RuntimeError("affine transform 'trans' not found in NDVI_historic.note and is required")
-orig = trans
-new_c = orig.c + min_col * orig.a + min_row * orig.b
-new_f = orig.f + min_col * orig.d + min_row * orig.e
-window_trans = rasterio.Affine(orig.a, orig.b, new_c, orig.d, orig.e, new_f)
+new_c = trans.c + min_col * trans.a + min_row * trans.b
+new_f = trans.f + min_col * trans.d + min_row * trans.e
+window_trans = rasterio.Affine(trans.a, trans.b, new_c, trans.d, trans.e, new_f)
 
 # Run tiff-generation for requested date
 dates_done = [s[:8] for s in os.listdir(OUTPUT_TIFF_BASE)]
 
+
+curr_date = np.datetime64(curr_date, "D")
+
 for curr_date in [curr_date]:
     curr_date_str = pd.to_datetime(curr_date).strftime('%Y%m%d')
     if (curr_date_str in dates_done):
-        print(f"Skipping file (already exported): {curr_date_str}.tiff")
+        print(f"Skipping file (already exported): {curr_date_str}_historic.tiff")
     else:
         # Initialize compact window grid filled with NaN for tiff to be filled with values
         grid_ndvi = np.full((height, width), np.nan) # TODO: add again: , dtype=np.int16
@@ -158,10 +117,10 @@ for curr_date in [curr_date]:
         NDVI_status_curr_date_gridded = NDVI_status_curr_date_gridded.rio.write_crs("EPSG:2056")
 
         # Output as cloud optimized Geotiff:
-        output_tiff_ndvi = f"{OUTPUT_TIFF_BASE}/{pd.to_datetime(curr_date).strftime('%Y%m%d')}.tiff"
-        output_tiff_mask = f"{OUTPUT_TIFF_BASE}/{pd.to_datetime(curr_date).strftime('%Y%m%d')}_mask.tiff"
+        output_tiff_ndvi = f"{OUTPUT_TIFF_BASE}/{pd.to_datetime(curr_date).strftime('%Y%m%d')}_historic.tiff"
+        output_tiff_mask = f"{OUTPUT_TIFF_BASE}/{pd.to_datetime(curr_date).strftime('%Y%m%d')}_historic_mask.tiff"
 
-        # TODO: check if this corresponds to: https://github.com/geostandards-ch/cog-best-practices#lossy-numerical-raster
+        # NOTE: this should correspond to: https://github.com/geostandards-ch/cog-best-practices#lossy-numerical-raster
         #       e.g. gdal_translate -a_srs EPSG:2056 -of COG -co COMPRESS=LERC_ZSTD -co LEVEL=22 -co NUM_THREADS=ALL_CPUS -co BIGTIFF=YES -co STATISTICS=YES -co MAX_Z_ERROR=<threshold> -tr <resolution in meter> <resolution in meter> -r Cubic -a_nodata <value> -ot <datatype> <input.tif> <output.tif>
         NDVI_processed_curr_date_gridded.rio.to_raster(
             output_tiff_ndvi,
@@ -184,14 +143,19 @@ for curr_date in [curr_date]:
         print(f"Created {output_tiff_ndvi}")
         print(f"Created {output_tiff_mask}")
 
-        # This is for testing: we additionally produce normal GeoTiff
-        output_tiff_ndvi2 = f"{OUTPUT_TIFF_BASE}/{pd.to_datetime(curr_date).strftime('%Y%m%d')}-nonCOG.tiff"
-        output_tiff_mask2 = f"{OUTPUT_TIFF_BASE}/{pd.to_datetime(curr_date).strftime('%Y%m%d')}-nonCOG_mask.tiff"
-        NDVI_processed_curr_date_gridded.rio.to_raster(output_tiff_ndvi2)
-        NDVI_status_curr_date_gridded.rio.to_raster(output_tiff_mask2)
+        # # This is for testing: we additionally produce normal GeoTiff
+        # output_tiff_ndvi2 = f"{OUTPUT_TIFF_BASE}/{pd.to_datetime(curr_date).strftime('%Y%m%d')}-nonCOG_historic.tiff"
+        # output_tiff_mask2 = f"{OUTPUT_TIFF_BASE}/{pd.to_datetime(curr_date).strftime('%Y%m%d')}-nonCOG_historic_mask.tiff"
+        # NDVI_processed_curr_date_gridded.rio.to_raster(output_tiff_ndvi2)
+        # NDVI_status_curr_date_gridded.rio.to_raster(output_tiff_mask2)
 
 # rsync 
-# rsync -avhz --progress -e 'ssh -p 2222' fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v3_compr/20240722-nonCOG.tiff ~/Downloads/test/tiffs_historic/
-# rsync -avhz --progress -e 'ssh -p 2222' fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v3_compr/20240722.tiff ~/Downloads/test/tiffs_historic/
-# rsync -avhz --progress -e 'ssh -p 2222' fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240722.tiff ~/Downloads/test/tiffs_historic/
-# rsync -avhz --progress -e 'ssh -p 2222' fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240722-nonCOG.tiff ~/Downloads/test/tiffs_historic/
+# rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v3_compr/20240722-nonCOG_historic.tiff ~/Downloads/test/tiffs_historic/
+# rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v3_compr/20240722_historic.tiff ~/Downloads/test/tiffs_historic/
+# rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240722_historic.tiff ~/Downloads/test/tiffs_historic/
+# rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240722-nonCOG_historic.tiff ~/Downloads/test/tiffs_historic/
+# rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
+# rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240731-nonCOG_historic.tiff ~/Downloads/test/tiffs_historic/
+
+# rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
+# rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr/20240731_historic_mask.tiff ~/Downloads/test/tiffs_historic/
