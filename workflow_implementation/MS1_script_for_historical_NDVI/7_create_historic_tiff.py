@@ -9,7 +9,8 @@ import os
 import argparse
 from dask.distributed import Client
 
-# run this pythons script to create a TIFF (non-COG for the moment)
+# run this pythons script to create a TIFF
+# source "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate"
 # python 7_create_historic_tiff.py "2025-08-22"
 
 
@@ -79,14 +80,24 @@ width = max_col - min_col + 1
 local_rows = (rows - min_row).astype(int)
 local_cols = (cols - min_col).astype(int)
 
-# Compute affine transform for the compact window by shifting the original transform
-# new_c = c + min_col*a + min_row*b
-# new_f = f + min_col*d + min_row*e
+# Compute affine transform for the compact window from the actual x/y coordinates
 if trans is None:
     raise RuntimeError("affine transform 'trans' not found in NDVI_historic.note and is required")
-new_c = trans.c + min_col * trans.a + min_row * trans.b
-new_f = trans.f + min_col * trans.d + min_row * trans.e
-window_trans = rasterio.Affine(trans.a, trans.b, new_c, trans.d, trans.e, new_f)
+
+# derive ordered unique coordinates and pixel size
+ux = np.unique(NDVI_historic.x.values)
+uy = np.unique(NDVI_historic.y.values)
+if ux.size < 2 or uy.size < 2:
+    raise RuntimeError("Not enough unique x/y coordinates to derive pixel size")
+dx = float(ux[1] - ux[0])
+dy = float(uy[1] - uy[0])
+
+# origin for Affine.from_origin is top-left: (min_x - dx/2, max_y + dy/2)
+origin_x = float(ux.min() - dx / 2.0)
+origin_y = float(uy.max() + dy / 2.0)
+
+# create transform with pixel-size in x (dx) and negative y (so row index increases downward)
+window_trans = rasterio.Affine(dx, 0.0, origin_x, 0.0, -dy, origin_y)
 
 # Run tiff-generation for requested date
 dates_done = [s[:8] for s in os.listdir(OUTPUT_TIFF_BASE)]
