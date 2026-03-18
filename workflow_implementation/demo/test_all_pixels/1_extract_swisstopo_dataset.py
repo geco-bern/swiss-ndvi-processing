@@ -88,7 +88,7 @@ if (len(s2_files) > 0):
     ###     """
     ###     item_search = service.search(
     ###         bbox=bbox_swiss_4326,
-    ###         datetime="2017-04-01/2025-11-30",               # NOTE: this must be kept fixed since it defines the bounding box,
+    ###         datetime="2025-04-30/2025-05-02",               # NOTE: this must be kept fixed since it defines the bounding box,
     ###                                                         #       and thus also the grid size and pixel ID.
     ###                                                         #       Thus it must remain the same as for the historic data set,
     ###                                                         #       and also for the median data set.
@@ -129,7 +129,7 @@ if (len(s2_files) > 0):
     ### # This is the full reference bounding box for the Swisstopo dataset covering the 4 orbits
     ### bbox_swisstopo_2056, width_swisstopo, height_swisstopo = union_bounds(collect_bounds_all_orbits())
     ### NOW HARDCODE THIS
-    bbox_swisstopo_2056 = BoundingBox(left=2474090.0, bottom=1064540.0, right=2851370.0, top=1310530.0)
+    bbox_swisstopo_2056 = BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0)
     width_swisstopo     = int((bbox_swisstopo_2056.right - bbox_swisstopo_2056.left) / 10) # 37728
     height_swisstopo    = int((bbox_swisstopo_2056.top - bbox_swisstopo_2056.bottom) / 10) # 24542
     ### END HARDCODING
@@ -200,8 +200,8 @@ if (len(s2_files) > 0):
         f"\nBox: {bbox_swisstopo_2056} pixels" + 
         f"\nGrid: {forest_mask.shape} = {forest_mask.size:_} pixels" + 
         f", of which {np.flatnonzero(forest_mask).size:_} are identified as forest pixels."
-    ) # Box: BoundingBox(left=2474090.0, bottom=1064540.0, right=2851370.0, top=1310530.0) pixels
-      # Grid: (24599, 37728) = 928_071_072 pixels, of which 105_715_396 are identified as forest pixels.
+    ) # Box: BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0) pixels
+      # Grid: (24542, 37728) = 925_920_576 pixels, of which 105_715_396 are identified as forest pixels.
     print(reference_summary_msg, flush = True)
     print("Reference raster metadata:")
     print(ref_meta, flush = True)
