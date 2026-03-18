@@ -1,13 +1,13 @@
 """
 Extract Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI time series for forested areas.
 """
-
 import xarray as xr
 import dask.array as da
 # from dask.distributed import Client, LocalCluster
 import pystac_client
 import rasterio
 from rasterio.coords import BoundingBox
+from rasterio.crs import CRS
 import numpy as np
 import zarr
 from tqdm import tqdm
@@ -17,6 +17,7 @@ import argparse
 import os, shutil
 import sys
 from datetime import datetime
+from affine import Affine
 
 import warnings
 warnings.filterwarnings(
@@ -76,106 +77,160 @@ if (len(s2_files) > 0):
           file=sys.stdout,
           flush=True)
 
-    # Retrieve the spatial coverage (bounds) of all 4 possible orbits covering Switzerland
-    def collect_bounds_all_orbits():
-        """
-        Collects the bounds of all orbits in the Swiss dataset.
-        Returns a list of BoundingBox objects.
-        """
-        item_search = service.search(
-            bbox=bbox_swiss_4326,
-            datetime=date_range,
-            collections=['ch.swisstopo.swisseo_s2-sr_v100']
-        )
-        s2_files_sample_orbits = list(item_search.items())
+    # ==========================================================================
 
-        all_bounds = []
+    ### # BELOW WAS DONE ONCE AND IS NOW HARDCODED OR STORED IN ../data/forest_mask_bits.zarr
+    ### # Retrieve the spatial coverage (bounds) of all 4 possible orbits covering Switzerland
+    ### def collect_bounds_all_orbits():
+    ###     """
+    ###     Collects the bounds of all orbits in the Swiss dataset.
+    ###     Returns a list of BoundingBox objects.
+    ###     """
+    ###     item_search = service.search(
+    ###         bbox=bbox_swiss_4326,
+    ###         datetime="2017-04-01/2025-11-30",               # NOTE: this must be kept fixed since it defines the bounding box,
+    ###                                                         #       and thus also the grid size and pixel ID.
+    ###                                                         #       Thus it must remain the same as for the historic data set,
+    ###                                                         #       and also for the median data set.
+    ###         collections=['ch.swisstopo.swisseo_s2-sr_v100']
+    ###     )
+    ###     s2_files_sample_orbits = list(item_search.items())
+    ###
+    ###     all_bounds = []
+    ###
+    ###     for item in tqdm(s2_files_sample_orbits):
+    ###         assets = item.assets
+    ###         key_bands = [k for k in assets.keys() if k.endswith('bands-10m.tif')][0]
+    ###         bands_asset = assets[key_bands]
+    ###         with rasterio.open(bands_asset.href) as src:
+    ###             bounds = src.bounds
+    ###             all_bounds.append(bounds)
+    ###
+    ###     return all_bounds
+    ###
+    ### # Combine all bounding boxes into one global bounding box and compute its pixel dimensions
+    ### def union_bounds(bounds_list):
+    ###     """
+    ###     Takes a list of BoundingBox objects and returns a single BoundingBox
+    ###     that encompasses all the bounds, along with the width and height
+    ###     of the bounding box in pixels, assuming a resolution of 10 meters.
+    ###     """
+    ###     left = min(b.left for b in bounds_list)
+    ###     bottom = min(b.bottom for b in bounds_list)
+    ###     right = max(b.right for b in bounds_list)
+    ###     top = max(b.top for b in bounds_list)
+    ###     resolution = 10
+    ###     width = int((right - left) / resolution)
+    ###     height = int((top - bottom) / resolution)
+    ###     return BoundingBox(left, bottom, right, top), width, height
+    ### 
+    ### # EPSG: 2056
+    ### # Swiss coordinate system (CH1903+ / LV95)
+    ### # This is the full reference bounding box for the Swisstopo dataset covering the 4 orbits
+    ### bbox_swisstopo_2056, width_swisstopo, height_swisstopo = union_bounds(collect_bounds_all_orbits())
+    ### NOW HARDCODE THIS
+    bbox_swisstopo_2056 = BoundingBox(left=2474090.0, bottom=1064540.0, right=2851370.0, top=1310530.0)
+    width_swisstopo     = int((bbox_swisstopo_2056.right - bbox_swisstopo_2056.left) / 10) # 37728
+    height_swisstopo    = int((bbox_swisstopo_2056.top - bbox_swisstopo_2056.bottom) / 10) # 24542
+    ### END HARDCODING
+    print("bbox_swisstopo_2056, width_swisstopo, height_swisstopo", flush = True)
+    print(bbox_swisstopo_2056, flush = True)
+    print(width_swisstopo, flush = True)
+    print(height_swisstopo, flush = True)
+    
 
-        for item in tqdm(s2_files_sample_orbits):
-            assets = item.assets
-            key_bands = [k for k in assets.keys() if k.endswith('bands-10m.tif')][0]
-            bands_asset = assets[key_bands]
-            with rasterio.open(bands_asset.href) as src:
-                bounds = src.bounds
-                all_bounds.append(bounds)
-
-        return all_bounds
-
-    # Combine all bounding boxes into one global bounding box and compute its pixel dimensions
-    def union_bounds(bounds_list):
-        """
-        Takes a list of BoundingBox objects and returns a single BoundingBox
-        that encompasses all the bounds, along with the width and height
-        of the bounding box in pixels, assuming a resolution of 10 meters.
-        """
-        left = min(b.left for b in bounds_list)
-        bottom = min(b.bottom for b in bounds_list)
-        right = max(b.right for b in bounds_list)
-        top = max(b.top for b in bounds_list)
-        resolution = 10
-        width = int((right - left) / resolution)
-        height = int((top - bottom) / resolution)
-        return BoundingBox(left, bottom, right, top), width, height
-
-    all_bounds = collect_bounds_all_orbits()
-
-    # EPSG: 2056
-    # Swiss coordinate system (CH1903+ / LV95)
-    # This is the full reference bounding box for the Swisstopo dataset covering the 4 orbits
-    bbox_swisstopo_2056, width_swisstopo, height_swisstopo = union_bounds(all_bounds)
-    # BoundingBox(left=2475010.0, bottom=1081620.0, right=2849700.0, top=1291810.0)
-    # width: 37469 x height: 21019
-
-    # Take the forest mask from the Swisstopo VHI dataset 
-    # The VHI dataset contains the forest mask that Swisstopo derived from the habitat map
-    # Also collect the metadata using the forest mask as a reference raster
-    def get_forest_mask():
-        """
-        Downloads the forest mask from the Swisstopo VHI dataset.
-        Returns a numpy array representing the forest mask.
-        Also returns the metadata for the reference raster.
-        """
-        item_search = service.search(
-            bbox=bbox_swiss_4326,
-            datetime='2025-05-01/2025-05-01', # use the forest mask of a hardcoded date
-            collections=['ch.swisstopo.swisseo_vhi_v100']
-        )
-        items = list(item_search.items())
-        item = items[0]
-        assets = item.assets
-        key_bands = [k for k in assets.keys() if k.endswith('forest-10m.tif')][0]
-        bands_asset = assets[key_bands]
-        
-        with rasterio.open(bands_asset.href) as src:
-            window = src.window(*bbox_swisstopo_2056)
-            vhi = src.read(1, window=window)
-            forest_mask = (vhi != 255).astype('uint8')
-            ref_meta = {
-                "transform": src.window_transform(window),
-                "crs": src.crs,
-                "width": window.width,
-                "height": window.height
-            }
-        
-        return forest_mask, ref_meta
-
-    forest_mask, ref_meta = get_forest_mask()
+    ### # BELOW WAS DONE ONCE AND IS NOW HARDCODED OR STORED IN ../data/forest_mask_bits.zarr
+    ### # Take the forest mask from the Swisstopo VHI dataset 
+    ### # The VHI dataset contains the forest mask that Swisstopo derived from the habitat map
+    ### # Also collect the metadata using the forest mask as a reference raster
+    ### def get_forest_mask():
+    ###     """
+    ###     Downloads the forest mask from the Swisstopo VHI dataset.
+    ###     Returns a numpy array representing the forest mask.
+    ###     Also returns the metadata for the reference raster.
+    ###     """
+    ###     item_search = service.search(
+    ###         bbox=bbox_swiss_4326,
+    ###         datetime='2025-05-01/2025-05-01', # use the forest mask of a hardcoded date
+    ###                                           # NOTE: this must be kept fixed since it defines the forest mask
+    ###                                           #       and thus also the pixel ID.
+    ###                                           #       Thus it must remain the same as for the historic data set,
+    ###                                           #       and also for the median data set.
+    ###         collections=['ch.swisstopo.swisseo_vhi_v100']
+    ###     )
+    ###     items = list(item_search.items())
+    ###     item = items[0]
+    ###     assets = item.assets
+    ###     key_bands = [k for k in assets.keys() if k.endswith('forest-10m.tif')][0]
+    ###     bands_asset = assets[key_bands]
+    ###     
+    ###     with rasterio.open(bands_asset.href) as src:
+    ###         window = src.window(*bbox_swisstopo_2056)
+    ###         vhi = src.read(1, window=window)
+    ###         forest_mask = (vhi != 255).astype('uint8')
+    ###         ref_meta = {
+    ###             "transform": src.window_transform(window),
+    ###             "crs": src.crs,
+    ###             "width": window.width,
+    ###             "height": window.height
+    ###         }
+    ###     
+    ###     return forest_mask, ref_meta
+    ### 
+    ### forest_mask, ref_meta = get_forest_mask()
+    ### # save forest mask to disk
+    ### bits = np.packbits(forest_mask.ravel())           # uint8 array, 8x smaller before compression
+    ### store = zarr.open("/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr", mode="w")
+    ### store.create_dataset("bits", data=bits, compressor=zarr.codecs.BloscCodec(cname="zstd", clevel=3), shape = bits.shape)
+    ### NOW HARDCODE THIS
+    ref_meta = {
+        'transform': Affine(10.0, 0.0,  bbox_swisstopo_2056.left,   # Affine(10.0, 0.0, np.float64(2474090.0),
+                            0.0, -10.0, bbox_swisstopo_2056.top),   #        0.0, -10.0, np.float64(1310530.0)), 
+        'crs': CRS.from_wkt('PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'), 
+        'width': np.float64(width_swisstopo), 
+        'height': np.float64(height_swisstopo)}
+    # load forest mask from disk
+    forest_mask_zarr = zarr.open("/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr", mode="r")
+    forest_mask_shape = (height_swisstopo, width_swisstopo)
+    forest_mask = np.unpackbits(forest_mask_zarr["bits"][:])[:np.prod(forest_mask_shape)].reshape(forest_mask_shape)
+    # np.array_equiv(forest_mask2, forest_mask) # True, this confirmed that recovery was good.
+    ### END HARDCODING
+    reference_summary_msg = (
+        f"Total of global grid used for pixel ID (based on forest mask): " + 
+        f"\nBox: {bbox_swisstopo_2056} pixels" + 
+        f"\nGrid: {forest_mask.shape} = {forest_mask.size:_} pixels" + 
+        f", of which {np.flatnonzero(forest_mask).size:_} are identified as forest pixels."
+    ) # Box: BoundingBox(left=2474090.0, bottom=1064540.0, right=2851370.0, top=1310530.0) pixels
+      # Grid: (24599, 37728) = 928_071_072 pixels, of which 105_715_396 are identified as forest pixels.
+    print(reference_summary_msg, flush = True)
     print("Reference raster metadata:")
-    print(ref_meta)
+    print(ref_meta, flush = True)
+
+    # ==========================================================================
 
     # Build index mapping from forest pixels in the full reference raster to 1D flat indices
-    forest_flat_indices = np.flatnonzero(forest_mask == 1)
-    max_index = forest_flat_indices.max() + 1
-    index_map = np.full(max_index, -1, dtype=np.int32)
-    index_map[forest_flat_indices] = np.arange(len(forest_flat_indices))
+    global_forest_pixelIDs = np.flatnonzero(forest_mask == 1)
+    # index_map = np.full(global_forest_pixelIDs.max() + 1, -1, dtype=np.int32) # contains as many elements as forest_mask (width_swisstopo * height_swisstopo)
+    index_map = np.full(forest_mask.size, -1, dtype=np.int32)                # contains as many elements as forest_mask (width_swisstopo * height_swisstopo)
+                                                                             # NOTE that using max() it stops at largest index needed, whereas with .size the last rows are filled with -1
+    index_map[global_forest_pixelIDs] = np.arange(len(global_forest_pixelIDs))
+    # at locations of the global grid 
+    # index_map contains
+    # the corresponding index (pixelID) in the forest-only pixel vector
+    # i.e. np.reshape(index_map, (height_swisstopo, width_swisstopo)) re-builds the global grid
+    #
+    # at locations of forest-only pixels (pixelID)
+    # global_forest_pixelIDs contains
+    # index (pixel_index) of the flattened global grid (24599 x 37728)
+    # i.e. index_map[global_forest_pixelIDs] gives the continuous indices from 0 to 105715395
 
     # Prepare constants
-    N = len(forest_flat_indices)
+    N = len(global_forest_pixelIDs)
     T = len(s2_files)
     INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
     NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
 
-    # Define the datasets for NDVI and NDSI values
+    ## Define the datasets stores for NDVI, NDSI and timestep values to be filled in the loop
     # Shape is (T, N) where T is the number of time steps and N is the number of forest pixels
     # Use int16 to save space, with a fill value for no coverage
     # Use compression to save space
@@ -193,7 +248,7 @@ if (len(s2_files) > 0):
         dtype="int16",
         fill_value=NO_COVERAGE,
         compressors=compressors,
-        zarr_format=3,
+        zarr_format=3, overwrite=True
     )
 
     ndsi_ds = zarr.create_array(
@@ -204,7 +259,7 @@ if (len(s2_files) > 0):
         dtype="int16",
         fill_value=NO_COVERAGE,
         compressors=compressors,
-        zarr_format=3,
+        zarr_format=3, overwrite=True
     )
 
     timesteps_ds = zarr.create_array(
@@ -215,7 +270,7 @@ if (len(s2_files) > 0):
         dtype="int64", # use int64 as nanoseconds since 1970. Good until year ~2262.
         fill_value=np.iinfo(np.int64).min,
         compressors=compressors,
-        zarr_format=3,
+        zarr_format=3, overwrite=True
     )   # np.iinfo(np.int32).max / 3600 / 24 / 365  # = 68 when representing seconds, int32 are only valid until 1970+68=2038
         # np.iinfo(np.int64).max / 3600 / 24 / 365  # = 292e9 (if seconds => good for 300e9 years, if nanoseconds => good for 300 years)
 
@@ -239,7 +294,6 @@ if (len(s2_files) > 0):
 
         # FOR INTERACTIVE DEVELOPMENT
         #     from contextlib import ExitStack
-
         #     import rasterio
         #     stack = ExitStack()
         #     b10_src = stack.enter_context(rasterio.open(bands10_asset.href))
@@ -318,7 +372,8 @@ if (len(s2_files) > 0):
         global_rows = local_rows + row_start
         global_cols = local_cols + col_start
         global_flat = global_rows * width_swisstopo + global_cols
-        current_flat_indices = index_map[global_flat]
+        current_pixelIDs = index_map[global_flat] # this contains pixelIDs (i.e. indices in the forest-only pixel vector)
+        global_forest_pixelIDs
 
         # Flat masks
         cloud_shadows_mask_flat = cloud_shadows_mask[local_rows, local_cols]
@@ -338,15 +393,15 @@ if (len(s2_files) > 0):
         # Write NDVI
         ndvi_flat = ndvi_scaled[local_rows, local_cols]
         ndvi_row = np.full(N, NO_COVERAGE, dtype="int16")
-        ndvi_row[current_flat_indices[valid_ndvi]] = ndvi_flat[valid_ndvi]
-        ndvi_row[current_flat_indices[cloud_only_ndvi]] = INVALID
+        ndvi_row[current_pixelIDs[valid_ndvi]] = ndvi_flat[valid_ndvi]
+        ndvi_row[current_pixelIDs[cloud_only_ndvi]] = INVALID
         ndvi_ds[t] = ndvi_row # write to zarr
 
         # Write NDSI
         ndsi_flat = ndsi_scaled[local_rows, local_cols]
         ndsi_row = np.full(N, NO_COVERAGE, dtype="int16")
-        ndsi_row[current_flat_indices[valid_ndsi]] = ndsi_flat[valid_ndsi]
-        ndsi_row[current_flat_indices[cloud_only_ndsi]] = INVALID
+        ndsi_row[current_pixelIDs[valid_ndsi]] = ndsi_flat[valid_ndsi]
+        ndsi_row[current_pixelIDs[cloud_only_ndsi]] = INVALID
         ndsi_ds[t] = ndsi_row # write to zarr
 
     failed_timesteps = []
@@ -465,31 +520,9 @@ if (len(s2_files) > 0):
     ds_out2.attrs["transform_note"] = str(trans)
     ds_out2.attrs["transform_coeffs"] = tuple(float(v) for v in trans)
     ds_out2.attrs["transform_instr"] = "from affine import Affine; t = Affine(*ds.attrs['transform_coeffs'][0:6])"
-    
-            # NOTE: this script reported the following values (using VHI from '2025-05-01/2025-05-01'):
-            # BoundingBox(left=2475010.0, bottom=1081620.0, right=2849700.0, top=1291810.0)
-            # width: 37469 x height: 21019
-            # {'transform': Affine(10.0, 0.0, np.float64(2475010.0), 0.0, -10.0, np.float64(1291810.0)), 
-            # 'crs': CRS.from_wkt('PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'), 
-            # 'width': np.float64(37469.0), 
-            # 'height': np.float64(21019.0)}
-            # ref_meta["transform"]
-            #   #| 10.00, 0.00, 2475010.00|
-            #   #| 0.00,-10.00, 1291810.00|
-            #   #| 0.00, 0.00, 1.00|
 
-            # NOTE: in ./MS1_script_for_historical_NDVI/6_append_coords_to_historic_ndvi.py the following was used:
-            #       TODO: where were these values coming from?
-            # height, width = 24542, 37728
-            # left, bottom = 2474090.0, 1065110.0
-            # px = 10.0
-            # top = bottom + height * px  # 1310530.0
-            # right = left + width * px   # 2851370.0
-            # # Define transform between row,col to coord (upper-left origin, pixel sizes)
-            # trans = rasterio.transform.from_origin(left, top, px, px)
-            #   # | 10.00, 0.00, 2474090.00|
-            #   # | 0.00,-10.00, 1310530.00|
-            #   # | 0.00, 0.00, 1.00|
+    ds_out2.attrs['pixel_definition'] = reference_summary_msg
+    # ==========================================================================
 
 
     # Write out
