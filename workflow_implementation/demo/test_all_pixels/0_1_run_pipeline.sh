@@ -91,7 +91,8 @@ echo "------------------------------------------------------------"
 echo "------------------------------------------------------------"
 echo "Running: ${SCRIPTS[0]}"; echo "Start time: $(timestamp)"
 START_TIME=$(date +%s)
-DOWNLOAD_FILE=$(python "${SCRIPTS[0]}" "$START_DATE" "$END_DATE")
+python -u "${SCRIPTS[0]}" "$START_DATE" "$END_DATE"
+DOWNLOAD_FILE=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
 END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
 echo "Finished: ${SCRIPTS[0]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"

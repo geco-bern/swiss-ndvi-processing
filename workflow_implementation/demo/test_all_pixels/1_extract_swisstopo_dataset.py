@@ -2,6 +2,9 @@
 Extract Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI time series for forested areas.
 """
 
+import xarray as xr
+import dask.array as da
+# from dask.distributed import Client, LocalCluster
 import pystac_client
 import rasterio
 from rasterio.coords import BoundingBox
@@ -14,6 +17,13 @@ import argparse
 import os, shutil
 import sys
 from datetime import datetime
+
+import warnings
+warnings.filterwarnings(
+    "ignore", 
+    message="Numcodecs codecs are not in the Zarr version 3 specification",
+    module="numcodecs.zarr3"
+)
 
 # PARSE ARGUMENTS:
 parser = argparse.ArgumentParser()
@@ -28,11 +38,15 @@ end_date = args.end_date
 #                           # the last date in the historic NDVI data set
 # end_date = "2026-03-10"
 # end_date = "2025-12-04"
+# end_date = "2025-12-06"
 # end_date = "2025-12-12"
+# start_date="2025-06-30"
+# end_date="2025-07-01"
 
 # CONFIGURE:
 today = datetime.today().strftime("%Y-%m-%d_%Hh%M")
 OUTPUT_ZARR_TEMP = f"/mnt/data1/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloadedA_{start_date}_{end_date}.zarr"
+OUTPUT_ZARR      = f"/mnt/data1/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloaded_{start_date}_{end_date}.zarr"
 # ==============================================================================
 
 # Start script:
@@ -58,6 +72,9 @@ s2_files = list(item_search.items())
 
 # If some images (s2_files) are available within the requested date_range
 if (len(s2_files) > 0):
+    print(f"Starting download for:\n{"\n".join([item.datetime.strftime('%Y-%m-%d_%Hh%M') for item in s2_files])}",
+          file=sys.stdout,
+          flush=True)
 
     # Retrieve the spatial coverage (bounds) of all 4 possible orbits covering Switzerland
     def collect_bounds_all_orbits():
@@ -106,6 +123,8 @@ if (len(s2_files) > 0):
     # Swiss coordinate system (CH1903+ / LV95)
     # This is the full reference bounding box for the Swisstopo dataset covering the 4 orbits
     bbox_swisstopo_2056, width_swisstopo, height_swisstopo = union_bounds(all_bounds)
+    # BoundingBox(left=2475010.0, bottom=1081620.0, right=2849700.0, top=1291810.0)
+    # width: 37469 x height: 21019
 
     # Take the forest mask from the Swisstopo VHI dataset 
     # The VHI dataset contains the forest mask that Swisstopo derived from the habitat map
@@ -162,7 +181,7 @@ if (len(s2_files) > 0):
     # Use compression to save space
     compressors = zarr.codecs.BloscCodec(cname='zstd', clevel=3, shuffle=zarr.codecs.BloscShuffle.bitshuffle)
 
-    # delete Zarr store if it is existing already
+    # delete temporary Zarr store if it is existing already
     if os.path.exists(OUTPUT_ZARR_TEMP):
         shutil.rmtree(OUTPUT_ZARR_TEMP)
     
@@ -349,8 +368,6 @@ if (len(s2_files) > 0):
         ndsi_row[current_flat_indices[cloud_only_ndsi]] = INVALID
         ndsi_ds[t] = ndsi_row # write to zarr
 
-    print(f"Starting download for:\n{"\n".join([item.datetime.strftime('%Y-%m-%d_%Hh%M') for item in s2_files])}", flush=True)
-
     failed_timesteps = []
     for t, path in tqdm(enumerate(s2_files), total=len(s2_files)):
         try:
@@ -372,7 +389,140 @@ if (len(s2_files) > 0):
                 print(f"Time step {t} retry failed: {e}", flush = True)
                 continue  # skip to the next time step
 
-    print(OUTPUT_ZARR_TEMP, flush=True)
+    # Transform unstructured zarr to structured xarray dataset stored in zarr:
+    # TODO: check if needed for speedup: DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data"
+    # TODO: check if needed for speedup: os.makedirs(DASK_TEMP_DIR, exist_ok=True)
+
+    # TODO: check if needed for speedup: N_WORKERS = 40
+    # TODO: check if needed for speedup: MEMORY_LIMIT = "300GB"
+    # TODO: check if needed for speedup: cluster = LocalCluster(
+    # TODO: check if needed for speedup:     n_workers=N_WORKERS,
+    # TODO: check if needed for speedup:     threads_per_worker=1,
+    # TODO: check if needed for speedup:     processes=True,
+    # TODO: check if needed for speedup:     memory_limit=MEMORY_LIMIT,
+    # TODO: check if needed for speedup:     dashboard_address=":8340",
+    # TODO: check if needed for speedup:     local_directory=DASK_TEMP_DIR,
+    # TODO: check if needed for speedup: )
+    # TODO: check if needed for speedup: client = Client(cluster)
+    # TODO: check if needed for speedup: print(client, flush = True)
+    # TODO: check if needed for speedup: print(client.dashboard_link, flush = True) # use this dashboard to follow progress
+
+    ds0 = zarr.open_group(OUTPUT_ZARR_TEMP, mode="r")
+    ndvi_da = da.from_zarr(ds0["ndvi"])
+    ndsi_da = da.from_zarr(ds0["ndsi"])
+    times_da = da.from_zarr(ds0["timestep"]).astype("datetime64[ns]").compute()
+    
+
+    PIXEL_CHUNKS = 10000
+
+    ndvi_xr = xr.DataArray(
+        ndvi_da, # this is of shape (timesteps, 105Mio pixel)
+        dims=("datetime", "pixel"),
+        coords={
+            "pixel": np.arange(ndvi_da.shape[1], dtype=np.int32),
+            "datetime": times_da
+        },
+        name="ndvi"
+    ).chunk({"pixel": PIXEL_CHUNKS, "datetime": -1})
+
+
+    ndsi_xr = xr.DataArray(
+        ndsi_da, # this is of shape (timesteps, 105Mio pixel)
+        dims=("datetime", "pixel"),
+        coords={
+            "pixel": np.arange(ndsi_da.shape[1], dtype=np.int32),
+            "datetime": times_da
+        },
+        name="ndvi"
+    ).chunk({"pixel": PIXEL_CHUNKS, "datetime": -1})
+
+    ds_out = xr.Dataset(
+        {
+            "ndvi": ndvi_xr,
+            "ndsi": ndsi_xr
+        }
+    )
+
+    # Append date
+    # append date (rounding) => multiple datetimes can have same date
+    ds_out = ds_out.assign_coords(
+        date=ds_out.datetime.dt.floor("D")
+    )
+
+    # Extend pixel dimensions by appending x and y:
+
+    # Define grid underlying PixelID and needed transformations
+    # Define transform between row,col to coord (upper-left origin, pixel sizes)
+    import pandas as pd
+    trans = ref_meta["transform"]
+    rows, cols = np.nonzero(forest_mask)
+    ids = np.arange(len(rows))
+    xs, ys = rasterio.transform.xy(trans, rows, cols)
+    coord_lookup = pd.DataFrame({
+        'pixel': ids,
+        'x': xs,
+        'y': ys,
+        'x_idx': rows,
+        'y_idx': cols,
+    }).set_index('pixel')
+    
+    # Align lookup by pixel values
+    pixel_coords   = ds_out.pixel.values
+    coord_lookup_aligned = coord_lookup.loc[pixel_coords]
+
+    ds_out2 = ds_out.assign_coords(
+        # change number types of dimensions (pixel is that way 420MB instead of 840MB)
+        pixel = ('pixel', ds_out.pixel.values.astype(np.int32)),
+        # doy   = ('date', ds_out.doy.values.astype(np.int32)),
+        # and add coordinates and indices in regular grid
+        x=('pixel', coord_lookup_aligned['x'].values.astype(np.int32)), # or uint32
+        y=('pixel', coord_lookup_aligned['y'].values.astype(np.int32)), # or uint32
+        x_idx=('pixel', coord_lookup_aligned['x_idx'].values.astype(np.int32)), # or uint32
+        y_idx=('pixel', coord_lookup_aligned['y_idx'].values.astype(np.int32))  # or uint32
+    )
+    
+    ds_out2.attrs["transform_note"] = str(trans)
+    ds_out2.attrs["transform_coeffs"] = tuple(float(v) for v in trans)
+    ds_out2.attrs["transform_instr"] = "from affine import Affine; t = Affine(*ds.attrs['transform_coeffs'][0:6])"
+    
+            # NOTE: this script reported the following values (using VHI from '2025-05-01/2025-05-01'):
+            # BoundingBox(left=2475010.0, bottom=1081620.0, right=2849700.0, top=1291810.0)
+            # width: 37469 x height: 21019
+            # {'transform': Affine(10.0, 0.0, np.float64(2475010.0), 0.0, -10.0, np.float64(1291810.0)), 
+            # 'crs': CRS.from_wkt('PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'), 
+            # 'width': np.float64(37469.0), 
+            # 'height': np.float64(21019.0)}
+            # ref_meta["transform"]
+            #   #| 10.00, 0.00, 2475010.00|
+            #   #| 0.00,-10.00, 1291810.00|
+            #   #| 0.00, 0.00, 1.00|
+
+            # NOTE: in ./MS1_script_for_historical_NDVI/6_append_coords_to_historic_ndvi.py the following was used:
+            #       TODO: where were these values coming from?
+            # height, width = 24542, 37728
+            # left, bottom = 2474090.0, 1065110.0
+            # px = 10.0
+            # top = bottom + height * px  # 1310530.0
+            # right = left + width * px   # 2851370.0
+            # # Define transform between row,col to coord (upper-left origin, pixel sizes)
+            # trans = rasterio.transform.from_origin(left, top, px, px)
+            #   # | 10.00, 0.00, 2474090.00|
+            #   # | 0.00,-10.00, 1310530.00|
+            #   # | 0.00, 0.00, 1.00|
+
+
+    # Write out
+    ds_out2.to_zarr(OUTPUT_ZARR, mode="w", consolidated=True, compute=True)
+
+
+
+    # test load this dataset:
+    # ds_test = xr.open_dataset(OUTPUT_ZARR)
+    # delete temporary Zarr store to clean up # TODO: reactivate this
+    #if os.path.exists(OUTPUT_ZARR_TEMP): 
+    #    shutil.rmtree(OUTPUT_ZARR_TEMP)
+
+    print(OUTPUT_ZARR, flush = True)
     sys.exit(0)
 
 else:
