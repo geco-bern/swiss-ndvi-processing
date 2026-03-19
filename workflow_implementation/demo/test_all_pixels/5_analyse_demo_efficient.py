@@ -8,6 +8,8 @@ import xarray as xr
 import os
 import shutil
 import time
+from numcodecs import blosc, Blosc, zarr3
+from zarr.codecs import BloscCodec
 
 import warnings
 warnings.filterwarnings(
@@ -144,17 +146,35 @@ if __name__ == "__main__":
     # PIXEL_CHUNKS = 10000  # b) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s; 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
     # MEMORY_PER_WORKER = '190GB'
 
-    N_WORKERS = 30        # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s; 586503 pixels => 53s; 16041205 pixels => 640s; 105715396 pixels => XXs
-    DATE_CHUNKS = -1      # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s; 586503 pixels => 53s; 16041205 pixels => 640s; 105715396 pixels => XXs
-    PIXEL_CHUNKS = 10000  # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s; 586503 pixels => 53s; 16041205 pixels => 640s; 105715396 pixels => XXs
-    MEMORY_PER_WORKER = '120GB'
+    # N_WORKERS = 30        # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s or 44s; 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
+    # DATE_CHUNKS = -1      # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s or 44s; 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
+    # PIXEL_CHUNKS = 10000  # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s or 44s; 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
+    # MEMORY_PER_WORKER = '120GB'
+    # TODO: check: 16041205 pixels in 640s in pipeline_FB_2026-03-19_09h09m26.log
+    #              16041205 pixels in 3300s in pipeline_FB_2026-03-19_11h38m18.log
+    #              Why so much longer? 
+    #                 Is it due to the compression when writing? 
+    #                 If so, then this would be smaller in case of appending.
+    #                 The dashboard showed some computation to be indeed over after 10mins. Then "PerformanceWarning: Increasing number of chunks by factor of 245". And then dashboard didn't show any activity anymore.
 
     # N_WORKERS = 60        # D) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 33s; 586503 pixels => 57s; 16041205 pixels => XXs; 105715396 pixels => XXs
     # DATE_CHUNKS = -1      # D) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 33s; 586503 pixels => 57s; 16041205 pixels => XXs; 105715396 pixels => XXs
     # PIXEL_CHUNKS = 10000  # D) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 33s; 586503 pixels => 57s; 16041205 pixels => XXs; 105715396 pixels => XXs
     # MEMORY_PER_WORKER = '66GB'
 
-    DATE_CHUNKS_OUT = 365
+    N_WORKERS = 30         # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 87s or 44s; 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    DATE_CHUNKS = -1       # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 87s or 44s; 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    PIXEL_CHUNKS = 100000  # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 87s or 44s; 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    MEMORY_PER_WORKER = '120GB'
+
+    # Definition of output format of new
+    # TODO: when going circular this is probably not needed anymore.
+    DATE_CHUNKS_OUT = 30
+    COMPRESSOR = zarr3.Blosc(cname="zstd", clevel=3, shuffle=2)
+    
+    
+    
+    t0=time.perf_counter()
 
     client = Client(
         n_workers=N_WORKERS,
@@ -166,12 +186,12 @@ if __name__ == "__main__":
 
     INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
 
-    HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr"
-    HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_extended.zarr" # TODO: remove this and instea do it circular
-    INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr"
-    # HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr"
-    # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km_extended.zarr" # TODO: remove this and instea do it circular
-    # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr"
+    # HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr"
+    # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_extended.zarr" # TODO: remove this and instea do it circular
+    # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr"
+    HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr"
+    HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km_extended.zarr" # TODO: remove this and instea do it circular
+    INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr"
     # HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km.zarr"
     # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km_extended.zarr" # TODO: remove this and instea do it circular
     # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_100kmX100km_4th.zarr"
@@ -186,6 +206,14 @@ if __name__ == "__main__":
     historic_ds  = xr.open_zarr(HISTO_ZARR_IN_OUTPUT, chunks={"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
     new_ds       = xr.open_zarr(INPUT_ZARR, chunks={"pixel": PIXEL_CHUNKS, "date": -1})
     lookuptable  = xr.open_zarr(INPUT_LOOKUPTABLE, consolidated=False).chunk({"pixel": PIXEL_CHUNKS})
+
+    def show_ds_structure(ds):
+        for c in list(ds.coords) + list(ds.data_vars):
+            print(str(c).ljust(15) + ":   " + str(ds[c].encoding))
+    
+    #show_ds_structure(historic_ds)
+    #show_ds_structure(new_ds)
+    #show_ds_structure(lookuptable)
 
     print("Last dates in historic_ds:\n  "+"\n  ".join(np.datetime_as_string(historic_ds.date.isel(date = slice(-10,None)), unit='D')), flush=True)
     print("First dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(0,10)), unit='D')), flush=True)
@@ -208,6 +236,7 @@ if __name__ == "__main__":
     historic_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
             doy=doy_noLeap,
             pixel=historic_ds.pixel) # this is to join by pixels and doy
+
 
     # Add mask_array to new_ds (filled with 0 or 2):
         # mask_array == 0: the data is not an observation and is yet to be smoothed
@@ -281,7 +310,7 @@ if __name__ == "__main__":
     # g = mask_processed.__dask_graph__()
     g = ndvi_processed.__dask_graph__()
     print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
-    #                    586503 pixels:                  | 16041205 pixels:                | 105715396 pixels:
+    #                    586_503 pixels:                 | 16_041_205 pixels:              | 105_715_396 pixels:
     # without persist(): 49    layers, and 196760 tasks  | 49    layers, and 1289428 tasks | xxx layers, and xxx tasks
     # with persist():    16-17 layers, and  31953 tasks  | 16-17 layers, and  872665 tasks | xxx layers, and xxx tasks
     # without persist(): .............. and 10.58 MiB
@@ -314,39 +343,27 @@ if __name__ == "__main__":
                  "date": DATE_CHUNKS_OUT})
     )
 
-    # # Remove any incompatible 'compressor' metadata left over from the source dataset
-    # for v in list(extended_historic_ds.data_vars):
-    #     extended_historic_ds[v].encoding.pop("compressor", None)
-    #     extended_historic_ds[v].encoding.pop("compressors", None)
-    #     # ensure chunks entry exists to avoid surprises
-    #     extended_historic_ds[v].encoding.setdefault("chunks", None)
+    # Explicit encoding: simple compressor for each data var
+    # encoding = {v: {"compressors": None      } for v in extended_historic_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
+    encoding = {v: {"compressors": COMPRESSOR} for v in extended_historic_ds.data_vars}
 
-    # for c in list(extended_historic_ds.coords):
-    #     extended_historic_ds[c].encoding.pop("compressor", None)
-    #     extended_historic_ds[c].encoding.pop("compressors", None)
-    #     extended_historic_ds[c].encoding.setdefault("chunks", None)
+    # For development
+    # show_ds_structure(extended_historic_ds)
     
+    # drop any coord/data var chunk encodings that conflict   # TODO: we're already doing 
+    for name in list(extended_historic_ds.coords) + list(extended_historic_ds.data_vars): # TODO: remove this again if possilbe
+        extended_historic_ds[name].encoding.pop("chunks", None)                           # TODO: remove this again if possilbe
+        extended_historic_ds[name].encoding.pop("compressor", None)                       # TODO: remove this again if possilbe
+        extended_historic_ds[name].encoding.pop("compressors", None)                      # TODO: remove this again if possilbe
 
-    # # Explicit encoding: no compressor for each data var
-    # encoding = {v: {"compressor": None} for v in extended_historic_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
-
-    # # drop any coord/data var chunk encodings that conflict   # TODO: we're already doing 
-    # for name in list(extended_historic_ds.coords) + list(extended_historic_ds.data_vars):
-    #     extended_historic_ds[name].encoding.pop("chunks", None)
-    #     extended_historic_ds[name].encoding.pop("compressor", None)
-    #     extended_historic_ds[name].encoding.pop("compressors", None)
-
-    if os.path.exists(HISTO_ZARR_OUTPUT): # TODO: remove this when going circular
-        shutil.rmtree(HISTO_ZARR_OUTPUT)  # TODO: remove this when going circular
     extended_historic_ds.to_zarr(
           HISTO_ZARR_OUTPUT, 
           mode="w", 
-          consolidated=True, 
+          # consolidated=True, # gave warning "consolidated metadata is currently not part in the Zarr format 3 specification."
           compute=True, 
           encoding=encoding, 
-          zarr_version=3)
-    # TODO: see if we want to go circular
-    #       whether we use: HISTO_ZARR_IN_OUTPUT and the appending with mode="a"
+          zarr_format=3)
+    # TODO: if we go circular and use: HISTO_ZARR_IN_OUTPUT then we should probably use mode="a" (appending)
 
     client.close()
 
