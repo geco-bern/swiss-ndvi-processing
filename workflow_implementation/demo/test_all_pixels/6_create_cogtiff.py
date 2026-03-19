@@ -52,7 +52,7 @@ OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs/"
 
 os.makedirs(OUTPUT_TIFF_BASE, exist_ok=True)
 
-# ssh dash-WS02-GECO; rsync -avh --progress -e 'ssh -p 2222' /data_2/scratch/sbiegel/processed/forest_mask.npy fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/forest_mask.npy
+# ssh dash-WS02-GECO; rsync -avhz --progress -e 'ssh -p 2222' /data_2/scratch/sbiegel/processed/forest_mask.npy fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/forest_mask.npy
 # FOREST_MASK = "/mnt/data1/UniBe-swiss-ndvi/data/forest_mask.npy" # NOTE: this is different from 'mask_array'  # TODO: FOREST_MASK is unused
 
 

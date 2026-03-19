@@ -1,3 +1,8 @@
+# NOTE: A good test is to run this pipeline with END_DATE="2025-12-12"
+#       Use the variant where it updates the HISTO_INPUT.
+#       Then modify the END_DATE="2025-12-28"
+#       and comment out the creation the working copy from the backup.
+#       Then rerun this script: now it should only download incrementally and append.
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
@@ -40,18 +45,20 @@ echo
 # Define historical NDVI update mode --------------
 # Script inputs: 
 #   Define which historical NDVI file to use, and whether it will be udpated in-place or copied.
-HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_copy.zarr" 
-HISTO_OUTPUT="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_extended.zarr" # currently unused since we append INPUT
+HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m.zarr" 
+HISTO_OUTPUT="/mnt/data1/UniBe-swiss-ndvi/output_data/ndvi_historic_extended.zarr" # currently unused since we append INPUT
 
-# Workaround to ensure we have the original untouched
-HISTO_ORIG="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr/" # Ensure we have the original untouched
-if [ -d "$HISTO_INPUT" ]; then rm -r -- "$HISTO_INPUT"; fi
-rsync -a $HISTO_ORIG $HISTO_INPUT # note the important trailing slash in source/
+# Workaround creating the working copy from the backup:
+HISTO_BKP="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m.zarr_bkp/" # Ensure we have the original untouched
+if [ -d "$HISTO_INPUT" ]; then rm -rf -- "$HISTO_INPUT"; fi
+rsync -rltDg --no-perms --chmod=ugo=rwX $HISTO_BKP $HISTO_INPUT # note the important trailing slash in source/
 
 # Define start and end date for download script --------------
 # End date:
-END_DATE="${2:-$(date -d "yesterday" +%Y-%m-%d)}" # Yesterday
-END_DATE="2025-12-12" # Or hardcode it alternatively
+# END_DATE="${2:-$(date -d "yesterday" +%Y-%m-%d)}" # Yesterday
+END_DATE="2025-12-12"   # Or hardcode it alternatively
+# END_DATE="2025-12-28" # For a second test run after the first.
+
 # Start date:
 # Read previous start date from historical NDVI file
 SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/0_2_get_last_date.py"

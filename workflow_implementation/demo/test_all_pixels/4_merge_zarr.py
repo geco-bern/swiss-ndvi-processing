@@ -23,7 +23,7 @@ warnings.filterwarnings(
 # SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py"
 # LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr_FB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
 # DOWNLOAD_FILE="/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr"
-# HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr"
+# HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
 # python -u $SCRIPT_FILE $DOWNLOAD_FILE $HISTO_INPUT > $LOG_FILE  2>&1 &
 
 # output will be a temporary zarr file that can be used for script 05
@@ -42,13 +42,13 @@ if __name__ == "__main__":
         # DOWNLOAD_ZARR     = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_23h33_ndvi_01_downloaded_2025-11-30_2025-12-06.zarr"
         # DOWNLOAD_ZARR     = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_15h29_ndvi_01_downloaded_2025-11-30_2025-12-06.zarr"
         # DOWNLOAD_ZARR     = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr"
-        # HISTO_ZARR         = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+        # HISTO_ZARR         = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
         # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr" # TODO: do not create this but simply merge in script 5
-        # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+        # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
         # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr" # TODO: do not create this but simply merge in script 5
-        # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+        # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_100kmX100km.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
         # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_100kmX100km_4th.zarr" # TODO: do not create this but simply merge in script 5
-        # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+        # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
         # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr" # TODO: do not create this but simply merge in script 5
 
     OUT_ZARR_TMP = DOWNLOAD_ZARR.replace(".zarr","_processed.zarr")
