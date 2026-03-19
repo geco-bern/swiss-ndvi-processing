@@ -32,7 +32,8 @@
 #     ndvi_processed  (pixel, date) int16 669GB dask.array<chunksize=(5000, 3164), meta=np.ndarray>
 #     mask_array      (pixel, date) bool 334GB dask.array<chunksize=(5000, 3164), meta=np.ndarray>
 
-# nohup python -u ../swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/6_append_coords_to_historic_ndvi.py > ../swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/6_append_coords_to_historic_ndvi.py.log
+# LOG_FILE="../swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/6_append_coords_to_historic_ndvi.py_FB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
+# nohup python -u ../swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/6_append_coords_to_historic_ndvi.py > $LOG_FILE
 
 import numpy as np
 import xarray as xr
@@ -244,8 +245,10 @@ if __name__ == "__main__":
         # NOTE: for 500000x30 this takes 2699 secs to write (with 35 workers)
 
         # Also genereate a spatial subset with a bounding box:
-        xmin, xmax = 2600000, 2601000
-        ymin, ymax = 1196000, 1197000
+        #xmin, xmax = 2600000, 2601000
+        #ymin, ymax = 1196000, 1197000
+        xmin, xmax = 2650000, 2750000 # focus on Ticino 100x100km
+        ymin, ymax = 1070000, 1170000 # focus on Ticino 100x100km
         pixels_subset_mask = (
             (out_ds.x.data >= xmin) &
             (out_ds.x.data <= xmax) &
@@ -259,7 +262,7 @@ if __name__ == "__main__":
         out_ds_subset.chunk(           # for  testing add before .chunk(): .isel(pixel = range(0,1000000))
             {"pixel": 500000, "date": 30}
             ).to_zarr(
-                OUT_HISTORIC_ZARR_v4_compr.replace(".zarr", "_1000mX1000m.zarr"),
+                OUT_HISTORIC_ZARR_v4_compr.replace(".zarr", "_100kmX100km.zarr"),
                 mode="w",
                 consolidated=True,
                 compute=True,
@@ -300,7 +303,8 @@ if __name__ == "__main__":
     # do manually in a terminal:
     # ssh dash
     # tmux
-    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v2.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
-    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v4.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
-    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v4_compr.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
-    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 2222' /data_3/scratch/francesco/ndvi_historic_v4_compr_1000mX1000m.zarr fabian-bernhard@dac3.ddns.net:/mnt/data1/UniBe-swiss-ndvi/data/
+    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 22' /data_3/scratch/francesco/ndvi_historic_v2.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/
+    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 22' /data_3/scratch/francesco/ndvi_historic_v4.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/
+    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 22' /data_3/scratch/francesco/ndvi_historic_v4_compr.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/
+    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 22' /data_3/scratch/francesco/ndvi_historic_v4_compr_100days.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/
+    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 22' /data_3/scratch/francesco/ndvi_historic_v4_compr_1000mX1000m.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/
