@@ -308,7 +308,7 @@ if __name__ == "__main__":
 
     # concatenate
     extended_historic_ds = (
-         xr.concat([historic_ds_to_extend, new_ds], dim="date")
+         xr.concat([historic_ds_to_extend, ds_to_append], dim="date")
          .sortby("date")
          .chunk({"pixel": PIXEL_CHUNKS, 
                  "date": DATE_CHUNKS_OUT})
