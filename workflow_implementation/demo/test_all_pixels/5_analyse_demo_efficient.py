@@ -5,8 +5,8 @@ from dask.distributed import Client
 from dask import visualize
 import dask.array as da
 import xarray as xr
-import os
-import shutil
+import argparse
+import os, shutil, sys
 import time
 from numcodecs import blosc, Blosc, zarr3
 from zarr.codecs import BloscCodec
@@ -18,7 +18,14 @@ warnings.filterwarnings(
     module="numcodecs.zarr3"
 )
 
-#  nohup python -u /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py > /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient_FB_2026-03-19.log 2>&1 &
+# HOW TO RUN FROM BASH:
+# source /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate
+# SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py"
+# LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient_FB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
+# NEW_NDVI="/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr"
+# HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr"
+# HISTO_OUTPUT="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km_extended2.zarr"
+# python -u $SCRIPT_FILE $NEW_NDVI $HISTO_INPUT --histo-output=$HISTO_OUTPUT > $LOG_FILE  2>&1 &
 
 def historical_ndvi(ndvi_arr_original, medians,mask_array_original, obs_dates,dates,starting_date):
         
@@ -139,17 +146,56 @@ def historical_ndvi(ndvi_arr_original, medians,mask_array_original, obs_dates,da
 
 if __name__ == "__main__":
 
+    # PARSE ARGUMENTS:
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("INPUT_ZARR",        help="Full path to Zarr folder with newly downloaded NDVI data")
+    parser.add_argument("HISTO_ZARR_INPUT",  help="Full path to Zarr folder with historic NDVI data")
+    parser.add_argument("--histo-output", dest = "HISTO_ZARR_OUTPUT", default=None,
+                        help="Full path for updated historic Zarr (if omitted, defaults to HISTO_ZARR_INPUT)"+
+                             "Path must either be a non-existing folder or then HISTO_ZARR_INPUT. In latter case data is appended.")
+    args = parser.parse_args()
+
+    INPUT_ZARR        = args.INPUT_ZARR
+    HISTO_ZARR_INPUT  = args.HISTO_ZARR_INPUT
+    HISTO_ZARR_OUTPUT = args.HISTO_ZARR_OUTPUT or HISTO_ZARR_INPUT # if None defaults to HISTO_ZARR_INPUT
+
+    # if running interactively use e.g.:
+    #   # HISTO_ZARR_INPUT     = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr"
+    #   # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_extended.zarr" # TODO: remove this and instea do it circular
+    #   # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr"
+    #   # HISTO_ZARR_INPUT     = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr"
+    #   # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km_extended.zarr" # TODO: remove this and instea do it circular
+    #   # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr"
+    #   HISTO_ZARR_INPUT     = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km.zarr"
+    #   HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km_extended.zarr" # TODO: remove this and instea do it circular
+    #   INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_100kmX100km_4th.zarr"
+    #   # HISTO_ZARR_INPUT     = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr.zarr"
+    #   # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_extended.zarr" # TODO: remove this and instea do it circular
+    #   # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr"
+
+    INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
+
+    # START PROCESSING:
     t0 = time.perf_counter()
 
-    # N_WORKERS = 20        # b) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s; 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
-    # DATE_CHUNKS = -1      # b) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s; 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
-    # PIXEL_CHUNKS = 10000  # b) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s; 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
-    # MEMORY_PER_WORKER = '190GB'
+    # N_WORKERS = 10           # e) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 120s (incl Zarr); 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # N_THREADS_PER_WORKER = 1 # e) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 120s (incl Zarr); 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # DATE_CHUNKS = -1         # e) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 120s (incl Zarr); 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # PIXEL_CHUNKS = 10000     # e) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 120s (incl Zarr); 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # MEMORY_PER_WORKER = '240GB'
 
-    # N_WORKERS = 30        # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s or 44s; 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
-    # DATE_CHUNKS = -1      # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s or 44s; 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
-    # PIXEL_CHUNKS = 10000  # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s or 44s; 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
-    # MEMORY_PER_WORKER = '120GB'
+    # N_WORKERS = 20        # b) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 90s (incl Zarr); 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # DATE_CHUNKS = -1      # b) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 90s (incl Zarr); 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # PIXEL_CHUNKS = 10000  # b) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 90s (incl Zarr); 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # MEMORY_PER_WORKER = '190GB'
+    # N_THREADS_PER_WORKER = 1
+
+    N_WORKERS = 30        # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr); 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
+    DATE_CHUNKS = -1      # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr); 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
+    PIXEL_CHUNKS = 10000  # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr); 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
+    MEMORY_PER_WORKER = '120GB'
+    N_THREADS_PER_WORKER = 1
     # TODO: check: 16041205 pixels in 640s in pipeline_FB_2026-03-19_09h09m26.log
     #              16041205 pixels in 3300s in pipeline_FB_2026-03-19_11h38m18.log
     #              Why so much longer? 
@@ -157,15 +203,12 @@ if __name__ == "__main__":
     #                 If so, then this would be smaller in case of appending.
     #                 The dashboard showed some computation to be indeed over after 10mins. Then "PerformanceWarning: Increasing number of chunks by factor of 245". And then dashboard didn't show any activity anymore.
 
-    # N_WORKERS = 60        # D) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 33s; 586503 pixels => 57s; 16041205 pixels => XXs; 105715396 pixels => XXs
-    # DATE_CHUNKS = -1      # D) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 33s; 586503 pixels => 57s; 16041205 pixels => XXs; 105715396 pixels => XXs
-    # PIXEL_CHUNKS = 10000  # D) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 33s; 586503 pixels => 57s; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # N_WORKERS = 60        # d) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 33s; 586503 pixels => 57s; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # DATE_CHUNKS = -1      # d) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 33s; 586503 pixels => 57s; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # PIXEL_CHUNKS = 10000  # d) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 33s; 586503 pixels => 57s; 16041205 pixels => XXs; 105715396 pixels => XXs
     # MEMORY_PER_WORKER = '66GB'
+    # N_THREADS_PER_WORKER = 1
 
-    N_WORKERS = 30         # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 87s or 44s; 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
-    DATE_CHUNKS = -1       # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 87s or 44s; 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
-    PIXEL_CHUNKS = 100000  # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 87s or 44s; 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
-    MEMORY_PER_WORKER = '120GB'
 
     # Definition of output format of new
     # TODO: when going circular this is probably not needed anymore.
@@ -178,32 +221,17 @@ if __name__ == "__main__":
 
     client = Client(
         n_workers=N_WORKERS,
-        threads_per_worker=1,
+        threads_per_worker=N_THREADS_PER_WORKER,
         memory_limit=MEMORY_PER_WORKER,
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
         dashboard_address=':8343')  
-    print(client.dashboard_link)
+    print(client, flush = True)
+    print(client.dashboard_link, flush = True) # use this dashboard to follow progress
 
-    INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
-
-    # HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr"
-    # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_extended.zarr" # TODO: remove this and instea do it circular
-    # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr"
-    HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr"
-    HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km_extended.zarr" # TODO: remove this and instea do it circular
-    INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr"
-    # HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km.zarr"
-    # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km_extended.zarr" # TODO: remove this and instea do it circular
-    # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_100kmX100km_4th.zarr"
-    # HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr.zarr"
-    # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_extended.zarr" # TODO: remove this and instea do it circular
-    # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr"
-    
     # DATE_CHUNKS  = historic_ds.chunks['date'][0]  # should be 30 days # TODO: why not this?
     # PIXEL_CHUNKS = historic_ds.chunks['pixel'][0]                     # TODO: why not this?
 
-
-    historic_ds  = xr.open_zarr(HISTO_ZARR_IN_OUTPUT, chunks={"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+    historic_ds  = xr.open_zarr(HISTO_ZARR_INPUT, chunks={"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
     new_ds       = xr.open_zarr(INPUT_ZARR, chunks={"pixel": PIXEL_CHUNKS, "date": -1})
     lookuptable  = xr.open_zarr(INPUT_LOOKUPTABLE, consolidated=False).chunk({"pixel": PIXEL_CHUNKS})
 
@@ -356,16 +384,56 @@ if __name__ == "__main__":
         extended_historic_ds[name].encoding.pop("compressor", None)                       # TODO: remove this again if possilbe
         extended_historic_ds[name].encoding.pop("compressors", None)                      # TODO: remove this again if possilbe
 
-    extended_historic_ds.to_zarr(
-          HISTO_ZARR_OUTPUT, 
-          mode="w", 
-          # consolidated=True, # gave warning "consolidated metadata is currently not part in the Zarr format 3 specification."
-          compute=True, 
-          encoding=encoding, 
-          zarr_format=3)
-    # TODO: if we go circular and use: HISTO_ZARR_IN_OUTPUT then we should probably use mode="a" (appending)
+    if HISTO_ZARR_OUTPUT == HISTO_ZARR_INPUT:
+        print(f"appending to file\n{HISTO_ZARR_OUTPUT}", flush=True)
+        # https://docs.xarray.dev/en/latest/generated/xarray.Dataset.to_zarr.html
+        try:
+            print("Appending new dates to existing zarr store...", flush=True)
+            # Only append the new portion (ds_to_append) along the "date" dimension
+            # Ensure encoding contains only variables present in the dataset being appended
+            encoding_append = {k: encoding[k] for k in ds_to_append.data_vars.keys() if k in encoding}
+            ds_to_append.to_zarr(
+                HISTO_ZARR_OUTPUT,
+                mode="a",
+                append_dim="date",
+                compute=True,
+                encoding=encoding_append,
+                zarr_format=3,
+            )
+            print("Append completed.", flush=True)
+        except Exception as e:
+            print(f"Appending failed: {e}. Falling back to rewrite.", flush=True)
+            # Backup original store (move directory) and write full dataset
+            backup = HISTO_ZARR_INPUT + ".backup_" + dt.datetime.now().strftime("%Y%m%d%H%M%S")
+            try:
+                shutil.move(HISTO_ZARR_INPUT, backup)
+                print(f"Backed up original store to {backup}", flush=True)
+            except Exception as e2:
+                print(f"Backup failed: {e2} -- continuing to overwrite.", flush=True)
+            extended_historic_ds.to_zarr(
+                HISTO_ZARR_OUTPUT,
+                mode="w",
+                # consolidated=True, # gave warning "consolidated metadata is currently not part in the Zarr format 3 specification."
+                compute=True,
+                encoding=encoding,
+                zarr_format=3,
+            )
+    else:
+        print(f"writing to new file\n{HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
+        extended_historic_ds.to_zarr(
+            HISTO_ZARR_OUTPUT, 
+            mode="w", 
+            # consolidated=True, # gave warning "consolidated metadata is currently not part in the Zarr format 3 specification."
+            compute=True,
+            encoding=encoding, 
+            zarr_format=3
+        )
 
     client.close()
 
     t1 = time.perf_counter()
     print(f"Total runtime: {t1 - t0:.2f} seconds")
+
+    print("Modified/Created file: ", flush = True)
+    print(HISTO_ZARR_OUTPUT, flush = True)
+    sys.exit(0)

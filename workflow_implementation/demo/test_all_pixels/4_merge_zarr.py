@@ -4,7 +4,7 @@ Merge all-time (historic) record onto newly downloaded NDVI data to prepare for 
 import numpy as np
 import zarr
 import pandas as pd
-import os
+import os, sys
 import xarray as xr
 import dask.array as da
 from dask.distributed import Client, LocalCluster
@@ -18,44 +18,40 @@ warnings.filterwarnings(
     module="numcodecs.zarr3"
 )
 
+# HOW TO RUN FROM BASH:
+# source /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate
+# SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py"
+# LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr_FB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
+# DOWNLOAD_FILE="/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr"
+# HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr"
+# python -u $SCRIPT_FILE $DOWNLOAD_FILE $HISTO_INPUT > $LOG_FILE  2>&1 &
+
+# output will be a temporary zarr file that can be used for script 05
+# script returns filename
+
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
-    parser.add_argument("end_date", help="End date in YYYY-MM-DD")
-    parser.add_argument("SOURCE_ZARR", help="Full path of Zarr folder, modified with script 2 and 3")
+    parser.add_argument("DOWNLOAD_ZARR", help="Full path of Zarr folder, downloaded with script 01")
+    parser.add_argument("HISTO_INPUT",   help="Full path to Zarr folder with historic NDVI data")
     args = parser.parse_args()
 
-    SOURCE_ZARR        = args.SOURCE_ZARR
-    # HISTO_ZARR         = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
-    # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr" # TODO: do not create this but simply merge in script 5
-    # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
-    # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr" # TODO: do not create this but simply merge in script 5
-    HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
-    OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_100kmX100km_4th.zarr" # TODO: do not create this but simply merge in script 5
-    # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
-    # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr" # TODO: do not create this but simply merge in script 5
-    
-    # start_date = args.start_date
-    # end_date = args.end_date
+    DOWNLOAD_ZARR        = args.DOWNLOAD_ZARR
+    HISTO_ZARR           = args.HISTO_INPUT
     # if running interactively use e.g.:
-    #   start_date = "2025-11-30" # for dates requested...
-    #   end_date = "2025-12-12"   # ...in script 1 when downloading
-    #   end_date = "2025-12-06"   # ...in script 1 when downloading
-    #   end_date = "2025-12-04"   # ...in script 1 when downloading
-    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_16h27_ndvi_02-03_downloadedB_2025-11-30_2025-12-12.zarr"
-                    #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" # the zarr from script 3
-                    #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_02-03_downloadedB.zarr" # the zarr from script 3
-                    #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_02-03_downloadedB_2026-03-17.zarr" # the zarr from script 3
-                    #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_16h27_ndvi_02-03_downloadedB_2025-11-30_2025-12-12.zarr"
-                    #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_16h35_ndvi_02-03_downloadedB_2025-11-30_2025-12-06.zarr"
-                    # SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" 
-    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr"
-    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_22h39_ndvi_01_downloadedA_2025-11-30_2025-12-08.zarr"
-    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_23h33_ndvi_01_downloaded_2025-11-30_2025-12-06.zarr"
-    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_15h29_ndvi_01_downloaded_2025-11-30_2025-12-06.zarr"
-    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr"
+        # DOWNLOAD_ZARR     = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_23h33_ndvi_01_downloaded_2025-11-30_2025-12-06.zarr"
+        # DOWNLOAD_ZARR     = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_15h29_ndvi_01_downloaded_2025-11-30_2025-12-06.zarr"
+        # DOWNLOAD_ZARR     = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr"
+        # HISTO_ZARR         = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+        # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr" # TODO: do not create this but simply merge in script 5
+        # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+        # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr" # TODO: do not create this but simply merge in script 5
+        # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+        # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_100kmX100km_4th.zarr" # TODO: do not create this but simply merge in script 5
+        # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+        # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr" # TODO: do not create this but simply merge in script 5
 
+    OUT_ZARR_TMP = DOWNLOAD_ZARR.replace(".zarr","_processed.zarr")
     DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data4/"
     os.makedirs(DASK_TEMP_DIR, exist_ok=True)
 
@@ -95,7 +91,7 @@ if __name__ == "__main__":
 
 
     # --- load new data dataset ------------------------------------
-    new_observations_ds = xr.open_dataset(SOURCE_ZARR, chunks={"pixel": PIXEL_CHUNKS, "date": -1})
+    new_observations_ds = xr.open_dataset(DOWNLOAD_ZARR, chunks={"pixel": PIXEL_CHUNKS, "date": -1})
 
     # Subset new_observations_ds to correspond to same pixels as in historic_ds
     if (len(historic_ds.pixel.values) < len(new_observations_ds.pixel.values)):
@@ -172,8 +168,8 @@ if __name__ == "__main__":
     #  Initialize empty daily dataset to append to historic
     #  i.e. extend it back to last historic date
     # =====================================================
-    last_historic_date = historic_ds.date.tail(1).values[0]
-    start_date         = np.datetime_as_string(last_historic_date, unit='D')
+    last_historic_date = historic_ds['date'].max().values
+    start_date         = np.datetime_as_string(last_historic_date + 1, unit='D')  # Note the shift +1, since we want to avoid a duplicate
     end_date           = observation_dates.max()
 
     # build full daily index from start_date to end_date (make sure start_date/end_date are pd-compatible)
@@ -347,3 +343,8 @@ if __name__ == "__main__":
 
     client.close()
     print("All done")
+
+    print("Modified/Created file: ", flush = True)
+    print(OUT_ZARR_TMP, flush = True)
+    sys.exit(0)
+
