@@ -3,7 +3,7 @@ Extract Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI t
 """
 import xarray as xr
 import dask.array as da
-# from dask.distributed import Client, LocalCluster
+from dask.distributed import Client, LocalCluster
 import pystac_client
 import rasterio
 from rasterio.coords import BoundingBox
@@ -18,6 +18,7 @@ import os, shutil
 import sys
 from datetime import datetime
 from affine import Affine
+import pandas as pd
 
 import warnings
 warnings.filterwarnings(
@@ -479,7 +480,7 @@ if (len(s2_files) > 0):
         }
     )
 
-    # Append date
+    # Add a day-level coord used for grouping (keeps original 'datetime' untouched).
     # append date (rounding) => multiple datetimes can have same date
     ds_out = ds_out.assign_coords(
         date=ds_out.datetime.dt.floor("D")
@@ -489,7 +490,6 @@ if (len(s2_files) > 0):
 
     # Define grid underlying PixelID and needed transformations
     # Define transform between row,col to coord (upper-left origin, pixel sizes)
-    import pandas as pd
     trans = ref_meta["transform"]
     rows, cols = np.nonzero(forest_mask)
     ids = np.arange(len(rows))
@@ -520,21 +520,36 @@ if (len(s2_files) > 0):
     ds_out2.attrs["transform_note"] = str(trans)
     ds_out2.attrs["transform_coeffs"] = tuple(float(v) for v in trans)
     ds_out2.attrs["transform_instr"] = "from affine import Affine; t = Affine(*ds.attrs['transform_coeffs'][0:6])"
-
+    ds_out2.attrs['description_ndvi'] = 'NDVI (scaled int16: -10000 to 10000)'
+    ds_out2.attrs['description_ndsi'] = 'NDSI (scaled int16: -10000 to 10000)'
+    ds_out2.attrs['nodata'] = NO_COVERAGE
+    ds_out2.attrs['cloud_shadow'] = INVALID
+    
     ds_out2.attrs['pixel_definition'] = reference_summary_msg
     # ==========================================================================
-
-
     # Write out
     ds_out2.to_zarr(OUTPUT_ZARR, mode="w", consolidated=True, compute=True)
 
-
-
     # test load this dataset:
     # ds_test = xr.open_dataset(OUTPUT_ZARR)
-    # delete temporary Zarr store to clean up # TODO: reactivate this
-    #if os.path.exists(OUTPUT_ZARR_TEMP): 
-    #    shutil.rmtree(OUTPUT_ZARR_TEMP)
+
+    # test plot this dataset    
+    # xmin, xmax = 2650000, 2750000 # focus on Ticino
+    # ymin, ymax = 1070000, 1160000 # focus on Ticino
+    # pixels_subset_mask = (
+    #     (ds_test.x.values >= xmin) &
+    #     (ds_test.x.values <= xmax) &
+    #     (ds_test.y.values >= ymin) &
+    #     (ds_test.y.values <= ymax)
+    # )
+    # ds_test_subset = ds_test["ndvi"].isel(pixel=pixels_subset_mask.nonzero()[0])
+    # plot_da_map(ds_test_subset.isel(datetime = 0), png_fname = 'foo5.png')
+    # plot_da_map(ds_test_subset.isel(datetime = 0), reduction_factor = 1, png_fname = 'foo1.png')
+
+
+    # delete temporary Zarr store to clean up
+    if os.path.exists(OUTPUT_ZARR_TEMP): 
+       shutil.rmtree(OUTPUT_ZARR_TEMP)
 
     print(OUTPUT_ZARR, flush = True)
     sys.exit(0)

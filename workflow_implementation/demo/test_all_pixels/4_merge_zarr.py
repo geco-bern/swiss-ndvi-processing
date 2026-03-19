@@ -19,13 +19,20 @@ if __name__ == "__main__":
     parser.add_argument("SOURCE_ZARR", help="Full path of Zarr folder, modified with script 2 and 3")
     args = parser.parse_args()
 
-    start_date = args.start_date
-    end_date = args.end_date
-    SOURCE_ZARR = args.SOURCE_ZARR
+    SOURCE_ZARR        = args.SOURCE_ZARR
+    #HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+    HISTO_ZARR         = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+    #HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v3_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+    
+    OUT_ZARR_TMP   = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr" # TODO: do not create this but simply merge in script 5
+    
+    # start_date = args.start_date
+    # end_date = args.end_date
     # if running interactively use e.g.:
     #   start_date = "2025-11-30" # for dates requested...
-    #   end_date = "2026-03-10"   # ...in script 1 when downloading
     #   end_date = "2025-12-12"   # ...in script 1 when downloading
+    #   end_date = "2025-12-06"   # ...in script 1 when downloading
+    #   end_date = "2025-12-04"   # ...in script 1 when downloading
     #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_16h27_ndvi_02-03_downloadedB_2025-11-30_2025-12-12.zarr"
                     #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" # the zarr from script 3
                     #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_02-03_downloadedB.zarr" # the zarr from script 3
@@ -34,15 +41,12 @@ if __name__ == "__main__":
                     #SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_16h35_ndvi_02-03_downloadedB_2025-11-30_2025-12-06.zarr"
                     # SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr" 
     #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr"
+    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_22h39_ndvi_01_downloadedA_2025-11-30_2025-12-08.zarr"
+    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_23h33_ndvi_01_downloaded_2025-11-30_2025-12-06.zarr"
+    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_15h29_ndvi_01_downloaded_2025-11-30_2025-12-06.zarr"
+    #   SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr"
 
-    historical_ndvi_src = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
-    #historical_ndvi_src = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v3_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
-    
-    OUT_ZARR_TMP   = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_3rd.zarr" # TODO: do not create this but simply merge in script 5
-    #OUT_ZARR_TMPold= "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_2026-03-12/" # TODO: do not create this but simply merge in script 5
-    #os.makedirs(OUT_ZARR_TMPold, exist_ok=True)
-    
-    DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data3/"
+    DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data4/"
     os.makedirs(DASK_TEMP_DIR, exist_ok=True)
 
     N_WORKERS = 50
@@ -61,194 +65,267 @@ if __name__ == "__main__":
 
 
     # =====================================================
-    #  Load Source Dataset lazily (no xarray metadata needed)
+    #  Load historic and new observation data sets
     # =====================================================
+    DATE_CHUNKS = 365
+    PIXEL_CHUNKS = 10000
+    # DATE_CHUNKS  = historic_ds.chunks['date'][0]  # should be 30 days # TODO: why not this?
+    # PIXEL_CHUNKS = historic_ds.chunks['pixel'][0]                     # TODO: why not this?
+
 
     # --- load historic dataset ------------------------------------
-    historic_ds = xr.open_zarr(historical_ndvi_src, chunks={})
+    historic_ds = xr.open_zarr(HISTO_ZARR, chunks={})
+    # TODO remove: # Rename ndvi_processed -> ndvi, mask_array -> obs_date to match new data schema
+    # TODO remove: historic_ds = historic_ds.rename(
+    # TODO remove:     {
+    # TODO remove:         "ndvi_processed": "ndvi",  # NOTE: we rename since the OUT_ZARR_TMP will contain part processed but also part unprocessed data
+    # TODO remove:         "mask_array": "obs_date",  # NOTE: we rename since the OUT_ZARR_TMP will contain part processed but also part unprocessed data
+    # TODO remove:     }
+    # TODO remove: )
+
+
+    # --- load new data dataset ------------------------------------
+    new_observations_ds = xr.open_dataset(SOURCE_ZARR, chunks={"pixel": PIXEL_CHUNKS, "date": -1})
+
+    # Subset new_observations_ds to correspond to same pixels as in historic_ds
+    if (len(historic_ds.pixel.values) < len(new_observations_ds.pixel.values)):
+        print(f"Subsetting downloaded data to spatial extent of historic file:\n{HISTO_ZARR}", flush = True)
+        print(f"Subsetting {len(historic_ds.pixel.values)} (historic) of {len(new_observations_ds.pixel.values)} (downloaded) pixels.", flush = True)
     
-    # Rename ndvi_processed -> ndvi, mask_array -> obs_date to match new data schema
-    historic_ds = historic_ds.rename(
-        {
-            "ndvi_processed": "ndvi",  # NOTE: we rename since the OUT_ZARR_TMP will contain part processed but also part unprocessed data
-            "mask_array": "obs_date",  # NOTE: we rename since the OUT_ZARR_TMP will contain part processed but also part unprocessed data
-        }
-    )
-
-    #DATE_CHUNKS = 365
-    #PIXEL_CHUNKS = 10000
-    DATE_CHUNKS  = historic_ds.chunks['date'][0]  # should be 30 days # TODO: why not this?
-    PIXEL_CHUNKS = historic_ds.chunks['pixel'][0]                     # TODO: why not this?
-
-        # TODO: with SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-17_16h27_ndvi_02-03_downloadedB_2025-11-30_2025-12-12.zarr"
-        #            start_date = "2025-11-30" # for dates requested...
-        #            end_date = "2025-12-12"   # ...in script 1 when downloading
-        #       dates gives me duplicated dates: 
-        #       ['2025-12-06' '2025-12-09' '2025-12-09' '2025-12-12'] 
-        #           # these are 4 dates and ndvi_da is 4 long, but there are only 3 unique dates.
-        #       dates_clean is still ['2025-12-06' '2025-12-09' '2025-12-09' '2025-12-12'] 
-        #       unique_dates is ['2025-12-06' '2025-12-09' '2025-12-12']
-        #       ndvi_xr is (4x105Mio)
-        #       The code errors when ndvi_xr.assign_coords(date=unique_dates[:ndvi_da.shape[1]])  since unique_dates is too short.
-        # TODO: with SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr"
-        #            start_date = "2025-11-30"
-        #            end_date   = "2026-03-10"
-        #       dates does also give duplicated dates:
-        #       ['2025-12-06' '2025-12-09' '2025-12-09' '2025-12-12' '2025-12-13'
-        #        '2025-12-13' '2025-12-14' '2025-12-21' '2025-12-26' '2025-12-26'
-        #        '2025-12-27' '2025-12-28' '2025-12-29' '2025-12-29' '2025-12-30'
-        #        '2025-12-31' '2026-01-01' '2026-01-03' '2026-01-05' '2026-01-05'
-        #        '2026-01-06' '2026-01-07' '2026-01-09' '2026-01-13' '2026-01-15'
-        #        '2026-01-16' '2026-01-18' '2026-01-20' '2026-01-21' '2026-01-22'
-        #        '2026-01-27' '2026-01-30' '2026-02-02' '2026-02-05' '2026-02-22'
-        #        '2026-02-25' '2026-02-26' '2026-03-02' '2026-03-03' '2026-03-04'
-        #        '2026-03-04'] 
-        #             # these are 41 (repeated) dates, and ndvi_da is only 34 long and len(unique_dates) == 35
-        #       dates_clean contains 34 values
-        #       unique_dates contains 35 values
-        #       ndvi_xr and ndvi_da is of dimension (34x105Mio)
-        #       When doing ndvi_xr.assign_coords(date=unique_dates[:ndvi_da.shape[1]])
-        #         this appears to be wrong: 1. we are just dropping the last unique_dates?
-        #         2. MAIN QUESTION: how come len(dates) can be longer than ndvi_da
-    # xr.open_dataset(SOURCE_ZARR) # TODO: this is not possible
-    ds0 = zarr.open_group(SOURCE_ZARR, mode="r")
-    ndvi_da = da.from_zarr(ds0["ndvi"])
-    dates = da.from_zarr(ds0["date"]).astype("datetime64[D]").compute()
-    dates.sort()
-
-    start_date  = np.datetime64(start_date, "D")
-    end_date    = np.datetime64(end_date, "D")
+    new_observations_ds = new_observations_ds.sel(pixel=historic_ds.pixel)
     
-    dates_clean = dates[:ndvi_da.shape[1]] # TODO: what does it mean: dates_clean? This appears wrong, if dates is longer than ndvi_da, it only takes the first n dates.
-    unique_dates, unique_idx = np.unique(dates, return_index=True) 
-    # TODO: why is unique_idx never used. I believe this should be used to index only first occurrence of each date in ndvi_da, no? Otherwise we get ndvi values of the wrong dates...
+    # attempt to plot
+        # new_observations_ds
+        # xmin, xmax = 2600000, 2601500
+        # ymin, ymax = 1196000, 1197500
+        # pixels_subset_mask = (
+        #     (new_observations_ds.x.values >= xmin) &
+        #     (new_observations_ds.x.values <= xmax) &
+        #     (new_observations_ds.y.values >= ymin) &
+        #     (new_observations_ds.y.values <= ymax)
+        # )
+        # new_observations_ds["ndvi"].x.values
+        # new_observations_subset_ds = new_observations_ds["ndvi"].isel(pixel=pixels_subset_mask.nonzero()[0])
+        # plot_da_map(new_observations_subset_ds.isel(datetime = 0))
+    
+    # =====================================================
+    #  Aggregate multiple daily observation
+    #  and resample to daily intervals (between observations)
+    # =====================================================
 
-    ndvi_xr = xr.DataArray(
-        ndvi_da,                 # this is 34x105Mio
-        dims=("pixel", "date"),
-        coords={
-            "pixel": np.arange(ndvi_da.shape[0], dtype=np.int32),
-            "date": dates_clean
-        },
-        name="ndvi"
-    ).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+    # FOR DEVELOPMENT: new_observations_ds["ndvi"].isel(datetime = 1) # 2025-12-09T10:33:29
+    # FOR DEVELOPMENT: new_observations_ds["ndvi"].isel(datetime = 2) # 2025-12-09T10:44:51
+    # FOR DEVELOPMENT: plot_da_map(new_observations_ds["ndvi"].isel(datetime = 1),
+    # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = 'NDVI_2025-12-09_10h33.png')
+    # FOR DEVELOPMENT: plot_da_map(new_observations_ds["ndvi"].isel(datetime = 2),
+    # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = 'NDVI_2025-12-09_10h44.png')
+    
+    # Decide how to collapse sub-daily duplicates to one observed value per day
+    agg = 'first' # # TODO: choose 'mean' or 'first'
+    if agg == 'first':
+        ndvi_daily_between_obs = (new_observations_ds
+            # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
+            #       and they are later both replace by only one of them NO_COVERAGE
+            #       effectively this removes INVALID pixels TODO: is this desired behavior?
+            .where((new_observations_ds['ndvi']  != NO_COVERAGE) &
+                    (new_observations_ds['ndvi'] != INVALID))
+            .groupby(datetime=xr.groupers.TimeResampler('1D'))
+            .first()
+            .fillna(NO_COVERAGE).astype(np.int16)
+            .rename({'datetime': 'date'})
+        )
+    elif agg == 'mean':
+        INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
+        NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
+        ndvi_daily_between_obs = (new_observations_ds
+            # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
+            #       and they are later both replace by only one of them NO_COVERAGE
+            #       effectively this removes INVALID pixels TODO: is this desired behavior?
+            .where((new_observations_ds['ndvi'] != NO_COVERAGE) &
+                    (new_observations_ds['ndvi'] != INVALID))
+            .astype(np.float32)
+            .groupby(datetime=xr.groupers.TimeResampler('1D'))
+            .mean(skipna=True)
+            .fillna(NO_COVERAGE).astype(np.int16)
+            .rename({'datetime': 'date'})
+        )
+    else:
+        raise ValueError(f"Unsupported agg={agg}")
 
-    ndvi_xr    = ndvi_xr.assign_coords(date=unique_dates[:ndvi_da.shape[1]]) 
-    # TODO: ValueError: conflicting sizes for dimension 'date': length 4 on <this-array> and length 3 on {'pixel': 'pixel', 'date': 'date'}
-    # NOTE: because unique_dates is only 3 long
-    # NOTE: but ndvi_da has a total of 4 date slices
-    # TODO: with SOURCE_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/02-03_ndvi_dataset_temporal.zarr"
-    #            start_date = "2025-11-30"
-    #            end_date   = "2026-03-10"
-    # this 'appears' to work: ndvi_da is 34 long, len(unique_dates) == 35, so above line just drops '2026-03-04' to make it work
-    # 
+    # keep track which dates were actually observation dates
+    observation_datetimes = pd.DatetimeIndex(new_observations_ds["datetime"].values)
+    observation_dates     = pd.DatetimeIndex(observation_datetimes).floor("D")
 
-    daily_dates = pd.date_range(start=start_date, end=end_date, freq="D")
-    print(f"Generated {len(daily_dates)} daily dates from {daily_dates.min().date()} to {daily_dates.max().date()}", flush = True)
-    obs_dates_xr = xr.DataArray(
-        daily_dates.isin(dates), 
-        dims=("date",), 
-        coords={"date": daily_dates}, 
-        name="obs_dates"
-    ).chunk({"date": DATE_CHUNKS})
-    ndvi_daily = ndvi_xr.reindex(date=daily_dates, method=None, fill_value=np.int16(32767)).astype(np.int16)
 
     # =====================================================
-    #  Assemble Daily Dataset and write
+    #  Initialize empty daily dataset to append to historic
+    #  i.e. extend it back to last historic date
     # =====================================================
-    out_ds = xr.Dataset(
-        {
-            "ndvi": ndvi_daily,
-            "obs" : obs_dates_xr
-        }
-    ).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-    print("Date added", flush = True)
+    last_historic_date = historic_ds.date.tail(1).values[0]
+    start_date         = np.datetime_as_string(last_historic_date, unit='D')
+    end_date           = observation_dates.max()
 
-    # out_ds has: coords pixel, date; vars ndvi, obs
-    # Rename obs -> obs_date so names match historic
-    new_ds = out_ds.rename({"obs": "obs_date"})
+    # build full daily index from start_date to end_date (make sure start_date/end_date are pd-compatible)
+    daily_dates_since_last_historic = pd.date_range(
+        start=pd.to_datetime(start_date).floor("D"),
+        end=pd.to_datetime(end_date).floor("D"),
+        freq="D")
 
-    # Subset new_ds to correspond to same pixels as in historic_ds
-    if (len(historic_ds.pixel.values) < len(new_ds.pixel.values)):
-        print(f"Subsetting downloaded data to spatial extent of historic file:\n{historical_ndvi_src}", flush = True)
-        print(f"Subsetting {len(historic_ds.pixel.values)} (historic) of {len(new_ds.pixel.values)} (downloaded) pixels.", flush = True)
-    
-    new_ds = new_ds.isel(pixel=historic_ds.pixel.values)
-    
-    # Ensure coords are exactly the same set of names (pixel, date, x, y)
-    new_ds = new_ds.assign_coords(
-        x=historic_ds["x"],
-        y=historic_ds["y"],
+    # reindex coords to guarantee daily coverage starts at start_date
+    # i.e. extending back to last historic date:
+    ndvi_daily_since_last_historic = (ndvi_daily_between_obs
+        .reindex(date=daily_dates_since_last_historic, 
+                 method=None) # None (default): don’t fill gaps;
+                              # fills missing days with NaN; fill later if desired
+        .fillna(NO_COVERAGE).astype(np.int16)
     )
-    #new_ds # TODO: FB this is an attempted workaround to move merging of the historic and new data into script 5. TODO_FB.zarr only contains new data.
-    # new_ds.to_zarr("/mnt/data1/UniBe-swiss-ndvi/TODO_FB.zarr", mode="w", consolidated=True)
-    # TODO: stop here and do rest in script 5.
+        
+    # ndvi_daily_between_obs.date.values
+    # ndvi_daily_since_last_historic.date.values
 
-    # --- concatenate full datasets along time ----------------------------------
-    # TODO: add doy already here
-    historic_ds_to_merge = historic_ds.drop_vars("doy") # NOTE: Drop DOY, we compute it later from date_stack. # TODO: why? Why not compute here for the small part where we need it?
-    historic_ds_to_merge = historic_ds_to_merge.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-    merged_ds = xr.concat([historic_ds_to_merge, new_ds], dim="date").sortby("date")
+    # FOR DEVELOPMENT: observation_dates[1] # 2025-12-09
+    # FOR DEVELOPMENT: observation_dates[2] # 2025-12-09
+    # FOR DEVELOPMENT: plot_da_map(ndvi_daily_since_last_historic["ndvi"].sel(date= observation_dates[1]),
+    # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = f"NDVI_2025-12-09_combined_{agg}.png")
     
-    merged_ds = merged_ds.chunk(
-        {"pixel": min(PIXEL_CHUNKS, len(merged_ds.pixel)), 
-         "date": min(DATE_CHUNKS, len(merged_ds.date))})
+    # Print status
+    print(
+        f"Initialized n={len(daily_dates_since_last_historic)} daily dates:",
+        #f"\nfrom {daily_dates_since_last_historic.min().date()}"+
+        #f" to {daily_dates_since_last_historic.max().date()}"+
+        # f"\nwith observations on days at:"+
+        # f"\n"+"\n".join([f"  {d.strftime('%Y-%m-%d')}: {dt.strftime('%Y-%m-%d_%Hh%M')}" 
+        #    for (d, dt) in zip(observation_dates, observation_datetimes)]),
+        flush=True,
+    )
+    # group observation times (as strings) by date
+    times = pd.Series(observation_datetimes.strftime("%H:%M:%S"), 
+                    index=observation_datetimes.floor("D"))
+    grouped = times.groupby(level=0).agg(lambda s: ",".join(s))
+
+    # build DataFrame: 'daily', 'obs_date' (date or NaT), 'obs_times' (comma-joined times or NaN)
+    status_df = pd.DataFrame({"daily": daily_dates_since_last_historic})
+    status_df["obs_date"] = status_df["daily"].where(status_df["daily"].isin(grouped.index))
+    status_df["obs_times"] = status_df["daily"].map(grouped).fillna("")
+    print(status_df, flush=True)
+    # Initialized n=13 daily dates:
+    #         daily   obs_date          obs_times
+    # 0  2025-11-30        NaT                   
+    # 1  2025-12-01        NaT                   
+    # 2  2025-12-02        NaT                   
+    # 3  2025-12-03        NaT                   
+    # 4  2025-12-04        NaT                   
+    # 5  2025-12-05        NaT                   
+    # 6  2025-12-06 2025-12-06           10:23:19
+    # 7  2025-12-07        NaT                   
+    # 8  2025-12-08        NaT                   
+    # 9  2025-12-09 2025-12-09  10:33:29,10:44:51
+    # 10 2025-12-10        NaT                   
+    # 11 2025-12-11        NaT                   
+    # 12 2025-12-12 2025-12-12           10:43:39
+
+
+    # new_observations_ds["ndvi"].values.shape    # (4,4216)
+    # ndvi_daily_between_obs["ndvi"].values.shape # (7,4216)
+    # new_observations_ds.datetime.values         # 4 values from (2025-12-06_10h23, 2025-12-09_10h33, 2025-12-09_10h44, 2025-12-12_10h43)
+    # ndvi_daily_between_obs.datetime.values      # 7 values from (2025-12-06, ..., 2025-12-12)
+
+    # Append day-of-year (for merging of median expected NDVI from model)
+    doy_array = daily_dates_since_last_historic.dayofyear.values
+    ndvi_daily_since_last_historic = ndvi_daily_since_last_historic.assign_coords(
+        doy   = ('date', doy_array.astype(np.int32))
+    )
     
-    # Now merged_ds has variables: ndvi, obs_date (for all time)
-    # and coords: pixel, date, x, y
-                        # TODO: can we simply write this out in a single (chunked data set instead of manually splitting by year?)
-                        #       I would guess so. But currently first fix script 5 with the yearly files before attempting to make a shortcut here.
-    # Write to Zarr (as single file)
-    _now = datetime.datetime.now()
-    print(f"{_now.strftime("%Y-%m-%d %H:%M:%S")} - Writing single-file data: {OUT_ZARR_TMP}", flush = True)
-    # TODO: fix encoding if we want to change it from historic (30 days) to something else
-    # merged_ds.encoding 
-    merged_ds.to_zarr(OUT_ZARR_TMP, mode="w", consolidated=True, compute=True)
-    _now = datetime.datetime.now()
-    print(f"{_now.strftime("%Y-%m-%d %H:%M:%S")} - Finished writing single-file data: {OUT_ZARR_TMP}", flush = True)
+    # Keep track which dates were actually observation dates:
+    # add a DataArray to Dataset, which specifies the dates that were observations
+    ndvi_daily_since_last_historic["obs_date"] = ndvi_daily_since_last_historic.date.isin(observation_dates)
 
-    # TODO: IF THAT WORKS FINISH SCRIPT HERE.
+    # =====================================================
+    #  Write daily dataset (containing NaN)
+    #  for later i.   gapfilling, 
+    #            ii.  outlier detection, and 
+    #            iii. appending to historic
+    # =====================================================
+    new_ds = (ndvi_daily_since_last_historic
+                .rename({'ndvi':'ndvi_obs',
+                         'ndsi':'ndsi_obs'})
+                .chunk({"pixel": PIXEL_CHUNKS}))
+    # new_ds has: 
+    #   coords: x,y,x_idx,y_idx, pixel, date, datetime; 
+    #   vars:   ndvi_obs,ndsi_obs,obs_date
+    #   attrs:  pixel_definition,transform_note,transform_coeffs,transform_instr,description_ndvi,description_ndsi,nodata,cloud_shadow
+    
+    new_ds.to_zarr(OUT_ZARR_TMP, mode="w", consolidated=True)
 
-    # # TODO: OTHERWISE CONTINUE WITH ALTERNATIVE:
-    # # OR ALTERNATIVE: Write to Zarr (as yearly files)
-    # date_stack = merged_ds["date"].astype("datetime64[D]")
 
-    # years = pd.DatetimeIndex(date_stack).year   
+    # overview of data structures: ---------------------------------------------
+    # historic_ds
+    # <xarray.Dataset> Size: 40MB
+    # Dimensions:         (pixel: 4216, date: 3164)
+    # Coordinates:
+    #   * pixel           (pixel) int32 17kB 44311103 44311104 ... 45049987 45049988
+    #   * date            (date) datetime64[ns] 25kB 2017-04-03 ... 2025-11-30
+    #     doy             (date) int32 13kB dask.array<chunksize=(30,), meta=np.ndarray>
+    #     x_idx           (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    #     y_idx           (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    #     x               (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    #     y               (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    # Data variables:
+    #     ndvi_processed  (pixel, date) int16 27MB dask.array<chunksize=(4216, 30), meta=np.ndarray>
+    #     mask_array      (pixel, date) bool 13MB dask.array<chunksize=(4216, 30), meta=np.ndarray>
+    # Attributes:
+    #     [...]
 
-    # # Years: 2017-2026
-    # start_year = pd.to_datetime(start_date).year
-    # end_year   = pd.to_datetime(end_date).year
-    # years = [start_year] if start_year == end_year else [start_year, end_year]
+    # new_ds
+    # <xarray.Dataset> Size: 304kB
+    # Dimensions:   (date: 13, pixel: 4216)
+    # Coordinates:
+    #   * pixel     (pixel) int32 17kB 44311103 44311104 ... 45049987 45049988
+    #   * date      (date) datetime64[ns] 104B 2025-11-30 2025-12-01 ... 2025-12-12
+    #     x_idx     (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    #     y_idx     (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    #     y         (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    #     x         (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    #     doy       (date) int32 52B dask.array<chunksize=(13,), meta=np.ndarray>
+    # Data variables:
+    #     ndsi_obs  (date, pixel) int16 110kB dask.array<chunksize=(1, 4216), meta=np.ndarray>
+    #     ndvi_obs  (date, pixel) int16 110kB dask.array<chunksize=(1, 4216), meta=np.ndarray>
+    #     obs_date  (date) bool 13B dask.array<chunksize=(13,), meta=np.ndarray>
+    # Attributes:
+    #     [...]
 
-    # for year in years:
 
-    #     year_dates = merged_ds.date.dt.year == year
-    #     year_ds = merged_ds.isel(date=year_dates)
+    # and materialized with compute() ------------------------------------------
+    # new_ds.compute()
+    # <xarray.Dataset> Size: 304kB
+    # Dimensions:   (date: 13, pixel: 4216)
+    # Coordinates:
+    #   * pixel     (pixel) int32 17kB 44311103 44311104 ... 45049987 45049988
+    #   * date      (date) datetime64[ns] 104B 2025-11-30 2025-12-01 ... 2025-12-12
+    #     x_idx     (pixel) int32 17kB 11353 11353 11353 11353 ... 11452 11452 11452
+    #     y_idx     (pixel) int32 17kB 12591 12592 12594 12595 ... 12635 12636 12690
+    #     y         (pixel) int32 17kB 1196995 1196995 1196995 ... 1196005 1196005
+    #     x         (pixel) int32 17kB 2600005 2600015 2600035 ... 2600455 2600995
+    #     doy       (date) int32 52B 334 335 336 337 338 339 ... 342 343 344 345 346
+    # Data variables:
+    #     ndsi_obs  (date, pixel) int16 110kB 32767 32767 32767 ... 32767 32767 32767
+    #     ndvi_obs  (date, pixel) int16 110kB 32767 32767 32767 ... 32767 32767 32767
+    #     obs_date  (date) bool 13B False False False False ... True False False True
 
-    #     year_ds = year_ds.load() # TODO: this gives an error currently
+    # Attributes:
+    # <xarray.Dataset> Size: 40MB
+    # Dimensions:         (pixel: 4216, date: 3164)
+    # Coordinates:
+    #   * pixel           (pixel) int32 17kB 44311103 44311104 ... 45049987 45049988
+    #   * date            (date) datetime64[ns] 25kB 2017-04-03 ... 2025-11-30
+    #     doy             (date) int32 13kB 93 94 95 96 97 98 ... 330 331 332 333 334
+    #     x_idx           (pixel) int32 17kB 11353 11353 11353 ... 11452 11452 11452
+    #     y_idx           (pixel) int32 17kB 12591 12592 12594 ... 12635 12636 12690
+    #     y               (pixel) int32 17kB 1196995 1196995 ... 1196005 1196005
+    #     x               (pixel) int32 17kB 2600005 2600015 ... 2600455 2600995
+    # Data variables:
+    #     ndvi_processed  (pixel, date) int16 27MB 7105 7108 7112 ... 5427 5398 5372
+    #     mask_array      (pixel, date) bool 13MB True True True ... False False False
 
-    #     out_ds_year = xr.Dataset(
-    #         {
-    #             "ndvi": year_ds["ndvi"], 
-    #             "obs_date": year_ds["obs_date"],
-    #         },
-    #         coords={
-    #             "pixel": year_ds.pixel,
-    #             "date": year_ds.date,
-    #             "x": year_ds["x"],
-    #             "y": year_ds["y"],
-    #         },
-    #     )
-        
-    #     out_ds_year["obs_date"].encoding = {"dtype": "bool"}
-        
-    #     for coord in ["x", "y", "pixel", "date"]:
-    #         out_ds_year[coord].encoding = {}
-        
-    #     # Write to year-specific folder
-    #     year_out_zarr = f"{OUT_ZARR_TMPold}/{year}.zarr"
-    #     print(f"Writing {year}: {len(year_ds.date)} dates to {year_out_zarr}", flush = True)
-
-    #     out_ds_year.to_zarr(year_out_zarr, mode="w", consolidated=True)
 
     print("All done")

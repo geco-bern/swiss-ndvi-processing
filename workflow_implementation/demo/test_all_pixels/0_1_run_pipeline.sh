@@ -5,7 +5,7 @@ set -Eeuo pipefail
 # Configuration
 # ============================================================
 VENV_PATH="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv"
-LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FB_$(date "+%Y-%m-%d_%Hh%M").log"
+LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
 
 SCRIPTS=(
   /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
@@ -74,14 +74,14 @@ PIPELINE_START=$(date +%s)
 # Define start and end
 # ============================================================
 # Read previous start date from file, or use default
+# START_DATE="2025-11-30" # TODO: deactivate this
 START_DATE=$(python "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/0_2_get_last_date.py")
 echo $START_DATE
-# START_DATE="2025-11-30"
 # END_DATE="${2:-$(date +%Y-%m-%d)}" # TODO activate this for
-# END_DATE="2025-12-12" # TODO: deactivate this
-# END_DATE="2025-12-24" # TODO: deactivate this
-#END_DATE="2025-12-06" # TODO: deactivate this
-END_DATE="2025-12-04" # TODO: deactivate this
+# END_DATE="2025-12-04" # TODO: deactivate this
+# END_DATE="2025-12-06" # TODO: deactivate this
+END_DATE="2025-12-12" # TODO: deactivate this
+# END_DATE="2026-03-05" # TODO: deactivate this
 
 echo "Running: with arguments: $START_DATE $END_DATE"
 echo "------------------------------------------------------------"
