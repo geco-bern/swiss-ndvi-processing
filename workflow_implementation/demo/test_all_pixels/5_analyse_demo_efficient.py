@@ -11,6 +11,8 @@ import time
 from numcodecs import blosc, Blosc, zarr3
 from zarr.codecs import BloscCodec
 
+INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
+
 import warnings
 warnings.filterwarnings(
     "ignore", 
@@ -27,10 +29,10 @@ warnings.filterwarnings(
 # HISTO_OUTPUT="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km_extended2.zarr"
 # python -u $SCRIPT_FILE $NEW_NDVI $HISTO_INPUT --histo-output=$HISTO_OUTPUT > $LOG_FILE  2>&1 &
 
-def historical_ndvi(ndvi_arr_original, medians,mask_array_original, obs_dates,dates,starting_date):
+def historical_ndvi(ndvi_arr_original, medians, mask_array_original, is_observation_date, dates, starting_date):
         
         start_idx = np.searchsorted(dates, starting_date) 
-        obs_prior = np.nonzero(obs_dates[:start_idx])
+        obs_prior = np.nonzero(is_observation_date[:start_idx])
 
         # Ensure mask_array is writable
         mask_array_original = np.array(mask_array_original, copy=True)
@@ -42,7 +44,7 @@ def historical_ndvi(ndvi_arr_original, medians,mask_array_original, obs_dates,da
         crop_start = obs_prior[-3]  # Start at 3th prior obs, use to smooth
         ndvi_arr = ndvi_arr_original[crop_start:]
         medians = medians[crop_start:]
-        obs_dates = obs_dates[crop_start:]
+        is_observation_date = is_observation_date[crop_start:]
         dates = dates[crop_start:]
         mask_array = mask_array_original[crop_start:] 
 
@@ -65,7 +67,7 @@ def historical_ndvi(ndvi_arr_original, medians,mask_array_original, obs_dates,da
         original_idx = np.arange(len(ndvi_arr)) # used to keep track of delta ndvi position and the outlier position
         original_idx = original_idx[mask_valid_ndvi]
 
-        obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & obs_dates
+        obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
         
         # outlier detection
 
@@ -127,7 +129,7 @@ def historical_ndvi(ndvi_arr_original, medians,mask_array_original, obs_dates,da
             before = np.arange(len(mask_array)) < original_idx_2[-4]
 
             outlier_idx = original_idx[1:-1][outlier_mask]
-            valid_outlier_idx = outlier_idx[obs_dates[outlier_idx] == 1]
+            valid_outlier_idx = outlier_idx[is_observation_date[outlier_idx] == 1]
 
             mask_array[ before & obs_mask ] = 3
             mask_array[ before & (~obs_mask) ] = 1
@@ -161,6 +163,11 @@ if __name__ == "__main__":
     HISTO_ZARR_OUTPUT = args.HISTO_ZARR_OUTPUT or HISTO_ZARR_INPUT # if None defaults to HISTO_ZARR_INPUT
 
     # if running interactively use e.g.:
+    #   # HISTO_ZARR_INPUT  = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_copy.zarr"
+    #   # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_copy.zarr"
+    #   # INPUT_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
+
+
     #   # HISTO_ZARR_INPUT     = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr"
     #   # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_extended.zarr" # TODO: remove this and instea do it circular
     #   # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr"
@@ -174,7 +181,6 @@ if __name__ == "__main__":
     #   # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_extended.zarr" # TODO: remove this and instea do it circular
     #   # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr"
 
-    INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
 
     # START PROCESSING:
     t0 = time.perf_counter()
@@ -356,51 +362,79 @@ if __name__ == "__main__":
 
     ndvi_processed_to_append = ndvi_processed.sel(date = slice(start_date + 1, None)) # Note the shift +1
     mask_processed_to_append = mask_processed.sel(date = slice(start_date + 1, None)) # Note the shift +1
-    ds_to_append = xr.Dataset({"ndvi_processed": ndvi_processed_to_append, 
-                               "mask_array":     mask_processed_to_append})
+    ds_to_append = (
+        xr.Dataset({"ndvi_processed": ndvi_processed_to_append, 
+                     "mask_array":     mask_processed_to_append})
+        .chunk({"pixel": PIXEL_CHUNKS, 
+                 "date": DATE_CHUNKS_OUT})
+    )
     #ndvi_processed_to_append.compute() 
     #mask_processed_to_append.compute()
     #ds_to_append.compute()               # starts on 2025-12-01 # Note the shift +1
     #historic_ds_to_extend.compute()      # ends   on 2025-11-30
 
-    # concatenate
-    extended_historic_ds = (
-         xr.concat([historic_ds_to_extend, ds_to_append], dim="date")
-         .sortby("date")
-         .chunk({"pixel": PIXEL_CHUNKS, 
-                 "date": DATE_CHUNKS_OUT})
-    )
-
-    # Explicit encoding: simple compressor for each data var
-    # encoding = {v: {"compressors": None      } for v in extended_historic_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
-    encoding = {v: {"compressors": COMPRESSOR} for v in extended_historic_ds.data_vars}
-
     # For development
+    # show_ds_structure(ds_to_append)
     # show_ds_structure(extended_historic_ds)
-    
-    # drop any coord/data var chunk encodings that conflict   # TODO: we're already doing 
-    for name in list(extended_historic_ds.coords) + list(extended_historic_ds.data_vars): # TODO: remove this again if possilbe
-        extended_historic_ds[name].encoding.pop("chunks", None)                           # TODO: remove this again if possilbe
-        extended_historic_ds[name].encoding.pop("compressor", None)                       # TODO: remove this again if possilbe
-        extended_historic_ds[name].encoding.pop("compressors", None)                      # TODO: remove this again if possilbe
+     
+
+
+    def fallback_action_overwrite_zarr():
+        # concatenate to complete dataset
+        extended_historic_ds = (
+            xr.concat([historic_ds_to_extend, ds_to_append], dim="date")
+            .sortby("date")
+            .chunk({"pixel": PIXEL_CHUNKS, 
+                    "date": DATE_CHUNKS_OUT})
+        )
+        
+        # Explicit encoding: simple compressor for each data var
+        # encoding = {v: {"compressors": None      } for v in extended_historic_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
+        encoding = {v: {"compressors": COMPRESSOR} for v in extended_historic_ds.data_vars}
+
+        # drop any coord/data var chunk encodings that conflict   # TODO: we're already doing 
+        for name in list(extended_historic_ds.coords) + list(extended_historic_ds.data_vars): # TODO: remove this again if possilbe
+            extended_historic_ds[name].encoding.pop("chunks", None)                           # TODO: remove this again if possilbe
+            extended_historic_ds[name].encoding.pop("compressor", None)                       # TODO: remove this again if possilbe
+            extended_historic_ds[name].encoding.pop("compressors", None)                      # TODO: remove this again if possilbe
+
+        # overwrite (mode="w")
+        extended_historic_ds.to_zarr(
+            HISTO_ZARR_OUTPUT, 
+            mode="w", 
+            # consolidated=True, # gave warning "consolidated metadata is currently not part in the Zarr format 3 specification."
+            compute=True,
+            encoding=encoding, 
+            zarr_format=3
+        )
 
     if HISTO_ZARR_OUTPUT == HISTO_ZARR_INPUT:
-        print(f"appending to file\n{HISTO_ZARR_OUTPUT}", flush=True)
-        # https://docs.xarray.dev/en/latest/generated/xarray.Dataset.to_zarr.html
+        print(f"appending to file\n  {HISTO_ZARR_OUTPUT}", flush=True)
         try:
             print("Appending new dates to existing zarr store...", flush=True)
-            # Only append the new portion (ds_to_append) along the "date" dimension
-            # Ensure encoding contains only variables present in the dataset being appended
-            encoding_append = {k: encoding[k] for k in ds_to_append.data_vars.keys() if k in encoding}
+            # test_ds = xr.open_dataset(HISTO_ZARR_OUTPUT) # final check what is in there
+            # test_ds.date.max() # indeed 2025-11-30
+            # extended_ds = xr.concat([test_ds, ds_to_append], dim="date")
             ds_to_append.to_zarr(
                 HISTO_ZARR_OUTPUT,
                 mode="a",
                 append_dim="date",
                 compute=True,
-                encoding=encoding_append,
+                encoding={},  # NOTE: since we append encoding must not be provided
                 zarr_format=3,
             )
-            print("Append completed.", flush=True)
+
+            # post-writing check of resulting file content, if fails do fallback of full rewrite. 
+            # NOTE: (can we still access the old values to created extended_historic_ds??)
+            n_appended = ds_to_append.dims['date']
+            old_and_new_dates = (xr.open_dataset(HISTO_ZARR_OUTPUT)
+                .isel(date = slice(-n_appended-1,-n_appended+1))
+                .date.values) 
+            if (old_and_new_dates[1] - old_and_new_dates[0]) != np.timedelta64(1, 'D'):
+                raise ValueError(f"Dates of resulting data set are not exactly 1 day apart at interface: {old_and_new_dates}")
+            else:
+                print("Append completed.", flush=True)
+
         except Exception as e:
             print(f"Appending failed: {e}. Falling back to rewrite.", flush=True)
             # Backup original store (move directory) and write full dataset
@@ -410,24 +444,12 @@ if __name__ == "__main__":
                 print(f"Backed up original store to {backup}", flush=True)
             except Exception as e2:
                 print(f"Backup failed: {e2} -- continuing to overwrite.", flush=True)
-            extended_historic_ds.to_zarr(
-                HISTO_ZARR_OUTPUT,
-                mode="w",
-                # consolidated=True, # gave warning "consolidated metadata is currently not part in the Zarr format 3 specification."
-                compute=True,
-                encoding=encoding,
-                zarr_format=3,
-            )
+            
+            # duplicate of else
+            fallback_action_overwrite_zarr()
     else:
-        print(f"writing to new file\n{HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
-        extended_historic_ds.to_zarr(
-            HISTO_ZARR_OUTPUT, 
-            mode="w", 
-            # consolidated=True, # gave warning "consolidated metadata is currently not part in the Zarr format 3 specification."
-            compute=True,
-            encoding=encoding, 
-            zarr_format=3
-        )
+        print(f"writing to new file\n  {HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
+        fallback_action_overwrite_zarr()
 
     client.close()
 

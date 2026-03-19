@@ -56,12 +56,15 @@ SCRIPTS=(
 
 # Define historical NDVI update mode --------------
 # Define which historical NDVI file to use, and whether it will be udpated in-place or copied.
-# Ensure we have the original untouched
-# rm -r "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_to_overwrite.zarr" 
-rsync -a "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr/" "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_to_overwrite.zarr"     # note the important trailing slash
 # define file paths
-HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_to_overwrite.zarr"
-HISTO_OUTPUT="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_extended2.zarr"
+HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_copy.zarr" # Ensure we have the original untouched
+HISTO_OUTPUT="/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_extended.zarr" # currently unused since we append INPUT
+
+# Ensure we have the original untouched
+if [ -d "$HISTO_INPUT" ]; then
+  rm -r -- "$HISTO_INPUT"
+fi
+rsync -a "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr/" $HISTO_INPUT # note the important trailing slash in source/
 
 # Define start and end --------------
 # Read previous start date from file, or use default
