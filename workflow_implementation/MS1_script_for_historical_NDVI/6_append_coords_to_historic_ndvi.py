@@ -247,8 +247,10 @@ if __name__ == "__main__":
         # Also genereate a spatial subset with a bounding box:
         #xmin, xmax = 2600000, 2601000
         #ymin, ymax = 1196000, 1197000
-        xmin, xmax = 2650000, 2750000 # focus on Ticino 100x100km
-        ymin, ymax = 1070000, 1170000 # focus on Ticino 100x100km
+        #xmin, xmax = 2650000, 2750000 # focus on Ticino 100x100km
+        #ymin, ymax = 1070000, 1170000 # focus on Ticino 100x100km
+        xmin, xmax = 2710000, 2720000 # focus on Ticino 10x10km
+        ymin, ymax = 1100000, 1110000 # focus on Ticino 10x10km
         pixels_subset_mask = (
             (out_ds.x.data >= xmin) &
             (out_ds.x.data <= xmax) &
@@ -262,7 +264,7 @@ if __name__ == "__main__":
         out_ds_subset.chunk(           # for  testing add before .chunk(): .isel(pixel = range(0,1000000))
             {"pixel": 500000, "date": 30}
             ).to_zarr(
-                OUT_HISTORIC_ZARR_v4_compr.replace(".zarr", "_100kmX100km.zarr"),
+                OUT_HISTORIC_ZARR_v4_compr.replace(".zarr", "_10kmX10km.zarr"),
                 mode="w",
                 consolidated=True,
                 compute=True,
@@ -308,3 +310,5 @@ if __name__ == "__main__":
     # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 22' /data_3/scratch/francesco/ndvi_historic_v4_compr.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/
     # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 22' /data_3/scratch/francesco/ndvi_historic_v4_compr_100days.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/
     # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 22' /data_3/scratch/francesco/ndvi_historic_v4_compr_1000mX1000m.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/
+    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 22' /data_3/scratch/francesco/ndvi_historic_v4_compr_100kmX100km.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/
+    # rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 22' /data_3/scratch/francesco/ndvi_historic_v4_compr_10kmX10km.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/
