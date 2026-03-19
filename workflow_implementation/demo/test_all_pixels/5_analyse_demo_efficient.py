@@ -321,17 +321,17 @@ if __name__ == "__main__":
     output_dtypes = [ndvi_array.dtype, mask_array.dtype] # prespecify types
     ndvi_processed, mask_processed = xr.apply_ufunc(
         historical_ndvi,
-        ndvi_array,
-        median_array,
-        mask_array,
-        dates_array,
+        ndvi_array,        # this is the observed/gapfilled/processed NDVI value
+        median_array,      # this is the modelled median NDVI for the corresponding DOY
+        mask_array,        # this is the integer processing status
+        obs_dates,         # this is the True-False boolean if a date contains satellite images (is_observation_date?)
         input_core_dims=[["date"], ["date"],["date"], ["date"]],    # each call gets 1D time arrays
         output_core_dims=[["date"],["date"]],
         vectorize=True, 
         dask="parallelized",
         kwargs={
-             "dates": dates_array,     # TODO: why do we specify dates_array twice??
-             "starting_date": start_date},
+             "dates": dates_array,           # this contains all daily dates
+             "starting_date": start_date},   # this contains the starting date when to start ??
         output_dtypes=output_dtypes, 
         dask_gufunc_kwargs={"allow_rechunk": True},
     )
