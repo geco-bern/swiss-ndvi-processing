@@ -2,10 +2,19 @@ from datetime import datetime, date
 import numpy as np
 import statsmodels.api as sm
 from dask.distributed import Client
+from dask import visualize
+import dask.array as da
 import xarray as xr
 import os
 import shutil
 import time
+
+import warnings
+warnings.filterwarnings(
+    "ignore", 
+    message="Numcodecs codecs are not in the Zarr version 3 specification",
+    module="numcodecs.zarr3"
+)
 
 #  nohup python -u /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py > /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient_FB_2026-03-19.log 2>&1 &
 
@@ -126,57 +135,73 @@ def historical_ndvi(ndvi_arr_original, medians,mask_array_original, obs_dates,da
 
             return ndvi_arr_original, mask_array_original
 
-# used with nohup (ni idea why)
-
 if __name__ == "__main__":
 
     t0 = time.perf_counter()
 
-    N_WORKERS = 10
+    # N_WORKERS = 10        # a) for 4216 pixels and 13 dates (2026-11-30 to 2026-12-12): 46s 
+    # DATE_CHUNKS = -1      # a) for 4216 pixels and 13 dates (2026-11-30 to 2026-12-12): 46s 
+    # PIXEL_CHUNKS = 10000  # a) for 4216 pixels and 13 dates (2026-11-30 to 2026-12-12): 46s 
+    
+    # N_WORKERS = 20        # b) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s; 586503 pixels => 73s; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # DATE_CHUNKS = -1      # b) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s; 586503 pixels => 73s; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # PIXEL_CHUNKS = 10000  # b) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 30s; 586503 pixels => 73s; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # MEMORY_PER_WORKER = '190GB'
+
+    N_WORKERS = 30        # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 49s; 586503 pixels => xxs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    DATE_CHUNKS = -1      # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 49s; 586503 pixels => xxs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    PIXEL_CHUNKS = 10000  # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 49s; 586503 pixels => xxs; 16041205 pixels => XXs; 105715396 pixels => XXs
+    MEMORY_PER_WORKER = '120GB'
+
+    # N_WORKERS = 60        # D) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 38s; 586503 pixels => 95s; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # DATE_CHUNKS = -1      # D) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 38s; 586503 pixels => 95s; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # PIXEL_CHUNKS = 10000  # D) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 38s; 586503 pixels => 95s; 16041205 pixels => XXs; 105715396 pixels => XXs
+    # MEMORY_PER_WORKER = '66GB'
+
+    DATE_CHUNKS_OUT = 365
 
     client = Client(
-    n_workers=N_WORKERS,
-    threads_per_worker=1,
-    memory_limit='200GB',
-    processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
-    dashboard_address=':1234')  
+        n_workers=N_WORKERS,
+        threads_per_worker=1,
+        memory_limit=MEMORY_PER_WORKER,
+        processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
+        dashboard_address=':8343')  
     print(client.dashboard_link)
 
-    # already having medians computed
-
-    #INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small.zarr" 
-    #INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small_FB2026-03-17.zarr" 
-    #ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 500})
-                # <xarray.Dataset> Size: 164MB
-                # Dimensions:      (pixel: 10000, date: 3265)
-                # Coordinates:
-                #   * pixel        (pixel) int64 80kB 0 1 2 3 4 5 ... 9995 9996 9997 9998 9999
-                #   * date         (date) datetime64[ns] 26kB 2017-04-03 2017-04-04 ... 2026-03-10
-                #     doy          (date) int64 26kB dask.array<chunksize=(3265,), meta=np.ndarray>
-                #     y            (pixel) int64 80kB dask.array<chunksize=(500,), meta=np.ndarray>
-                #     x            (pixel) int64 80kB dask.array<chunksize=(500,), meta=np.ndarray>
-                # Data variables:
-                #     obs_date     (date) bool 3kB dask.array<chunksize=(3265,), meta=np.ndarray>
-                #     mask_array   (pixel, date) int8 33MB dask.array<chunksize=(500, 3265), meta=np.ndarray>
-                #     median_ndvi  (pixel, date) int16 65MB dask.array<chunksize=(500, 3265), meta=np.ndarray>
-                #     ndvi         (pixel, date) int16 65MB dask.array<chunksize=(500, 3265), meta=np.ndarray>
     INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
+
     HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr"
     HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m_extended.zarr" # TODO: remove this and instea do it circular
     INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr"
-    historic_ds = xr.open_zarr(HISTO_ZARR_IN_OUTPUT, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-    new_ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 500})
+    # HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr"
+    # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km_extended.zarr" # TODO: remove this and instea do it circular
+    # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr"
+    # HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km.zarr"
+    # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km_extended.zarr" # TODO: remove this and instea do it circular
+    # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_100kmX100km_4th.zarr"
+    # HISTO_ZARR_IN_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr.zarr"
+    # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_extended.zarr" # TODO: remove this and instea do it circular
+    # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr"
+    
+    # DATE_CHUNKS  = historic_ds.chunks['date'][0]  # should be 30 days # TODO: why not this?
+    # PIXEL_CHUNKS = historic_ds.chunks['pixel'][0]                     # TODO: why not this?
+
+
+    historic_ds  = xr.open_zarr(HISTO_ZARR_IN_OUTPUT, chunks={"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+    new_ds       = xr.open_zarr(INPUT_ZARR, chunks={"pixel": PIXEL_CHUNKS, "date": -1})
+    lookuptable  = xr.open_zarr(INPUT_LOOKUPTABLE, consolidated=False).chunk({"pixel": PIXEL_CHUNKS})
+
+    print(historic_ds, flush = True)
+    print(new_ds, flush = True)
     
     # --- concatenate full datasets along time ----------------------------------
-    # Add median NDVI from model
-    lookuptable  = xr.open_zarr(INPUT_LOOKUPTABLE, consolidated=False)
-    
+    # Add median NDVI from model    
     # to new_ds:
     doy_noLeap = xr.where(new_ds.doy == 366, 365, new_ds.doy) # remove leap year if encountered
     new_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
             doy=doy_noLeap,
             pixel=new_ds.pixel) # this is to join by pixels and doy
-    # to historic_ds:
+    # to historic_ds: # TODO: note that each time we are adding the medians to the historic data again and again. Maybe just add it once and store it?
     doy_noLeap = xr.where(historic_ds.doy == 366, 365, historic_ds.doy) # remove leap year if encountered
     historic_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
             doy=doy_noLeap,
@@ -213,60 +238,94 @@ if __name__ == "__main__":
     # --- apply gapfilling and outlier detection function: historical_ndvi() ----------------------------------
 
     # prepare arguments spanning historic and new data: all lazy
-    ndvi_array   = ds["ndvi_processed"]           # dims ("date","pixel")
-    median_array = ds["median_ndvi"]              # dims ("date","pixel") 
-    dates_array  = ds["date"].values.astype("datetime64[D]").ravel()   #.values.astype(np.int32)
-    obs_dates    = ds["obs_date"]
-    mask_array   = ds["mask_array"]
+    ndvi_array   = ds["ndvi_processed"].persist()
+    median_array = ds["median_ndvi"].persist()
+    dates_array  = ds["date"].persist()
+    mask_array   = ds["mask_array"].persist()
+    obs_dates    = ds["obs_date"].persist()
+    # using persist() reduces graph size
 
     # specifying where new data starts
-    starting_date = dates_array[365] # TODO: fix this
+    start_date = historic_ds['date'].max().values
+
+    # reduce graph size by using futures
+    # dates_future  = client.scatter(dates_array)
+    # ndvi_future   = client.scatter(ndvi_array)
+    # median_future = client.scatter(median_array)
+    # dates_future  = client.scatter(dates_array)
+    # mask_future   = client.scatter(mask_array)
+    # then reference *_future inside tasks/closures instead of passing *_array
+    # visualize(dates_future)
+
+    # reduce graph size by handing NumPy arrays to dask:
+    # dates_daskarray = da.from_array(dates_array)   # Hand NumPy array to Dask
 
     # call gufunc where core dim is "time" (1D arrays per pixel)
-    ndvi_processed, mask_array = xr.apply_ufunc(
+    output_dtypes = [ndvi_array.dtype, mask_array.dtype] # prespecify types
+    ndvi_processed, mask_processed = xr.apply_ufunc(
         historical_ndvi,
         ndvi_array,
         median_array,
         mask_array,
-        obs_dates,
+        dates_array,
         input_core_dims=[["date"], ["date"],["date"], ["date"]],    # each call gets 1D time arrays
         output_core_dims=[["date"],["date"]],
         vectorize=True, 
         dask="parallelized",
-        kwargs={"dates": dates_array, "starting_date": starting_date},
-        output_dtypes=[ndvi_array.dtype, obs_dates.dtype], # TODO: this shoudl be mask_array.dtype
+        kwargs={
+             "dates": dates_array,     # TODO: why do we specify dates_array twice??
+             "starting_date": start_date},
+        output_dtypes=output_dtypes, 
         dask_gufunc_kwargs={"allow_rechunk": True},
     )
+    # g = mask_processed.__dask_graph__()
+    g = ndvi_processed.__dask_graph__()
+    print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
+    #                    586503 pixels:                  | 16041205 pixels:                | 105715396 pixels:
+    # without persist(): 49    layers, and 196760 tasks  | 49    layers, and 1289428 tasks | xxx layers, and xxx tasks
+    # with persist():    16-17 layers, and  31953 tasks  | 16-17 layers, and  872665 tasks | xxx layers, and xxx tasks
+    # without persist(): .............. and 10.58 MiB
+    # with persist():    size 23.08 MiB and 10.58 MiB
+    
+    # visualize(ndvi_processed)
 
     # create the dataset to write 
     out_ds = xr.Dataset(
     {
         "ndvi_processed": ndvi_processed,
-        "mask_array": mask_array
+        "mask_array": mask_processed
     },
     coords={
         "date": ds["date"],
         "pixel": ds["pixel"]
     }
     )
-    out_ds = out_ds.chunk({"pixel": 5000, "date": -1})
-    out_ds.compute()
+    out_ds = out_ds.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS_OUT})
 
     # Remove any incompatible 'compressor' metadata left over from the source dataset
     for v in list(out_ds.data_vars):
         out_ds[v].encoding.pop("compressor", None)
+        out_ds[v].encoding.pop("compressors", None)
         # ensure chunks entry exists to avoid surprises
         out_ds[v].encoding.setdefault("chunks", None)
 
     for c in list(out_ds.coords):
         out_ds[c].encoding.pop("compressor", None)
+        out_ds[c].encoding.pop("compressors", None)
         out_ds[c].encoding.setdefault("chunks", None)
+    
 
     # Explicit encoding: no compressor for each data var
     encoding = {v: {"compressor": None} for v in out_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
 
     if os.path.exists(HISTO_ZARR_OUTPUT): # TODO: remove this when going circular
         shutil.rmtree(HISTO_ZARR_OUTPUT)  # TODO: remove this when going circular
+
+    # drop any coord/data var chunk encodings that conflict   # TODO: we're already doing 
+    for name in list(out_ds.coords) + list(out_ds.data_vars):
+        out_ds[name].encoding.pop("chunks", None)
+        out_ds[name].encoding.pop("compressor", None)
+        out_ds[name].encoding.pop("compressors", None)
 
     out_ds.to_zarr(
           HISTO_ZARR_OUTPUT, 
@@ -276,9 +335,7 @@ if __name__ == "__main__":
           encoding=encoding, 
           zarr_version=3)
 
-    print("done")
     client.close()
-    
 
     t1 = time.perf_counter()
     print(f"Total runtime: {t1 - t0:.2f} seconds")

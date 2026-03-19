@@ -11,6 +11,13 @@ from dask.distributed import Client, LocalCluster
 import argparse
 import datetime
 
+import warnings
+warnings.filterwarnings(
+    "ignore", 
+    message="Numcodecs codecs are not in the Zarr version 3 specification",
+    module="numcodecs.zarr3"
+)
+
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
@@ -20,11 +27,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     SOURCE_ZARR        = args.SOURCE_ZARR
-    #HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
-    HISTO_ZARR         = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
-    #HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v3_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
-    
-    OUT_ZARR_TMP   = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr" # TODO: do not create this but simply merge in script 5
+    # HISTO_ZARR         = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_1000mX1000m.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+    # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr" # TODO: do not create this but simply merge in script 5
+    # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+    # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr" # TODO: do not create this but simply merge in script 5
+    HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_100kmX100km.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+    OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_100kmX100km_4th.zarr" # TODO: do not create this but simply merge in script 5
+    # HISTO_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr.zarr" # TODO: is this the main file that is extended? So in the full workflow this would be circular, i.e. 04_merged_ndvi.zarr ?
+    # OUT_ZARR_TMP      = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr" # TODO: do not create this but simply merge in script 5
     
     # start_date = args.start_date
     # end_date = args.end_date
@@ -120,6 +130,9 @@ if __name__ == "__main__":
     # FOR DEVELOPMENT: plot_da_map(new_observations_ds["ndvi"].isel(datetime = 2),
     # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = 'NDVI_2025-12-09_10h44.png')
     
+    INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
+    NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
+    
     # Decide how to collapse sub-daily duplicates to one observed value per day
     agg = 'first' # # TODO: choose 'mean' or 'first'
     if agg == 'first':
@@ -135,8 +148,6 @@ if __name__ == "__main__":
             .rename({'datetime': 'date'})
         )
     elif agg == 'mean':
-        INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
-        NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
         ndvi_daily_between_obs = (new_observations_ds
             # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
             #       and they are later both replace by only one of them NO_COVERAGE
@@ -249,12 +260,19 @@ if __name__ == "__main__":
     new_ds = (ndvi_daily_since_last_historic
                 .rename({'ndvi':'ndvi_obs',
                          'ndsi':'ndsi_obs'})
-                .chunk({"pixel": PIXEL_CHUNKS}))
+                .chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS}))
     # new_ds has: 
     #   coords: x,y,x_idx,y_idx, pixel, date, datetime; 
     #   vars:   ndvi_obs,ndsi_obs,obs_date
     #   attrs:  pixel_definition,transform_note,transform_coeffs,transform_instr,description_ndvi,description_ndsi,nodata,cloud_shadow
     
+    # drop any coord/data var chunk encodings that conflict
+    for name in list(new_ds.coords) + list(new_ds.data_vars):
+        new_ds[name].encoding.pop("chunks", None)
+        new_ds[name].encoding.pop("compressor", None)
+        new_ds[name].encoding.pop("compressors", None)
+
+    # write out    
     new_ds.to_zarr(OUT_ZARR_TMP, mode="w", consolidated=True)
 
 
@@ -327,5 +345,5 @@ if __name__ == "__main__":
     #     ndvi_processed  (pixel, date) int16 27MB 7105 7108 7112 ... 5427 5398 5372
     #     mask_array      (pixel, date) bool 13MB True True True ... False False False
 
-
+    client.close()
     print("All done")
