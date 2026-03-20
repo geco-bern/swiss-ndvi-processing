@@ -423,83 +423,87 @@ if __name__ == "__main__":
             zarr_format=3
         )
 
-    if HISTO_ZARR_OUTPUT == HISTO_ZARR_INPUT:
-        print(f"appending to file\n  {HISTO_ZARR_OUTPUT}", flush=True)
-        try:
-            print("Appending new dates to existing zarr store...", flush=True)
-            # NOTE: Ensure that we can append and the zarr structure remains intact and unchanged:
-            # We had the issue that secondary coords got demoted to data variables.
-            #   If there are mismatches (in coordinates or in dtypes ^*) it is 
-            #   possible that secondary coordiantes get demoted from coordinates 
-            #   to data variables. This breaks the workflow of continuous 
-            #   appending from the next run on.
-            #      ^* During development we encountered the issue that 
-            #         HISTO_ZARR_OUTPUT had mask_array encoded as bool while 
-            #         in ds_to_append it was correctly encoded as int8. This
-            #         mismatch lead to ["x_idx", "y", "y_idx", "x"] being demoted 
-            #         to data variables
-            # BOTTOM LINE: ensure the data set to append uses exactly same 
-            #              structure as the one to be appended:            
-            # Opening HISTO_ZARR_OUTPUT is not needed, but just for checking the structure
-            existing = xr.open_zarr(HISTO_ZARR_OUTPUT)
-            assert sorted(list(ds_to_append.dims)) == sorted(list(existing.dims)), "Aborted append: dimensions are not equal"
-            assert sorted(list(ds_to_append.coords)) == sorted(list(existing.coords)), "Aborted append: coordinates are not equal" # this is not strictly needed
-            assert sorted(list(ds_to_append.data_vars)) == sorted(list(existing.data_vars)), "Aborted append: list of data variables are not equal" # this is not strictly needed
-            for c in ds_to_append.coords:  # e.g. ["pixel", "x_idx", "y", "y_idx", "x"]:
-                assert ds_to_append[c].dtype == existing[c].dtype
-                assert ds_to_append[c].shape == existing[c].shape
-                # optional but safest:
-                assert (ds_to_append[c].values == existing[c].values).all()
-            for c in list(ds_to_append.data_vars): # e.g ndvi_processed, mask_array
-                assert ds_to_append[c].dtype == existing[c].dtype
-            # show_ds_structure(ds_to_append)
-            
-            # ds_to_append.attrs["note"] = historic_ds.attrs["note"] # TODO: check if this can be dropped
-            # NOTE: dropping secondary coordinates (non-dimension coordinates) 
-            #       seems safest to append
-            # Only keep main coords (and doy) for correct appending:
-            ds_to_append.drop_vars(["x_idx", "y", "y_idx", "x"]).to_zarr(
-                HISTO_ZARR_OUTPUT,
-                mode="a-",
-                append_dim="date",
-                compute=True,
-                encoding={},  # NOTE: since we append encoding must not be provided
-            )
-            # dds = xr.open_dataset(HISTO_ZARR_OUTPUT)
-            
-            # Post-writing check of resulting file content, if this fails do 
-            # the fallback procedure and resolve to a full rewrite. 
-            # NOTE: Unsure: Is a full rewrite still possible given that we 
-            #       attempted to overwrite values with the appending above? 
-            #       I do believe so, since we used (mode = "a-"), but not 100% sure.
-            n_appended = ds_to_append.dims['date']
-            old_and_new_dates = (xr.open_dataset(HISTO_ZARR_OUTPUT)
-                .isel(date = slice(-n_appended-1,-n_appended+1))
-                .date.values) 
-            if (old_and_new_dates[1] - old_and_new_dates[0]) != np.timedelta64(1, 'D'):
-                raise ValueError(f"Dates of resulting data set are not exactly 1 day apart at interface: {old_and_new_dates}")
-            else:
-                print("Append successfully completed.", flush=True)
-
-        except Exception as e:
-            fallback_output = HISTO_ZARR_INPUT + ".failedAppending_" + dt.datetime.now().strftime("%Y%m%d%H%M%S")
-            print(f"Appending failed: {e}. Writing whole file to {fallback_output}", flush=True)
-            fallback_action_overwrite_zarr(fallback_output)
-
-            # print(f"Appending failed: {e}. Falling back to rewrite.", flush=True)
-            # # Backup original store (move directory) and write full dataset
-            # backup = HISTO_ZARR_INPUT + ".backup_" + dt.datetime.now().strftime("%Y%m%d%H%M%S")
-            # try:
-            #     shutil.move(HISTO_ZARR_INPUT, backup)
-            #     print(f"Backed up original store to {backup}", flush=True)
-            # except Exception as e2:
-            #     print(f"Backup failed: {e2} -- continuing to overwrite.", flush=True)
-            # 
-            # # duplicate of else
-            # fallback_action_overwrite_zarr()
+    if len(ds_to_append['date'].values) == 0: # this might be 0 if these dates have already been appended to the historic NDVI
+        warnings.warn("Did not modify historic NDVI since no new dates were found.")
+        raise ValueError("Did not modify historic NDVI since no new dates were found.")
     else:
-        print(f"writing to new file\n  {HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
-        fallback_action_overwrite_zarr(HISTO_ZARR_OUTPUT)
+        if HISTO_ZARR_OUTPUT == HISTO_ZARR_INPUT:
+            print(f"appending to file\n  {HISTO_ZARR_OUTPUT}", flush=True)
+            try:
+                print("Appending new dates to existing zarr store...", flush=True)
+                # NOTE: Ensure that we can append and the zarr structure remains intact and unchanged:
+                # We had the issue that secondary coords got demoted to data variables.
+                #   If there are mismatches (in coordinates or in dtypes ^*) it is 
+                #   possible that secondary coordiantes get demoted from coordinates 
+                #   to data variables. This breaks the workflow of continuous 
+                #   appending from the next run on.
+                #      ^* During development we encountered the issue that 
+                #         HISTO_ZARR_OUTPUT had mask_array encoded as bool while 
+                #         in ds_to_append it was correctly encoded as int8. This
+                #         mismatch lead to ["x_idx", "y", "y_idx", "x"] being demoted 
+                #         to data variables
+                # BOTTOM LINE: ensure the data set to append uses exactly same 
+                #              structure as the one to be appended:            
+                # Opening HISTO_ZARR_OUTPUT is not needed, but just for checking the structure
+                existing = xr.open_zarr(HISTO_ZARR_OUTPUT)
+                assert sorted(list(ds_to_append.dims)) == sorted(list(existing.dims)), "Aborted append: dimensions are not equal"
+                assert sorted(list(ds_to_append.coords)) == sorted(list(existing.coords)), "Aborted append: coordinates are not equal" # this is not strictly needed
+                assert sorted(list(ds_to_append.data_vars)) == sorted(list(existing.data_vars)), "Aborted append: list of data variables are not equal" # this is not strictly needed
+                for c in ds_to_append.coords:  # e.g. ["pixel", "x_idx", "y", "y_idx", "x"]:
+                    assert ds_to_append[c].dtype == existing[c].dtype
+                    assert ds_to_append[c].shape == existing[c].shape
+                    # optional but safest:
+                    assert (ds_to_append[c].values == existing[c].values).all()
+                for c in list(ds_to_append.data_vars): # e.g ndvi_processed, mask_array
+                    assert ds_to_append[c].dtype == existing[c].dtype
+                # show_ds_structure(ds_to_append)
+                
+                # ds_to_append.attrs["note"] = historic_ds.attrs["note"] # TODO: check if this can be dropped
+                # NOTE: dropping secondary coordinates (non-dimension coordinates) 
+                #       seems safest to append
+                # Only keep main coords (and doy) for correct appending:
+                ds_to_append.drop_vars(["x_idx", "y", "y_idx", "x"]).to_zarr(
+                    HISTO_ZARR_OUTPUT,
+                    mode="a-",
+                    append_dim="date",
+                    compute=True,
+                    encoding={},  # NOTE: since we append encoding must not be provided
+                )
+                # dds = xr.open_dataset(HISTO_ZARR_OUTPUT)
+                
+                # Post-writing check of resulting file content, if this fails do 
+                # the fallback procedure and resolve to a full rewrite. 
+                # NOTE: Unsure: Is a full rewrite still possible given that we 
+                #       attempted to overwrite values with the appending above? 
+                #       I do believe so, since we used (mode = "a-"), but not 100% sure.
+                n_appended = ds_to_append.dims['date']
+                old_and_new_dates = (xr.open_dataset(HISTO_ZARR_OUTPUT)
+                    .isel(date = slice(-n_appended-1,-n_appended+1))
+                    .date.values) 
+                if (old_and_new_dates[1] - old_and_new_dates[0]) != np.timedelta64(1, 'D'):
+                    raise ValueError(f"Dates of resulting data set are not exactly 1 day apart at interface: {old_and_new_dates}")
+                else:
+                    print("Append successfully completed.", flush=True)
+
+            except Exception as e:
+                fallback_output = HISTO_ZARR_INPUT + ".failedAppending_" + dt.datetime.now().strftime("%Y%m%d%H%M%S")
+                print(f"Appending failed: {e}. Writing whole file to {fallback_output}", flush=True)
+                fallback_action_overwrite_zarr(fallback_output)
+
+                # print(f"Appending failed: {e}. Falling back to rewrite.", flush=True)
+                # # Backup original store (move directory) and write full dataset
+                # backup = HISTO_ZARR_INPUT + ".backup_" + dt.datetime.now().strftime("%Y%m%d%H%M%S")
+                # try:
+                #     shutil.move(HISTO_ZARR_INPUT, backup)
+                #     print(f"Backed up original store to {backup}", flush=True)
+                # except Exception as e2:
+                #     print(f"Backup failed: {e2} -- continuing to overwrite.", flush=True)
+                # 
+                # # duplicate of else
+                # fallback_action_overwrite_zarr()
+        else:
+            print(f"writing to new file\n  {HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
+            fallback_action_overwrite_zarr(HISTO_ZARR_OUTPUT)
 
     client.close()
 
