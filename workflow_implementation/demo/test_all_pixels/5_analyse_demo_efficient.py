@@ -163,8 +163,8 @@ if __name__ == "__main__":
     HISTO_ZARR_OUTPUT = args.HISTO_ZARR_OUTPUT or HISTO_ZARR_INPUT # if None defaults to HISTO_ZARR_INPUT
 
     # if running interactively use e.g.:
-    #   # HISTO_ZARR_INPUT  = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m_copy.zarr"
-    #   # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m_copy.zarr"
+    #   # HISTO_ZARR_INPUT  = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
+    #   # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
     #   # INPUT_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
 
 
@@ -197,11 +197,15 @@ if __name__ == "__main__":
     # MEMORY_PER_WORKER = '190GB'
     # N_THREADS_PER_WORKER = 1
 
-    N_WORKERS = 30        # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr); 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
-    DATE_CHUNKS = -1      # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr); 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
-    PIXEL_CHUNKS = 10000  # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr); 586503 pixels => 53s; 16041205 pixels => 3300s; 105715396 pixels => XXs
+    N_WORKERS = 30        # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr rewrite); 586503 pixels => (434s rewrite, 90s append); 16041205 pixels => 3300s; 105715396 pixels => XXs
+    DATE_CHUNKS = -1      # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr rewrite); 586503 pixels => (434s rewrite, 90s append); 16041205 pixels => 3300s; 105715396 pixels => XXs
+    PIXEL_CHUNKS = 10000  # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr rewrite); 586503 pixels => (434s rewrite, 90s append); 16041205 pixels => 3300s; 105715396 pixels => XXs
     MEMORY_PER_WORKER = '120GB'
     N_THREADS_PER_WORKER = 1
+
+    PIXEL_CHUNKS = 500000 # 10000  # TODO: with v5 move back to 10k,365
+    DATE_CHUNKS_OUT = 30  # 365    # TODO: with v5 move back to 10k,365
+
     # TODO: check: 16041205 pixels in 640s in pipeline_FB_2026-03-19_09h09m26.log
     #              16041205 pixels in 3300s in pipeline_FB_2026-03-19_11h38m18.log
     #              Why so much longer? 
@@ -218,7 +222,6 @@ if __name__ == "__main__":
 
     # Definition of output format of new
     # TODO: when going circular this is probably not needed anymore.
-    DATE_CHUNKS_OUT = 30
     COMPRESSOR = zarr3.Blosc(cname="zstd", clevel=3, shuffle=2)
     
     
@@ -237,9 +240,23 @@ if __name__ == "__main__":
     # DATE_CHUNKS  = historic_ds.chunks['date'][0]  # should be 30 days # TODO: why not this?
     # PIXEL_CHUNKS = historic_ds.chunks['pixel'][0]                     # TODO: why not this?
 
-    historic_ds  = xr.open_zarr(HISTO_ZARR_INPUT, chunks={"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-    new_ds       = xr.open_zarr(INPUT_ZARR, chunks={"pixel": PIXEL_CHUNKS, "date": -1})
+    historic_ds  = xr.open_zarr(HISTO_ZARR_INPUT, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+    new_ds       = xr.open_zarr(INPUT_ZARR, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": -1})
     lookuptable  = xr.open_zarr(INPUT_LOOKUPTABLE, consolidated=False).chunk({"pixel": PIXEL_CHUNKS})
+
+        # NOTE: minor fix historic_ds in v4 does not have mask_array as int8 but as bool. 
+        # TODO: this is an error. Check with Francesco what values are needed.
+        # historic_ds["mask_array"] = historic_ds["mask_array"].astype(np.int8)
+        # historic_ds.to_zarr(HISTO_ZARR_INPUT.replace(".zarr",".zarr_bkp_fixedMaskArray"))
+        # xr.open_zarr(HISTO_ZARR_INPUT.replace(".zarr",".zarr_bkp_fixedMaskArray"))
+        # This has now been worked-around with .zarr_bkp_fixedMaskArray
+    
+    
+    # NOTE: minor fix lookuptable does not have pixel as int32 but as int64. This prevents appending to zarr.
+    lookuptable = lookuptable.assign_coords(
+        # change number types of dimensions (pixel is that way 420MB instead of 840MB)
+        pixel = ('pixel', lookuptable.pixel.values.astype(np.int32)),
+        doy   = ('date', lookuptable.doy.values.astype(np.int32)))
 
     def show_ds_structure(ds):
         for c in list(ds.coords) + list(ds.data_vars):
@@ -293,10 +310,8 @@ if __name__ == "__main__":
             [historic_ds, new_ds], 
             dim="date")
         .sortby("date")
+        .chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
     )
-    merged_ds = merged_ds.chunk(
-        {"pixel": PIXEL_CHUNKS, 
-            "date": DATE_CHUNKS})
 
     # --- apply gapfilling and outlier detection function: historical_ndvi() ----------------------------------
 
@@ -364,7 +379,7 @@ if __name__ == "__main__":
     mask_processed_to_append = mask_processed.sel(date = slice(start_date + 1, None)) # Note the shift +1
     ds_to_append = (
         xr.Dataset({"ndvi_processed": ndvi_processed_to_append, 
-                     "mask_array":     mask_processed_to_append})
+                     "mask_array":    mask_processed_to_append})
         .chunk({"pixel": PIXEL_CHUNKS, 
                  "date": DATE_CHUNKS_OUT})
     )
@@ -379,7 +394,7 @@ if __name__ == "__main__":
      
 
 
-    def fallback_action_overwrite_zarr():
+    def fallback_action_overwrite_zarr(outfile):
         # concatenate to complete dataset
         extended_historic_ds = (
             xr.concat([historic_ds_to_extend, ds_to_append], dim="date")
@@ -392,7 +407,7 @@ if __name__ == "__main__":
         # encoding = {v: {"compressors": None      } for v in extended_historic_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
         encoding = {v: {"compressors": COMPRESSOR} for v in extended_historic_ds.data_vars}
 
-        # drop any coord/data var chunk encodings that conflict   # TODO: we're already doing 
+        # drop any coord/data var chunk encodings that conflict   # TODO: is this needed?
         for name in list(extended_historic_ds.coords) + list(extended_historic_ds.data_vars): # TODO: remove this again if possilbe
             extended_historic_ds[name].encoding.pop("chunks", None)                           # TODO: remove this again if possilbe
             extended_historic_ds[name].encoding.pop("compressor", None)                       # TODO: remove this again if possilbe
@@ -400,7 +415,7 @@ if __name__ == "__main__":
 
         # overwrite (mode="w")
         extended_historic_ds.to_zarr(
-            HISTO_ZARR_OUTPUT, 
+            outfile, 
             mode="w", 
             # consolidated=True, # gave warning "consolidated metadata is currently not part in the Zarr format 3 specification."
             compute=True,
@@ -412,17 +427,59 @@ if __name__ == "__main__":
         print(f"appending to file\n  {HISTO_ZARR_OUTPUT}", flush=True)
         try:
             print("Appending new dates to existing zarr store...", flush=True)
+            # Test beforehand: 
             # test_ds = xr.open_dataset(HISTO_ZARR_OUTPUT) # final check what is in there
             # test_ds.date.max() # indeed 2025-11-30
-            # extended_ds = xr.concat([test_ds, ds_to_append], dim="date")
-            ds_to_append.to_zarr(
+            # show_ds_structure(ds_to_append)
+            # # this test should not error:
+            # xr.concat([test_ds, ds_to_append], dim="date")
+
+            # drop any coord/data var chunk encodings that conflict   # TODO: is this needed?
+            # for name in list(ds_to_append.coords) + list(ds_to_append.data_vars): # TODO: remove this again if possilbe
+            #     ds_to_append[name].encoding.pop("chunks", None)       # TODO: remove this again if possilbe
+            #     ds_to_append[name].encoding.pop("compressor", None)   # TODO: remove this again if possilbe
+            #     ds_to_append[name].encoding.pop("compressors", None)  # TODO: remove this again if possilbe
+
+            # It appears we need to:
+            # only keep main coords (and doy) for correct appending:
+            # remove secondary coords coords match historic store exactly
+            # otherwise these secondary coords end up being demoted to data variables instead
+                # assert all(ds_to_append["pixel"] == historic_ds_to_extend["pixel"])
+                assert ds_to_append["pixel"].equals(historic_ds_to_extend["pixel"])
+                # assert ds_to_append["x"].equals(historic_ds_to_extend["x"])
+                # assert ds_to_append["x_idx"].equals(historic_ds_to_extend["x_idx"])
+                # assert ds_to_append["y"].equals(historic_ds_to_extend["y"])
+                # assert ds_to_append["y_idx"].equals(historic_ds_to_extend["y_idx"])
+                # existing = xr.open_zarr(HISTO_ZARR_OUTPUT)
+                # for c in ["pixel", "x_idx", "y", "y_idx", "x"]:
+                #     assert ds_to_append[c].dtype == existing[c].dtype
+                #     assert ds_to_append[c].shape == existing[c].shape
+                #     # optional but safest:
+                #     assert (ds_to_append[c].values == existing[c].values).all()
+
+            # show_ds_structure(ds_to_append)
+            # xr.open_dataset(HISTO_ZARR_OUTPUT)
+            # TODO: it might be linked that HISTO_ZARR_OUTPUT currently has mask array as bool
+            #       Yes the culprit was was indeed mask_array being bool
+            ds_to_append.attrs["note"] = historic_ds.attrs["note"]
+            # NOTE: dropping secondary coordinates (non-dimension coordinates) seems safer to append
+            #      if there are mismatches (in coordinates or in dtypes *) 
+            #      it is possible that secondary coordiantes get demoted from coordinates to data variables
+            #      this breaks the workflow of continuous appending from the next run on.
+            #      * we had the issue that HISTO_ZARR_OUTPUT had mask_array encoded as bool
+            #        while in ds_to_append it was correctly encoded as int8
+            #        this mismatch lead to ["x_idx", "y", "y_idx", "x"] being demoted to data variables
+            #     BOTTOM LINE: ensure the data set to append uses ecax
+            ds_to_append.drop_vars(["x_idx", "y", "y_idx", "x"]).to_zarr(
                 HISTO_ZARR_OUTPUT,
-                mode="a",
+                mode="a-",
                 append_dim="date",
                 compute=True,
                 encoding={},  # NOTE: since we append encoding must not be provided
-                zarr_format=3,
             )
+            # dds = xr.open_dataset(HISTO_ZARR_OUTPUT)
+            # NOTE: additional coords get lost, reset them as:
+            # dds.set_coords(['x','y','x_idx','y_idx']).to_zarr(HISTO_ZARR_OUTPUT)
 
             # post-writing check of resulting file content, if fails do fallback of full rewrite. 
             # NOTE: (can we still access the old values to created extended_historic_ds??)
@@ -433,23 +490,27 @@ if __name__ == "__main__":
             if (old_and_new_dates[1] - old_and_new_dates[0]) != np.timedelta64(1, 'D'):
                 raise ValueError(f"Dates of resulting data set are not exactly 1 day apart at interface: {old_and_new_dates}")
             else:
-                print("Append completed.", flush=True)
+                print("Append successfully completed.", flush=True)
 
         except Exception as e:
-            print(f"Appending failed: {e}. Falling back to rewrite.", flush=True)
-            # Backup original store (move directory) and write full dataset
-            backup = HISTO_ZARR_INPUT + ".backup_" + dt.datetime.now().strftime("%Y%m%d%H%M%S")
-            try:
-                shutil.move(HISTO_ZARR_INPUT, backup)
-                print(f"Backed up original store to {backup}", flush=True)
-            except Exception as e2:
-                print(f"Backup failed: {e2} -- continuing to overwrite.", flush=True)
-            
-            # duplicate of else
-            fallback_action_overwrite_zarr()
+            fallback_output = HISTO_ZARR_INPUT + ".failedAppending_" + dt.datetime.now().strftime("%Y%m%d%H%M%S")
+            print(f"Appending failed: {e}. Writing whole file to {fallback_output}", flush=True)
+            fallback_action_overwrite_zarr(fallback_output)
+
+            # print(f"Appending failed: {e}. Falling back to rewrite.", flush=True)
+            # # Backup original store (move directory) and write full dataset
+            # backup = HISTO_ZARR_INPUT + ".backup_" + dt.datetime.now().strftime("%Y%m%d%H%M%S")
+            # try:
+            #     shutil.move(HISTO_ZARR_INPUT, backup)
+            #     print(f"Backed up original store to {backup}", flush=True)
+            # except Exception as e2:
+            #     print(f"Backup failed: {e2} -- continuing to overwrite.", flush=True)
+            # 
+            # # duplicate of else
+            # fallback_action_overwrite_zarr()
     else:
         print(f"writing to new file\n  {HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
-        fallback_action_overwrite_zarr()
+        fallback_action_overwrite_zarr(HISTO_ZARR_OUTPUT)
 
     client.close()
 
