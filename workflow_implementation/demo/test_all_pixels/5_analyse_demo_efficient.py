@@ -427,49 +427,37 @@ if __name__ == "__main__":
         print(f"appending to file\n  {HISTO_ZARR_OUTPUT}", flush=True)
         try:
             print("Appending new dates to existing zarr store...", flush=True)
-            # Test beforehand: 
-            # test_ds = xr.open_dataset(HISTO_ZARR_OUTPUT) # final check what is in there
-            # test_ds.date.max() # indeed 2025-11-30
+            # NOTE: Ensure that we can append and the zarr structure remains intact and unchanged:
+            # We had the issue that secondary coords got demoted to data variables.
+            #   If there are mismatches (in coordinates or in dtypes ^*) it is 
+            #   possible that secondary coordiantes get demoted from coordinates 
+            #   to data variables. This breaks the workflow of continuous 
+            #   appending from the next run on.
+            #      ^* During development we encountered the issue that 
+            #         HISTO_ZARR_OUTPUT had mask_array encoded as bool while 
+            #         in ds_to_append it was correctly encoded as int8. This
+            #         mismatch lead to ["x_idx", "y", "y_idx", "x"] being demoted 
+            #         to data variables
+            # BOTTOM LINE: ensure the data set to append uses exactly same 
+            #              structure as the one to be appended:            
+            # Opening HISTO_ZARR_OUTPUT is not needed, but just for checking the structure
+            existing = xr.open_zarr(HISTO_ZARR_OUTPUT)
+            assert sorted(list(ds_to_append.dims)) == sorted(list(existing.dims)), "Aborted append: dimensions are not equal"
+            assert sorted(list(ds_to_append.coords)) == sorted(list(existing.coords)), "Aborted append: coordinates are not equal" # this is not strictly needed
+            assert sorted(list(ds_to_append.data_vars)) == sorted(list(existing.data_vars)), "Aborted append: list of data variables are not equal" # this is not strictly needed
+            for c in ds_to_append.coords:  # e.g. ["pixel", "x_idx", "y", "y_idx", "x"]:
+                assert ds_to_append[c].dtype == existing[c].dtype
+                assert ds_to_append[c].shape == existing[c].shape
+                # optional but safest:
+                assert (ds_to_append[c].values == existing[c].values).all()
+            for c in list(ds_to_append.data_vars): # e.g ndvi_processed, mask_array
+                assert ds_to_append[c].dtype == existing[c].dtype
             # show_ds_structure(ds_to_append)
-            # # this test should not error:
-            # xr.concat([test_ds, ds_to_append], dim="date")
-
-            # drop any coord/data var chunk encodings that conflict   # TODO: is this needed?
-            # for name in list(ds_to_append.coords) + list(ds_to_append.data_vars): # TODO: remove this again if possilbe
-            #     ds_to_append[name].encoding.pop("chunks", None)       # TODO: remove this again if possilbe
-            #     ds_to_append[name].encoding.pop("compressor", None)   # TODO: remove this again if possilbe
-            #     ds_to_append[name].encoding.pop("compressors", None)  # TODO: remove this again if possilbe
-
-            # It appears we need to:
-            # only keep main coords (and doy) for correct appending:
-            # remove secondary coords coords match historic store exactly
-            # otherwise these secondary coords end up being demoted to data variables instead
-                # assert all(ds_to_append["pixel"] == historic_ds_to_extend["pixel"])
-                assert ds_to_append["pixel"].equals(historic_ds_to_extend["pixel"])
-                # assert ds_to_append["x"].equals(historic_ds_to_extend["x"])
-                # assert ds_to_append["x_idx"].equals(historic_ds_to_extend["x_idx"])
-                # assert ds_to_append["y"].equals(historic_ds_to_extend["y"])
-                # assert ds_to_append["y_idx"].equals(historic_ds_to_extend["y_idx"])
-                # existing = xr.open_zarr(HISTO_ZARR_OUTPUT)
-                # for c in ["pixel", "x_idx", "y", "y_idx", "x"]:
-                #     assert ds_to_append[c].dtype == existing[c].dtype
-                #     assert ds_to_append[c].shape == existing[c].shape
-                #     # optional but safest:
-                #     assert (ds_to_append[c].values == existing[c].values).all()
-
-            # show_ds_structure(ds_to_append)
-            # xr.open_dataset(HISTO_ZARR_OUTPUT)
-            # TODO: it might be linked that HISTO_ZARR_OUTPUT currently has mask array as bool
-            #       Yes the culprit was was indeed mask_array being bool
-            ds_to_append.attrs["note"] = historic_ds.attrs["note"]
-            # NOTE: dropping secondary coordinates (non-dimension coordinates) seems safer to append
-            #      if there are mismatches (in coordinates or in dtypes *) 
-            #      it is possible that secondary coordiantes get demoted from coordinates to data variables
-            #      this breaks the workflow of continuous appending from the next run on.
-            #      * we had the issue that HISTO_ZARR_OUTPUT had mask_array encoded as bool
-            #        while in ds_to_append it was correctly encoded as int8
-            #        this mismatch lead to ["x_idx", "y", "y_idx", "x"] being demoted to data variables
-            #     BOTTOM LINE: ensure the data set to append uses ecax
+            
+            # ds_to_append.attrs["note"] = historic_ds.attrs["note"] # TODO: check if this can be dropped
+            # NOTE: dropping secondary coordinates (non-dimension coordinates) 
+            #       seems safest to append
+            # Only keep main coords (and doy) for correct appending:
             ds_to_append.drop_vars(["x_idx", "y", "y_idx", "x"]).to_zarr(
                 HISTO_ZARR_OUTPUT,
                 mode="a-",
@@ -478,11 +466,12 @@ if __name__ == "__main__":
                 encoding={},  # NOTE: since we append encoding must not be provided
             )
             # dds = xr.open_dataset(HISTO_ZARR_OUTPUT)
-            # NOTE: additional coords get lost, reset them as:
-            # dds.set_coords(['x','y','x_idx','y_idx']).to_zarr(HISTO_ZARR_OUTPUT)
-
-            # post-writing check of resulting file content, if fails do fallback of full rewrite. 
-            # NOTE: (can we still access the old values to created extended_historic_ds??)
+            
+            # Post-writing check of resulting file content, if this fails do 
+            # the fallback procedure and resolve to a full rewrite. 
+            # NOTE: Unsure: Is a full rewrite still possible given that we 
+            #       attempted to overwrite values with the appending above? 
+            #       I do believe so, since we used (mode = "a-"), but not 100% sure.
             n_appended = ds_to_append.dims['date']
             old_and_new_dates = (xr.open_dataset(HISTO_ZARR_OUTPUT)
                 .isel(date = slice(-n_appended-1,-n_appended+1))
