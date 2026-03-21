@@ -166,7 +166,10 @@ if __name__ == "__main__":
     #   # HISTO_ZARR_INPUT  = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
     #   # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
     #   # INPUT_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
-
+    
+    #   # HISTO_ZARR_INPUT  = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_1kmX1km_fixedMaskArray.zarr"
+    #   # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_1kmX1km_fixedMaskArray.zarr"
+    #   # INPUT_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
 
     #   # HISTO_ZARR_INPUT     = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m.zarr"
     #   # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m_extended.zarr" # TODO: remove this and instea do it circular
@@ -203,8 +206,8 @@ if __name__ == "__main__":
     MEMORY_PER_WORKER = '120GB'
     N_THREADS_PER_WORKER = 1
 
-    PIXEL_CHUNKS = 500000 # 10000  # TODO: with v5 move back to 10k,365
-    DATE_CHUNKS_OUT = 30  # 365    # TODO: with v5 move back to 10k,365
+    PIXEL_CHUNKS = 40000 # 10000  # TODO: with v5 move back from 500k,30 to 10k,365
+    DATE_CHUNKS_OUT = 365    # TODO: with v5 move back from 500k,30 to 10k,365
 
     # TODO: check: 16041205 pixels in 640s in pipeline_FB_2026-03-19_09h09m26.log
     #              16041205 pixels in 3300s in pipeline_FB_2026-03-19_11h38m18.log
@@ -242,7 +245,7 @@ if __name__ == "__main__":
 
     historic_ds  = xr.open_zarr(HISTO_ZARR_INPUT, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
     new_ds       = xr.open_zarr(INPUT_ZARR, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": -1})
-    lookuptable  = xr.open_zarr(INPUT_LOOKUPTABLE, consolidated=False).chunk({"pixel": PIXEL_CHUNKS})
+    lookuptable  = xr.open_zarr(INPUT_LOOKUPTABLE).chunk({"pixel": PIXEL_CHUNKS})
 
         # NOTE: minor fix historic_ds in v4 does not have mask_array as int8 but as bool. 
         # TODO: this is an error. Check with Francesco what values are needed.
@@ -383,6 +386,10 @@ if __name__ == "__main__":
         .chunk({"pixel": PIXEL_CHUNKS, 
                  "date": DATE_CHUNKS_OUT})
     )
+
+    ds_to_append.attrs["pixel_definition"] = historic_ds.attrs["pixel_definition"]
+
+
     #ndvi_processed_to_append.compute() 
     #mask_processed_to_append.compute()
     #ds_to_append.compute()               # starts on 2025-12-01 # Note the shift +1
@@ -449,7 +456,7 @@ if __name__ == "__main__":
                 assert sorted(list(ds_to_append.dims)) == sorted(list(existing.dims)), "Aborted append: dimensions are not equal"
                 assert sorted(list(ds_to_append.coords)) == sorted(list(existing.coords)), "Aborted append: coordinates are not equal" # this is not strictly needed
                 assert sorted(list(ds_to_append.data_vars)) == sorted(list(existing.data_vars)), "Aborted append: list of data variables are not equal" # this is not strictly needed
-                for c in ds_to_append.coords:  # e.g. ["pixel", "x_idx", "y", "y_idx", "x"]:
+                for c in [c for c in list(ds_to_append.coords) if c not in ['date','doy']]:  # e.g. ["pixel", "x_idx", "y", "y_idx", "x"]:
                     assert ds_to_append[c].dtype == existing[c].dtype
                     assert ds_to_append[c].shape == existing[c].shape
                     # optional but safest:
@@ -457,8 +464,7 @@ if __name__ == "__main__":
                 for c in list(ds_to_append.data_vars): # e.g ndvi_processed, mask_array
                     assert ds_to_append[c].dtype == existing[c].dtype
                 # show_ds_structure(ds_to_append)
-                
-                # ds_to_append.attrs["note"] = historic_ds.attrs["note"] # TODO: check if this can be dropped
+
                 # NOTE: dropping secondary coordinates (non-dimension coordinates) 
                 #       seems safest to append
                 # Only keep main coords (and doy) for correct appending:
@@ -476,7 +482,7 @@ if __name__ == "__main__":
                 # NOTE: Unsure: Is a full rewrite still possible given that we 
                 #       attempted to overwrite values with the appending above? 
                 #       I do believe so, since we used (mode = "a-"), but not 100% sure.
-                n_appended = ds_to_append.dims['date']
+                n_appended = ds_to_append.sizes['date']
                 old_and_new_dates = (xr.open_dataset(HISTO_ZARR_OUTPUT)
                     .isel(date = slice(-n_appended-1,-n_appended+1))
                     .date.values) 
