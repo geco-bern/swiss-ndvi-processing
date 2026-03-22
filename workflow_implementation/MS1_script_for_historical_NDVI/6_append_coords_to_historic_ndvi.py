@@ -1,27 +1,3 @@
-####### TODO: #mask_array is a bool... why?? should be an int8
-#######       ds_hist_raw = xr.open_dataset("/data_3/scratch/francesco/ndvi_processed_all_pixels.zarr")
-#######       # subset a small area to look at values:
-#######       ds_small_area = xr.open_dataset("/data_3/scratch/francesco/ndvi_historic_v4_compr_1000mX1000m.zarr")
-#######       ds_hist_raw_subset = ds_hist_raw.sel(pixel = ds_small_area.pixel)
-#######       # ds_hist_raw_subset.ndvi_processed.values
-#######       # [[7105 7108 7112 ... 7287 7268 7251]
-#######       #  [5704 5708 5716 ... 5841 5826 5814]
-#######       #  [5669 5676 5685 ... 5732 5721 5711]
-#######       #  ...
-#######       #  [5943 5956 5973 ... 5876 5858 5840]
-#######       #  [6009 6015 6023 ... 5939 5925 5911]
-#######       #  [5255 5269 5289 ... 5427 5398 5372]]
-#######       # ds_hist_raw_subset.mask_array.values
-#######       # [[ True  True  True ... False False False]
-#######       #  [ True  True  True ... False False False]
-#######       #  [ True  True  True ... False False False]
-#######       #  ...
-#######       #  [ True  True  True ... False False False]
-#######       #  [ True  True  True ... False False False]
-#######       #  [ True  True  True ... False False False]]
-
-
-
 # This script finalizes the historic ndvi data set
 # by appending x and y coordinates and also by re-chunking it
 # to simplify appending new data without re-writing the whole
@@ -74,7 +50,7 @@ from zarr.codecs import BloscCodec
 import time
 
 DATE_CHUNKS = 365
-PIXEL_CHUNKS = 40000
+PIXEL_CHUNKS = 40000 # TODO make alternative versions with 40k and 10k. Ideally the chunk size should not be too small. 30x500k ~20MB. 365x40k similar, 365x10k is 4x smaller
 
 if __name__ == "__main__":
 
@@ -93,15 +69,20 @@ if __name__ == "__main__":
 
     # NOTE: this was run on GECO workstation 02:
     IN_HISTORIC_ZARR    = "/data_3/scratch/francesco/ndvi_processed_all_pixels.zarr"
+    IN_FIX_FOR_HISTORIC_ZARR = "/data_3/scratch/francesco/mask_array_fixed.zarr" # this was created on 2026-03-22 with /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/quick_fix_mask_array.py
+
     #OUT_HISTORIC_ZARR_v3 = "/data_3/scratch/francesco/ndvi_historic_v3.zarr"
     OUT_HISTORIC_ZARR_v5 = "/data_3/scratch/francesco/ndvi_historic_v5.zarr"
-    FOREST_MASK      = "/data_2/scratch/sbiegel/processed/forest_mask.npy"
+    FOREST_MASK      = "/data_3/scratch/francesco/forest_mask.npy" # "/data_2/scratch/sbiegel/processed/forest_mask.npy"
 
     LOOKUP_TABLE     = "/data_3/francesco/lookup_table_median_ndvi.zarr"
 
 
 
     ndvi_hist   = xr.open_zarr(IN_HISTORIC_ZARR)
+    ndvi_hist_fix_mask_array = xr.open_zarr(IN_FIX_FOR_HISTORIC_ZARR)
+    ndvi_hist['mask_array'] = ndvi_hist_fix_mask_array['mask_array'] # quickfix
+
     #ndvi_hist3  = xr.open_zarr(OUT_HISTORIC_ZARR_v3)
     forest_mask = np.load(FOREST_MASK)
 
@@ -213,11 +194,6 @@ if __name__ == "__main__":
     #ndvi_hist_v5.attrs['nodata'] = NO_COVERAGE
     #ndvi_hist_v5.attrs['cloud_shadow'] = INVALID
 
-
-    # =====================================================
-    #  Workaround to fix dtype of mask_array (TODO: why was it boolean, what does it mean?)
-    # =====================================================
-    ndvi_hist_v5["mask_array"] = ndvi_hist_v5["mask_array"].astype(np.int8) # TODO: remove this again when underlying dataset is fixed
 
     # =====================================================
     #  Write zarr file
