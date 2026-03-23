@@ -206,8 +206,8 @@ if __name__ == "__main__":
     MEMORY_PER_WORKER = '120GB'
     N_THREADS_PER_WORKER = 1
 
-    PIXEL_CHUNKS = 40000 # 10000  # TODO: with v5 move back from 500k,30 to 10k,365
-    DATE_CHUNKS_OUT = 365    # TODO: with v5 move back from 500k,30 to 10k,365
+    PIXEL_CHUNKS    = 40000 # 10000  # TODO: with v5 move back from 500k,30 to 10k,365 or 40k,365
+    DATE_CHUNKS_OUT = 365            # TODO: with v5 move back from 500k,30 to 10k,365 or 40k,365
 
     # TODO: check: 16041205 pixels in 640s in pipeline_FB_2026-03-19_09h09m26.log
     #              16041205 pixels in 3300s in pipeline_FB_2026-03-19_11h38m18.log
@@ -230,11 +230,12 @@ if __name__ == "__main__":
     
     
     t0=time.perf_counter()
-
+    DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data5/"
     client = Client(
         n_workers=N_WORKERS,
         threads_per_worker=N_THREADS_PER_WORKER,
         memory_limit=MEMORY_PER_WORKER,
+        local_directory= DASK_TEMP_DIR,
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
         dashboard_address=':8343')  
     print(client, flush = True)
@@ -424,7 +425,6 @@ if __name__ == "__main__":
         extended_historic_ds.to_zarr(
             outfile, 
             mode="w", 
-            # consolidated=True, # gave warning "consolidated metadata is currently not part in the Zarr format 3 specification."
             compute=True,
             encoding=encoding, 
             zarr_format=3

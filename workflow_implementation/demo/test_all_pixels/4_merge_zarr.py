@@ -74,24 +74,16 @@ if __name__ == "__main__":
     #  Load historic and new observation data sets
     # =====================================================
     DATE_CHUNKS = 365
-    PIXEL_CHUNKS = 10000
+    PIXEL_CHUNKS = 40000
     # DATE_CHUNKS  = historic_ds.chunks['date'][0]  # should be 30 days # TODO: why not this?
     # PIXEL_CHUNKS = historic_ds.chunks['pixel'][0]                     # TODO: why not this?
 
 
     # --- load historic dataset ------------------------------------
     historic_ds = xr.open_zarr(HISTO_ZARR, chunks={})
-    # TODO remove: # Rename ndvi_processed -> ndvi, mask_array -> obs_date to match new data schema
-    # TODO remove: historic_ds = historic_ds.rename(
-    # TODO remove:     {
-    # TODO remove:         "ndvi_processed": "ndvi",  # NOTE: we rename since the OUT_ZARR_TMP will contain part processed but also part unprocessed data
-    # TODO remove:         "mask_array": "obs_date",  # NOTE: we rename since the OUT_ZARR_TMP will contain part processed but also part unprocessed data
-    # TODO remove:     }
-    # TODO remove: )
-
 
     # --- load new data dataset ------------------------------------
-    new_observations_ds = xr.open_dataset(DOWNLOAD_ZARR, chunks={"pixel": PIXEL_CHUNKS, "date": -1})
+    new_observations_ds = xr.open_dataset(DOWNLOAD_ZARR, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "datetime": -1})
 
     # Subset new_observations_ds to correspond to same pixels as in historic_ds
     if (len(historic_ds.pixel.values) < len(new_observations_ds.pixel.values)):
@@ -269,7 +261,7 @@ if __name__ == "__main__":
         new_ds[name].encoding.pop("compressors", None)
 
     # write out    
-    new_ds.to_zarr(OUT_ZARR_TMP, mode="w", consolidated=True)
+    new_ds.to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
 
 
     # overview of data structures: ---------------------------------------------
@@ -286,7 +278,7 @@ if __name__ == "__main__":
     #     y               (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
     # Data variables:
     #     ndvi_processed  (pixel, date) int16 27MB dask.array<chunksize=(4216, 30), meta=np.ndarray>
-    #     mask_array      (pixel, date) bool 13MB dask.array<chunksize=(4216, 30), meta=np.ndarray>
+    #     mask_array      (pixel, date) int8 13MB dask.array<chunksize=(4216, 30), meta=np.ndarray>
     # Attributes:
     #     [...]
 
@@ -304,7 +296,7 @@ if __name__ == "__main__":
     # Data variables:
     #     ndsi_obs  (date, pixel) int16 110kB dask.array<chunksize=(1, 4216), meta=np.ndarray>
     #     ndvi_obs  (date, pixel) int16 110kB dask.array<chunksize=(1, 4216), meta=np.ndarray>
-    #     obs_date  (date) bool 13B dask.array<chunksize=(13,), meta=np.ndarray>
+    #     obs_date  (date) int8 13B dask.array<chunksize=(13,), meta=np.ndarray>
     # Attributes:
     #     [...]
 
@@ -324,7 +316,7 @@ if __name__ == "__main__":
     # Data variables:
     #     ndsi_obs  (date, pixel) int16 110kB 32767 32767 32767 ... 32767 32767 32767
     #     ndvi_obs  (date, pixel) int16 110kB 32767 32767 32767 ... 32767 32767 32767
-    #     obs_date  (date) bool 13B False False False False ... True False False True
+    #     obs_date  (date) int8 13B TODO
 
     # Attributes:
     # <xarray.Dataset> Size: 40MB
@@ -339,12 +331,12 @@ if __name__ == "__main__":
     #     x               (pixel) int32 17kB 2600005 2600015 ... 2600455 2600995
     # Data variables:
     #     ndvi_processed  (pixel, date) int16 27MB 7105 7108 7112 ... 5427 5398 5372
-    #     mask_array      (pixel, date) bool 13MB True True True ... False False False
+    #     mask_array      (pixel, date) int8 13MB TODO
 
     client.close()
     print("All done")
 
-    print("Modified/Created file: ", flush = True)
+    print("Created file: ", flush = True)
     print(OUT_ZARR_TMP, flush = True)
     sys.exit(0)
 
