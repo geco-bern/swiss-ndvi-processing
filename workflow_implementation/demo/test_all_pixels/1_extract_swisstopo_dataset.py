@@ -70,7 +70,34 @@ item_search = service.search(
     datetime = date_range,               
     collections=['ch.swisstopo.swisseo_s2-sr_v100']
 )
-s2_files = list(item_search.items())
+s2_files = np.array(list(item_search.items()))
+
+# And filter the images:
+# s2_files[0] # <Item id=swisseo_s2-sr_v100> TODO: we need to drop this first element.
+#             #                              TODO(Joan): is it correct that this first element is different from the rest?
+# s2_files[1] # <Item id=2025-12-06t102319>
+# s2_files[2] # <Item id=2025-12-09t103329>
+# s2_files[-1] # <Item id=2026-03-18t100741>
+
+# FOR DEVELOPMENT: INVESTIGATION:
+# FOR DEVELOPMENT: s2_files[0].datetime # 2026-03-18 10:07:41+00:00 # is this just always the datetime of the newest element?
+# FOR DEVELOPMENT: s2_files[0].id "swisseo_s2-sr_v100"
+# FOR DEVELOPMENT: s2_files[0].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_current_cloudprobability-10m.tif':
+# FOR DEVELOPMENT: s2_files[1].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_2025-12-06t102319_bands-10m.tif':
+# FOR DEVELOPMENT: Aha, based on above it looks like the first is always the current
+
+# mark which indices do not represent specific dates, but just the current state:
+remove_idx = np.array(["current" in list(itm.assets.keys())[0] for itm in s2_files])
+# s2_files[np.array(remove_idx)]           # This one is removed
+s2_files = s2_files[~remove_idx] # These are kept
+
+        # TO FIX A PREVIOUSLY DOWNLOADED DATA SET CONTAINING THE FIRST WRONG DATE, DO THE FOLLOWING:
+        # ds_out2_initial = xr.open_dataset("/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-23_06h15_ndvi_01_downloaded_2025-11-30_2026-03-22.zarr")
+        # drop the current time step
+        # ds_out2_initial.datetime.values # Yes, the first line shows the newest date.
+        # ds_out2_initial_fixed = ds_out2_initial.isel(datetime = slice(1,None))
+        # ds_out2_initial_fixed.to_zarr(OUTPUT_ZARR, mode="w", consolidated=True, compute=True)
+
 
 # If some images (s2_files) are available within the requested date_range
 if (len(s2_files) > 0):

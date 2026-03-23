@@ -15,7 +15,7 @@ args = parser.parse_args()
 HISTO_ZARR           = args.HISTO_INPUT
 # if running interactively use e.g.:
     # HISTO_ZARR = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m.zarr"
-
+    # HISTO_ZARR = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_1kmX1km.zarr"
 import warnings
 warnings.filterwarnings(
     "ignore", 

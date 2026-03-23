@@ -75,7 +75,16 @@ def download_timeseries_NDVI_singlePixel(
         datetime = date_range,               
         collections=['ch.swisstopo.swisseo_s2-sr_v100']
     )
-    s2_files = list(item_search.items())
+    
+    s2_files = np.array(list(item_search.items()))
+    # And filter the images:
+    # FOR DEVELOPMENT: s2_files[0].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_current_cloudprobability-10m.tif':
+    # FOR DEVELOPMENT: s2_files[1].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_2025-12-06t102319_bands-10m.tif':
+    
+    # mark which indices do not represent specific dates, but just the current state:
+    remove_idx = np.array(["current" in list(itm.assets.keys())[0] for itm in s2_files])
+    s2_files = s2_files[~remove_idx] # These are kept
+
 
     # If some images (s2_files) are available within the requested date_range
     if (len(s2_files) > 0):
