@@ -167,9 +167,10 @@ if __name__ == "__main__":
     #   # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
     #   # INPUT_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
     
-    #   # HISTO_ZARR_INPUT  = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_1kmX1km_fixedMaskArray.zarr"
-    #   # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_1kmX1km_fixedMaskArray.zarr"
+    #   # HISTO_ZARR_INPUT  = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_10kmX10km.zarr"
+    #   # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_10kmX10km.zarr"
     #   # INPUT_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
+    #   # INPUT_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-23_12h50_ndvi_01_downloaded_2025-11-30_2026-03-22_processed.zarr/"
 
     #   # HISTO_ZARR_INPUT     = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m.zarr"
     #   # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m_extended.zarr" # TODO: remove this and instea do it circular
@@ -188,6 +189,10 @@ if __name__ == "__main__":
     # START PROCESSING:
     t0 = time.perf_counter()
 
+    # Definition of output format of new
+    # TODO: when going circular this is probably not needed anymore.
+    COMPRESSOR = zarr3.Blosc(cname="zstd", clevel=3, shuffle=2)
+    
     # N_WORKERS = 10           # e) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 120s (incl Zarr); 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
     # N_THREADS_PER_WORKER = 1 # e) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 120s (incl Zarr); 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
     # DATE_CHUNKS = -1         # e) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 120s (incl Zarr); 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
@@ -221,13 +226,6 @@ if __name__ == "__main__":
     # PIXEL_CHUNKS = 10000  # d) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 33s; 586503 pixels => 57s; 16041205 pixels => XXs; 105715396 pixels => XXs
     # MEMORY_PER_WORKER = '66GB'
     # N_THREADS_PER_WORKER = 1
-
-
-    # Definition of output format of new
-    # TODO: when going circular this is probably not needed anymore.
-    COMPRESSOR = zarr3.Blosc(cname="zstd", clevel=3, shuffle=2)
-    
-    
     
     t0=time.perf_counter()
     DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data5/"
@@ -237,7 +235,7 @@ if __name__ == "__main__":
         memory_limit=MEMORY_PER_WORKER,
         local_directory= DASK_TEMP_DIR,
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
-        dashboard_address=':8343')  
+        dashboard_address=':8343')
     print(client, flush = True)
     print(client.dashboard_link, flush = True) # use this dashboard to follow progress
 
@@ -360,6 +358,8 @@ if __name__ == "__main__":
         output_dtypes=output_dtypes, 
         dask_gufunc_kwargs={"allow_rechunk": True},
     )
+    # ndvi_processed.isel(pixel=1, date=slice(3160,3170)).compute() # TODO: check why this is [ 4845,  4835,  4826,  4819, 32767, 32767, 32767, 32767, 32767, 32767]
+    
     # g = mask_processed.__dask_graph__()
     g = ndvi_processed.__dask_graph__()
     print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)

@@ -39,13 +39,30 @@ warnings.filterwarnings(
 # SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB.py"
 # LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
 # # HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_100kmX100km.zarr"
-# HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365.zarr_bkp"
+# # HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365.zarr_bkp"
+# HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_100kmX100km.zarr"
+# HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_10kmX10km.zarr"
+# # X_COORD="2720645"; Y_COORD="1118245"
+# # X_COORD="2710385"; Y_COORD="1116375"
 # X_COORD="2710005"
 # Y_COORD="1109995"
+# START_DATE="2025-09-01"
 # START_DATE="2025-05-01"
+# END_DATE="2026-03-31"
 # END_DATE="2025-12-31"
 # # python -u $SCRIPT_FILE $HISTO_INPUT $X_COORD $Y_COORD $START_DATE $END_DATE > $LOG_FILE  2>&1 &
 # # python -u $SCRIPT_FILE $HISTO_INPUT $X_COORD $Y_COORD $START_DATE $END_DATE --add_raw_download > $LOG_FILE  2>&1 &
+
+    #     X_COORD="2710005" # TODO: check if this is indeed a forest pixel otherwise choose other test option
+    #     Y_COORD="1109995" # TODO: check if this is indeed a forest pixel otherwise choose other test option
+    #     # X_COORD="2644020" # NOTE: Bitsch forest fire
+    #     # Y_COORD="1133790" # NOTE: Bitsch forest fire
+    # 
+    #     
+
+    #     END_DATE="2026-03-31"
+    #     FLAG_DOWNLOAD=True
+
 
 INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr" # TODO: use this
 
@@ -56,187 +73,201 @@ def download_timeseries_NDVI_singlePixel(
     start_date, end_date):  # String dates ("YYYY-MM-DD")
     # NOTE: below code is duplicated (copy/paste) from 1_extract_swisstopo_dataset.py
 
-    # Start script:
-    date_range = f"{start_date}/{end_date}"
-
-    # Connect to Swisstopo STAC API
-    service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
-    service.add_conforms_to("COLLECTIONS")
-    service.add_conforms_to("ITEM_SEARCH")
-
-    # EPSG: 4326
-    # WGS 84
-    # Swiss bounds: left, bottom, right, top
-    bbox_swiss_4326 = [5.70, 45.8, 10.6, 47.95]
-
-    # Search all images for the full CH bounding box for the requested date range
-    item_search = service.search(
-        bbox=bbox_swiss_4326,
-        datetime = date_range,               
-        collections=['ch.swisstopo.swisseo_s2-sr_v100']
-    )
+    downloadpath = (
+        "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova2/"+
+        "TESTSUITE_"+
+        f"{start_date.replace("-","")}to{end_date.replace("-","")}_"+
+        f"location_{x}x{y}"+
+        ".csv")
     
-    s2_files = np.array(list(item_search.items()))
-    # And filter the images:
-    # FOR DEVELOPMENT: s2_files[0].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_current_cloudprobability-10m.tif':
-    # FOR DEVELOPMENT: s2_files[1].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_2025-12-06t102319_bands-10m.tif':
-    
-    # mark which indices do not represent specific dates, but just the current state:
-    remove_idx = np.array(["current" in list(itm.assets.keys())[0] for itm in s2_files])
-    s2_files = s2_files[~remove_idx] # These are kept
+    if os.path.exists(downloadpath):
+        df = pd.read_csv(downloadpath, index_col=0, parse_dates=[1])
+        return(df)
+    else:
+        # Start script:
+        date_range = f"{start_date}/{end_date}"
+
+        # Connect to Swisstopo STAC API
+        service = pystac_client.Client.open('https://data.geo.admin.ch/api/stac/v0.9/')
+        service.add_conforms_to("COLLECTIONS")
+        service.add_conforms_to("ITEM_SEARCH")
+
+        # EPSG: 4326
+        # WGS 84
+        # Swiss bounds: left, bottom, right, top
+        bbox_swiss_4326 = [5.70, 45.8, 10.6, 47.95]
+
+        # Search all images for the full CH bounding box for the requested date range
+        item_search = service.search(
+            bbox=bbox_swiss_4326,
+            datetime = date_range,               
+            collections=['ch.swisstopo.swisseo_s2-sr_v100']
+        )
+        
+        s2_files = np.array(list(item_search.items()))
+        # And filter the images:
+        # FOR DEVELOPMENT: s2_files[0].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_current_cloudprobability-10m.tif':
+        # FOR DEVELOPMENT: s2_files[1].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_2025-12-06t102319_bands-10m.tif':
+        
+        # mark which indices do not represent specific dates, but just the current state:
+        remove_idx = np.array(["current" in list(itm.assets.keys())[0] for itm in s2_files])
+        s2_files = s2_files[~remove_idx] # These are kept
 
 
-    # If some images (s2_files) are available within the requested date_range
-    if (len(s2_files) > 0):
-        print(f"Starting download for:\n{"\n".join([item.datetime.strftime('%Y-%m-%d_%Hh%M') for item in s2_files])}",
-            file=sys.stdout,
-            flush=True)
+        # If some images (s2_files) are available within the requested date_range
+        if (len(s2_files) > 0):
+            print(f"Starting download for:\n{"\n".join([item.datetime.strftime('%Y-%m-%d_%Hh%M') for item in s2_files])}",
+                file=sys.stdout,
+                flush=True)
 
-        ### NOW HARDCODE THIS
-        bbox_swisstopo_2056 = BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0)
-        width_swisstopo     = int((bbox_swisstopo_2056.right - bbox_swisstopo_2056.left) / 10) # 37728
-        height_swisstopo    = int((bbox_swisstopo_2056.top - bbox_swisstopo_2056.bottom) / 10) # 24542        
-        ref_meta = {
-        'transform': Affine(10.0, 0.0,  bbox_swisstopo_2056.left,   # Affine(10.0, 0.0, np.float64(2474090.0),
-                            0.0, -10.0, bbox_swisstopo_2056.top),   #        0.0, -10.0, np.float64(1310530.0)), 
-        'crs': CRS.from_wkt('PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'), 
-        'width': np.float64(width_swisstopo), 
-        'height': np.float64(height_swisstopo)}
-        # load forest mask from disk
-        # UNNEEDED: forest_mask_zarr = zarr.open("/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr", mode="r")
-        # UNNEEDED: forest_mask_shape = (height_swisstopo, width_swisstopo)
-        # UNNEEDED: forest_mask = np.unpackbits(forest_mask_zarr["bits"][:])[:np.prod(forest_mask_shape)].reshape(forest_mask_shape)
-        ### END HARDCODING
-        reference_summary_msg = (
-            f"Total of global grid used for pixel ID (based on forest mask): " + 
-            f"\nBox: {bbox_swisstopo_2056} pixels" #+ 
-            # f"\nGrid: {forest_mask.shape} = {forest_mask.size:_} pixels" + 
-            # f", of which {np.flatnonzero(forest_mask).size:_} are identified as forest pixels."
-        ) # Box: BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0) pixels
-        # Grid: (24542, 37728) = 925_920_576 pixels, of which 105_715_396 are identified as forest pixels.
-        print(reference_summary_msg, flush = True)
-        print("Reference raster metadata:")
-        print(ref_meta, flush = True)
+            ### NOW HARDCODE THIS
+            bbox_swisstopo_2056 = BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0)
+            width_swisstopo     = int((bbox_swisstopo_2056.right - bbox_swisstopo_2056.left) / 10) # 37728
+            height_swisstopo    = int((bbox_swisstopo_2056.top - bbox_swisstopo_2056.bottom) / 10) # 24542        
+            ref_meta = {
+            'transform': Affine(10.0, 0.0,  bbox_swisstopo_2056.left,   # Affine(10.0, 0.0, np.float64(2474090.0),
+                                0.0, -10.0, bbox_swisstopo_2056.top),   #        0.0, -10.0, np.float64(1310530.0)), 
+            'crs': CRS.from_wkt('PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'), 
+            'width': np.float64(width_swisstopo), 
+            'height': np.float64(height_swisstopo)}
+            # load forest mask from disk
+            # UNNEEDED: forest_mask_zarr = zarr.open("/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr", mode="r")
+            # UNNEEDED: forest_mask_shape = (height_swisstopo, width_swisstopo)
+            # UNNEEDED: forest_mask = np.unpackbits(forest_mask_zarr["bits"][:])[:np.prod(forest_mask_shape)].reshape(forest_mask_shape)
+            ### END HARDCODING
+            reference_summary_msg = (
+                f"Total of global grid used for pixel ID (based on forest mask): " + 
+                f"\nBox: {bbox_swisstopo_2056} pixels" #+ 
+                # f"\nGrid: {forest_mask.shape} = {forest_mask.size:_} pixels" + 
+                # f", of which {np.flatnonzero(forest_mask).size:_} are identified as forest pixels."
+            ) # Box: BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0) pixels
+            # Grid: (24542, 37728) = 925_920_576 pixels, of which 105_715_396 are identified as forest pixels.
+            print(reference_summary_msg, flush = True)
+            print("Reference raster metadata:")
+            print(ref_meta, flush = True)
 
-        # item = s2_files[0]; coords = (2710005, 1109995) # For development.
-        def get_timestep_NDVI_singlePixel(item, coords):
+            # item = s2_files[0]; coords = (2710005, 1109995) # For development.
+            def get_timestep_NDVI_singlePixel(item, coords):
 
-            # Prepare constants
-            INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
-            NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
+                # Prepare constants
+                INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
+                NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
 
-            #bbox_single_pixel_swisstopo_2056 = BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0)
-            half_px_size = 5 # 10/2 = 5 m
-            bbox_single_pixel_swisstopo_2056 = BoundingBox(
-                left =coords[0]-half_px_size, bottom=coords[1]-half_px_size, 
-                right=coords[0]+half_px_size, top   =coords[1]+half_px_size)
-            
+                #bbox_single_pixel_swisstopo_2056 = BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0)
+                half_px_size = 5 # 10/2 = 5 m
+                bbox_single_pixel_swisstopo_2056 = BoundingBox(
+                    left =coords[0]-half_px_size, bottom=coords[1]-half_px_size, 
+                    right=coords[0]+half_px_size, top   =coords[1]+half_px_size)
+                
 
-            timestep_dttm = item.datetime
-            assets = item.assets
-            bands10_asset = assets[[k for k in assets if k.endswith('bands-10m.tif')][0]]
-            bands20_asset = assets[[k for k in assets if k.endswith('bands-20m.tif')][0]]
-            masks_asset = assets[[k for k in assets if k.endswith('masks-10m.tif')][0]]
+                timestep_dttm = item.datetime
+                assets = item.assets
+                bands10_asset = assets[[k for k in assets if k.endswith('bands-10m.tif')][0]]
+                bands20_asset = assets[[k for k in assets if k.endswith('bands-20m.tif')][0]]
+                masks_asset = assets[[k for k in assets if k.endswith('masks-10m.tif')][0]]
 
-            # FOR INTERACTIVE DEVELOPMENT
-            #     from contextlib import ExitStack
-            #     import rasterio
-            #     stack = ExitStack()
-            #     b10_src = stack.enter_context(rasterio.open(bands10_asset.href))
-            #     b20_src = stack.enter_context(rasterio.open(bands20_asset.href))
-            #     masks_src = stack.enter_context(rasterio.open(masks_asset.href))
-            with rasterio.open(bands10_asset.href) as b10_src, \
-                rasterio.open(bands20_asset.href) as b20_src, \
-                rasterio.open(masks_asset.href) as masks_src:
+                # FOR INTERACTIVE DEVELOPMENT
+                #     from contextlib import ExitStack
+                #     import rasterio
+                #     stack = ExitStack()
+                #     b10_src = stack.enter_context(rasterio.open(bands10_asset.href))
+                #     b20_src = stack.enter_context(rasterio.open(bands20_asset.href))
+                #     masks_src = stack.enter_context(rasterio.open(masks_asset.href))
+                with rasterio.open(bands10_asset.href) as b10_src, \
+                    rasterio.open(bands20_asset.href) as b20_src, \
+                    rasterio.open(masks_asset.href) as masks_src:
 
-                # Handle alignment mismatches between bands and masks
-                if not (
-                    (b10_src.transform == masks_src.transform) and
-                    (b10_src.width, b10_src.height) == (masks_src.width, masks_src.height)
-                ):
-                    b10_window = from_bounds(*bbox_single_pixel_swisstopo_2056, transform=b10_src.transform)
-                    mask_window = from_bounds(*bbox_single_pixel_swisstopo_2056, transform=masks_src.transform)
-                    b20_window = from_bounds(*bbox_single_pixel_swisstopo_2056, transform=b20_src.transform)
+                    # Handle alignment mismatches between bands and masks
+                    if not (
+                        (b10_src.transform == masks_src.transform) and
+                        (b10_src.width, b10_src.height) == (masks_src.width, masks_src.height)
+                    ):
+                        b10_window = from_bounds(*bbox_single_pixel_swisstopo_2056, transform=b10_src.transform)
+                        mask_window = from_bounds(*bbox_single_pixel_swisstopo_2056, transform=masks_src.transform)
+                        b20_window = from_bounds(*bbox_single_pixel_swisstopo_2056, transform=b20_src.transform)
 
-                    red, green, nir = b10_src.read([1, 2, 4], window=b10_window, boundless=True, fill_value=9999)
-                    swir = b20_src.read(3, window=b20_window, boundless=True, fill_value=9999)
-                    masks = masks_src.read([1, 2], window=mask_window, boundless=True, fill_value=255).astype("uint8")
+                        red, green, nir = b10_src.read([1, 2, 4], window=b10_window, boundless=True, fill_value=9999)
+                        swir = b20_src.read(3, window=b20_window, boundless=True, fill_value=9999)
+                        masks = masks_src.read([1, 2], window=mask_window, boundless=True, fill_value=255).astype("uint8")
 
-                else:
-                    b10_window = b10_src.window(*bbox_single_pixel_swisstopo_2056)
-                    b20_window = b20_src.window(*bbox_single_pixel_swisstopo_2056)
-                    red, green, nir = b10_src.read([1, 2, 4], window=b10_window)
-                    swir = b20_src.read(3, window=b20_window)
-                    masks = masks_src.read([1, 2], window=b10_window).astype("uint8")
+                    else:
+                        b10_window = b10_src.window(*bbox_single_pixel_swisstopo_2056)
+                        b20_window = b20_src.window(*bbox_single_pixel_swisstopo_2056)
+                        red, green, nir = b10_src.read([1, 2, 4], window=b10_window)
+                        swir = b20_src.read(3, window=b20_window)
+                        masks = masks_src.read([1, 2], window=b10_window).astype("uint8")
 
-                terrain_mask, cloud_mask = masks
-                cloud_shadows_mask = (terrain_mask == 100) | (cloud_mask == 1)
-                nodata_mask_ndvi = (red == 9999) | (nir == 9999) | (terrain_mask == 255) | (cloud_mask == 255)
+                    terrain_mask, cloud_mask = masks
+                    cloud_shadows_mask = (terrain_mask == 100) | (cloud_mask == 1)
+                    nodata_mask_ndvi = (red == 9999) | (nir == 9999) | (terrain_mask == 255) | (cloud_mask == 255)
 
-                # Compute NDVI
-                red = red.astype("float32") / 10000.0
-                nir = nir.astype("float32") / 10000.0
-                ndvi = (nir - red) / (nir + red)
-                ndvi = np.clip(ndvi, -1.0, 1.0)
-                ndvi_scaled = (np.nan_to_num(ndvi, nan=NO_COVERAGE / 10000.0) * 10000.0).astype("int16")
+                    # Compute NDVI
+                    red = red.astype("float32") / 10000.0
+                    nir = nir.astype("float32") / 10000.0
+                    ndvi = (nir - red) / (nir + red)
+                    ndvi = np.clip(ndvi, -1.0, 1.0)
+                    ndvi_scaled = (np.nan_to_num(ndvi, nan=NO_COVERAGE / 10000.0) * 10000.0).astype("int16")
 
-                # Reproject SWIR to align with green band
-                h, w = green.shape
-                src_transform = b20_src.window_transform(b20_window)
-                target_transform = b10_src.window_transform(b10_window)
+                    # Reproject SWIR to align with green band
+                    h, w = green.shape
+                    src_transform = b20_src.window_transform(b20_window)
+                    target_transform = b10_src.window_transform(b10_window)
 
-                swir_10m = np.full((h, w), 9999, dtype=np.float32)
-                reproject(
-                    source=swir,
-                    destination=swir_10m,
-                    src_transform=src_transform,
-                    src_crs=b20_src.crs,
-                    dst_transform=target_transform,
-                    dst_crs=b10_src.crs,
-                    resampling=Resampling.bilinear,
-                    src_nodata=9999,
-                    dst_nodata=9999
-                )
+                    swir_10m = np.full((h, w), 9999, dtype=np.float32)
+                    reproject(
+                        source=swir,
+                        destination=swir_10m,
+                        src_transform=src_transform,
+                        src_crs=b20_src.crs,
+                        dst_transform=target_transform,
+                        dst_crs=b10_src.crs,
+                        resampling=Resampling.bilinear,
+                        src_nodata=9999,
+                        dst_nodata=9999
+                    )
 
-                nodata_mask_ndsi = (green == 9999) | (swir_10m == 9999) | (terrain_mask == 255) | (cloud_mask == 255)
+                    nodata_mask_ndsi = (green == 9999) | (swir_10m == 9999) | (terrain_mask == 255) | (cloud_mask == 255)
 
-                # Compute NDSI
-                green = green.astype("float32") / 10000.0
-                swir_10m = swir_10m.astype("float32") / 10000.0
-                ndsi = (green - swir_10m) / (green + swir_10m)
-                ndsi = np.clip(ndsi, -1.0, 1.0)
-                ndsi_scaled = (np.nan_to_num(ndsi, nan=NO_COVERAGE / 10000.0) * 10000.0).astype("int16")
+                    # Compute NDSI
+                    green = green.astype("float32") / 10000.0
+                    swir_10m = swir_10m.astype("float32") / 10000.0
+                    ndsi = (green - swir_10m) / (green + swir_10m)
+                    ndsi = np.clip(ndsi, -1.0, 1.0)
+                    ndsi_scaled = (np.nan_to_num(ndsi, nan=NO_COVERAGE / 10000.0) * 10000.0).astype("int16")
 
-            assert ndvi.size == 1 # below only works for 1 pixel
+                assert ndvi.size == 1 # below only works for 1 pixel
 
-            # Return a 1-row dataframe for the given date (item)
-            # out_df = pd.DataFrame(); out_df['a'] = [12]
-            out_df = pd.DataFrame(); 
-            out_df['datetime'] = [timestep_dttm]
-            out_df['x'] = [coords[0]]
-            out_df['y'] = [coords[1]]
+                # Return a 1-row dataframe for the given date (item)
+                # out_df = pd.DataFrame(); out_df['a'] = [12]
+                out_df = pd.DataFrame(); 
+                out_df['datetime'] = [timestep_dttm]
+                out_df['x'] = [coords[0]]
+                out_df['y'] = [coords[1]]
 
-            out_df['ndvi']        = [ndvi[0][0]]
-            out_df['ndvi_scaled'] = [ndvi_scaled[0][0]]
-            out_df['ndsi']        = [ndsi[0][0]]
-            out_df['ndsi_scaled'] = [ndsi_scaled[0][0]]
+                out_df['ndvi']        = [ndvi[0][0]]
+                out_df['ndvi_scaled'] = [ndvi_scaled[0][0]]
+                out_df['ndsi']        = [ndsi[0][0]]
+                out_df['ndsi_scaled'] = [ndsi_scaled[0][0]]
 
-            return(out_df)
+                return(out_df)
 
-        failed_timesteps = []
-        dataframerows = []
-        # FOR DEVELOPMENT: t = 0; path = s2_files[t]
-        for t, path in tqdm(enumerate(s2_files), total=len(s2_files)):
-            try:
-                row = get_timestep_NDVI_singlePixel(path, (x, y))
-                dataframerows.append(row)
-                print(f"Time step {t} processed successfully.", flush = True)
-            except Exception as e:
-                print(f"Time step {t} failed: {e}", flush = True)
-                failed_timesteps.append((path, (x, y)))
-                continue  # skip to the next time step
+            failed_timesteps = []
+            dataframerows = []
+            # FOR DEVELOPMENT: t = 0; path = s2_files[t]
+            for t, path in tqdm(enumerate(s2_files), total=len(s2_files)):
+                try:
+                    row = get_timestep_NDVI_singlePixel(path, (x, y))
+                    dataframerows.append(row)
+                    print(f"Time step {t} processed successfully.", flush = True)
+                except Exception as e:
+                    print(f"Time step {t} failed: {e}", flush = True)
+                    failed_timesteps.append((path, (x, y)))
+                    continue  # skip to the next time step
 
-        df = pd.concat(dataframerows, ignore_index=True)
+            df = pd.concat(dataframerows, ignore_index=True)
+
+            # store the downloaded data:
+            df.to_csv(downloadpath)
 
         return(df)
 
@@ -268,8 +299,9 @@ if __name__ == "__main__":
     #     # X_COORD="2644020" # NOTE: Bitsch forest fire
     #     # Y_COORD="1133790" # NOTE: Bitsch forest fire
     # 
-    #     START_DATE="2025-06-01"
-    #     END_DATE="2025-12-31"
+    #     START_DATE="2025-09-01"
+
+    #     END_DATE="2026-03-31"
     #     FLAG_DOWNLOAD=True
 
     X_COORD, Y_COORD = int(X_COORD), int(Y_COORD)
@@ -310,6 +342,9 @@ if __name__ == "__main__":
     #ds_h_subset2.compute()
     #ds_h_subset2.sizes
 
+    print(ds_h_subset2)
+    print(ds_h_subset2.compute())
+
     # d) download raw data directly from swisstopo
     if FLAG_DOWNLOAD:
         df_raw = download_timeseries_NDVI_singlePixel(
@@ -340,7 +375,7 @@ if __name__ == "__main__":
     # f) make plot
     plt.figure(figsize=(7.2, 4), dpi = 200)
 
-    plt.plot(dates[no_obs_to_smooth], ndvi[no_obs_to_smooth], marker="D", linestyle="None",markersize=2, color ="black",  label = "no obs to smooth") # TODO: what y-values do these have???
+    plt.plot(dates[no_obs_to_smooth], ndvi[no_obs_to_smooth], marker="D", linestyle="None",markersize=2, color ="black",  label = "no obs to smooth") # TODO: what y-values do these have??? They have 32767.
     plt.plot(dates[no_obs_smoothed],  ndvi[no_obs_smoothed],  marker="D", linestyle="None",markersize=2, color ="orange", label = "no obs smoothed")
     plt.plot(dates[obs_to_smooth],    ndvi[obs_to_smooth],    marker="x", linestyle="None",markersize=4, color ="yellow", label = "obs to smooth")
     plt.plot(dates[obs_smoothed],     ndvi[obs_smoothed],     marker="x", linestyle="None",markersize=4, color ="green",  label = "obs smoothed")
@@ -359,7 +394,8 @@ if __name__ == "__main__":
         [plt.axvspan(_range[0], _range[1], color='grey', alpha=1.0) for _range in obs_dates]
 
     # TODO: ALSO ADD MEDIANS: plt.plot(dates, medians,color = "black", linestyle="-",label = "median_ndvi")
-    plt.ylim(0, 10000)
+    # plt.ylim(0, 10000)
+    plt.ylim(0, 33000) # TODO: reactivate cropping at 10000
     plt.xlabel("Date")
     plt.ylabel("NDVI")
     plt.title(f"NDVI Time Series of location: {(X_COORD, Y_COORD)}")
@@ -377,3 +413,5 @@ if __name__ == "__main__":
         ".png")
     plt.savefig(plotpath)
     plt.close()
+    
+    print("All done")
