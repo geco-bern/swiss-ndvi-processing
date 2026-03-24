@@ -27,6 +27,15 @@ warnings.filterwarnings(
     module="numcodecs.zarr3"
 )
 
+# HOW TO RUN FROM BASH:
+# source /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate
+# SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py"
+# LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset_FB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
+# START_DATE="2026-01-01"
+# END_DATE="2026-01-15"
+# python -u $SCRIPT_FILE $START_DATE $END_DATE > $LOG_FILE  2>&1 &
+
+
 # PARSE ARGUMENTS:
 parser = argparse.ArgumentParser()
 parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
@@ -38,7 +47,7 @@ end_date = args.end_date
 # if running interactively use e.g.:
 # start_date = "2025-11-30" # for the pipeline this should correspond to 
 #                           # the last date in the historic NDVI data set
-# end_date = "2026-03-10"
+# end_date = "2026-03-22"
 # end_date = "2025-12-04"
 # end_date = "2025-12-06"
 # end_date = "2025-12-12"
@@ -72,19 +81,20 @@ item_search = service.search(
 )
 s2_files = np.array(list(item_search.items()))
 
-# And filter the images:
-# s2_files[0] # <Item id=swisseo_s2-sr_v100> TODO: we need to drop this first element.
-#             #                              TODO(Joan): is it correct that this first element is different from the rest?
-# s2_files[1] # <Item id=2025-12-06t102319>
-# s2_files[2] # <Item id=2025-12-09t103329>
-# s2_files[-1] # <Item id=2026-03-18t100741>
+# And filter the images (if date_range includes the date of newest satellite image, 
+#                        s2_files contains an additional first element 'current'):
+    # s2_files[0] # <Item id=swisseo_s2-sr_v100> TODO: we need to drop this first element.
+    #             #                              TODO(Joan): is it correct that this first element is different from the rest?
+    # s2_files[1] # <Item id=2025-12-06t102319>
+    # s2_files[2] # <Item id=2025-12-09t103329>
+    # s2_files[-1] # <Item id=2026-03-18t100741>
 
-# FOR DEVELOPMENT: INVESTIGATION:
-# FOR DEVELOPMENT: s2_files[0].datetime # 2026-03-18 10:07:41+00:00 # is this just always the datetime of the newest element?
-# FOR DEVELOPMENT: s2_files[0].id "swisseo_s2-sr_v100"
-# FOR DEVELOPMENT: s2_files[0].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_current_cloudprobability-10m.tif':
-# FOR DEVELOPMENT: s2_files[1].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_2025-12-06t102319_bands-10m.tif':
-# FOR DEVELOPMENT: Aha, based on above it looks like the first is always the current
+    # FOR DEVELOPMENT: INVESTIGATION:
+    # FOR DEVELOPMENT: s2_files[0].datetime # 2026-03-18 10:07:41+00:00 # is this just always the datetime of the newest element?
+    # FOR DEVELOPMENT: s2_files[0].id "swisseo_s2-sr_v100"
+    # FOR DEVELOPMENT: s2_files[0].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_current_cloudprobability-10m.tif':
+    # FOR DEVELOPMENT: s2_files[1].assets # {'ch.swisstopo.swisseo_s2-sr_v100_mosaic_2025-12-06t102319_bands-10m.tif':
+    # FOR DEVELOPMENT: Aha, based on above it looks like the first is always the current
 
 # mark which indices do not represent specific dates, but just the current state:
 remove_idx = np.array(["current" in list(itm.assets.keys())[0] for itm in s2_files])
@@ -249,7 +259,7 @@ if (len(s2_files) > 0):
     #
     # at locations of forest-only pixels (pixelID)
     # global_forest_pixelIDs contains
-    # index (pixel_index) of the flattened global grid (24599 x 37728)
+    # index (pixel_index) of the flattened global grid (24542 x 37728)
     # i.e. index_map[global_forest_pixelIDs] gives the continuous indices from 0 to 105715395
 
     # Prepare constants
@@ -312,7 +322,7 @@ if (len(s2_files) > 0):
     #     for t, item in tqdm(enumerate(s2_files), total=len(s2_files)):
     #         print(item)
     #         print(item.datetime)
-    #         sleep(1)
+    #         sleep(0.1)
     def add_timestep_to_zarr(t, item):
         timestep_dttm = item.datetime
         assets = item.assets
@@ -401,7 +411,6 @@ if (len(s2_files) > 0):
         global_cols = local_cols + col_start
         global_flat = global_rows * width_swisstopo + global_cols
         current_pixelIDs = index_map[global_flat] # this contains pixelIDs (i.e. indices in the forest-only pixel vector)
-        global_forest_pixelIDs
 
         # Flat masks
         cloud_shadows_mask_flat = cloud_shadows_mask[local_rows, local_cols]
@@ -559,8 +568,10 @@ if (len(s2_files) > 0):
 
     # test load this dataset:
     # ds_test = xr.open_dataset(OUTPUT_ZARR)
-
-    # test plot this dataset    
+    # # ds_test = xr.open_dataset("/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-23_22h26_ndvi_01_downloaded_2026-01-01_2026-01-15.zarr")
+    # # ds_test = xr.open_dataset("/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-23_22h26_ndvi_01_downloaded_2026-01-01_2026-01-15.zarr")
+    # # ds_test = xr.open_dataset("/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-23_12h50_ndvi_01_downloaded_2025-11-30_2026-03-22.zarr")
+    # # test plot this dataset    
     # xmin, xmax = 2650000, 2750000 # focus on Ticino
     # ymin, ymax = 1070000, 1160000 # focus on Ticino
     # pixels_subset_mask = (
@@ -571,6 +582,13 @@ if (len(s2_files) > 0):
     # )
     # ds_test_subset = ds_test["ndvi"].isel(pixel=pixels_subset_mask.nonzero()[0])
     # plot_da_map(ds_test_subset.isel(datetime = 0), png_fname = 'foo5.png')
+    # plot_da_map(ds_test_subset.isel(datetime = 18), png_fname = 'foo5ter.png')
+    # pixels_subset_mask2 = (
+    #     (ds_test.ndvi.values != 32767) &
+    #     (ds_test.ndvi.values != -32768) &
+    #     (ds_test.y.values >= ymin) &
+    #     (ds_test.y.values <= ymax)
+    # )
     # plot_da_map(ds_test_subset.isel(datetime = 0), reduction_factor = 1, png_fname = 'foo1.png')
 
 
