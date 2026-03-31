@@ -160,11 +160,15 @@ if __name__ == "__main__":
     full_doy = xr.DataArray(
         full_dates.dayofyear, 
         dims="date",
-        name="datetime")
+        name="doy")
 
 
     # build the full daily median array for that exact span
     full_median_array_original = ds_median["median_ndvi"].sel(doy=full_doy)
+    # change number types of dimensions
+    full_median_array_original = full_median_array_original.assign_coords(
+        doy   = ('date', full_median_array_original.doy.values.astype(np.int32))
+    )
 
     dates_array = ds["date"].values.astype("datetime64[D]").ravel()   #.values.astype(np.int32)
 
@@ -192,17 +196,8 @@ if __name__ == "__main__":
     {
         "ndvi_processed": ndvi_processed,
         "mask_array": mask_array
-    },
-    coords={
-        "date": full_dates_array,
-        "pixel": ds["pixel"],
-        'x': ds["x"],
-        'y': ds["y"],
-        'x_idx': ds["x_idx"],
-        'y_idx': ds["y_idx"],
-    }
-    )
-
+    })
+    
     out_ds = out_ds.chunk({"date": -1, "pixel": 10000})
 
 
