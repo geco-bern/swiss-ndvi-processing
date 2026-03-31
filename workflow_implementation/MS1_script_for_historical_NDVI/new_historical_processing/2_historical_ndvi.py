@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
     #INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small.zarr" 
     INPUT_ZARR = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial_short.zarr"
-    INPUT_ZARR_LOOKUPTABLE = "/data_3/francesco/lookup_table_median_ndvi.zarr"
+    INPUT_ZARR_LOOKUPTABLE = "/data_3/francesco/lookup_table_median_ndvi_v6.zarr"
     OUT_PATH = "/data_3/scratch/francesco/processed/short_historical.zarr"
 
 
@@ -165,10 +165,6 @@ if __name__ == "__main__":
 
     # build the full daily median array for that exact span
     full_median_array_original = ds_median["median_ndvi"].sel(doy=full_doy)
-    # change number types of dimensions
-    full_median_array_original = full_median_array_original.assign_coords(
-        doy   = ('date', full_median_array_original.doy.values.astype(np.int32))
-    )
 
     dates_array = ds["date"].values.astype("datetime64[D]").ravel()   #.values.astype(np.int32)
 

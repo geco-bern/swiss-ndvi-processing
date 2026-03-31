@@ -24,16 +24,13 @@ client = Client(
 )  # start distributed scheduler locally.
 client.dashboard_link
 
-# make it so big so that all swiss is covered
-
-
 
 ds0 = zarr.open_group(SRC_ZARR, mode="r")
 
 # Lazy dask arrays from zarr
 ndvi_z = ds0["ndvi"]
-pl_z   = ds0["params"]["params_lower"]
-pu_z   = ds0["params"]["params_upper"]
+pl_z   = ds0["params_2"]["params_lower"]
+pu_z   = ds0["params_2"]["params_upper"]
 
 ndvi_da = da.from_zarr(ndvi_z)     # lazy
 pl_da   = da.from_zarr(pl_z)       # lazy
@@ -79,7 +76,13 @@ median_ndvi_xr = xr.DataArray(
     name="median_ndvi",
 )
 
-OUT = "/data_3/francesco/lookup_table_median_ndvi.zarr"
+# change number types of dimensions
+median_ndvi_xr = median_ndvi_xr.assign_coords(
+    pixel   = ('pixel', median_ndvi_xr.pixel.values.astype(np.int32)),
+    doy     = ('doy', median_ndvi_xr.doy.values.astype(np.int32))
+)
+
+OUT = "/data_3/francesco/lookup_table_median_ndvi_v6.zarr"
 
 median_ndvi_xr.to_dataset().to_zarr(OUT, mode="w", consolidated=True)
 
