@@ -5,32 +5,37 @@ from dask.distributed import Client
 import xarray as xr
 import os
 import shutil
+import pandas as pd
 
-#  nohup python -u /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py > /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_2.log 2>&1 &
+#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_folder/2_historical_ndvi_short.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_folder/2_historical_ndvi_short_3.log 2>&1 &
 
-def historical_ndvi(ndvi_arr_original, medians, obs_dates,dates):
+def historical_ndvi(ndvi_arr_original,full_median_array_original,obs_date):
+
+    # create evenly spaced ndvi
+    ndvi_full = np.full(obs_date.shape, 2**15 -1, dtype= np.int16)
+    ndvi_full[obs_date] = ndvi_arr_original
 
 
     # Ensure mask_array is writable
-    mask_array = np.zeros(ndvi_arr_original.shape, dtype=np.int8)
+    mask_array = np.zeros(full_median_array_original.shape, dtype=np.int8)
 
-    days_diff = (dates- dates[0])  / np.timedelta64(1, 'D')
+    days_diff = np.arange(0, len(obs_date)) 
 
     delta_ndvi = np.array([0])
-     
-    ndvi_arr = ndvi_arr / 10000
-    medians  = medians  / 10000
 
-    mask_valid_ndvi = (ndvi_arr > 0) & (ndvi_arr < 1)
+    # renaming is necessary otherwise won't work
+     
+    ndvi_arr = ndvi_full / 10000
+    full_median_array = full_median_array_original / 10000
+
+    mask_valid_ndvi = (ndvi_arr > 0) & (ndvi_arr < 1) & obs_date
 
     ndvi_valid = ndvi_arr[mask_valid_ndvi]
-    median_valid = medians[mask_valid_ndvi]
+    median_valid = full_median_array[mask_valid_ndvi]
     days_diff_2 = days_diff[mask_valid_ndvi]
 
-    original_idx = np.arange(len(ndvi_arr)) # used to keep track of delta ndvi position and the outlier position
+    original_idx = np.arange(len(ndvi_full)) # used to keep track of delta ndvi position and the outlier position
     original_idx = original_idx[mask_valid_ndvi]
-
-    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & obs_dates
         
     # outlier detection
 
@@ -84,18 +89,18 @@ def historical_ndvi(ndvi_arr_original, medians, obs_dates,dates):
 
         interpolated_values = np.interp(days_diff,days_diff_2,delta_ndvi_to_interpolate)
 
-        ndvi_smoothed = 10000 * (interpolated_values + medians)
+        ndvi_smoothed = np.array(10000 * (interpolated_values + full_median_array),  dtype=np.int16)
 
 
-        # indexing of array mask
-        mask_array[obs_mask] = 2
-        smoothed_values = np.arange(len(mask_array)) < original_idx_2[-4]
+        # mask_array 
+        mask_array[mask_valid_ndvi] = 2
+        before = np.arange(len(mask_array)) <= original_idx_2[-3]
 
         outlier_idx = original_idx[1:-1][outlier_mask]
-        valid_outlier_idx = outlier_idx[obs_dates[outlier_idx] == 1]
+        valid_outlier_idx = outlier_idx[obs_date[outlier_idx] == 1]
 
-        mask_array[ smoothed_values & obs_mask ] = 3
-        mask_array[ smoothed_values & (~obs_mask) ] = 1
+        mask_array[ before & mask_valid_ndvi ] = 3
+        mask_array[ before & (~mask_valid_ndvi) ] = 1
 
         mask_array[valid_outlier_idx] = 4
 
@@ -103,13 +108,13 @@ def historical_ndvi(ndvi_arr_original, medians, obs_dates,dates):
         
     else:
 
-        return ndvi_arr_original, mask_array
+        return ndvi_full , mask_array
 
 # used with nohup (ni idea why)
 
 if __name__ == "__main__":
 
-    N_WORKERS = 10
+    N_WORKERS = 30
 
     client = Client(
     n_workers=N_WORKERS,
@@ -122,36 +127,64 @@ if __name__ == "__main__":
     # already having medians computed
 
     #INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small.zarr" 
-    INPUT_ZARR = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial.zarr"
+    INPUT_ZARR = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial_short.zarr"
     INPUT_ZARR_LOOKUPTABLE = "/data_3/francesco/lookup_table_median_ndvi.zarr"
-    
-    ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 5000})
-    ds_median = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 5000})
+    OUT_PATH = "/data_3/scratch/francesco/processed/short_historical.zarr"
 
-    ndvi_array = ds["ndvi"]           # dims ("time","pixel")
-    median_array = ds_median["median_ndvi"]    # dims ("time","pixel") 
+
+    ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 10000})
+    ds_median = xr.open_zarr(INPUT_ZARR_LOOKUPTABLE, chunks={"date": -1, "pixel": 10000})
+
+    # retrieve doy from date and use it for extract the median values
+    doy = ds["datetime"].dt.dayofyear
+    median_array_original = ds_median["median_ndvi"].sel(doy=doy)   # dims ("datetime","pixel")
+
+    # create dataset of medians 
+    full_dates = pd.date_range(
+        start=pd.to_datetime(ds["datetime"].min().values),
+        end=pd.to_datetime(ds["datetime"].max().values),
+        freq="D"
+    )
+
+    full_dates_array = full_dates.values.astype("datetime64[D]") 
+
+    ds_dates = ds["datetime"].values
+    obs_date = np.isin(full_dates.values, ds_dates).astype(bool)
+
+    full_dates_d = full_dates.values.astype("datetime64[D]")
+    ds_dates_d = ds["datetime"].values.astype("datetime64[D]")
+
+    obs_date = np.isin(full_dates_d, ds_dates_d)
+
+    # create a zarr with doy and date, date will be used as coordinate for xr.apply
+    full_doy = xr.DataArray(
+        full_dates.dayofyear, 
+        dims="date",
+        name="datetime")
+
+
+    # build the full daily median array for that exact span
+    full_median_array_original = ds_median["median_ndvi"].sel(doy=full_doy)
+
     dates_array = ds["date"].values.astype("datetime64[D]").ravel()   #.values.astype(np.int32)
-    obs_dates = ds["obs_date"]
-    mask_array = ds["mask_array"]
 
-    starting_date = dates_array[365]
+
+    ndvi_array_original = ds["ndvi"]           # dims ("datetime","pixel")
+
 
     # call gufunc where core dim is "time" (1D arrays per pixel)
     ndvi_processed, mask_array = xr.apply_ufunc(
         historical_ndvi,
-        ndvi_array,
-        median_array,
-        mask_array,
-        obs_dates,
-        input_core_dims=[["date"], ["date"],["date"], ["date"]],    # each call gets 1D time arrays
+        ndvi_array_original,
+        full_median_array_original,
+        input_core_dims=[["datetime"],["date"]],    # each call gets 1D time arrays
         output_core_dims=[["date"],["date"]],
         vectorize=True, 
         dask="parallelized",
-        kwargs={"dates": dates_array, "starting_date": starting_date},
-        output_dtypes=[ndvi_array.dtype, np.int8],
+        kwargs={"obs_date" : obs_date},
+        output_dtypes=[np.int16, np.int8],
         dask_gufunc_kwargs={"allow_rechunk": True},
     )
-
 
     # create the dataset to write 
 
@@ -161,7 +194,7 @@ if __name__ == "__main__":
         "mask_array": mask_array
     },
     coords={
-        "date": ds["date"],
+        "date": full_dates_array,
         "pixel": ds["pixel"],
         'x': ds["x"],
         'y': ds["y"],
@@ -169,28 +202,20 @@ if __name__ == "__main__":
         'y_idx': ds["y_idx"],
     }
     )
-    out_ds = out_ds.chunk({"pixel": 5000, "date": -1})
 
-    # Remove any incompatible 'compressor' metadata left over from the source dataset
-    for v in list(out_ds.data_vars):
-        out_ds[v].encoding.pop("compressor", None)
-        # ensure chunks entry exists to avoid surprises
-        out_ds[v].encoding.setdefault("chunks", None)
+    out_ds = out_ds.chunk({"date": -1, "pixel": 10000})
 
-    for c in list(out_ds.coords):
-        out_ds[c].encoding.pop("compressor", None)
-        out_ds[c].encoding.setdefault("chunks", None)
 
-    # Explicit encoding: no compressor for each data var
-    encoding = {v: {"compressor": None} for v in out_ds.data_vars}
+    # Clean everything
+    for var in out_ds.variables:
+        out_ds[var].attrs.pop('_FillValue', None)
+        out_ds[var].encoding.clear()
 
-    OUT_PATH = "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/data_for_demo_2"
 
     if os.path.exists(OUT_PATH):
         shutil.rmtree(OUT_PATH)
 
-    # Write using zarr version 2 to avoid new v3 codec/BytesBytesCodec mismatch
-    out_ds.to_zarr(OUT_PATH, mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=3)
+    out_ds.to_zarr(OUT_PATH, mode="w", consolidated=True, compute=True)
 
     print("done")
     client.close()
