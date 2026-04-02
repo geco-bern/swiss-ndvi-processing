@@ -27,7 +27,7 @@ warnings.filterwarnings(
     module="numcodecs.zarr3"
 )
 
-#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_folder/1_download_satellite_images.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_folder/log/donwload.log &
+#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_folder/1_download_satellite_images.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_folder/log/donwload_2.log &
 
 
 # HOW TO RUN FROM BASH:
@@ -59,8 +59,8 @@ end_date = "2025-11-30"
 
 # CONFIGURE:
 today = datetime.today().strftime("%Y-%m-%d_%Hh%M")
-OUTPUT_ZARR_TEMP      = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial_tmp.zarr"
-OUTPUT_ZARR      = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial.zarr"
+OUTPUT_ZARR_TEMP      = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial_tmp_short.zarr"
+OUTPUT_ZARR      = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial_short_2.zarr"
 # ==============================================================================
 
 # Start script:
@@ -654,6 +654,7 @@ if (len(s2_files) > 0):
        shutil.rmtree(OUTPUT_ZARR_TEMP)
 
     print(OUTPUT_ZARR, flush = True)
+    print("DONE")
     sys.exit(0)
 
 else:
