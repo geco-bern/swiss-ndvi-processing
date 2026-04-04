@@ -7,8 +7,6 @@ import os
 import shutil
 import pandas as pd
 
-#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_folder/2_historical_ndvi_test.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_folder/2_historical_ndvi_short_3.log 2>&1 &
-
 
 # !!! Important
 # some date have duplicate, if that the case (1148 unique enttry out of 1180)
@@ -18,7 +16,7 @@ def historical_ndvi(ndvi_arr_original,full_median_array_original,obs_date):
 
     NO_COVERAGE = 32767
 
-    # create evenly spaced ndvi
+    # create evenly spaced ndvi and add obs to the right location
     ndvi_full = np.full(full_median_array_original.shape, NO_COVERAGE, dtype = np.int16)
     ndvi_full[obs_date] = ndvi_arr_original
 
@@ -145,7 +143,7 @@ if __name__ == "__main__":
     # already having medians computed
 
     #INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small.zarr" 
-    INPUT_ZARR = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial.zarr"
+    INPUT_ZARR = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial_short.zarr" # for whole set "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial.zarr"
     INPUT_ZARR_LOOKUPTABLE = "/data_3/francesco/lookup_table_median_ndvi.zarr"
     OUT_PATH = "/data_3/scratch/francesco/processed/short_historical.zarr"
 
@@ -161,27 +159,39 @@ if __name__ == "__main__":
     dayofyear_pos = (ds['datetime'].dt.dayofyear - 1).astype('int64').clip(0, 364)
 
 
+    # this is only used with a short dataset to create a dummy data
     median_array_original = ds_median["median_ndvi"].isel(doy=dayofyear_pos)   # dims ("datetime","pixel")
 
     # create dataset of medians 
     datetime_values = ds["datetime"].compute().values
 
+    # check number of entries
     print(len(datetime_values))
+    
+    # remove missing date
     datetime_clean = datetime_values[~np.isnat(datetime_values)]
     datetime_clean_days = datetime_clean.astype("datetime64[D]")
+
+    # check number of clean entries
     print(len(datetime_clean_days))
+
+    # check number of unique clean entries
     print(len(np.unique(datetime_clean_days)))
 
 
+    # clip to first and last obs date
     dt_min = np.min(datetime_clean_days)
     dt_max = np.max(datetime_clean_days)
     full_dates = pd.date_range(start=dt_min, end=dt_max, freq="D")
 
+    # generate evenly spaced data
     full_dates_array = full_dates.values.astype("datetime64[D]") 
 
-    
+    # boolean array of where the obs. is located
     obs_date = np.isin(full_dates_array, datetime_clean_days).astype(bool)
 
+
+    # check, should the equal to print(len(np.unique(datetime_clean_days)))
     print(np.sum(obs_date))
 
 
@@ -210,7 +220,7 @@ if __name__ == "__main__":
     other=NO_COVERAGE).astype(np.int16)
 
 
-    # remove non-unique date
+    # remove wrong date date
     valid_time_mask = ~np.isnat(ds["datetime"].values)
     ds_filtered = ds.isel(datetime = valid_time_mask)
 
@@ -224,6 +234,7 @@ if __name__ == "__main__":
     # jsut to print the len
     ndvi_test = ndvi_avg.load().to_numpy()
 
+    # check if all data are zeros or not
     print(np.sum(ndvi_test))
 
     valid = ds["ndvi"].isel(pixel=(slice(0,1000)))
