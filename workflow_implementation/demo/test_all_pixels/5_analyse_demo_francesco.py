@@ -145,8 +145,8 @@ if __name__ == "__main__":
 
     # already having medians computed
 
-    #INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small.zarr" 
-    INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small_FB2026-03-17.zarr" 
+    #INPUT_ZARR = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small.zarr" 
+    INPUT_ZARR = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small_FB2026-03-17.zarr" 
     
     ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 500})
 

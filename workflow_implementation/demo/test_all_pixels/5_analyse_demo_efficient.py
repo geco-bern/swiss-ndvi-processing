@@ -11,7 +11,7 @@ import time
 from numcodecs import blosc, Blosc, zarr3
 from zarr.codecs import BloscCodec
 
-INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
+INPUT_LOOKUPTABLE  = "/mnt/data2/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
 
 import warnings
 warnings.filterwarnings(
@@ -24,9 +24,9 @@ warnings.filterwarnings(
 # source /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate
 # SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py"
 # LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient_FB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
-# NEW_NDVI="/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr"
-# HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
-# HISTO_OUTPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km_extended2.zarr"
+# NEW_NDVI="/mnt/data2/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr"
+# HISTO_INPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
+# HISTO_OUTPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km_extended2.zarr"
 # python -u $SCRIPT_FILE $NEW_NDVI $HISTO_INPUT --histo-output=$HISTO_OUTPUT > $LOG_FILE  2>&1 &
 
 def historical_ndvi(ndvi_arr_original, medians, mask_array_original, is_observation_date, dates, starting_date):
@@ -163,27 +163,27 @@ if __name__ == "__main__":
     HISTO_ZARR_OUTPUT = args.HISTO_ZARR_OUTPUT or HISTO_ZARR_INPUT # if None defaults to HISTO_ZARR_INPUT
 
     # if running interactively use e.g.:
-    #   # HISTO_ZARR_INPUT  = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
-    #   # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
-    #   # INPUT_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
+    #   # HISTO_ZARR_INPUT  = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
+    #   # HISTO_ZARR_OUTPUT = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
+    #   # INPUT_ZARR        = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
     
-    #   # HISTO_ZARR_INPUT  = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_10kmX10km.zarr"
-    #   # HISTO_ZARR_OUTPUT = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_10kmX10km.zarr"
-    #   # INPUT_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
-    #   # INPUT_ZARR        = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-23_12h50_ndvi_01_downloaded_2025-11-30_2026-03-22_processed.zarr/"
+    #   # HISTO_ZARR_INPUT  = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_10kmX10km.zarr"
+    #   # HISTO_ZARR_OUTPUT = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_10kmX10km.zarr"
+    #   # INPUT_ZARR        = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
+    #   # INPUT_ZARR        = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-23_12h50_ndvi_01_downloaded_2025-11-30_2026-03-22_processed.zarr/"
 
-    #   # HISTO_ZARR_INPUT     = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m.zarr"
-    #   # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m_extended.zarr" # TODO: remove this and instea do it circular
-    #   # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr"
-    #   # HISTO_ZARR_INPUT     = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
-    #   # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km_extended.zarr" # TODO: remove this and instea do it circular
-    #   # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr"
-    #   HISTO_ZARR_INPUT     = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_100kmX100km.zarr"
-    #   HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_100kmX100km_extended.zarr" # TODO: remove this and instea do it circular
-    #   INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_100kmX100km_4th.zarr"
-    #   # HISTO_ZARR_INPUT     = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr.zarr"
-    #   # HISTO_ZARR_OUTPUT    = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_extended.zarr" # TODO: remove this and instea do it circular
-    #   # INPUT_ZARR           = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr"
+    #   # HISTO_ZARR_INPUT     = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m.zarr"
+    #   # HISTO_ZARR_OUTPUT    = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m_extended.zarr" # TODO: remove this and instea do it circular
+    #   # INPUT_ZARR           = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_1000mX1000m_4th.zarr"
+    #   # HISTO_ZARR_INPUT     = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km.zarr"
+    #   # HISTO_ZARR_OUTPUT    = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km_extended.zarr" # TODO: remove this and instea do it circular
+    #   # INPUT_ZARR           = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_10kmX10km_4th.zarr"
+    #   HISTO_ZARR_INPUT     = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_100kmX100km.zarr"
+    #   HISTO_ZARR_OUTPUT    = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_100kmX100km_extended.zarr" # TODO: remove this and instea do it circular
+    #   INPUT_ZARR           = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_100kmX100km_4th.zarr"
+    #   # HISTO_ZARR_INPUT     = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr.zarr"
+    #   # HISTO_ZARR_OUTPUT    = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_extended.zarr" # TODO: remove this and instea do it circular
+    #   # INPUT_ZARR           = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr"
 
 
     # START PROCESSING:
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     # N_THREADS_PER_WORKER = 1
     
     t0=time.perf_counter()
-    DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data5/"
+    DASK_TEMP_DIR = "/mnt/data2/UniBe-swiss-ndvi/tmp_data5/"
     client = Client(
         n_workers=N_WORKERS,
         threads_per_worker=N_THREADS_PER_WORKER,
