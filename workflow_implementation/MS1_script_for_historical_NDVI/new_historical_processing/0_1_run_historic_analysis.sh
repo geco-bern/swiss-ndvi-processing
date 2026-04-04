@@ -4,8 +4,8 @@ set -Eeuo pipefail
 # ============================================================
 # Script Configuration
 # ============================================================
-VENV_PATH="/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/.env/ndvi"
-LOG_FILE="/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/logs/historic_analysis_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
+VENV_PATH="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv"
+LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
 
 # Logging setup (terminal + file) -------------------------------
 : > "$LOG_FILE"
@@ -44,14 +44,14 @@ END_DATE="2017-11-30"  # TODO: change to "2025-11-30"
 echo $START_DATE
 echo $END_DATE
 
-SCRIPT_0="/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/0_create_lookup_table.py"
-SCRIPT_1="/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py"
-SCRIPT_2="/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py"
+SCRIPT_0="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/0_create_lookup_table.py"
+SCRIPT_1="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py"
+SCRIPT_2="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py"
 
 # ============================================================
 # Log git repository status
 # ============================================================
-cd /home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/
+cd /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/
 echo "Current commit:"
 git rev-parse HEAD
 

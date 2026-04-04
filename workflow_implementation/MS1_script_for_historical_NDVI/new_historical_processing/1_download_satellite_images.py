@@ -58,8 +58,10 @@ end_date = args.end_date
 
 # CONFIGURE:
 today = datetime.today().strftime("%Y-%m-%d_%Hh%M")
-OUTPUT_ZARR_TEMP = f"/data_3/scratch/fabian/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloadedA_{start_date}_{end_date}.zarr"
-OUTPUT_ZARR      = f"/data_3/scratch/fabian/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloaded_{start_date}_{end_date}.zarr"
+OUTPUT_ZARR_TEMP = f"/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_{today}_ndvi_01_downloadedA_{start_date}_{end_date}.zarr"
+OUTPUT_ZARR      = f"/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_{today}_ndvi_01_downloaded_{start_date}_{end_date}.zarr"
+# OUTPUT_ZARR_TEMP = f"/data_3/scratch/fabian/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloadedA_{start_date}_{end_date}.zarr"
+# OUTPUT_ZARR      = f"/data_3/scratch/fabian/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloaded_{start_date}_{end_date}.zarr"
 # ==============================================================================
 
 # Start script:
@@ -225,7 +227,8 @@ if (len(s2_files) > 0):
         'width': np.float64(width_swisstopo), 
         'height': np.float64(height_swisstopo)}
     # load forest mask from disk
-    forest_mask_zarr = zarr.open("/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr", mode="r")
+    #forest_mask_zarr = zarr.open("/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr", mode="r")
+    forest_mask_zarr = zarr.open("/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr", mode="r")
     forest_mask_shape = (height_swisstopo, width_swisstopo)
     forest_mask = np.unpackbits(forest_mask_zarr["bits"][:])[:np.prod(forest_mask_shape)].reshape(forest_mask_shape)
     # np.array_equiv(forest_mask2, forest_mask) # True, this confirmed that recovery was good.
