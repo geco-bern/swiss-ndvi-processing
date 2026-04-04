@@ -51,8 +51,10 @@ end_date = args.end_date
 # end_date = "2025-12-04"
 # end_date = "2025-12-06"
 # end_date = "2025-12-12"
-# start_date="2025-06-30"
-# end_date="2025-07-01"
+# start_date="2025-04-01"
+# end_date="2025-04-30"
+# start_date="2017-04-01"
+# end_date="2017-11-30"
 
 # CONFIGURE:
 today = datetime.today().strftime("%Y-%m-%d_%Hh%M")
@@ -101,13 +103,8 @@ remove_idx = np.array(["current" in list(itm.assets.keys())[0] for itm in s2_fil
 # s2_files[np.array(remove_idx)]           # This one is removed
 s2_files = s2_files[~remove_idx] # These are kept
 
-        # TO FIX A PREVIOUSLY DOWNLOADED DATA SET CONTAINING THE FIRST WRONG DATE, DO THE FOLLOWING:
-        # ds_out2_initial = xr.open_dataset("/data_3/scratch/fabian/UniBe-swiss-ndvi/data/tmp_2026-03-23_06h15_ndvi_01_downloaded_2025-11-30_2026-03-22.zarr")
-        # drop the current time step
-        # ds_out2_initial.datetime.values # Yes, the first line shows the newest date.
-        # ds_out2_initial_fixed = ds_out2_initial.isel(datetime = slice(1,None))
-        # ds_out2_initial_fixed.to_zarr(OUTPUT_ZARR, mode="w", consolidated=True, compute=True)
-
+# ensure items are ordered by observation date:
+s2_files2 = np.array(sorted(s2_files, key=lambda itm: itm.datetime))
 
 # If some images (s2_files) are available within the requested date_range
 if (len(s2_files) > 0):
@@ -450,7 +447,7 @@ if (len(s2_files) > 0):
     for t, path in tqdm(enumerate(s2_files), total=len(s2_files)):
         try:
             add_timestep_to_zarr(t, path)
-            print(f"Time step {t} processed successfully.", flush = True)
+            print(f"Time step {t} ({path.datetime}) processed successfully.", flush = True)
         except Exception as e:
             print(f"Time step {t} failed: {e}", flush = True)
             failed_timesteps.append((t, path))
@@ -468,23 +465,6 @@ if (len(s2_files) > 0):
                 continue  # skip to the next time step
 
     # Transform unstructured zarr to structured xarray dataset stored in zarr:
-    # TODO: check if needed for speedup: DASK_TEMP_DIR = "/data_3/scratch/fabian/UniBe-swiss-ndvi/tmp_data"
-    # TODO: check if needed for speedup: os.makedirs(DASK_TEMP_DIR, exist_ok=True)
-
-    # TODO: check if needed for speedup: N_WORKERS = 40
-    # TODO: check if needed for speedup: MEMORY_LIMIT = "300GB"
-    # TODO: check if needed for speedup: cluster = LocalCluster(
-    # TODO: check if needed for speedup:     n_workers=N_WORKERS,
-    # TODO: check if needed for speedup:     threads_per_worker=1,
-    # TODO: check if needed for speedup:     processes=True,
-    # TODO: check if needed for speedup:     memory_limit=MEMORY_LIMIT,
-    # TODO: check if needed for speedup:     dashboard_address=":8340",
-    # TODO: check if needed for speedup:     local_directory=DASK_TEMP_DIR,
-    # TODO: check if needed for speedup: )
-    # TODO: check if needed for speedup: client = Client(cluster)
-    # TODO: check if needed for speedup: print(client, flush = True)
-    # TODO: check if needed for speedup: print(client.dashboard_link, flush = True) # use this dashboard to follow progress
-
     ds0 = zarr.open_group(OUTPUT_ZARR_TEMP, mode="r")
     ndvi_da = da.from_zarr(ds0["ndvi"])
     ndsi_da = da.from_zarr(ds0["ndsi"])
