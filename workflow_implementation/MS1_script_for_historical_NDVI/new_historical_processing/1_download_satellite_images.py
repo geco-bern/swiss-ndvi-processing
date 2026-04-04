@@ -37,21 +37,27 @@ warnings.filterwarnings(
 
 
 # PARSE ARGUMENTS:
-"""parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser()
 parser.add_argument("start_date", help="Start date in YYYY-MM-DD")
 parser.add_argument("end_date", help="End date in YYYY-MM-DD")
 args = parser.parse_args()
 
 start_date = args.start_date
-end_date = args.end_date"""
-
-start_date = "2017-04-01"
-end_date = "2025-11-30"
+end_date = args.end_date
+# if running interactively use e.g.:
+# start_date = "2025-11-30" # for the pipeline this should correspond to 
+#                           # the last date in the historic NDVI data set
+# end_date = "2026-03-22"
+# end_date = "2025-12-04"
+# end_date = "2025-12-06"
+# end_date = "2025-12-12"
+# start_date="2025-06-30"
+# end_date="2025-07-01"
 
 # CONFIGURE:
 today = datetime.today().strftime("%Y-%m-%d_%Hh%M")
-OUTPUT_ZARR_TEMP      = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial_tmp_short.zarr"
-OUTPUT_ZARR      = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial_short_2.zarr"
+OUTPUT_ZARR_TEMP = f"/data_3/scratch/fabian/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloadedA_{start_date}_{end_date}.zarr"
+OUTPUT_ZARR      = f"/data_3/scratch/fabian/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloaded_{start_date}_{end_date}.zarr"
 # ==============================================================================
 
 # Start script:
@@ -96,7 +102,7 @@ remove_idx = np.array(["current" in list(itm.assets.keys())[0] for itm in s2_fil
 s2_files = s2_files[~remove_idx] # These are kept
 
         # TO FIX A PREVIOUSLY DOWNLOADED DATA SET CONTAINING THE FIRST WRONG DATE, DO THE FOLLOWING:
-        # ds_out2_initial = xr.open_dataset("/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-23_06h15_ndvi_01_downloaded_2025-11-30_2026-03-22.zarr")
+        # ds_out2_initial = xr.open_dataset("/data_3/scratch/fabian/UniBe-swiss-ndvi/data/tmp_2026-03-23_06h15_ndvi_01_downloaded_2025-11-30_2026-03-22.zarr")
         # drop the current time step
         # ds_out2_initial.datetime.values # Yes, the first line shows the newest date.
         # ds_out2_initial_fixed = ds_out2_initial.isel(datetime = slice(1,None))
@@ -159,7 +165,7 @@ if (len(s2_files) > 0):
     ### # EPSG: 2056
     ### # Swiss coordinate system (CH1903+ / LV95)
     ### # This is the full reference bounding box for the Swisstopo dataset covering the 4 orbits
-    ### bbox_ROI_2056, width_swisstopo, height_swisstopo = union_bounds(collect_bounds_all_orbits())
+    ### bbox_swisstopo_2056, width_swisstopo, height_swisstopo = union_bounds(collect_bounds_all_orbits())
     ### NOW HARDCODE THIS
     bbox_swisstopo_2056 = BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0)
     width_swisstopo     = int((bbox_swisstopo_2056.right - bbox_swisstopo_2056.left) / 10) # 37728
@@ -169,8 +175,9 @@ if (len(s2_files) > 0):
     print(bbox_swisstopo_2056, flush = True)
     print(width_swisstopo, flush = True)
     print(height_swisstopo, flush = True)
+    
 
-        ### # BELOW WAS DONE ONCE AND IS NOW HARDCODED OR STORED IN ../data/forest_mask_bits.zarr
+    ### # BELOW WAS DONE ONCE AND IS NOW HARDCODED OR STORED IN ../data/forest_mask_bits.zarr
     ### # Take the forest mask from the Swisstopo VHI dataset 
     ### # The VHI dataset contains the forest mask that Swisstopo derived from the habitat map
     ### # Also collect the metadata using the forest mask as a reference raster
@@ -196,7 +203,7 @@ if (len(s2_files) > 0):
     ###     bands_asset = assets[key_bands]
     ###     
     ###     with rasterio.open(bands_asset.href) as src:
-    ###         window = src.window(*bbox_ROI_2056)
+    ###         window = src.window(*bbox_swisstopo_2056)
     ###         vhi = src.read(1, window=window)
     ###         forest_mask = (vhi != 255).astype('uint8')
     ###         ref_meta = {
@@ -211,7 +218,7 @@ if (len(s2_files) > 0):
     ### forest_mask, ref_meta = get_forest_mask()
     ### # save forest mask to disk
     ### bits = np.packbits(forest_mask.ravel())           # uint8 array, 8x smaller before compression
-    ### store = zarr.open("/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr", mode="w")
+    ### store = zarr.open("/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr", mode="w")
     ### store.create_dataset("bits", data=bits, compressor=zarr.codecs.BloscCodec(cname="zstd", clevel=3), shape = bits.shape)
     ### NOW HARDCODE THIS
     ref_meta = {
@@ -221,7 +228,7 @@ if (len(s2_files) > 0):
         'width': np.float64(width_swisstopo), 
         'height': np.float64(height_swisstopo)}
     # load forest mask from disk
-    forest_mask_zarr = zarr.open("/data_3/francesco/processed/forest_mask_bits.zarr", mode="r")
+    forest_mask_zarr = zarr.open("/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr", mode="r")
     forest_mask_shape = (height_swisstopo, width_swisstopo)
     forest_mask = np.unpackbits(forest_mask_zarr["bits"][:])[:np.prod(forest_mask_shape)].reshape(forest_mask_shape)
     # np.array_equiv(forest_mask2, forest_mask) # True, this confirmed that recovery was good.
@@ -241,18 +248,18 @@ if (len(s2_files) > 0):
 
     # Build index mapping from forest pixels in the full reference raster to 1D flat indices
     global_forest_pixelIDs = np.flatnonzero(forest_mask == 1)
-    # index_map = np.full(global_forest_pixelIDs.max() + 1, -1, dtype=np.int32) # contains as many elements as forest_mask (width_ROI * height_ROI)
-    index_map = np.full(forest_mask.size, -1, dtype=np.int32)                # contains as many elements as forest_mask (width_ROI * height_ROI)
+    # index_map = np.full(global_forest_pixelIDs.max() + 1, -1, dtype=np.int32) # contains as many elements as forest_mask (width_swisstopo * height_swisstopo)
+    index_map = np.full(forest_mask.size, -1, dtype=np.int32)                # contains as many elements as forest_mask (width_swisstopo * height_swisstopo)
                                                                              # NOTE that using max() it stops at largest index needed, whereas with .size the last rows are filled with -1
     index_map[global_forest_pixelIDs] = np.arange(len(global_forest_pixelIDs))
     # at locations of the global grid 
     # index_map contains
     # the corresponding index (pixelID) in the forest-only pixel vector
-    # i.e. np.reshape(index_map, (height_ROI, width_ROI)) re-builds the global grid
+    # i.e. np.reshape(index_map, (height_swisstopo, width_swisstopo)) re-builds the global grid
     #
     # at locations of forest-only pixels (pixelID)
     # global_forest_pixelIDs contains
-    # index (pixel_index) of the flattened global grid (24599 x 37728)
+    # index (pixel_index) of the flattened global grid (24542 x 37728)
     # i.e. index_map[global_forest_pixelIDs] gives the continuous indices from 0 to 105715395
 
     # Prepare constants
@@ -305,53 +312,24 @@ if (len(s2_files) > 0):
     )   # np.iinfo(np.int32).max / 3600 / 24 / 365  # = 68 when representing seconds, int32 are only valid until 1970+68=2038
         # np.iinfo(np.int64).max / 3600 / 24 / 365  # = 292e9 (if seconds => good for 300e9 years, if nanoseconds => good for 300 years)
 
-    # global_grid_idx_24599_37728 = zarr.create_array(
-    #     name="global_grid_idx_24599_37728",
-    #     store= OUTPUT_ZARR_TEMP,
-    #     shape=(N,),
-    #     chunks=(1000,),
-    #     dtype="int32",
-    #     fill_value=np.iinfo(np.int32).min,
-    #     compressors=compressors,
-    #     zarr_format=3, overwrite=True
-    # )
-    # global_grid_idx_24599_37728[:] = global_forest_pixelIDs
-
     timesteps_ds.attrs['description'] = 'Datetime in nanoseconds since 1970-01-01 (int64)'
     ndvi_ds.attrs['description'] = 'NDVI (scaled int16: -10000 to 10000)'
     ndsi_ds.attrs['description'] = 'NDSI (scaled int16: -10000 to 10000)'
     ndvi_ds.attrs['nodata'] = NO_COVERAGE
     ndvi_ds.attrs['cloud_shadow'] = INVALID
-
-    # ALTERNATIVELY: import xarray as xr
-    # ALTERNATIVELY: times  = [item.datetime for item in s2_files]
-    # ALTERNATIVELY: pixels = [i for i in range(1,10,1)]
-    # ALTERNATIVELY: xr_ds = xr.Dataset(
-    # ALTERNATIVELY:     {"ndvi": (["time", "pixel"], np.empty((len(times), len(pixels)))),
-    # ALTERNATIVELY:      "ndsi": (["time", "pixel"], np.empty((len(times), len(pixels))))},
-    # ALTERNATIVELY:     coords={"time": times, "pixel": pixels},
-    # ALTERNATIVELY: )
-    # ALTERNATIVELY: for i, time in enumerate(times): # and then fill:
-    # ALTERNATIVELY:     test_xarray.ndvi[i] = np.random.random(len(pixels))
-    # ALTERNATIVELY:     test_xarray.ndsi[i] = np.random.random(len(pixels))
-
-    # ==========================================================================
-
     # FOR INTERACTIVE DEVELOPMENT:
     #     from time import sleep
     #     for t, item in tqdm(enumerate(s2_files), total=len(s2_files)):
     #         print(item)
     #         print(item.datetime)
     #         sleep(0.1)
-    def add_timestep_to_zarr(t, item, bbox_ROI_2056):
+    def add_timestep_to_zarr(t, item):
         timestep_dttm = item.datetime
         assets = item.assets
         bands10_asset = assets[[k for k in assets if k.endswith('bands-10m.tif')][0]]
         bands20_asset = assets[[k for k in assets if k.endswith('bands-20m.tif')][0]]
         masks_asset = assets[[k for k in assets if k.endswith('masks-10m.tif')][0]]
 
-        px_size = 10 # m, hardcoded
-        
         # FOR INTERACTIVE DEVELOPMENT
         #     from contextlib import ExitStack
         #     import rasterio
@@ -368,17 +346,17 @@ if (len(s2_files) > 0):
                 (b10_src.transform == masks_src.transform) and
                 (b10_src.width, b10_src.height) == (masks_src.width, masks_src.height)
             ):
-                b10_window = from_bounds(*bbox_ROI_2056, transform=b10_src.transform)
-                mask_window = from_bounds(*bbox_ROI_2056, transform=masks_src.transform)
-                b20_window = from_bounds(*bbox_ROI_2056, transform=b20_src.transform)
+                b10_window = from_bounds(*bbox_swisstopo_2056, transform=b10_src.transform)
+                mask_window = from_bounds(*bbox_swisstopo_2056, transform=masks_src.transform)
+                b20_window = from_bounds(*bbox_swisstopo_2056, transform=b20_src.transform)
 
                 red, green, nir = b10_src.read([1, 2, 4], window=b10_window, boundless=True, fill_value=9999)
                 swir = b20_src.read(3, window=b20_window, boundless=True, fill_value=9999)
                 masks = masks_src.read([1, 2], window=mask_window, boundless=True, fill_value=255).astype("uint8")
 
             else:
-                b10_window = b10_src.window(*bbox_ROI_2056)
-                b20_window = b20_src.window(*bbox_ROI_2056)
+                b10_window = b10_src.window(*bbox_swisstopo_2056)
+                b20_window = b20_src.window(*bbox_swisstopo_2056)
                 red, green, nir = b10_src.read([1, 2, 4], window=b10_window)
                 swir = b20_src.read(3, window=b20_window)
                 masks = masks_src.read([1, 2], window=b10_window).astype("uint8")
@@ -436,11 +414,8 @@ if (len(s2_files) > 0):
 
         global_rows = local_rows + row_start
         global_cols = local_cols + col_start
-        #width_ROI_2056 = int((bbox_ROI_2056.right - bbox_ROI_2056.left) / 10) # TODO: no, this must be the global
-        width_swisstopo_2056 = int((bbox_swisstopo_2056.right - bbox_swisstopo_2056.left) / 10) # TODO: no, this must be the global
-        global_flat = global_rows * width_swisstopo_2056 + global_cols
+        global_flat = global_rows * width_swisstopo + global_cols
         current_pixelIDs = index_map[global_flat] # this contains pixelIDs (i.e. indices in the forest-only pixel vector)
-        # global_forest_pixelIDs
 
         # Flat masks
         cloud_shadows_mask_flat = cloud_shadows_mask[local_rows, local_cols]
@@ -474,7 +449,7 @@ if (len(s2_files) > 0):
     failed_timesteps = []
     for t, path in tqdm(enumerate(s2_files), total=len(s2_files)):
         try:
-            add_timestep_to_zarr(t, path,bbox_swisstopo_2056)
+            add_timestep_to_zarr(t, path)
             print(f"Time step {t} processed successfully.", flush = True)
         except Exception as e:
             print(f"Time step {t} failed: {e}", flush = True)
@@ -486,14 +461,14 @@ if (len(s2_files) > 0):
         print(f"Retrying {len(failed_timesteps)} failed time steps...", flush = True)
         for t, path in tqdm(failed_timesteps):
             try:
-                add_timestep_to_zarr(t, path,bbox_swisstopo_2056)
+                add_timestep_to_zarr(t, path)
                 print(f"Time step {t} retried successfully.", flush = True)
             except Exception as e:
                 print(f"Time step {t} retry failed: {e}", flush = True)
                 continue  # skip to the next time step
 
     # Transform unstructured zarr to structured xarray dataset stored in zarr:
-    # TODO: check if needed for speedup: DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data"
+    # TODO: check if needed for speedup: DASK_TEMP_DIR = "/data_3/scratch/fabian/UniBe-swiss-ndvi/tmp_data"
     # TODO: check if needed for speedup: os.makedirs(DASK_TEMP_DIR, exist_ok=True)
 
     # TODO: check if needed for speedup: N_WORKERS = 40
@@ -510,16 +485,13 @@ if (len(s2_files) > 0):
     # TODO: check if needed for speedup: print(client, flush = True)
     # TODO: check if needed for speedup: print(client.dashboard_link, flush = True) # use this dashboard to follow progress
 
-
-    # FOR DEVELOPMENT: OUTPUT_ZARR_TEMP = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_15h30_ndvi_01_downloadedA_2025-11-30_2025-12-12.zarr"
-    #                  OUTPUT_ZARR = "foo.zarr" 
     ds0 = zarr.open_group(OUTPUT_ZARR_TEMP, mode="r")
     ndvi_da = da.from_zarr(ds0["ndvi"])
     ndsi_da = da.from_zarr(ds0["ndsi"])
     times_da = da.from_zarr(ds0["timestep"]).astype("datetime64[ns]").compute()
     
 
-    PIXEL_CHUNKS = 10000 # TODO: should we increase this also to 40k?
+    PIXEL_CHUNKS = 10000
 
     ndvi_xr = xr.DataArray(
         ndvi_da, # this is of shape (timesteps, 105Mio pixel)
@@ -531,21 +503,6 @@ if (len(s2_files) > 0):
         name="ndvi"
     ).chunk({"pixel": PIXEL_CHUNKS, "datetime": -1})
 
-    # NOTE: previously we did transform: T, N = ndvi_da.shape
-    # NOTE: previously we did transform: ndvi_da2 = ndvi_da.T
-    # NOTE: previously we did transform: ndvi_da3 = ndvi_da2.rechunk(chunks=(4000, T))
-    # NOTE: previously we did transform: ndvi_xr2 = xr.DataArray(
-    # NOTE: previously we did transform:     ndvi_da3, # this is of shape (105Mio pixel, timesteps)
-    # NOTE: previously we did transform:     dims=("pixel", "datetime"),
-    # NOTE: previously we did transform:     coords={
-    # NOTE: previously we did transform:         "pixel": np.arange(ndvi_da3.shape[0], dtype=np.int32),
-    # NOTE: previously we did transform:         "datetime": times_da
-    # NOTE: previously we did transform:     },
-    # NOTE: previously we did transform:     name="ndvi"
-    # NOTE: previously we did transform: ).chunk({"pixel": PIXEL_CHUNKS, "datetime": -1})    
-    # ndvi_xr.where((~np.isnan(ndvi_xr)) & (ndvi_xr != 32767)).isel(datetime=3, pixel = slice(0,10000)).values
-    # ndvi_xr2.where(ndvi_xr2 != 32767).isel(datetime=3, pixel = slice(0,10000)).values
-    # ndvi_xr2.isel(datetime=3, pixel = slice(0,10000)).values
 
     ndsi_xr = xr.DataArray(
         ndsi_da, # this is of shape (timesteps, 105Mio pixel)
@@ -616,9 +573,9 @@ if (len(s2_files) > 0):
 
     # test load this dataset:
     # ds_test = xr.open_dataset(OUTPUT_ZARR)
-    # ds_test = xr.open_dataset("/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-23_22h26_ndvi_01_downloaded_2026-01-01_2026-01-15.zarr")
-    # ds_test = xr.open_dataset("/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-23_22h26_ndvi_01_downloaded_2026-01-01_2026-01-15.zarr")
-    # ds_test = xr.open_dataset("/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-23_12h50_ndvi_01_downloaded_2025-11-30_2026-03-22.zarr")
+    # # ds_test = xr.open_dataset("/data_3/scratch/fabian/UniBe-swiss-ndvi/data/tmp_2026-03-23_22h26_ndvi_01_downloaded_2026-01-01_2026-01-15.zarr")
+    # # ds_test = xr.open_dataset("/data_3/scratch/fabian/UniBe-swiss-ndvi/data/tmp_2026-03-23_22h26_ndvi_01_downloaded_2026-01-01_2026-01-15.zarr")
+    # # ds_test = xr.open_dataset("/data_3/scratch/fabian/UniBe-swiss-ndvi/data/tmp_2026-03-23_12h50_ndvi_01_downloaded_2025-11-30_2026-03-22.zarr")
     # # test plot this dataset    
     # xmin, xmax = 2650000, 2750000 # focus on Ticino
     # ymin, ymax = 1070000, 1160000 # focus on Ticino
@@ -645,7 +602,6 @@ if (len(s2_files) > 0):
        shutil.rmtree(OUTPUT_ZARR_TEMP)
 
     print(OUTPUT_ZARR, flush = True)
-    print("DONE")
     sys.exit(0)
 
 else:
