@@ -27,9 +27,6 @@ warnings.filterwarnings(
     module="numcodecs.zarr3"
 )
 
-#  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_folder/1_download_satellite_images.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_folder/log/donwload_2.log &
-
-
 # HOW TO RUN FROM BASH:
 # source /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate
 # SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py"
@@ -47,15 +44,9 @@ args = parser.parse_args()
 
 start_date = args.start_date
 end_date = args.end_date"""
-# if running interactively use e.g.:
-start_date = "2017-04-01" # for the pipeline this should correspond to 
-#                           # the last date in the historic NDVI data set
-# end_date = "2026-03-22"
+
+start_date = "2017-04-01"
 end_date = "2025-11-30"
-# end_date = "2025-12-06"
-# end_date = "2025-12-12"
-# start_date="2025-06-30"
-# end_date="2025-07-01"
 
 # CONFIGURE:
 today = datetime.today().strftime("%Y-%m-%d_%Hh%M")

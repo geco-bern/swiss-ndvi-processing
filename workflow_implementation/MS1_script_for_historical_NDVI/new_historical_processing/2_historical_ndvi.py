@@ -110,8 +110,6 @@ def historical_ndvi(ndvi_arr_original,full_median_array_original,obs_date):
 
         return ndvi_full , mask_array
 
-# used with nohup (ni idea why)
-
 if __name__ == "__main__":
 
     N_WORKERS = 30
