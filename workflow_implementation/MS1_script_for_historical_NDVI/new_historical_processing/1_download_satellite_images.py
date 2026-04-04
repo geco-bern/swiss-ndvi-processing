@@ -106,7 +106,7 @@ remove_idx = np.array(["current" in list(itm.assets.keys())[0] for itm in s2_fil
 s2_files = s2_files[~remove_idx] # These are kept
 
 # ensure items are ordered by observation date:
-s2_files2 = np.array(sorted(s2_files, key=lambda itm: itm.datetime))
+s2_files = np.array(sorted(s2_files, key=lambda itm: itm.datetime))
 
 # If some images (s2_files) are available within the requested date_range
 if (len(s2_files) > 0):
