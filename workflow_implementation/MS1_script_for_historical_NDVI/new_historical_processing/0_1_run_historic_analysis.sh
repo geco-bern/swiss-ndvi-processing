@@ -39,7 +39,7 @@ echo
 # ============================================================
 # Define start and end date for download script --------------
 START_DATE="2017-04-01"
-END_DATE="2017-11-30"  # TODO: change to "2025-11-30"
+END_DATE="2025-11-30"
 
 echo $START_DATE
 echo $END_DATE
