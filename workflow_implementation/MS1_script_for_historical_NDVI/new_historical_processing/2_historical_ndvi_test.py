@@ -12,35 +12,37 @@ import pandas as pd
 # some date have duplicate, if that the case (1148 unique enttry out of 1180)
 # If that is the case, I take the average for value within the range
 
-def historical_ndvi(ndvi_arr_original,full_median_array_original,obs_date):
+def historical_ndvi(ndvi_arr_original, medians, obs_date):
 
     NO_COVERAGE = 32767
 
-    # create evenly spaced ndvi and add obs to the right location
-    ndvi_full = np.full(full_median_array_original.shape, NO_COVERAGE, dtype = np.int16)
+    # create evenly spaced ndvi and add obs to the correct location
+    ndvi_full = np.full(medians.shape, NO_COVERAGE, dtype = np.int16)
     ndvi_full[obs_date] = ndvi_arr_original
 
 
     # Ensure mask_array is writable
-    mask_array = np.zeros(full_median_array_original.shape, dtype=np.int8)
+    mask_array = np.zeros(medians.shape, dtype=np.int8)
 
-    days_diff = np.arange(0, len(obs_date)) 
+    days_diff = np.arange(0, len(obs_date)) # TODO # TODO 5_analyse_demo_efficient defines days_diff differently
 
     delta_ndvi = np.array([0])
 
     # renaming is necessary otherwise won't work
      
     ndvi_arr = ndvi_full / 10000
-    full_median_array = full_median_array_original / 10000
+    full_median_array = medians / 10000
 
-    mask_valid_ndvi = (ndvi_arr > 0) & (ndvi_arr < 1) & obs_date
+    mask_valid_ndvi = (ndvi_arr > 0) & (ndvi_arr < 1)
 
-    ndvi_valid = ndvi_arr[mask_valid_ndvi]
-    median_valid = full_median_array[mask_valid_ndvi]
-    days_diff_2 = days_diff[mask_valid_ndvi]
+    ndvi_valid = ndvi_arr[mask_valid_ndvi & obs_date]            # TODO 5_analyse_demo_efficient is no t using obs_date here
+    median_valid = full_median_array[mask_valid_ndvi & obs_date] # TODO 5_analyse_demo_efficient is no t using obs_date here
+    days_diff_2 = days_diff[mask_valid_ndvi & obs_date]          # TODO 5_analyse_demo_efficient is no t using obs_date here
 
     original_idx = np.arange(len(ndvi_full)) # used to keep track of delta ndvi position and the outlier position
-    original_idx = original_idx[mask_valid_ndvi]
+    original_idx = original_idx[mask_valid_ndvi & obs_date]      # TODO 5_analyse_demo_efficient is no t using obs_date here
+
+    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & obs_date
         
     # outlier detection
 
@@ -57,7 +59,6 @@ def historical_ndvi(ndvi_arr_original,full_median_array_original,obs_date):
 
     original_idx_2 = original_idx[1:-1][~outlier_mask]
         
-    print(len(delta_ndvi))
 
     # some sites do not have any observation or very few
     if len(delta_ndvi) > 6:
@@ -82,7 +83,7 @@ def historical_ndvi(ndvi_arr_original,full_median_array_original,obs_date):
                 delta_ndvi_to_interpolate[i] = delta_window_to_smooth[3]
 
             else:
-                    
+                
                 # smooth the 7 rolling window
                 loess =  sm.nonparametric.lowess(delta_window_to_smooth, idx, frac= 1, it=3, return_sorted=False)
                 delta_ndvi_to_interpolate[i] = loess[3]
@@ -92,32 +93,22 @@ def historical_ndvi(ndvi_arr_original,full_median_array_original,obs_date):
         # combine smoothed value with values yet to smooth, after that linearly interpolate everything
 
         delta_ndvi_to_interpolate = np.concatenate([delta_ndvi_to_interpolate,delta_ndvi[-6:]]) 
-
-        #print(f"len delta_ndvi_to_interpolate", len(delta_ndvi_to_interpolate))
-        #print(f"len days_diff_2", len(days_diff_2))
+        # TODO: in 5_analyse_demo_efficient we have: dates_to_interpolate = np.concatenate([np.array([0]),days_diff_2,np.array([days_diff[-1]])]) 
 
         interpolated_values = np.interp(days_diff,days_diff_2,delta_ndvi_to_interpolate)
 
-        #print(f"interpolated_value: ",interpolated_values)
-
         ndvi_smoothed = np.array((10000 * (interpolated_values + full_median_array)),  dtype=np.int16)
+        ndvi_smoothed = np.clip(ndvi_smoothed, 0, 10000) # TODO: ndvi_smoothed is generated differently in 5_analyse_demo_efficient
 
-        ndvi_smoothed = np.clip(ndvi_smoothed, 0, 10000)
-
-        #print(f"ndvi_smoothed: ",ndvi_smoothed)
-        print(ndvi_smoothed)
-
-
-
-        # mask_array 
-        mask_array[mask_valid_ndvi] = 2
-        before = np.arange(len(mask_array)) <= original_idx_2[-3]
+        # indexing of array mask 
+        mask_array[obs_mask] = 2
+        before = np.arange(len(mask_array)) <= original_idx_2[-3] # TODO: 5_analyse_demo_efficient uses: < -4 here.
 
         outlier_idx = original_idx[1:-1][outlier_mask]
         valid_outlier_idx = outlier_idx[obs_date[outlier_idx] == 1]
 
-        mask_array[ before & mask_valid_ndvi ] = 3
-        mask_array[ before & (~mask_valid_ndvi) ] = 1
+        mask_array[ before & obs_mask ] = 3
+        mask_array[ before & (~obs_mask) ] = 1
 
         mask_array[valid_outlier_idx] = 4
 
@@ -210,7 +201,7 @@ if __name__ == "__main__":
 
 
     # build the full daily median array for that exact span
-    full_median_array_original = ds_median["median_ndvi"].sel(doy=full_doy)
+    medians = ds_median["median_ndvi"].sel(doy=full_doy)
 
 
 
@@ -248,7 +239,7 @@ if __name__ == "__main__":
     ndvi_processed, mask_array = xr.apply_ufunc(
         historical_ndvi,
         ndvi_avg,
-        full_median_array_original,
+        medians,
         input_core_dims=[["datetime"],["date"]],    # each call gets 1D time arrays
         output_core_dims=[["date"],["date"]],
         vectorize=True, 
