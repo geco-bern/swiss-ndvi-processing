@@ -1,5 +1,5 @@
 """
-Extract Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI time series for forested areas.
+Download Swisstopo Sentinel-2 dataset for Switzerland and compute NDVI and NDSI time series for forested areas.
 """
 import xarray as xr
 import dask.array as da

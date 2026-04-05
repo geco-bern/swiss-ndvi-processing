@@ -102,9 +102,22 @@ echo "------------------------------------------------------------"
 echo "------------------------------------------------------------"
 echo "Running: ${SCRIPT_1}"; echo "Start time: $(timestamp)"
 START_TIME=$(date +%s)
-python -u "${SCRIPT_1}" "$START_DATE" "$END_DATE"
-DOWNLOAD_FILE=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
-#DOWNLOAD_FILE="/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr" # TODO: deactivate this
+## variant a: # SINGLE CORE RESULTING IN SINGLE FILE:
+## variant a: #python -u "${SCRIPT_1}" "$START_DATE" "$END_DATE"
+## variant a: #DOWNLOAD_FILE=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
+## variant a: #DOWNLOAD_FILE="/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr" # TODO: deactivate this
+
+## variant b: MULTI CORE (9 parallel jobs) RESULTING IN MULTIPLE FILES
+# START_YEAR=${START_DATE:0:4}
+# END_YEAR=${END_DATE:0:4}
+# export VENV_PATH SCRIPT_1 LOG_FILE
+# seq "$START_YEAR" "$END_YEAR" | parallel -j9 \
+#   '$VENV_PATH/bin/python -u $SCRIPT_1 {1}-01-01 {1}-12-31  > ${LOG_FILE}_{1}.log  2>&1'
+# # wait is implicit when parallel finishes
+# merge together and define DOWNLOAD_FILE
+# manually run 1b_merge_satellite_image_downloads.py
+
+DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
 END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
 echo "Finished: ${SCRIPT_1}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
