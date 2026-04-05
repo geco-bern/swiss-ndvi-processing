@@ -249,8 +249,8 @@ if __name__ == "__main__":
     #            iii. appending to historic
     # =====================================================
     new_ds = (ndvi_daily_since_last_historic
-                .rename({'ndvi':'ndvi_obs',
-                         'ndsi':'ndsi_obs'})
+                .rename({'ndvi':'ndvi_obs',  # TODO: this does not make sense. Given that we already interpolated ndvi would be a better name than ndvi_obs
+                         'ndsi':'ndsi_obs'}) # TODO: this does not make sense. Given that we already interpolated ndvi would be a better name than ndvi_obs
                 .chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS}))
     # new_ds has: 
     #   coords: x,y,x_idx,y_idx, pixel, date, datetime; 

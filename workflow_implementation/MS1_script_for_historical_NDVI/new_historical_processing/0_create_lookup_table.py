@@ -87,3 +87,7 @@ if __name__ == '__main__':
 
     median_ndvi_xr.to_dataset().to_zarr(OUT, mode="w", consolidated=True)
 
+
+
+# rsync --dry-run -avz --human-readable --progress -i -e 'ssh -p 22' /data_3/francesco/lookup_table_median_ndvi_v7.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data2/UniBe-swiss-ndvi/input_data/
+# rsync --dry-run -az --human-readable --info=progress2 -e 'ssh -p 22' /data_3/francesco/lookup_table_median_ndvi_v7.zarr fabian-bernhard@tunder.dev.admin.ch:/mnt/data2/UniBe-swiss-ndvi/input_data/

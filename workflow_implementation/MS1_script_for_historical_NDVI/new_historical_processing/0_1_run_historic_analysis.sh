@@ -124,30 +124,24 @@ echo "Finished: ${SCRIPT_1}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:m
 echo "Download script returned value: $DOWNLOAD_FILE"
 echo
 
-# # ============================================================
-# # run historical processing script
-# echo "------------------------------------------------------------"
-# echo "Running: ${SCRIPT_1}"; echo "Start time: $(timestamp)"
-
-# START_TIME=$(date +%s)
-# python -u "${SCRIPT_1}" "$DOWNLOAD_FILE" "$HISTO_INPUT"
-# NEW_NDVI=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
-# #NEW_NDVI="/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
-# END_TIME=$(date +%s)
-# ELAPSED=$((END_TIME - START_TIME))
-# echo "Finished: ${SCRIPT_1}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
-# echo "Merging script returned value: $NEW_NDVI"
-
-
-# PROCESSING_END=$(date +%s)
-# PROCESSING_TIME=$((PROCESSING_END - PROCESSING_START))
+# ============================================================
+# run historical processing script
+echo "------------------------------------------------------------"
+echo "Running: ${SCRIPT_2}"; echo "Start time: $(timestamp)"
+START_TIME=$(date +%s)
+python -u "${SCRIPT_2}"      # NO ARGS NEEDED
+NEW_NDVI=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
+END_TIME=$(date +%s)
+ELAPSED=$((END_TIME - START_TIME))
+echo "Finished: ${SCRIPT_2}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+echo "Processing script returned value: $NEW_NDVI"
 
 # # ============================================================
 # # Clean up temporary output data
 # # ============================================================
 
 # #rm -rf $NEW_NDVI      # TODO: activate this
-# #rm -rf $DOWNLOAD_FILE # TODO: activate this
+# #rm -rf $DOWNLOAD_FILE # TODO: keep this inactivated for plotting
 
 # # ============================================================
 # # Finish processing

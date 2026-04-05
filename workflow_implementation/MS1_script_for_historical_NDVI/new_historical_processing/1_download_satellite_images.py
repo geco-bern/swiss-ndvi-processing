@@ -533,7 +533,7 @@ if (len(s2_files) > 0):
     ds_out2 = ds_out.assign_coords(
         # change number types of dimensions (pixel is that way 420MB instead of 840MB)
         pixel = ('pixel', ds_out.pixel.values.astype(np.int32)),
-        # doy   = ('date', ds_out.doy.values.astype(np.int32)),
+        # doy   = ('date', ds_out.doy.values.astype(np.int32)),    # TODO: it would make sense to add the doy here
         # and add coordinates and indices in regular grid
         x=('pixel', coord_lookup_aligned['x'].values.astype(np.int32)), # or uint32
         y=('pixel', coord_lookup_aligned['y'].values.astype(np.int32)), # or uint32
