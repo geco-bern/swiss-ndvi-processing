@@ -206,348 +206,347 @@ if __name__ == "__main__":
 
     N_WORKERS = 60
 
-    client = Client(
-    n_workers=N_WORKERS,
-    threads_per_worker=1,
-    memory_limit='50GB',
-    processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
-    dashboard_address=':1236')  
-    print(client.dashboard_link)
-
-    # already having medians computed
-
-    #INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small.zarr" 
-    INPUT_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
-    INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
-    OUT_PATH = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
-
-    # FROM 4_merge_zarr.py
-    # =====================================================
-    #  Load -------- and new observation data sets
-    # =====================================================
-    DATE_CHUNKS = 365
-    PIXEL_CHUNKS = 40000
-    DATE_CHUNKS_OUT = 365
-
-    # --- load historic dataset ------------------------------------
-    # --- ONLY IN CONTINUOUS ---
-
-    # --- load new data dataset ------------------------------------
-    new_observations_ds = xr.open_dataset(INPUT_ZARR, chunks={}, mask_and_scale= False).drop_vars("ndsi")
-    # NOTE: delay the datetime chunking , "datetime": -1
-    # NOTE: and directly drop unused ndsi
+    with Client(
+        n_workers=N_WORKERS,
+        threads_per_worker=1,
+        memory_limit='50GB',
+        processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
+        dashboard_address=':1239') as client:
     
-    # --- load median values for each doy --------------------------
-    lookuptable  = xr.open_zarr(INPUT_ZARR_LOOKUPTABLE).chunk({"doy": -1, "pixel": PIXEL_CHUNKS})
+        print(client.dashboard_link)
 
-    #TODO: remove this when development
-    # subset pixels for development: FOR DEVELOPMENT:
-    new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**3)) # , datetime = slice(0,30)
-    # with 10 pixels:       runtime=55s,  storage=304KB
-    # with 100 pixels:      runtime=78s,  storage=644KB
-    # with 1000 pixels:     runtime=327s, storage=4.1MB
-    # with 10000 pixels:    runtime=1200s, storage=39MB
-    # with 100000 pixels:   runtime=XXs, storage=XXKB
-    # with 1000000 pixels:  runtime=282min, storage=3.8GB
-    # wit all pixels:       runtime=XXXmin, storage=XXXGB
-    # END TODO
+        # already having medians computed
 
-    # =====================================================
-    #  Aggregate multiple daily observation
-    #  and resample to daily intervals (between observations)
-    # =====================================================
+        #INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small.zarr" 
+        INPUT_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
+        INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
+        OUT_PATH = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
 
-    # Decide how to collapse sub-daily duplicates to one observed value per day
-    agg = 'first' # # TODO: choose 'mean' or 'first'
-    if agg == 'first':
-        ndvi_daily_between_obs = (new_observations_ds
-            # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
-            #       and they are later both replace by only one of them NO_COVERAGE
-            #       effectively this removes INVALID pixels TODO: is this desired behavior?
-            .where((new_observations_ds['ndvi']  != NO_COVERAGE) &
-                    (new_observations_ds['ndvi'] != INVALID))
-            .groupby(datetime=xr.groupers.TimeResampler('1D'))
-            .first()
-            .fillna(NO_COVERAGE).astype(np.int16)
-            .rename({'datetime': 'date'})
-        )
-    elif agg == 'mean':
-        ndvi_daily_between_obs = (new_observations_ds
-            # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
-            #       and they are later both replace by only one of them NO_COVERAGE
-            #       effectively this removes INVALID pixels TODO: is this desired behavior?
-            .where((new_observations_ds['ndvi'] != NO_COVERAGE) &
-                    (new_observations_ds['ndvi'] != INVALID))
-            .astype(np.float32)
-            .groupby(datetime=xr.groupers.TimeResampler('1D'))
-            .mean(skipna=True)
-            .fillna(NO_COVERAGE).astype(np.int16)
-            .rename({'datetime': 'date'})
-        )
-    else:
-        raise ValueError(f"Unsupported agg={agg}")
+        # FROM 4_merge_zarr.py
+        # =====================================================
+        #  Load -------- and new observation data sets
+        # =====================================================
+        DATE_CHUNKS = 365
+        PIXEL_CHUNKS = 40000
+        DATE_CHUNKS_OUT = 365
 
-    # keep track which dates were actually observation dates
-    observation_datetimes = pd.DatetimeIndex(new_observations_ds["datetime"].values)
-    observation_dates     = pd.DatetimeIndex(observation_datetimes).floor("D")
+        # --- load historic dataset ------------------------------------
+        # --- ONLY IN CONTINUOUS ---
 
-    # =====================================================
-    #  Initialize empty daily dataset
-    # =====================================================
-    # note: we call this dataset since_last_historic in the continuous update.
-    #       Here this is means simply since the first observation:
-    start_date         = observation_dates.min()
-    end_date           = observation_dates.max()
-
-    # build full daily index from start_date to end_date (make sure start_date/end_date are pd-compatible)
-    daily_dates_since_last_historic = pd.date_range(
-        start=pd.to_datetime(start_date).floor("D"),
-        end=pd.to_datetime(end_date).floor("D"),
-        freq="D")
-
-    # reindex coords to guarantee daily coverage starts at start_date
-    # i.e. extending back to last historic date:
-    ndvi_daily_since_last_historic = (ndvi_daily_between_obs
-        .reindex(date=daily_dates_since_last_historic, 
-                 method=None) # None (default): don’t fill gaps;
-                              # fills missing days with NaN; fill later if desired
-        .fillna(NO_COVERAGE).astype(np.int16)
-    )
+        # --- load new data dataset ------------------------------------
+        new_observations_ds = xr.open_dataset(INPUT_ZARR, chunks={}, mask_and_scale= False).drop_vars("ndsi")
+        # NOTE: delay the datetime chunking , "datetime": -1
+        # NOTE: and directly drop unused ndsi
         
-    # ndvi_daily_between_obs.date.values
-    # ndvi_daily_since_last_historic.date.values
+        # --- load median values for each doy --------------------------
+        lookuptable  = xr.open_zarr(INPUT_ZARR_LOOKUPTABLE).chunk({"doy": -1, "pixel": PIXEL_CHUNKS})
 
-    # FOR DEVELOPMENT: observation_dates[1] # 2025-12-09
-    # FOR DEVELOPMENT: observation_dates[2] # 2025-12-09
-    # FOR DEVELOPMENT: plot_da_map(ndvi_daily_since_last_historic["ndvi"].sel(date= observation_dates[1]),
-    # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = f"NDVI_2025-12-09_combined_{agg}.png")
-    
-    # Print status
-    print(
-        f"Initialized n={len(daily_dates_since_last_historic)} daily dates:",
-        #f"\nfrom {daily_dates_since_last_historic.min().date()}"+
-        #f" to {daily_dates_since_last_historic.max().date()}"+
-        # f"\nwith observations on days at:"+
-        # f"\n"+"\n".join([f"  {d.strftime('%Y-%m-%d')}: {dt.strftime('%Y-%m-%d_%Hh%M')}" 
-        #    for (d, dt) in zip(observation_dates, observation_datetimes)]),
-        flush=True,
-    )
-    # group observation times (as strings) by date
-    times = pd.Series(observation_datetimes.strftime("%H:%M:%S"), 
-                    index=observation_datetimes.floor("D"))
-    grouped = times.groupby(level=0).agg(lambda s: ",".join(s))
+        #TODO: remove this when development
+        # subset pixels for development: FOR DEVELOPMENT:
+        new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**3)) # , datetime = slice(0,30)
+        # with 10 pixels:       runtime=55s,  storage=304KB
+        # with 100 pixels:      runtime=78s,  storage=644KB
+        # with 1000 pixels:     runtime=327s, storage=4.1MB
+        # with 10000 pixels:    runtime=1200s, storage=39MB
+        # with 100000 pixels:   runtime=XXs, storage=XXKB
+        # with 1000000 pixels:  runtime=282min, storage=3.8GB
+        # wit all pixels:       runtime=XXXmin, storage=XXXGB
+        # END TODO
 
-    # build DataFrame: 'daily', 'obs_date' (date or NaT), 'obs_times' (comma-joined times or NaN)
-    status_df = pd.DataFrame({"daily": daily_dates_since_last_historic})
-    status_df["obs_date"] = status_df["daily"].where(status_df["daily"].isin(grouped.index))
-    status_df["obs_times"] = status_df["daily"].map(grouped).fillna("")
-    print(status_df, flush=True)
-    print(f"In total: {len(status_df["daily"])} days, {sum(status_df["obs_date"].notnull())} obs_dates, {len(times)} obs_times. ")
+        # =====================================================
+        #  Aggregate multiple daily observation
+        #  and resample to daily intervals (between observations)
+        # =====================================================
 
-    # Append day-of-year (for merging of median expected NDVI from model)
-    doy_array = daily_dates_since_last_historic.dayofyear.values
-    ndvi_daily_since_last_historic = ndvi_daily_since_last_historic.assign_coords(
-        doy   = ('date', doy_array.astype(np.int32))
-    )
-    
-    # Keep track which dates were actually observation dates:
-    # add a DataArray to Dataset, which specifies the dates that were observations
-    ndvi_daily_since_last_historic["obs_date"] = ndvi_daily_since_last_historic.date.isin(observation_dates)
+        # Decide how to collapse sub-daily duplicates to one observed value per day
+        agg = 'first' # # TODO: choose 'mean' or 'first'
+        if agg == 'first':
+            ndvi_daily_between_obs = (new_observations_ds
+                # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
+                #       and they are later both replace by only one of them NO_COVERAGE
+                #       effectively this removes INVALID pixels TODO: is this desired behavior?
+                .where((new_observations_ds['ndvi']  != NO_COVERAGE) &
+                        (new_observations_ds['ndvi'] != INVALID))
+                .groupby(datetime=xr.groupers.TimeResampler('1D'))
+                .first()
+                .fillna(NO_COVERAGE).astype(np.int16)
+                .rename({'datetime': 'date'})
+            )
+        elif agg == 'mean':
+            ndvi_daily_between_obs = (new_observations_ds
+                # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
+                #       and they are later both replace by only one of them NO_COVERAGE
+                #       effectively this removes INVALID pixels TODO: is this desired behavior?
+                .where((new_observations_ds['ndvi'] != NO_COVERAGE) &
+                        (new_observations_ds['ndvi'] != INVALID))
+                .astype(np.float32)
+                .groupby(datetime=xr.groupers.TimeResampler('1D'))
+                .mean(skipna=True)
+                .fillna(NO_COVERAGE).astype(np.int16)
+                .rename({'datetime': 'date'})
+            )
+        else:
+            raise ValueError(f"Unsupported agg={agg}")
 
-    # =====================================================
-    #  Write daily dataset (containing NaN)
-    #  for later i.   gapfilling, 
-    #            ii.  outlier detection, and 
-    #            iii. appending to historic
-    # =====================================================
-    new_ds = ndvi_daily_since_last_historic # NOTE: delay rechunking just before apply_ufunc(): (.chunk({"pixel": PIXEL_CHUNKS, "date": -1}))
-    # new_ds has: 
-    #   coords: x,y,x_idx,y_idx, pixel, date; 
-    #   vars:   ndvi,obs_date
-    #   attrs:  pixel_definition,transform_note,transform_coeffs,transform_instr,description_ndvi,description_ndsi,nodata,cloud_shadow
-    
-    # drop any coord/data var chunk encodings that conflict
-    # for name in list(new_ds.coords) + list(new_ds.data_vars):
-    #     new_ds[name].encoding.pop("chunks", None)
-    #     new_ds[name].encoding.pop("compressor", None)
-    #     new_ds[name].encoding.pop("compressors", None)
+        # keep track which dates were actually observation dates
+        observation_datetimes = pd.DatetimeIndex(new_observations_ds["datetime"].values)
+        observation_dates     = pd.DatetimeIndex(observation_datetimes).floor("D")
 
-    # write out    
-    # new_ds.to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
-    # NOTE: here is end of 4_merge_zarr.py in the continuous case
+        # =====================================================
+        #  Initialize empty daily dataset
+        # =====================================================
+        # note: we call this dataset since_last_historic in the continuous update.
+        #       Here this is means simply since the first observation:
+        start_date         = observation_dates.min()
+        end_date           = observation_dates.max()
 
-    # NOTE: here is the start of 5_analyse_demo_efficient.py in the continuous case
-    # def show_ds_structure(ds):
-    #     for c in list(ds.coords) + list(ds.data_vars):
-    #         print(str(c).ljust(15) + ":   " + str(ds[c].encoding))
-    #show_ds_structure(new_ds)
-    #show_ds_structure(lookuptable)
+        # build full daily index from start_date to end_date (make sure start_date/end_date are pd-compatible)
+        daily_dates_since_last_historic = pd.date_range(
+            start=pd.to_datetime(start_date).floor("D"),
+            end=pd.to_datetime(end_date).floor("D"),
+            freq="D")
 
-    print("First dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(0,10)), unit='D')), flush=True)
-    print("Last dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(-10,None)), unit='D')), flush=True)
-    # NOTE: here is end of 5_analyse_demo_efficient.py in the continuous case
+        # reindex coords to guarantee daily coverage starts at start_date
+        # i.e. extending back to last historic date:
+        ndvi_daily_since_last_historic = (ndvi_daily_between_obs
+            .reindex(date=daily_dates_since_last_historic, 
+                    method=None) # None (default): don’t fill gaps;
+                                # fills missing days with NaN; fill later if desired
+            .fillna(NO_COVERAGE).astype(np.int16)
+        )
+            
+        # ndvi_daily_between_obs.date.values
+        # ndvi_daily_since_last_historic.date.values
 
-    print("Newly downloaded dataset:", flush = True)
-    print(new_ds, flush = True)
-    
-    # --- add median NDVI from model ----------------------------------
-    doy_noLeap = xr.where(new_ds.doy == 366, 365, new_ds.doy) # remove leap year if encountered
-    new_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
-            doy=doy_noLeap,
-            pixel=new_ds.pixel) # this is to join by pixels and doy
+        # FOR DEVELOPMENT: observation_dates[1] # 2025-12-09
+        # FOR DEVELOPMENT: observation_dates[2] # 2025-12-09
+        # FOR DEVELOPMENT: plot_da_map(ndvi_daily_since_last_historic["ndvi"].sel(date= observation_dates[1]),
+        # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = f"NDVI_2025-12-09_combined_{agg}.png")
+        
+        # Print status
+        print(
+            f"Initialized n={len(daily_dates_since_last_historic)} daily dates:",
+            #f"\nfrom {daily_dates_since_last_historic.min().date()}"+
+            #f" to {daily_dates_since_last_historic.max().date()}"+
+            # f"\nwith observations on days at:"+
+            # f"\n"+"\n".join([f"  {d.strftime('%Y-%m-%d')}: {dt.strftime('%Y-%m-%d_%Hh%M')}" 
+            #    for (d, dt) in zip(observation_dates, observation_datetimes)]),
+            flush=True,
+        )
+        # group observation times (as strings) by date
+        times = pd.Series(observation_datetimes.strftime("%H:%M:%S"), 
+                        index=observation_datetimes.floor("D"))
+        grouped = times.groupby(level=0).agg(lambda s: ",".join(s))
 
+        # build DataFrame: 'daily', 'obs_date' (date or NaT), 'obs_times' (comma-joined times or NaN)
+        status_df = pd.DataFrame({"daily": daily_dates_since_last_historic})
+        status_df["obs_date"] = status_df["daily"].where(status_df["daily"].isin(grouped.index))
+        status_df["obs_times"] = status_df["daily"].map(grouped).fillna("")
+        print(status_df, flush=True)
+        print(f"In total: {len(status_df["daily"])} days, {sum(status_df["obs_date"].notnull())} obs_dates, {len(times)} obs_times. ")
 
-    # Add mask_array to new_ds (filled with 0 or 2 at this point):
-        # mask_array == 0: the data is not an observation and is yet to be smoothed
-        # mask_array == 1: the data is not an observation and is smoothed
-        # mask_array == 2: the data is an observation and is yet to be smoothed
-        # mask_array == 3: the data is an observation and is smoothed
-        # mask_array == 4: the data is an observation and is an outlier
-    mask_2or0 = (
-        (new_ds["obs_date"]) & 
-        (new_ds["ndvi"] < NO_COVERAGE) & 
-        (new_ds["ndvi"] > INVALID))
-    new_ds['mask_array'] = xr.where(mask_2or0, np.int8(2), np.int8(0))
-    
-    new_ds = new_ds.rename(
-        {'ndvi':'ndvi_processed'})
+        # Append day-of-year (for merging of median expected NDVI from model)
+        doy_array = daily_dates_since_last_historic.dayofyear.values
+        ndvi_daily_since_last_historic = ndvi_daily_since_last_historic.assign_coords(
+            doy   = ('date', doy_array.astype(np.int32))
+        )
+        
+        # Keep track which dates were actually observation dates:
+        # add a DataArray to Dataset, which specifies the dates that were observations
+        ndvi_daily_since_last_historic["obs_date"] = ndvi_daily_since_last_historic.date.isin(observation_dates)
 
-    # Save for intermediate computation
-    OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
-    new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1}).to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
+        # =====================================================
+        #  Write daily dataset (containing NaN)
+        #  for later i.   gapfilling, 
+        #            ii.  outlier detection, and 
+        #            iii. appending to historic
+        # =====================================================
+        new_ds = ndvi_daily_since_last_historic # NOTE: delay rechunking just before apply_ufunc(): (.chunk({"pixel": PIXEL_CHUNKS, "date": -1}))
+        # new_ds has: 
+        #   coords: x,y,x_idx,y_idx, pixel, date; 
+        #   vars:   ndvi,obs_date
+        #   attrs:  pixel_definition,transform_note,transform_coeffs,transform_instr,description_ndvi,description_ndsi,nodata,cloud_shadow
+        
+        # drop any coord/data var chunk encodings that conflict
+        # for name in list(new_ds.coords) + list(new_ds.data_vars):
+        #     new_ds[name].encoding.pop("chunks", None)
+        #     new_ds[name].encoding.pop("compressor", None)
+        #     new_ds[name].encoding.pop("compressors", None)
 
-    # Reload freshly:
-    new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False)
-    
+        # write out    
+        # new_ds.to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
+        # NOTE: here is end of 4_merge_zarr.py in the continuous case
 
-    # --- visual check of resulting new_ds ----------------------------------
-    # import matplotlib.pyplot as plt
-    # plt.figure(figsize=(7.2, 4), dpi = 200)
+        # NOTE: here is the start of 5_analyse_demo_efficient.py in the continuous case
+        # def show_ds_structure(ds):
+        #     for c in list(ds.coords) + list(ds.data_vars):
+        #         print(str(c).ljust(15) + ":   " + str(ds[c].encoding))
+        #show_ds_structure(new_ds)
+        #show_ds_structure(lookuptable)
 
-    # new_ds_subset = new_ds.isel(pixel=[0,1,2, 2100, 3500, 4900])
-    # new_ds_subset["median_ndvi"].plot.line(x='date',hue='pixel')
+        print("First dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(0,10)), unit='D')), flush=True)
+        print("Last dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(-10,None)), unit='D')), flush=True)
+        # NOTE: here is end of 5_analyse_demo_efficient.py in the continuous case
 
-    # indexer = (new_ds_subset["mask_array"] == 2).compute()
-    # new_ds_subset2 = new_ds_subset.where(indexer, drop=True)
-    # new_ds_subset2["ndvi_processed"].plot.scatter(x='date',hue='pixel',marker="x")
-    
-    # plt.savefig('test.png')
-    
-    # --- apply gapfilling and outlier detection function: historical_ndvi() ----------------------------------
-
-    # prepare arguments spanning historic and new data: all lazy
-    ndvi_array_arg   = new_ds["ndvi_processed"].chunk(dict(date=-1)).persist() # NOTE: in continuous integration this is the merged_ds
-    median_array_arg = new_ds["median_ndvi"].chunk(dict(date=-1)).persist()    # NOTE: in continuous integration this is the merged_ds
-    mask_array_arg   = new_ds["mask_array"].chunk(dict(date=-1)).persist()     # NOTE: in continuous integration this is the merged_ds
-    is_obs_date_array_arg = new_ds["obs_date"].chunk(dict(date=-1)).persist()  # NOTE: in continuous integration this is the merged_ds
-    dates_array_arg  = new_ds["date"].chunk(dict(date=-1)).persist()           # NOTE: in continuous integration this is the merged_ds
-    start_date_arg   = dates_array_arg.values[0] # NOTE: in the historic case
-    # using persist() reduces graph size
-
-    # reduce graph size by using futures
-    # dates_future  = client.scatter(dates_array)
-    # ndvi_future   = client.scatter(ndvi_array)
-    # median_future = client.scatter(median_array)
-    # dates_future  = client.scatter(dates_array)
-    # mask_future   = client.scatter(mask_array)
-    # then reference *_future inside tasks/closures instead of passing *_array
-    # visualize(dates_future)
-
-    # reduce graph size by handing NumPy arrays to dask:
-    # dates_daskarray = da.from_array(dates_array)   # Hand NumPy array to Dask
-
-    # call gufunc where core dim is "time" (1D arrays per pixel)
-    ndvi_processed, mask_processed = xr.apply_ufunc(
-        historical_ndvi,
-        ndvi_array_arg,        # this is the observed/gapfilled/processed NDVI value
-        median_array_arg,      # this is the modelled median NDVI for the corresponding DOY
-        mask_array_arg,        # this is the integer processing status
-        is_obs_date_array_arg, # this is the True-False boolean if a date contains satellite images (is_observation_date?)
-        input_core_dims=[["date"], ["date"],["date"], ["date"]],    # each call gets 1D time arrays
-        output_core_dims=[["date"],["date"]],
-        kwargs={
-             "dates_array": dates_array_arg,           # this contains all daily dates
-             "starting_date": start_date_arg},   # this contains the starting date when to start ??
-        vectorize=True, 
-        dask="parallelized",
-        output_dtypes=[np.dtype('int16'), np.dtype('int8')],
-        # dask_gufunc_kwargs={"allow_rechunk": True},
-    )
-    # ndvi_processed.isel(pixel=1, date=slice(3160,3170)).compute() # TODO: check why this is [ 4845,  4835,  4826,  4819, 32767, 32767, 32767, 32767, 32767, 32767]
-
-    # FROM THE PREVIOUS HISTORIC VERSION: # call ufunc where core dim is "time" (1D arrays per pixel)
-    # FROM THE PREVIOUS HISTORIC VERSION: ndvi_processed, mask_array = xr.apply_ufunc(
-    # FROM THE PREVIOUS HISTORIC VERSION:     historical_ndvi,
-    # FROM THE PREVIOUS HISTORIC VERSION:     ndvi_avg,
-    # FROM THE PREVIOUS HISTORIC VERSION:     medians,
-    # FROM THE PREVIOUS HISTORIC VERSION:     input_core_dims=[["datetime"],["date"]],    # each call gets 1D time arrays
-    # FROM THE PREVIOUS HISTORIC VERSION:     output_core_dims=[["date"],["date"]],
-    # FROM THE PREVIOUS HISTORIC VERSION:     vectorize=True, 
-    # FROM THE PREVIOUS HISTORIC VERSION:     dask="parallelized",
-    # FROM THE PREVIOUS HISTORIC VERSION:     kwargs={"obs_date" : obs_date},
-    # FROM THE PREVIOUS HISTORIC VERSION:     output_dtypes=[np.int16, np.int8],
-    # FROM THE PREVIOUS HISTORIC VERSION:     dask_gufunc_kwargs={"allow_rechunk": True},
-    # FROM THE PREVIOUS HISTORIC VERSION: )
-    
-    # Ensure both outputs are computed in ONE scheduler pass (avoids re-running apply_ufunc twice)
-    ndvi_processed, mask_processed = dask.persist(ndvi_processed, mask_processed)
-    dask.distributed.wait([ndvi_processed, mask_processed])
-
-    # g = mask_processed.__dask_graph__()
-    g = ndvi_processed.__dask_graph__()
-    print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
-    #                    586_503 pixels:                 | 16_041_205 pixels:              | 105_715_396 pixels:
-    # without persist(): 49    layers, and 196760 tasks  | 49    layers, and 1289428 tasks | xxx layers, and xxx tasks
-    # with persist():    16-17 layers, and  31953 tasks  | 16-17 layers, and  872665 tasks | xxx layers, and xxx tasks
-    # without persist(): .............. and 10.58 MiB
-    # with persist():    size 23.08 MiB and 10.58 MiB
-    
-    # visualize(ndvi_processed)
-
-    # create the dataset to write 
-    out_ds = xr.Dataset(
-        {
-            "ndvi_processed": ndvi_processed,
-            "mask_array": mask_processed
-        }
-    )
-    
-    #out_ds.attrs["pixel_definition"] = new_ds.attrs["pixel_definition"]
-    out_ds.attrs = new_ds.attrs
-    out_ds.attrs.pop("description_ndsi", None) # since we dropped ndsi, we also drop this attr
+        print("Newly downloaded dataset:", flush = True)
+        print(new_ds, flush = True)
+        
+        # --- add median NDVI from model ----------------------------------
+        doy_noLeap = xr.where(new_ds.doy == 366, 365, new_ds.doy) # remove leap year if encountered
+        new_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
+                doy=doy_noLeap,
+                pixel=new_ds.pixel) # this is to join by pixels and doy
 
 
-    if os.path.exists(OUT_PATH):
-        shutil.rmtree(OUT_PATH)
+        # Add mask_array to new_ds (filled with 0 or 2 at this point):
+            # mask_array == 0: the data is not an observation and is yet to be smoothed
+            # mask_array == 1: the data is not an observation and is smoothed
+            # mask_array == 2: the data is an observation and is yet to be smoothed
+            # mask_array == 3: the data is an observation and is smoothed
+            # mask_array == 4: the data is an observation and is an outlier
+        mask_2or0 = (
+            (new_ds["obs_date"]) & 
+            (new_ds["ndvi"] < NO_COVERAGE) & 
+            (new_ds["ndvi"] > INVALID))
+        new_ds['mask_array'] = xr.where(mask_2or0, np.int8(2), np.int8(0))
+        
+        new_ds = new_ds.rename(
+            {'ndvi':'ndvi_processed'})
 
-    print(f"writing to new file: {OUT_PATH}", flush=True)
-    out_ds = (
-        out_ds
-        .sortby("date")
-        .chunk({"pixel": PIXEL_CHUNKS, 
-                "date": DATE_CHUNKS_OUT})
-    )
-    
-    # Explicit encoding: simple compressor for each data var
-    # encoding = {v: {"compressors": None      } for v in out_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
-    encoding = {v: {"compressors": COMPRESSOR} for v in out_ds.data_vars}
+        # Save for intermediate computation
+        OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
+        new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1}).to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
 
-    # drop any coord/data var chunk encodings that conflict   # TODO: is this needed?
-    for name in list(out_ds.coords) + list(out_ds.data_vars): # TODO: remove this again if possilbe
-        out_ds[name].encoding.pop("chunks", None)                           # TODO: remove this again if possilbe
-        out_ds[name].encoding.pop("compressor", None)                       # TODO: remove this again if possilbe
-        out_ds[name].encoding.pop("compressors", None)                      # TODO: remove this again if possilbe
+        # Reload freshly:
+        new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False)
+        
 
-    # overwrite (mode="w")
-    out_ds.to_zarr(
-        OUT_PATH, 
-        mode="w", 
-        compute=True,
-        encoding=encoding, 
-        zarr_format=3
-    )
-    
-    client.close()
+        # --- visual check of resulting new_ds ----------------------------------
+        # import matplotlib.pyplot as plt
+        # plt.figure(figsize=(7.2, 4), dpi = 200)
 
+        # new_ds_subset = new_ds.isel(pixel=[0,1,2, 2100, 3500, 4900])
+        # new_ds_subset["median_ndvi"].plot.line(x='date',hue='pixel')
+
+        # indexer = (new_ds_subset["mask_array"] == 2).compute()
+        # new_ds_subset2 = new_ds_subset.where(indexer, drop=True)
+        # new_ds_subset2["ndvi_processed"].plot.scatter(x='date',hue='pixel',marker="x")
+        
+        # plt.savefig('test.png')
+        
+        # --- apply gapfilling and outlier detection function: historical_ndvi() ----------------------------------
+
+        # prepare arguments spanning historic and new data: all lazy
+        ndvi_array_arg   = new_ds["ndvi_processed"].chunk(dict(date=-1)).persist() # NOTE: in continuous integration this is the merged_ds
+        median_array_arg = new_ds["median_ndvi"].chunk(dict(date=-1)).persist()    # NOTE: in continuous integration this is the merged_ds
+        mask_array_arg   = new_ds["mask_array"].chunk(dict(date=-1)).persist()     # NOTE: in continuous integration this is the merged_ds
+        is_obs_date_array_arg = new_ds["obs_date"].chunk(dict(date=-1)).persist()  # NOTE: in continuous integration this is the merged_ds
+        dates_array_arg  = new_ds["date"].chunk(dict(date=-1)).persist()           # NOTE: in continuous integration this is the merged_ds
+        start_date_arg   = dates_array_arg.values[0] # NOTE: in the historic case
+        # using persist() reduces graph size
+
+        # reduce graph size by using futures
+        # dates_future  = client.scatter(dates_array)
+        # ndvi_future   = client.scatter(ndvi_array)
+        # median_future = client.scatter(median_array)
+        # dates_future  = client.scatter(dates_array)
+        # mask_future   = client.scatter(mask_array)
+        # then reference *_future inside tasks/closures instead of passing *_array
+        # visualize(dates_future)
+
+        # reduce graph size by handing NumPy arrays to dask:
+        # dates_daskarray = da.from_array(dates_array)   # Hand NumPy array to Dask
+
+        # call gufunc where core dim is "time" (1D arrays per pixel)
+        ndvi_processed, mask_processed = xr.apply_ufunc(
+            historical_ndvi,
+            ndvi_array_arg,        # this is the observed/gapfilled/processed NDVI value
+            median_array_arg,      # this is the modelled median NDVI for the corresponding DOY
+            mask_array_arg,        # this is the integer processing status
+            is_obs_date_array_arg, # this is the True-False boolean if a date contains satellite images (is_observation_date?)
+            input_core_dims=[["date"], ["date"],["date"], ["date"]],    # each call gets 1D time arrays
+            output_core_dims=[["date"],["date"]],
+            kwargs={
+                "dates_array": dates_array_arg,           # this contains all daily dates
+                "starting_date": start_date_arg},   # this contains the starting date when to start ??
+            vectorize=True, 
+            dask="parallelized",
+            output_dtypes=[np.dtype('int16'), np.dtype('int8')],
+            # dask_gufunc_kwargs={"allow_rechunk": True},
+        )
+        # ndvi_processed.isel(pixel=1, date=slice(3160,3170)).compute() # TODO: check why this is [ 4845,  4835,  4826,  4819, 32767, 32767, 32767, 32767, 32767, 32767]
+
+        # FROM THE PREVIOUS HISTORIC VERSION: # call ufunc where core dim is "time" (1D arrays per pixel)
+        # FROM THE PREVIOUS HISTORIC VERSION: ndvi_processed, mask_array = xr.apply_ufunc(
+        # FROM THE PREVIOUS HISTORIC VERSION:     historical_ndvi,
+        # FROM THE PREVIOUS HISTORIC VERSION:     ndvi_avg,
+        # FROM THE PREVIOUS HISTORIC VERSION:     medians,
+        # FROM THE PREVIOUS HISTORIC VERSION:     input_core_dims=[["datetime"],["date"]],    # each call gets 1D time arrays
+        # FROM THE PREVIOUS HISTORIC VERSION:     output_core_dims=[["date"],["date"]],
+        # FROM THE PREVIOUS HISTORIC VERSION:     vectorize=True, 
+        # FROM THE PREVIOUS HISTORIC VERSION:     dask="parallelized",
+        # FROM THE PREVIOUS HISTORIC VERSION:     kwargs={"obs_date" : obs_date},
+        # FROM THE PREVIOUS HISTORIC VERSION:     output_dtypes=[np.int16, np.int8],
+        # FROM THE PREVIOUS HISTORIC VERSION:     dask_gufunc_kwargs={"allow_rechunk": True},
+        # FROM THE PREVIOUS HISTORIC VERSION: )
+        
+        # Ensure both outputs are computed in ONE scheduler pass (avoids re-running apply_ufunc twice)
+        ndvi_processed, mask_processed = dask.persist(ndvi_processed, mask_processed)
+        dask.distributed.wait([ndvi_processed, mask_processed])
+
+        # g = mask_processed.__dask_graph__()
+        g = ndvi_processed.__dask_graph__()
+        print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
+        #                    586_503 pixels:                 | 16_041_205 pixels:              | 105_715_396 pixels:
+        # without persist(): 49    layers, and 196760 tasks  | 49    layers, and 1289428 tasks | xxx layers, and xxx tasks
+        # with persist():    16-17 layers, and  31953 tasks  | 16-17 layers, and  872665 tasks | xxx layers, and xxx tasks
+        # without persist(): .............. and 10.58 MiB
+        # with persist():    size 23.08 MiB and 10.58 MiB
+        
+        # visualize(ndvi_processed)
+
+        # create the dataset to write 
+        out_ds = xr.Dataset(
+            {
+                "ndvi_processed": ndvi_processed,
+                "mask_array": mask_processed
+            }
+        )
+        
+        #out_ds.attrs["pixel_definition"] = new_ds.attrs["pixel_definition"]
+        out_ds.attrs = new_ds.attrs
+        out_ds.attrs.pop("description_ndsi", None) # since we dropped ndsi, we also drop this attr
+
+
+        if os.path.exists(OUT_PATH):
+            shutil.rmtree(OUT_PATH)
+
+        print(f"writing to new file: {OUT_PATH}", flush=True)
+        out_ds = (
+            out_ds
+            .sortby("date")
+            .chunk({"pixel": PIXEL_CHUNKS, 
+                    "date": DATE_CHUNKS_OUT})
+        )
+        
+        # Explicit encoding: simple compressor for each data var
+        # encoding = {v: {"compressors": None      } for v in out_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
+        encoding = {v: {"compressors": COMPRESSOR} for v in out_ds.data_vars}
+
+        # drop any coord/data var chunk encodings that conflict   # TODO: is this needed?
+        for name in list(out_ds.coords) + list(out_ds.data_vars): # TODO: remove this again if possilbe
+            out_ds[name].encoding.pop("chunks", None)                           # TODO: remove this again if possilbe
+            out_ds[name].encoding.pop("compressor", None)                       # TODO: remove this again if possilbe
+            out_ds[name].encoding.pop("compressors", None)                      # TODO: remove this again if possilbe
+
+        # overwrite (mode="w")
+        out_ds.to_zarr(
+            OUT_PATH, 
+            mode="w", 
+            compute=True,
+            encoding=encoding, 
+            zarr_format=3
+        )
+        
     print(OUT_PATH, flush = True)
     sys.exit(0)
