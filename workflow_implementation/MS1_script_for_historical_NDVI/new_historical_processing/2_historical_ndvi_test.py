@@ -243,13 +243,13 @@ if __name__ == "__main__":
 
         #TODO: remove this when development
         # subset pixels for development: FOR DEVELOPMENT:
-        new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**3)) # , datetime = slice(0,30)
-        # with 10 pixels:       runtime=55s,  storage=304KB
-        # with 100 pixels:      runtime=78s,  storage=644KB
-        # with 1000 pixels:     runtime=327s, storage=4.1MB
-        # with 10000 pixels:    runtime=1200s, storage=39MB
-        # with 100000 pixels:   runtime=XXs, storage=XXKB
-        # with 1000000 pixels:  runtime=282min, storage=3.8GB
+        new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**6)) # , datetime = slice(0,30)
+        # with 10 pixels:         runtime=55s,  storage=304KB
+        # with 100 pixels:        runtime=78s,  storage=644KB
+        # with 1_000 pixels:      runtime=317s, storage=4.1MB
+        # with 10_000 pixels:     runtime=1200s, storage=39MB
+        # with 100_000 pixels:    runtime=XXs, storage=XXKB
+        # with 1_000_000 pixels:  runtime=282min, storage=3.8GB
         # wit all pixels:       runtime=XXXmin, storage=XXXGB
         # END TODO
 
@@ -413,13 +413,7 @@ if __name__ == "__main__":
         new_ds = new_ds.rename(
             {'ndvi':'ndvi_processed'})
 
-        # Save for intermediate computation
-        OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
-        new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1}).to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
 
-        # Reload freshly:
-        new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False)
-        
 
         # --- visual check of resulting new_ds ----------------------------------
         # import matplotlib.pyplot as plt
@@ -547,6 +541,9 @@ if __name__ == "__main__":
             encoding=encoding, 
             zarr_format=3
         )
+
+        # small pause to allow dashboard websocket handshakes / metadata flush
+        time.sleep(2)
         
     print(OUT_PATH, flush = True)
     sys.exit(0)
