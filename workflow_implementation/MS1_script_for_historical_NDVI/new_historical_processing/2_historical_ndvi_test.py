@@ -240,13 +240,13 @@ if __name__ == "__main__":
 
     #TODO: remove this when development
     # subset pixels for development: FOR DEVELOPMENT:
-    new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**4)) # , datetime = slice(0,100)
+    # new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**6)) # , datetime = slice(0,100)
     # with 10 pixels:       runtime=41s,  storage=304KB
     # with 1000 pixels:     runtime=98s, storage=4.1MB
     # with 10000 pixels:    runtime=1200s, storage=39MB
     # with 100000 pixels:   runtime=XXs, storage=XXKB
-    # with 1000000 pixels:  runtime=XXs, storage=XXKB
-    
+    # with 1000000 pixels:  runtime=282min, storage=3.8GB
+    # wit all pixels:       runtime=XXXmin, storage=XXXGB
     # END TODO
 
     # =====================================================
