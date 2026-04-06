@@ -233,16 +233,19 @@ if __name__ == "__main__":
     # --- ONLY IN CONTINUOUS ---
 
     # --- load new data dataset ------------------------------------
-    new_observations_ds = xr.open_dataset(INPUT_ZARR, chunks={}, mask_and_scale= False).chunk({"pixel": PIXEL_CHUNKS, "datetime": -1})
+    new_observations_ds = xr.open_dataset(INPUT_ZARR, chunks={}, mask_and_scale= False).drop_vars("ndsi")
+    # NOTE: delay the datetime chunking , "datetime": -1
+    # NOTE: and directly drop unused ndsi
     
     # --- load median values for each doy --------------------------
     lookuptable  = xr.open_zarr(INPUT_ZARR_LOOKUPTABLE).chunk({"doy": -1, "pixel": PIXEL_CHUNKS})
 
     #TODO: remove this when development
     # subset pixels for development: FOR DEVELOPMENT:
-    # new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**6)) # , datetime = slice(0,100)
-    # with 10 pixels:       runtime=41s,  storage=304KB
-    # with 1000 pixels:     runtime=98s, storage=4.1MB
+    new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**3)) # , datetime = slice(0,30)
+    # with 10 pixels:       runtime=55s,  storage=304KB
+    # with 100 pixels:      runtime=78s,  storage=644KB
+    # with 1000 pixels:     runtime=327s, storage=4.1MB
     # with 10000 pixels:    runtime=1200s, storage=39MB
     # with 100000 pixels:   runtime=XXs, storage=XXKB
     # with 1000000 pixels:  runtime=282min, storage=3.8GB
@@ -357,10 +360,10 @@ if __name__ == "__main__":
     #            ii.  outlier detection, and 
     #            iii. appending to historic
     # =====================================================
-    new_ds = (ndvi_daily_since_last_historic.chunk({"pixel": PIXEL_CHUNKS, "date": -1}))
+    new_ds = ndvi_daily_since_last_historic # NOTE: delay rechunking just before apply_ufunc(): (.chunk({"pixel": PIXEL_CHUNKS, "date": -1}))
     # new_ds has: 
-    #   coords: x,y,x_idx,y_idx, pixel, date, datetime; 
-    #   vars:   ndvi,ndsi,obs_date
+    #   coords: x,y,x_idx,y_idx, pixel, date; 
+    #   vars:   ndvi,obs_date
     #   attrs:  pixel_definition,transform_note,transform_coeffs,transform_instr,description_ndvi,description_ndsi,nodata,cloud_shadow
     
     # drop any coord/data var chunk encodings that conflict
@@ -400,9 +403,6 @@ if __name__ == "__main__":
         # mask_array == 2: the data is an observation and is yet to be smoothed
         # mask_array == 3: the data is an observation and is smoothed
         # mask_array == 4: the data is an observation and is an outlier
-    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: mask_0or2_1D = xr.where(new_ds["obs_date"], 2, 0).astype(np.int8)   # dims: date
-    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: mask_0or2_2D = mask_0or2_1D.expand_dims({"pixel": new_ds.pixel})
-    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: new_ds = new_ds.assign(mask_array=mask_0or2_2D)
     mask_2or0 = (
         (new_ds["obs_date"]) & 
         (new_ds["ndvi"] < NO_COVERAGE) & 
@@ -410,10 +410,15 @@ if __name__ == "__main__":
     new_ds['mask_array'] = xr.where(mask_2or0, np.int8(2), np.int8(0))
     
     new_ds = new_ds.rename(
-        {'ndvi':'ndvi_processed',
-         'ndsi':'ndsi_processed'}
-    ).drop_vars('ndsi_processed')
+        {'ndvi':'ndvi_processed'})
 
+    # Save for intermediate computation
+    OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
+    new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1}).to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
+
+    # Reload freshly:
+    new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False)
+    
 
     # --- visual check of resulting new_ds ----------------------------------
     # import matplotlib.pyplot as plt
@@ -431,11 +436,11 @@ if __name__ == "__main__":
     # --- apply gapfilling and outlier detection function: historical_ndvi() ----------------------------------
 
     # prepare arguments spanning historic and new data: all lazy
-    ndvi_array_arg   = new_ds["ndvi_processed"].persist() # NOTE: in continuous integration this is the merged_ds
-    median_array_arg = new_ds["median_ndvi"].persist()    # NOTE: in continuous integration this is the merged_ds
-    mask_array_arg   = new_ds["mask_array"].persist()     # NOTE: in continuous integration this is the merged_ds
-    is_obs_date_array_arg = new_ds["obs_date"].persist()  # NOTE: in continuous integration this is the merged_ds
-    dates_array_arg  = new_ds["date"].persist()           # NOTE: in continuous integration this is the merged_ds
+    ndvi_array_arg   = new_ds["ndvi_processed"].chunk(dict(date=-1)).persist() # NOTE: in continuous integration this is the merged_ds
+    median_array_arg = new_ds["median_ndvi"].chunk(dict(date=-1)).persist()    # NOTE: in continuous integration this is the merged_ds
+    mask_array_arg   = new_ds["mask_array"].chunk(dict(date=-1)).persist()     # NOTE: in continuous integration this is the merged_ds
+    is_obs_date_array_arg = new_ds["obs_date"].chunk(dict(date=-1)).persist()  # NOTE: in continuous integration this is the merged_ds
+    dates_array_arg  = new_ds["date"].chunk(dict(date=-1)).persist()           # NOTE: in continuous integration this is the merged_ds
     start_date_arg   = dates_array_arg.values[0] # NOTE: in the historic case
     # using persist() reduces graph size
 
@@ -466,7 +471,7 @@ if __name__ == "__main__":
         vectorize=True, 
         dask="parallelized",
         output_dtypes=[np.dtype('int16'), np.dtype('int8')],
-        dask_gufunc_kwargs={"allow_rechunk": True},
+        # dask_gufunc_kwargs={"allow_rechunk": True},
     )
     # ndvi_processed.isel(pixel=1, date=slice(3160,3170)).compute() # TODO: check why this is [ 4845,  4835,  4826,  4819, 32767, 32767, 32767, 32767, 32767, 32767]
 
