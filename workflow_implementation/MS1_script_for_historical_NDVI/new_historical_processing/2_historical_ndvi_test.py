@@ -390,15 +390,20 @@ if __name__ == "__main__":
             pixel=new_ds.pixel) # this is to join by pixels and doy
 
 
-    # Add mask_array to new_ds (filled with 0 or 2):
+    # Add mask_array to new_ds (filled with 0 or 2 at this point):
         # mask_array == 0: the data is not an observation and is yet to be smoothed
         # mask_array == 1: the data is not an observation and is smoothed
         # mask_array == 2: the data is an observation and is yet to be smoothed
         # mask_array == 3: the data is an observation and is smoothed
         # mask_array == 4: the data is an observation and is an outlier
-    mask_0or2_1D = xr.where(new_ds["obs_date"], 2, 0).astype(np.int8)   # dims: date
-    mask_0or2_2D = mask_0or2_1D.expand_dims({"pixel": new_ds.pixel})
-    new_ds = new_ds.assign(mask_array=mask_0or2_2D)
+    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: mask_0or2_1D = xr.where(new_ds["obs_date"], 2, 0).astype(np.int8)   # dims: date
+    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: mask_0or2_2D = mask_0or2_1D.expand_dims({"pixel": new_ds.pixel})
+    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: new_ds = new_ds.assign(mask_array=mask_0or2_2D)
+    mask_2or0 = (
+        (new_ds["obs_date"]) & 
+        (new_ds["ndvi"] < NO_COVERAGE) & 
+        (new_ds["ndvi"] > INVALID))
+    new_ds['mask_array'] = xr.where(mask_2or0, np.int8(2), np.int8(0))
     
     new_ds = new_ds.rename(
         {'ndvi':'ndvi_processed',
@@ -406,6 +411,19 @@ if __name__ == "__main__":
     ).drop_vars('ndsi_processed')
 
 
+    # --- visual check of resulting new_ds ----------------------------------
+    # import matplotlib.pyplot as plt
+    # plt.figure(figsize=(7.2, 4), dpi = 200)
+
+    # new_ds_subset = new_ds.isel(pixel=[0,1,2, 2100, 3500, 4900])
+    # new_ds_subset["median_ndvi"].plot.line(x='date',hue='pixel')
+
+    # indexer = (new_ds_subset["mask_array"] == 2).compute()
+    # new_ds_subset2 = new_ds_subset.where(indexer, drop=True)
+    # new_ds_subset2["ndvi_processed"].plot.scatter(x='date',hue='pixel',marker="x")
+    
+    # plt.savefig('test.png')
+    
     # --- apply gapfilling and outlier detection function: historical_ndvi() ----------------------------------
 
     # prepare arguments spanning historic and new data: all lazy

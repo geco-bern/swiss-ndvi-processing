@@ -20,6 +20,11 @@ warnings.filterwarnings(
     module="numcodecs.zarr3"
 )
 
+NO_COVERAGE = 32767
+NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
+INVALID     = -32768
+INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
+
 # HOW TO RUN FROM BASH:
 # source /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate
 # SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py"
@@ -291,15 +296,20 @@ if __name__ == "__main__":
             pixel=historic_ds.pixel) # this is to join by pixels and doy
 
 
-    # Add mask_array to new_ds (filled with 0 or 2):
+    # Add mask_array to new_ds (filled with 0 or 2 at this point):
         # mask_array == 0: the data is not an observation and is yet to be smoothed
         # mask_array == 1: the data is not an observation and is smoothed
         # mask_array == 2: the data is an observation and is yet to be smoothed
         # mask_array == 3: the data is an observation and is smoothed
         # mask_array == 4: the data is an observation and is an outlier
-    mask_0or2_1D = xr.where(new_ds["obs_date"], 2, 0).astype(np.int8)   # dims: date
-    mask_0or2_2D = mask_0or2_1D.expand_dims({"pixel": new_ds.pixel})
-    new_ds = new_ds.assign(mask_array=mask_0or2_2D)
+    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: mask_0or2_1D = xr.where(new_ds["obs_date"], 2, 0).astype(np.int8)   # dims: date
+    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: mask_0or2_2D = mask_0or2_1D.expand_dims({"pixel": new_ds.pixel})
+    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: new_ds = new_ds.assign(mask_array=mask_0or2_2D)
+    mask_2or0 = (
+        (new_ds["obs_date"]) & 
+        (new_ds["ndvi_obs"] < NO_COVERAGE) & 
+        (new_ds["ndvi_obs"] > INVALID))
+    new_ds['mask_array'] = xr.where(mask_2or0, np.int8(2), np.int8(0))
 
     # --- concatenate full datasets along time ----------------------------------
     new_ds = new_ds.rename(
