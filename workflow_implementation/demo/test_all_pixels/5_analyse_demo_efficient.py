@@ -80,9 +80,11 @@ def historical_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         delta_delta_threshold = 0.1
 
         delta_ndvi = ndvi_valid - median_valid
-        delta_delta_left = delta_ndvi[2:]
-        delta_delta_rigth = delta_ndvi[:-2]
-        outlier_mask = ((abs(delta_ndvi[1:-1]) > delta_threshold) & (abs(delta_delta_left) > delta_delta_threshold) & (abs(delta_delta_rigth) > delta_delta_threshold))
+        delta_delta_left = delta_ndvi[2:]   # TODO: shouldnt this be a difference of deltas?
+        delta_delta_rigth = delta_ndvi[:-2] # TODO: shouldnt this be a difference of deltas?
+        outlier_mask = ((abs(delta_ndvi[1:-1]) > delta_threshold) &       # TODO: shouldn't this be a OR
+                        (abs(delta_delta_left) > delta_delta_threshold) & # TODO: shouldn't this be a OR
+                        (abs(delta_delta_rigth) > delta_delta_threshold))
         ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
         delta_ndvi = delta_ndvi[1:-1][~outlier_mask]
         days_diff_2 = days_diff_2[1:-1][~outlier_mask]
@@ -97,7 +99,7 @@ def historical_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
             # loop over the 7 rolling deltas. If the deltas are too large (extreme events as fire) 
             # or the original values too close to the boundaries condition (0.9 and 0.1) we do linear fit
 
-            delta_ndvi_to_interpolate = np.empty(len(delta_ndvi) -6, dtype=float)
+            delta_ndvi_to_interpolate = np.full(len(delta_ndvi)-6, np.nan)
 
             idx = np.arange(len(delta_ndvi))
 
