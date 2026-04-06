@@ -2,6 +2,7 @@ from datetime import datetime, date
 import numpy as np
 import statsmodels.api as sm
 from dask.distributed import Client
+import dask
 import xarray as xr
 import os, sys
 import shutil
@@ -210,7 +211,7 @@ if __name__ == "__main__":
     threads_per_worker=1,
     memory_limit='50GB',
     processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
-    dashboard_address=':1234')  
+    dashboard_address=':1236')  
     print(client.dashboard_link)
 
     # already having medians computed
@@ -239,10 +240,10 @@ if __name__ == "__main__":
 
     #TODO: remove this when development
     # subset pixels for development: FOR DEVELOPMENT:
-    new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**6)) # , datetime = slice(0,100)
+    new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**4)) # , datetime = slice(0,100)
     # with 10 pixels:       runtime=41s,  storage=304KB
-    # with 1000 pixels:     runtime=132s, storage=4.1MB
-    # with 10000 pixels:    runtime=976s, storage=39MB
+    # with 1000 pixels:     runtime=98s, storage=4.1MB
+    # with 10000 pixels:    runtime=1200s, storage=39MB
     # with 100000 pixels:   runtime=XXs, storage=XXKB
     # with 1000000 pixels:  runtime=XXs, storage=XXKB
     
@@ -483,6 +484,10 @@ if __name__ == "__main__":
     # FROM THE PREVIOUS HISTORIC VERSION:     dask_gufunc_kwargs={"allow_rechunk": True},
     # FROM THE PREVIOUS HISTORIC VERSION: )
     
+    # Ensure both outputs are computed in ONE scheduler pass (avoids re-running apply_ufunc twice)
+    ndvi_processed, mask_processed = dask.persist(ndvi_processed, mask_processed)
+    dask.distributed.wait([ndvi_processed, mask_processed])
+
     # g = mask_processed.__dask_graph__()
     g = ndvi_processed.__dask_graph__()
     print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)

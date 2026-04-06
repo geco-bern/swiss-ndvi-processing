@@ -11,6 +11,7 @@ from zarr.codecs import BloscCodec
 import time
 
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 
 import warnings
 warnings.filterwarnings(
@@ -36,7 +37,7 @@ dashboard_address=':2234')
 print(client.dashboard_link)
 
 OBS_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
-PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test.zarr" # TODO: remove -test
+PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test3.zarr" # TODO: remove -test
 INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
 
 # =====================================================
@@ -52,7 +53,7 @@ lookuptable  = xr.open_zarr(INPUT_ZARR_LOOKUPTABLE)
 # --- add median NDVI from model ----------------------------------
 
 # Append day-of-year (for merging of median expected NDVI from model)
-doy_array = pd.to_datetime(obs_ds['date']).dayofyear
+doy_array = pd.to_datetime(obs_ds['datetime']).dayofyear
 obs_ds = obs_ds.assign_coords(doy = ('datetime', doy_array))
 doy_noLeap = xr.where(obs_ds.doy == 366, 365, obs_ds.doy) # remove leap year if encountered
 obs_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
@@ -60,7 +61,7 @@ obs_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
         pixel=obs_ds.pixel) # this is to join by pixels and doy
 
 doy_array = pd.to_datetime(proc_ds['date']).dayofyear
-proc_ds = proc_ds.assign_coords(doy = ('datetime', doy_array))
+proc_ds = proc_ds.assign_coords(doy = ('date', doy_array))
 doy_noLeap = xr.where(proc_ds.doy == 366, 365, proc_ds.doy) # remove leap year if encountered
 proc_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
         doy=doy_noLeap,
@@ -91,7 +92,6 @@ proc_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
 # =====================================================
 #  Plot figures
 # =====================================================
-# Figure 0 (taken from workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB.py)
 START_DATE="2025-04-01"
 END_DATE="2025-08-01"
 # X_COORD, Y_COORD = "2720645", "1118245"
@@ -101,110 +101,167 @@ X_COORD, Y_COORD = "2644020", "1133790" # NOTE: Bitsch forest fire
     #     X_COORD="2710005" # TODO: check if this is indeed a forest pixel otherwise choose other test option
     #     Y_COORD="1109995" # TODO: check if this is indeed a forest pixel otherwise choose other test option
 X_COORD, Y_COORD = proc_ds['x'].values[0], proc_ds['y'].values[0]
-X_COORD, Y_COORD = proc_ds.isel(pixel=9999)['x'].values, proc_ds['y'].isel(pixel=9999).values
+X_COORD, Y_COORD = proc_ds.isel(pixel=999)['x'].values, proc_ds['y'].isel(pixel=999).values
 
-# c) subset historic data
-# 1) by date
-proc_ds_subset = proc_ds.sel(date = slice(pd.to_datetime(START_DATE), pd.to_datetime(END_DATE)))
-obs_ds_subset = obs_ds.sel(datetime = slice(pd.to_datetime(START_DATE), pd.to_datetime(END_DATE)))
 
-# 2) by coordinate
-#proc_ds_subset.x.compute() # from 2710005 to 2719945
-#proc_ds_subset.y.compute() # from 1109995 to 1100005
-indexer = ((proc_ds_subset.x==X_COORD) & (proc_ds_subset.y==Y_COORD))
-indexer = indexer.compute() # in order to use drop=True, we need to compute indexer so that dimension of result is known.
+# Figure 00
+# --- visual check of resulting data sets ----------------------------------
+proc_ds_subset = proc_ds.isel(pixel=[0, 210, 350, 490]).drop(["y_idx","x_idx"])
+obs_ds_subset  = obs_ds.isel(pixel=[0, 210, 350, 490]).drop(["y_idx","x_idx"])
+
+# proc_ds_subset["median_ndvi"].plot.line(x='datetime',hue='pixel')
+# plot all processed
+# proc_ds_subset["ndvi_processed"].plot.scatter(x='date',hue='pixel',marker=".", edgecolors="none")
+gr = proc_ds_subset["ndvi_processed"].plot.line(
+    x='date',row='pixel', color = 'black',
+    figsize=(7.2*2, 7.2*2))
+
+# plot processed observation
+        # mask_array == 0: the data is not an observation and is yet to be smoothed
+        # mask_array == 1: the data is not an observation and is smoothed
+        # mask_array == 2: the data is an observation and is yet to be smoothed
+        # mask_array == 3: the data is an observation and is smoothed
+        # mask_array == 4: the data is an observation and is an outlier
+indexer = ((proc_ds_subset["mask_array"] == 2) |
+           (proc_ds_subset["mask_array"] == 3) |
+           (proc_ds_subset["mask_array"] == 4)).compute()
 proc_ds_subset2 = proc_ds_subset.where(indexer, drop=True)
-#proc_ds_subset2.compute()
-#proc_ds_subset2.sizes
-
-indexer = ((obs_ds_subset.x==X_COORD) & (obs_ds_subset.y==Y_COORD))
-indexer = indexer.compute() # in order to use drop=True, we need to compute indexer so that dimension of result is known.
-obs_ds_subset2 = obs_ds_subset.where(indexer, drop=True)
-
+color_map = {
+    2: 'orange',
+    3: 'green',
+    4: 'red'
+}
 
 
-print(proc_ds_subset2)
-print(proc_ds_subset2.compute())
-print(obs_ds_subset2.compute())
+# automatic facetting (doesn't work: https://github.com/pydata/xarray/issues/10176):
+# proc_ds_subset2["ndvi_processed"].plot.scatter(x='date',col='pixel',marker="x")
+# manual facetting (works):
+for i in range(proc_ds_subset2.pixel.size):
+    ax = gr.axs.flat[i]
+    ax.set_prop_cycle(None)
+    proc_ds_subset2.isel(pixel=i).plot.scatter(
+        ax=ax, x='date',marker="x", 
+        y = "ndvi_processed", hue = "mask_array", cmap = mcolors.ListedColormap(['green', 'black', 'red']))
 
-# d) download raw data directly from swisstopo
-# if FLAG_DOWNLOAD:
-#     df_raw = download_timeseries_NDVI_singlePixel(
-#         x=X_COORD, 
-#         y=Y_COORD, 
-#         start_date = START_DATE, 
-#         end_date = END_DATE)
+# plot raw observation
+indexer_obs = ((obs_ds_subset["ndvi"] < NO_COVERAGE) &
+               (obs_ds_subset["ndvi"] > INVALID)).compute()
+obs_ds_subset2 = obs_ds_subset.where(indexer_obs, drop=True)
+# automatic facetting (doesn't work: https://github.com/pydata/xarray/issues/10176):
+# obs_ds_subset2["ndvi"].plot.scatter(row='pixel',x='datetime',marker="o", hue=None, color="red", alpha=0.2)
+# manual facetting (works):
+for i in range(obs_ds_subset2.pixel.size):
+    ax = gr.axs.flat[i]
+    ax.set_prop_cycle(None)
+    obs_ds_subset2.isel(pixel=i).plot.scatter(
+        ax=ax, x='datetime',marker="o", hue=None, color="green", alpha=0.2, y = "ndvi")
 
-# e) prepare plot
-# Get data
-dates      = proc_ds_subset2["date"].to_numpy()
-ndvi       = proc_ds_subset2["ndvi_processed"].load().to_numpy()[0]
-mask_array = proc_ds_subset2["mask_array"].load().to_numpy()[0]
+plt.savefig('test2.png')
+    
+    
+# Figure 0 (taken from workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB.py)
+# # c) subset historic data
+# # 1) by date
+# proc_ds_subset = proc_ds.sel(date = slice(pd.to_datetime(START_DATE), pd.to_datetime(END_DATE)))
+# obs_ds_subset = obs_ds.sel(datetime = slice(pd.to_datetime(START_DATE), pd.to_datetime(END_DATE)))
 
-obs_dates  = obs_ds_subset2["datetime"].to_numpy()
-obs_ndvi   = obs_ds_subset2["ndvi"].load().to_numpy()
+# # 2) by coordinate
+# #proc_ds_subset.x.compute() # from 2710005 to 2719945
+# #proc_ds_subset.y.compute() # from 1109995 to 1100005
+# indexer = ((proc_ds_subset.x==X_COORD) & (proc_ds_subset.y==Y_COORD))
+# indexer = indexer.compute() # in order to use drop=True, we need to compute indexer so that dimension of result is known.
+# proc_ds_subset2 = proc_ds_subset.where(indexer, drop=True)
+# #proc_ds_subset2.compute()
+# #proc_ds_subset2.sizes
 
-
-print(ndvi)
-print(mask_array)
-
-# TODO: we did not include medians in historical data cube and need to append it each time: medians = ds_h["median_ndvi"].isel(date = slice(2800,3265)).load().to_numpy()
-
-# Filter based on mask_array
-no_obs_to_smooth = mask_array == 0
-no_obs_smoothed = mask_array == 1
-obs_to_smooth = mask_array == 2
-obs_smoothed = mask_array == 3
-outlier_smoothed = mask_array == 4
-
-# f) make plot
-plt.figure(figsize=(7.2, 4), dpi = 200)
-
-# plt.plot(dates[no_obs_to_smooth], ndvi[no_obs_to_smooth], marker="D", linestyle="None", markersize=2, color ="black",  label = "no obs to smooth") # TODO: what y-values do these have??? They have 32767.
-# plt.plot(dates[no_obs_smoothed],  ndvi[no_obs_smoothed],  marker="D", linestyle="None", markersize=2, color ="orange", label = "no obs smoothed")
-# plt.plot(dates[obs_to_smooth],    ndvi[obs_to_smooth],    marker="x", linestyle="None", markersize=4, color ="yellow", label = "obs to smooth")
-# plt.plot(dates[obs_smoothed],     ndvi[obs_smoothed],     marker="x", linestyle="None", markersize=4, color ="green",  label = "obs smoothed")
-# plt.plot(dates[outlier_smoothed], ndvi[outlier_smoothed], marker="x", linestyle="None", markersize=2, color ="red",    label = "outlier smoothed")
+# indexer = ((obs_ds_subset.x==X_COORD) & (obs_ds_subset.y==Y_COORD))
+# indexer = indexer.compute() # in order to use drop=True, we need to compute indexer so that dimension of result is known.
+# obs_ds_subset2 = obs_ds_subset.where(indexer, drop=True)
 
 
-plt.plot(obs_dates, obs_ndvi, marker="x", linestyle="None", markersize=2, color ="black",  label = "raw obs")
 
-# if FLAG_DOWNLOAD:
-#     # add crosses for raw downloaded observations
-#     plt.plot(
-#         df_raw.datetime, 
-#         df_raw.ndvi_scaled, 
-#         marker="x", alpha=.5, linestyle="None", markersize=5, color ="blue",
-#         label = "Raw download")
-#     # add vertical areas for days with observations
-#     obs_dates = [
-#         [obs_date.floor("D"), obs_date.ceil("D")]  for obs_date in df_raw.datetime]
-#     [plt.axvspan(_range[0], _range[1], color='grey', alpha=1.0) for _range in obs_dates]
+# print(proc_ds_subset2)
+# print(proc_ds_subset2.compute())
+# print(obs_ds_subset2.compute())
 
-# TODO: ALSO ADD MEDIANS: plt.plot(dates, medians,color = "black", linestyle="-",label = "median_ndvi")
-# plt.ylim(0, 10000)
-plt.ylim(0, 33000) # TODO: reactivate cropping at 10000
-plt.xlabel("Date")
-plt.ylabel("NDVI")
-plt.title(f"NDVI Time Series of location: {(X_COORD, Y_COORD)}")
-plt.grid(True)
-plt.legend()
-plt.tight_layout()
+# # d) download raw data directly from swisstopo
+# # if FLAG_DOWNLOAD:
+# #     df_raw = download_timeseries_NDVI_singlePixel(
+# #         x=X_COORD, 
+# #         y=Y_COORD, 
+# #         start_date = START_DATE, 
+# #         end_date = END_DATE)
 
-# g) output figure
+# # e) prepare plot
+# # Get data
+# dates      = proc_ds_subset2["date"].to_numpy()
+# ndvi       = proc_ds_subset2["ndvi_processed"].load().to_numpy()[0]
+# mask_array = proc_ds_subset2["mask_array"].load().to_numpy()[0]
 
-plotpath = (
-    #"/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova2/"+
-    # "TESTSUITE_"+
-    # f"{os.path.basename(HISTO_ZARR_INPUT)}_"+
-    # f"{START_DATE.replace("-","")}to{END_DATE.replace("-","")}_"+
-    # f"location_{X_COORD}x{Y_COORD}"+
-    PROC_ZARR+"-TESTSUITE_"+
-    f"{START_DATE.replace("-","")}to{END_DATE.replace("-","")}_"+
-    f"location_{X_COORD}x{Y_COORD}"+
-    ".png")
-plt.savefig(plotpath)
-plt.close()
+# obs_dates  = obs_ds_subset2["datetime"].to_numpy()
+# obs_ndvi   = obs_ds_subset2["ndvi"].load().to_numpy()
+
+
+# print(ndvi)
+# print(mask_array)
+
+# # TODO: we did not include medians in historical data cube and need to append it each time: medians = ds_h["median_ndvi"].isel(date = slice(2800,3265)).load().to_numpy()
+
+# # Filter based on mask_array
+# no_obs_to_smooth = mask_array == 0
+# no_obs_smoothed = mask_array == 1
+# obs_to_smooth = mask_array == 2
+# obs_smoothed = mask_array == 3
+# outlier_smoothed = mask_array == 4
+
+# # f) make plot
+# plt.figure(figsize=(7.2, 4), dpi = 200)
+
+# # plt.plot(dates[no_obs_to_smooth], ndvi[no_obs_to_smooth], marker="D", linestyle="None", markersize=2, color ="black",  label = "no obs to smooth") # TODO: what y-values do these have??? They have 32767.
+# # plt.plot(dates[no_obs_smoothed],  ndvi[no_obs_smoothed],  marker="D", linestyle="None", markersize=2, color ="orange", label = "no obs smoothed")
+# # plt.plot(dates[obs_to_smooth],    ndvi[obs_to_smooth],    marker="x", linestyle="None", markersize=4, color ="yellow", label = "obs to smooth")
+# # plt.plot(dates[obs_smoothed],     ndvi[obs_smoothed],     marker="x", linestyle="None", markersize=4, color ="green",  label = "obs smoothed")
+# # plt.plot(dates[outlier_smoothed], ndvi[outlier_smoothed], marker="x", linestyle="None", markersize=2, color ="red",    label = "outlier smoothed")
+
+
+# plt.plot(obs_dates, obs_ndvi, marker="x", linestyle="None", markersize=2, color ="black",  label = "raw obs")
+
+# # if FLAG_DOWNLOAD:
+# #     # add crosses for raw downloaded observations
+# #     plt.plot(
+# #         df_raw.datetime, 
+# #         df_raw.ndvi_scaled, 
+# #         marker="x", alpha=.5, linestyle="None", markersize=5, color ="blue",
+# #         label = "Raw download")
+# #     # add vertical areas for days with observations
+# #     obs_dates = [
+# #         [obs_date.floor("D"), obs_date.ceil("D")]  for obs_date in df_raw.datetime]
+# #     [plt.axvspan(_range[0], _range[1], color='grey', alpha=1.0) for _range in obs_dates]
+
+# # TODO: ALSO ADD MEDIANS: plt.plot(dates, medians,color = "black", linestyle="-",label = "median_ndvi")
+# # plt.ylim(0, 10000)
+# plt.ylim(0, 33000) # TODO: reactivate cropping at 10000
+# plt.xlabel("Date")
+# plt.ylabel("NDVI")
+# plt.title(f"NDVI Time Series of location: {(X_COORD, Y_COORD)}")
+# plt.grid(True)
+# plt.legend()
+# plt.tight_layout()
+
+# # g) output figure
+
+# plotpath = (
+#     #"/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova2/"+
+#     # "TESTSUITE_"+
+#     # f"{os.path.basename(HISTO_ZARR_INPUT)}_"+
+#     # f"{START_DATE.replace("-","")}to{END_DATE.replace("-","")}_"+
+#     # f"location_{X_COORD}x{Y_COORD}"+
+#     PROC_ZARR+"-TESTSUITE_"+
+#     f"{START_DATE.replace("-","")}to{END_DATE.replace("-","")}_"+
+#     f"location_{X_COORD}x{Y_COORD}"+
+#     ".png")
+# plt.savefig(plotpath)
+# plt.close()
 
 
 
