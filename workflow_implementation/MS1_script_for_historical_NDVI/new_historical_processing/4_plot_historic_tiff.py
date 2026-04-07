@@ -59,8 +59,10 @@ if __name__ == '__main__':
     # Starting from v4 we have access to x_idx and y_idx.
     # Compute minimal bounding window that contains all pixels, then shift indices
     # so the grid uses a compact array sized to that window.
-    rows = NDVI_historic.y_idx.values.astype(int)
-    cols = NDVI_historic.x_idx.values.astype(int)
+    cols = NDVI_historic.y_idx.values.astype(int) # TODO: this fixes to rotation, but ideally 
+    rows = NDVI_historic.x_idx.values.astype(int) # TODO: this fixes to rotation, but ideally 
+    #y_coords = NDVI_historic.y.values.astype(int) # NOTE: this is correct, not affected by the rotation
+    #x_coords = NDVI_historic.x.values.astype(int) # NOTE: this is correct, not affected by the rotation
 
     # bounding box in full-raster coordinates
     min_row = int(rows.min())
@@ -133,7 +135,7 @@ if __name__ == '__main__':
                 output_tiff_ndvi,
                 driver="COG",
                 compress="deflate",
-                dtype="int16",
+                dtype="int16"
             )
             NDVI_status_curr_date_gridded.rio.to_raster(
                 output_tiff_mask,

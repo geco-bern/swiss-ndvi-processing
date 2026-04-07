@@ -522,8 +522,8 @@ if (len(s2_files) > 0):
         'pixel': ids,
         'x': xs,
         'y': ys,
-        'x_idx': rows,
-        'y_idx': cols,
+        'x_idx': rows, # TODO: bug: here, were mixing rows/cols up. Fix and rerun download.
+        'y_idx': cols, # TODO: bug: here, were mixing rows/cols up. Fix and rerun download.
     }).set_index('pixel')
     
     # Align lookup by pixel values
