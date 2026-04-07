@@ -551,6 +551,13 @@ if __name__ == "__main__":
 
         # small pause to allow dashboard websocket handshakes / metadata flush
         time.sleep(2)
-        
+
+
+
     print(OUT_PATH, flush = True)
+
+    # cleanup the temporary file:
+    # if os.path.exists(OUT_ZARR_TMP): # TODO: activate
+    #     shutil.rmtree(OUT_ZARR_TMP)  # TODO: activate
+        
     sys.exit(0)

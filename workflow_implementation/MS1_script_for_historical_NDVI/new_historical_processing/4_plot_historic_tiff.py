@@ -1,5 +1,6 @@
 # This plots maps of selected (all) time steps
  
+import re
 import rasterio
 import textwrap
 import rioxarray
@@ -14,24 +15,30 @@ from dask.distributed import Client
 # run this python script to create a TIFF
 # source "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate"
 # python 7_create_historic_tiff.py "2025-08-22"
+# python 7_create_historic_tiff.py "all_dates"
 
 if __name__ == '__main__':
 
     # Paths
-    INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test6.zarr" # TODO: remove -test
-    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7_compr"
+    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7"
     # DASK_TEMP_DIR    = "/mnt/data1/UniBe-swiss-ndvi/tmp_data2/"
 
     os.makedirs(OUTPUT_TIFF_BASE, exist_ok=True)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("date", help="Start date in YYYY-MM-DD")
+    parser.add_argument("INPUT_HISTORIC",  help="Full path to Zarr folder with historic NDVI data")
+    parser.add_argument("date",            help="Start date in YYYY-MM-DD or then 'all_dates'")
     args = parser.parse_args()
 
-    curr_date = args.date
+    args = parser.parse_args()
+
+    INPUT_HISTORIC = args.INPUT_HISTORIC
+    date_arg       = args.date
     # if running interactively use e.g.:
-        # curr_date = "2024-07-22" # for dates requested...
-        # curr_date = "2024-07-31" # for dates requested...
+        # date_arg = "2024-07-22" # for dates requested...
+        # date_arg = "2024-07-31" # for dates requested...
+        # date_arg = "all_dates"
+        # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test6.zarr" # TODO: remove -test
 
 
     # Load (processed) NDVI data set to output specific dates
@@ -42,7 +49,7 @@ if __name__ == '__main__':
         threads_per_worker=1,
         processes=True,
         memory_limit=MEMORY_PER_WORKER,
-        dashboard_address=":8345",
+        dashboard_address=":8346",
         # local_directory= DASK_TEMP_DIR
     )
     print(client, flush = True)
@@ -100,10 +107,18 @@ if __name__ == '__main__':
     # Run tiff-generation for requested date
     dates_done = [s[:8] for s in os.listdir(OUTPUT_TIFF_BASE)]
 
+    if date_arg == "all_dates": 
+        curr_date_to_loop = [np.datetime64(d, "D") for d in NDVI_historic['date'].values]
+    else:
+        # date_arg = "2017-06-19" # NOTE: this date shows gapfilled data (in region Schaffhausen)
+        # date_arg = "2017-06-02" # NOTE: this date shows observed data (in region Schaffhausen)
+        # date_arg = "21-06-19"   # NOTE: this would trigger the wrong format warning
+        assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", date_arg), f"Expected format YYYY-MM-DD with digits only. Received date_arg: {date_arg}"
+        # curr_date_to_loop = [np.datetime64("2024-01-01", "D")]
+        curr_date_to_loop = [np.datetime64(date_arg, "D")]
 
-    curr_date = np.datetime64(curr_date, "D")
-
-    for curr_date in [curr_date]:
+    # curr_date = curr_date_to_loop[0]
+    for curr_date in curr_date_to_loop:
         curr_date_str = pd.to_datetime(curr_date).strftime('%Y%m%d')
         if (curr_date_str in dates_done):
             print(f"Skipping file (already exported): {curr_date_str}_historic.tiff")
@@ -115,6 +130,11 @@ if __name__ == '__main__':
             # Fill compact window grid using local indices
             grid_ndvi[local_rows, local_cols] = NDVI_historic.sel(date=curr_date)['ndvi_processed'].values
             grid_mask[local_rows, local_cols] = NDVI_historic.sel(date=curr_date)['mask_array'].values
+                # mask_array == 0: the data is not an observation and is yet to be smoothed
+                # mask_array == 1: the data is not an observation and is smoothed
+                # mask_array == 2: the data is an observation and is yet to be smoothed
+                # mask_array == 3: the data is an observation and is smoothed
+                # mask_array == 4: the data is an observation and is an outlier
 
             # Transform back into a xarray/rioxarray DataArray that spans the compact x-y-grid
             NDVI_processed_curr_date_gridded = xr.DataArray(grid_ndvi, dims=("y", "x"))
