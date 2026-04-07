@@ -144,8 +144,24 @@ if __name__ == "__main__":
 
     # already having medians computed
 
+
+
+    import zarr
+    import numpy as np
+
+    # path al tuo tmp
+    OUT = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial_tmp_short.zarr"
+
+    # apri solo l'array NDVI dal tmp
+    ndvi_arr = zarr.open_array(store=f"{OUT}/ndvi", mode="r")
+
+    # stampa shape per vedere se è ok
+    mask = (ndvi_arr[3:103, 200:255] > 0) & (ndvi_arr[3:103, 200:255] < 10000)
+    count = np.sum(mask)
+
+
     #INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small.zarr" 
-    INPUT_ZARR = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial_short.zarr" # for whole set "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial.zarr"
+    INPUT_ZARR = "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial_short_2.zarr" # for whole set "/data_3/scratch/francesco/processed/new_ndvi_dataset_spatial.zarr"
     INPUT_ZARR_LOOKUPTABLE = "/data_3/francesco/lookup_table_median_ndvi.zarr"
     OUT_PATH = "/data_3/scratch/francesco/processed/short_historical.zarr"
 
@@ -230,20 +246,13 @@ if __name__ == "__main__":
     valid = ds_filtered["ndvi"].isel(pixel=(slice(0,1000)))
     ndvi_avg = (valid.groupby(valid.datetime.dt.date).mean(dim="datetime", skipna=False))
 
-    # rename to datetime 
-    ndvi_avg = ndvi_avg.rename({"date": "datetime"})
-
     # jsut to print the len
-    ndvi_test = ndvi_avg.load().to_numpy()
+    ndvi_test = valid.load().to_numpy()
+
+    print(valid)
 
     # check if all data are zeros or not
     print(np.sum(ndvi_test))
-
-    valid = ds["ndvi"].isel(pixel=(slice(0,1000)))
-
-    ndvi_test = ndvi_avg.load().to_numpy()
-    print((ndvi_test))
-
 
 
     # call gufunc where core dim is "time" (1D arrays per pixel)
