@@ -56,8 +56,8 @@ end_date = args.end_date
 
 # CONFIGURE:
 today = datetime.today().strftime("%Y-%m-%d_%Hh%M")
-OUTPUT_ZARR_TEMP = f"/mnt/data1/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloadedA_{start_date}_{end_date}.zarr"
-OUTPUT_ZARR      = f"/mnt/data1/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloaded_{start_date}_{end_date}.zarr"
+OUTPUT_ZARR_TEMP = f"/mnt/data2/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloadedA_{start_date}_{end_date}.zarr"
+OUTPUT_ZARR      = f"/mnt/data2/UniBe-swiss-ndvi/data/tmp_{today}_ndvi_01_downloaded_{start_date}_{end_date}.zarr"
 # ==============================================================================
 
 # Start script:

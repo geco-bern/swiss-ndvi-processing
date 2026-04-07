@@ -46,14 +46,14 @@ def get_swisstopo_sentinel_dates(start, end): # start='2025-12-01', end='2026-02
 
 
 # Paths
-#INPUT_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/"
-INPUT_BASE = "/mnt/data1/UniBe-swiss-ndvi/tmp_ndvi_05_processed.zarr"
-OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs/"
+#INPUT_BASE = "/mnt/data2/UniBe-swiss-ndvi/data/demo_all_pixel/05_processed/"
+INPUT_BASE = "/mnt/data2/UniBe-swiss-ndvi/tmp_ndvi_05_processed.zarr"
+OUTPUT_TIFF_BASE = "/mnt/data2/UniBe-swiss-ndvi/data/tiffs/"
 
 os.makedirs(OUTPUT_TIFF_BASE, exist_ok=True)
 
-# ssh dash-WS02-GECO; rsync -avhz --progress -e 'ssh -p 2222' /data_2/scratch/sbiegel/processed/forest_mask.npy fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/forest_mask.npy
-# FOREST_MASK = "/mnt/data1/UniBe-swiss-ndvi/data/forest_mask.npy" # NOTE: this is different from 'mask_array'  # TODO: FOREST_MASK is unused
+# ssh dash-WS02-GECO; rsync -avhz --progress -e 'ssh -p 2222' /data_2/scratch/sbiegel/processed/forest_mask.npy fabian-bernhard@tunder.dev.admin.ch:/mnt/data2/UniBe-swiss-ndvi/data/forest_mask.npy
+# FOREST_MASK = "/mnt/data2/UniBe-swiss-ndvi/data/forest_mask.npy" # NOTE: this is different from 'mask_array'  # TODO: FOREST_MASK is unused
 
 
 parser = argparse.ArgumentParser()

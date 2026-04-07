@@ -38,10 +38,10 @@ warnings.filterwarnings(
 # source /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate
 # SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB.py"
 # LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
-# # HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_100kmX100km.zarr"
-# # HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365.zarr_bkp"
-# HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_100kmX100km.zarr"
-# HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_10kmX10km.zarr"
+# # HISTO_INPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_100kmX100km.zarr"
+# # HISTO_INPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365.zarr_bkp"
+# HISTO_INPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_100kmX100km.zarr"
+# HISTO_INPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_10kmX10km.zarr"
 # # X_COORD="2720645"; Y_COORD="1118245"
 # # X_COORD="2710385"; Y_COORD="1116375"
 # X_COORD="2710005"
@@ -64,7 +64,7 @@ warnings.filterwarnings(
     #     FLAG_DOWNLOAD=True
 
 
-INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr" # TODO: use this
+INPUT_LOOKUPTABLE  = "/mnt/data2/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr" # TODO: use this
 
 
 # FOR DEVELOPMENT: x=2710005; y=1109995; start_date = START_DATE; end_date = END_DATE
@@ -293,7 +293,7 @@ if __name__ == "__main__":
     END_DATE          = args.END_DATE
     FLAG_DOWNLOAD     = args.add_raw_download
     # if running interactively use e.g.:
-    #     HISTO_ZARR_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_10kmX10km.zarr"
+    #     HISTO_ZARR_INPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_10kmX10km.zarr"
     #     X_COORD="2710005" # TODO: check if this is indeed a forest pixel otherwise choose other test option
     #     Y_COORD="1109995" # TODO: check if this is indeed a forest pixel otherwise choose other test option
     #     # X_COORD="2644020" # NOTE: Bitsch forest fire
@@ -315,7 +315,7 @@ if __name__ == "__main__":
     N_WORKERS = 2
     MEMORY_PER_WORKER = '20GB'
     N_THREADS_PER_WORKER = 1
-    DASK_TEMP_DIR = "/mnt/data1/UniBe-swiss-ndvi/tmp_data7/"
+    DASK_TEMP_DIR = "/mnt/data2/UniBe-swiss-ndvi/tmp_data7/"
     client = Client(
         n_workers=N_WORKERS,
         threads_per_worker=N_THREADS_PER_WORKER,

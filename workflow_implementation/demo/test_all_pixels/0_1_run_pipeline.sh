@@ -97,9 +97,11 @@ echo "------------------------------------------------------------"
 echo "------------------------------------------------------------"
 echo "Running: ${SCRIPTS[0]}"; echo "Start time: $(timestamp)"
 START_TIME=$(date +%s)
-#python -u "${SCRIPTS[0]}" "$START_DATE" "$END_DATE"
+# python -u "${SCRIPTS[0]}" "$START_DATE" "$END_DATE"
 #DOWNLOAD_FILE=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
-DOWNLOAD_FILE="/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr" # TODO: deactivate this
+#DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr" # step 1 TODO: deactivate this
+#DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-19_18h40_ndvi_01_downloaded_2025-12-12_2025-12-28.zarr" # step 2 TODO: deactivate this
+DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-24_00h27_ndvi_01_downloaded_2025-11-30_2025-12-28.zarr"
 END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
 echo "Finished: ${SCRIPTS[0]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
@@ -126,8 +128,10 @@ else
 
   START_TIME=$(date +%s)
   python -u "${SCRIPTS[1]}" "$DOWNLOAD_FILE" "$HISTO_INPUT"
-  NEW_NDVI=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
-  #NEW_NDVI="/mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
+  #NEW_NDVI=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
+  #NEW_NDVI="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
+  #NEW_NDVI="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-19_18h40_ndvi_01_downloaded_2025-12-12_2025-12-28_processed.zarr"
+  NEW_NDVI="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-24_00h27_ndvi_01_downloaded_2025-11-30_2025-12-28_processed.zarr"
   END_TIME=$(date +%s)
   ELAPSED=$((END_TIME - START_TIME))
   echo "Finished: ${SCRIPTS[1]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"

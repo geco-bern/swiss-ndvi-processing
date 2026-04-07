@@ -51,7 +51,7 @@ def create_png(pixel,path):
 
 
 input_zarr_src = "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/data_for_demo_2/"
-historical_data = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small_FB2026-03-17.zarr"
+historical_data = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small_FB2026-03-17.zarr"
 
 ds = xr.open_zarr(input_zarr_src, chunks={})
 ds_h = xr.open_zarr(historical_data, chunks={})
