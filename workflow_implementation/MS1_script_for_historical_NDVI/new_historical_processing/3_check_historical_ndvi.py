@@ -1,3 +1,5 @@
+# This plots time series of selected pixels, illustrating our processing
+
 from datetime import datetime, date
 import numpy as np
 import statsmodels.api as sm
@@ -12,6 +14,8 @@ import time
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import matplotlib.ticker as ticker
+from matplotlib.lines import Line2D
 
 import warnings
 warnings.filterwarnings(
@@ -37,7 +41,7 @@ dashboard_address=':2234')
 print(client.dashboard_link)
 
 OBS_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
-PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test3.zarr" # TODO: remove -test
+PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test6.zarr" # TODO: remove -test
 INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
 
 # =====================================================
@@ -51,7 +55,6 @@ lookuptable  = xr.open_zarr(INPUT_ZARR_LOOKUPTABLE)
 
 
 # --- add median NDVI from model ----------------------------------
-
 # Append day-of-year (for merging of median expected NDVI from model)
 doy_array = pd.to_datetime(obs_ds['datetime']).dayofyear
 obs_ds = obs_ds.assign_coords(doy = ('datetime', doy_array))
@@ -109,11 +112,21 @@ X_COORD, Y_COORD = proc_ds.isel(pixel=999)['x'].values, proc_ds['y'].isel(pixel=
 proc_ds_subset = proc_ds.isel(pixel=[0, 210, 350, 490]).drop(["y_idx","x_idx"])
 obs_ds_subset  = obs_ds.isel(pixel=[0, 210, 350, 490]).drop(["y_idx","x_idx"])
 
+smoothed_cmap = {
+    # 0: ("no_obs_to_smooth", "black"),
+    # 1: ("no_obs_smoothed",  "orange"),
+    2: ("2: obs_to_smooth",    "orange"),
+    3: ("3: obs_smoothed",     "black"),
+    4: ("4: obs_smoothed_outlier", "red"),
+}
+obs_cmap     = {0: ("obs_raw",   "green")}
+gapfill_cmap = {0: ("gapfilled", "black")}
+
 # proc_ds_subset["median_ndvi"].plot.line(x='datetime',hue='pixel')
 # plot all processed
 # proc_ds_subset["ndvi_processed"].plot.scatter(x='date',hue='pixel',marker=".", edgecolors="none")
 gr = proc_ds_subset["ndvi_processed"].plot.line(
-    x='date',row='pixel', color = 'black',
+    x='date',row='pixel', color = gapfill_cmap[0][1],
     figsize=(7.2*2, 7.2*2))
 
 # plot processed observation
@@ -122,26 +135,26 @@ gr = proc_ds_subset["ndvi_processed"].plot.line(
         # mask_array == 2: the data is an observation and is yet to be smoothed
         # mask_array == 3: the data is an observation and is smoothed
         # mask_array == 4: the data is an observation and is an outlier
-indexer = ((proc_ds_subset["mask_array"] == 2) |
-           (proc_ds_subset["mask_array"] == 3) |
-           (proc_ds_subset["mask_array"] == 4)).compute()
-proc_ds_subset2 = proc_ds_subset.where(indexer, drop=True)
-color_map = {
-    2: 'orange',
-    3: 'green',
-    4: 'red'
-}
-
+indexer_proc = ((proc_ds_subset["mask_array"] == 2) |
+                (proc_ds_subset["mask_array"] == 3) |
+                (proc_ds_subset["mask_array"] == 4)).compute()
+proc_ds_subset2 = proc_ds_subset.where(indexer_proc, drop=True)
 
 # automatic facetting (doesn't work: https://github.com/pydata/xarray/issues/10176):
 # proc_ds_subset2["ndvi_processed"].plot.scatter(x='date',col='pixel',marker="x")
 # manual facetting (works):
+colors = [smoothed_cmap[k][1] for k in sorted(smoothed_cmap)]
+cmap = mcolors.ListedColormap(colors)
+# boundaries = np.arange(-0.5, len(colors) + 0.5, 1.0)
+# norm = mcolors.BoundaryNorm(boundaries, cmap.N)
 for i in range(proc_ds_subset2.pixel.size):
     ax = gr.axs.flat[i]
     ax.set_prop_cycle(None)
     proc_ds_subset2.isel(pixel=i).plot.scatter(
-        ax=ax, x='date',marker="x", 
-        y = "ndvi_processed", hue = "mask_array", cmap = mcolors.ListedColormap(['green', 'black', 'red']))
+        ax=ax, x='date', marker="x",
+        y="ndvi_processed", hue="mask_array",
+        cmap=cmap, add_colorbar=False) # norm=norm, 
+
 
 # plot raw observation
 indexer_obs = ((obs_ds_subset["ndvi"] < NO_COVERAGE) &
@@ -154,9 +167,32 @@ for i in range(obs_ds_subset2.pixel.size):
     ax = gr.axs.flat[i]
     ax.set_prop_cycle(None)
     obs_ds_subset2.isel(pixel=i).plot.scatter(
-        ax=ax, x='datetime',marker="o", hue=None, color="green", alpha=0.2, y = "ndvi")
+        ax=ax, x='datetime',marker="o", hue=None, 
+        color=obs_cmap[0][1],
+        alpha=0.2, y = "ndvi")
 
-plt.savefig('test2.png')
+# layouting/formatting
+for i in range(obs_ds_subset2.pixel.size):
+    ax = gr.axs.flat[i]
+    ax.set_xlabel("") # remove x labels
+    ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda val, pos: val / 10000)) # fix y-axis tick labels
+
+handles_for_legend = [ # legend entry for raw observations:
+    Line2D([0], [0], marker='o', linestyle='', color=color, markerfacecolor=color, markersize=6, label=label)
+    for _, (label, color) in obs_cmap.items()
+] + [                  # legend entry for gapfilled line:
+    Line2D([0], [0], marker='', linestyle='-', color=color, markerfacecolor=color, markersize=6, label=label)
+    for _, (label, color) in gapfill_cmap.items()
+] + [                  # legend entry for processed (smoothed) observations:
+    Line2D([0], [0], marker='x', linestyle='', color=color, markerfacecolor=color, markersize=6, label=label)
+    for _, (label, color) in smoothed_cmap.items()
+]
+for i in range(obs_ds_subset2.pixel.size):
+    ax = gr.axs.flat[i]
+    ax.legend(handles=handles_for_legend, title="", fontsize="small", loc="lower left") # add discrete legend
+
+# save plot:    
+plt.savefig('test4.png')
     
     
 # Figure 0 (taken from workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB.py)
