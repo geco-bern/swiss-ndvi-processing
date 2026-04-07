@@ -243,7 +243,7 @@ if __name__ == "__main__":
 
         #TODO: remove this when development
         # subset pixels for development: FOR DEVELOPMENT:
-        new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**6)) # , datetime = slice(0,30)
+        new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**3)) # , datetime = slice(0,30)
         # with 10 pixels:         runtime=55s,  storage=304KB
         # with 100 pixels:        runtime=52s,  storage=644KB
         # with 1_000 pixels:      runtime=81s, storage=4.1MB
@@ -413,10 +413,10 @@ if __name__ == "__main__":
         new_ds = new_ds.rename(
             {'ndvi':'ndvi_processed'})
         
-        # Save for intermediate computation
+        # NOTE: this requires 400GB of free, additional disk space (for all images from 2017-04-01 to 2025-12-31)
+        # Save for intermediate computation (disk-backed rechunking)
         OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
         new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1}).to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
-
         # Reload freshly:
         new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False)
         
@@ -561,3 +561,9 @@ if __name__ == "__main__":
     #     shutil.rmtree(OUT_ZARR_TMP)  # TODO: activate
         
     sys.exit(0)
+
+
+
+# from dash:
+# rsync -ahz --info=progress2 -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test7.zarr /data_3/scratch
+# 
