@@ -211,7 +211,7 @@ if __name__ == "__main__":
         threads_per_worker=1,
         memory_limit='50GB',
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
-        dashboard_address=':1239') as client:
+        dashboard_address=':1235') as client:
     
         print(client.dashboard_link)
 
@@ -244,12 +244,12 @@ if __name__ == "__main__":
         # subset pixels for development: FOR DEVELOPMENT:
         new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**3)) # , datetime = slice(0,30)
         # with 10 pixels:         runtime=55s,  storage=304KB
-        # with 100 pixels:        runtime=52s,  storage=644KB
-        # with 1_000 pixels:      runtime=81s, storage=4.1MB
-        # with 10_000 pixels:     runtime=286s, storage=39MB
-        # with 100_000 pixels:    runtime=XXs, storage=XXKB
-        # with 1_000_000 pixels:  runtime=442min, storage=3.8GB
-        # wit all pixels:         runtime=XXXmin, storage=XXXGB
+        # with 100 pixels:        runtime=54s,  storage=644KB
+        # with 1_000 pixels:      runtime=61s, storage=4.1MB
+        # with 10_000 pixels:     runtime=141s, storage=39MB
+        # with 100_000 pixels:    runtime=1080s, storage=XXKB
+        # with 1_000_000 pixels:  runtime=105min, storage=3.8GB
+        # with all pixels:        runtime=XXXmin, storage=380GB
         # END TODO
 
         # =====================================================
@@ -428,84 +428,101 @@ if __name__ == "__main__":
         
         # --- apply gapfilling and outlier detection function: historical_ndvi() ----------------------------------
 
-        # prepare arguments spanning historic and new data: all lazy
-        ndvi_array_arg   = new_ds["ndvi_processed"].persist() # NOTE: in continuous integration this is the merged_ds
-        median_array_arg = new_ds["median_ndvi"].persist()    # NOTE: in continuous integration this is the merged_ds
-        mask_array_arg   = new_ds["mask_array"].persist()     # NOTE: in continuous integration this is the merged_ds
-        is_obs_date_array_arg = new_ds["obs_date"].persist()  # NOTE: in continuous integration this is the merged_ds
-        dates_array_arg  = new_ds["date"].persist()           # NOTE: in continuous integration this is the merged_ds
-        start_date_arg   = dates_array_arg.values[0] # NOTE: in the historic case
-        # using persist() reduces graph size
-
-
-        # call gufunc where core dim is "time" (1D arrays per pixel)
-        ndvi_processed, mask_processed = xr.apply_ufunc(
-            historical_ndvi,
-            ndvi_array_arg,        # this is the observed/gapfilled/processed NDVI value
-            median_array_arg,      # this is the modelled median NDVI for the corresponding DOY
-            mask_array_arg,        # this is the integer processing status
-            is_obs_date_array_arg, # this is the True-False boolean if a date contains satellite images (is_observation_date?)
-            input_core_dims=[["date"], ["date"],["date"], ["date"]],    # each call gets 1D time arrays
-            output_core_dims=[["date"],["date"]],
-            kwargs={
-                "dates_array": dates_array_arg,           # this contains all daily dates
-                "starting_date": start_date_arg},   # this contains the starting date when to start ??
-            vectorize=True, 
-            dask="parallelized",
-            output_dtypes=[np.dtype('int16'), np.dtype('int8')],
-            dask_gufunc_kwargs={"allow_rechunk": True},
-        )
-
-        # Ensure both outputs are computed in ONE scheduler pass (avoids re-running apply_ufunc twice)
-        ndvi_processed, mask_processed = dask.persist(ndvi_processed, mask_processed)
-        dask.distributed.wait([ndvi_processed, mask_processed])
-
-        # g = mask_processed.__dask_graph__()
-        g = ndvi_processed.__dask_graph__()
-        print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
-
-        # create the dataset to write 
-        out_ds = xr.Dataset(
-            {
-                "ndvi_processed": ndvi_processed,
-                "mask_array": mask_processed
-            }
-        )
-        
-        #out_ds.attrs["pixel_definition"] = new_ds.attrs["pixel_definition"]
-        out_ds.attrs = new_ds.attrs
-        out_ds.attrs.pop("description_ndsi", None) # since we dropped ndsi, we also drop this attr
-
-
+        # delete previous output if existing
         if os.path.exists(OUT_PATH):
             shutil.rmtree(OUT_PATH)
 
-        print(f"writing to new file: {OUT_PATH}", flush=True)
-        out_ds = (
-            out_ds
-            .sortby("date")
-            .chunk({"pixel": PIXEL_CHUNKS, 
-                    "date": DATE_CHUNKS_OUT})
-        )
-        
-        # Explicit encoding: simple compressor for each data var
-        # encoding = {v: {"compressors": None      } for v in out_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
-        encoding = {v: {"compressors": COMPRESSOR} for v in out_ds.data_vars}
+        # Attempt at doing this not for the whole data set but in batches of 1_000_000 pixels:
+        # BATCH_SIZE = 1_000_000  # pixels per outer loop iteration
+        BATCH_SIZE = int(200_000/200)  # pixels per outer loop iteration
+        INNER_PIXEL_CHUNK = int(3_334/200)  # ~200K / 60 workers → 1 task per worker per round
+        n_pixels = len(new_ds.pixel)
+        n_batches = (n_pixels + BATCH_SIZE - 1) // BATCH_SIZE
 
-        # drop any coord/data var chunk encodings that conflict   # TODO: is this needed?
-        for name in list(out_ds.coords) + list(out_ds.data_vars): # TODO: remove this again if possilbe
-            out_ds[name].encoding.pop("chunks", None)                           # TODO: remove this again if possilbe
-            out_ds[name].encoding.pop("compressor", None)                       # TODO: remove this again if possilbe
-            out_ds[name].encoding.pop("compressors", None)                      # TODO: remove this again if possilbe
+        # materialize coordinate arrays once (small, 1D)
+        dates_array_arg  = new_ds["date"].values          # NumPy, not Dask
+        start_date_arg   = dates_array_arg[0]
+        for batch_idx in range(n_batches):
+            t0 = datetime.now()
+            print(
+                f"[{t0:%Y-%m-%d %H:%M:%S}]  " + 
+                f"Starting Batch {batch_idx+1}/{n_batches}",
+                flush=True
+            )
+            pix_start = batch_idx * BATCH_SIZE
+            pix_end   = min(pix_start + BATCH_SIZE, n_pixels)
+            # slice one batch and rechunk for apply_ufunc: date must be one core chunk
+            batch_ds = (
+                new_ds
+                .isel(pixel=slice(pix_start, pix_end))
+                .chunk({"pixel": INNER_PIXEL_CHUNK, "date": -1})  # no allow_rechunk needed
+            )
 
-        # overwrite (mode="w")
-        out_ds.to_zarr(
-            OUT_PATH, 
-            mode="w", 
-            compute=True,
-            encoding=encoding, 
-            zarr_format=3
-        )
+            # call gufunc where core dim is "time" (1D arrays per pixel)
+            ndvi_out, mask_out = xr.apply_ufunc(
+                historical_ndvi,
+                batch_ds["ndvi_processed"],
+                batch_ds["median_ndvi"],
+                batch_ds["mask_array"],
+                batch_ds["obs_date"],
+                input_core_dims=[["date"], ["date"], ["date"], ["date"]],
+                output_core_dims=[["date"], ["date"]],
+                kwargs={"dates_array": dates_array_arg,   # pass as NumPy, not Dask
+                        "starting_date": start_date_arg},
+                vectorize=True,
+                dask="parallelized",
+                output_dtypes=[np.dtype('int16'), np.dtype('int8')],
+                # allow_rechunk no longer needed: batch is already chunked correctly above
+            )
+            # g = mask_processed.__dask_graph__()
+            g = ndvi_out.__dask_graph__()
+            print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
+
+            # compute this batch with all 60 workers
+            ndvi_out, mask_out = dask.compute(ndvi_out, mask_out)
+
+            # create the dataset to write for this batch
+            out_ds = xr.Dataset(
+                {
+                    "ndvi_processed": ndvi_out, #(["pixel", "date"], ndvi_out.data),
+                    "mask_array":     mask_out  #(["pixel", "date"], mask_out.data)
+                },
+                # coords={c: batch_ds[c] for c in batch_ds.coords}
+            )
+            out_ds = out_ds.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS_OUT})
+
+            #out_ds.attrs["pixel_definition"] = new_ds.attrs["pixel_definition"]
+            out_ds.attrs = new_ds.attrs
+            out_ds.attrs.pop("description_ndsi", None) # since we dropped ndsi, we also drop this attr
+
+            print(f"Partial writing to new file: {OUT_PATH}", flush=True)
+            # Explicit encoding: simple compressor for each data var
+            # encoding = {v: {"compressors": None      } for v in out_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
+            encoding = {v: {"compressors": COMPRESSOR} for v in out_ds.data_vars}
+
+            # drop any coord/data var chunk encodings that conflict
+            for name in list(out_ds.coords) + list(out_ds.data_vars): # TODO: remove this again if possible
+                out_ds[name].encoding.pop("chunks", None)                           # TODO: remove this again if possible
+                out_ds[name].encoding.pop("compressor", None)                       # TODO: remove this again if possible
+                out_ds[name].encoding.pop("compressors", None)                      # TODO: remove this again if possible
+                
+            # write: create on first batch, append on subsequent
+            if batch_idx == 0:
+                out_ds.to_zarr(OUT_PATH, mode="w", encoding=encoding, zarr_format=3)
+            else:
+                out_ds.to_zarr(OUT_PATH, append_dim="pixel")
+
+            # progress log
+            elapsed  = (datetime.now() - t0).total_seconds()
+            done_pix = pix_end
+            eta_s    = elapsed / done_pix * (n_pixels - done_pix) if done_pix < n_pixels else 0
+            print(
+                f"[{datetime.now():%Y-%m-%d %H:%M:%S}]  "
+                f"Batch {batch_idx+1}/{n_batches}  "
+                f"pixels {pix_start:,}–{pix_end:,}  "
+                f"elapsed {elapsed/60:.1f}min  ETA {eta_s/60:.0f}min",
+                flush=True
+            )
 
         # small pause to allow dashboard websocket handshakes / metadata flush
         time.sleep(2)
