@@ -245,11 +245,11 @@ if __name__ == "__main__":
         # subset pixels for development: FOR DEVELOPMENT:
         new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**6)) # , datetime = slice(0,30)
         # with 10 pixels:         runtime=55s,  storage=304KB
-        # with 100 pixels:        runtime=78s,  storage=644KB
-        # with 1_000 pixels:      runtime=317s, storage=4.1MB
-        # with 10_000 pixels:     runtime=1200s, storage=39MB
+        # with 100 pixels:        runtime=52s,  storage=644KB
+        # with 1_000 pixels:      runtime=81s, storage=4.1MB
+        # with 10_000 pixels:     runtime=286s, storage=39MB
         # with 100_000 pixels:    runtime=XXs, storage=XXKB
-        # with 1_000_000 pixels:  runtime=282min, storage=3.8GB
+        # with 1_000_000 pixels:  runtime=442min, storage=3.8GB
         # wit all pixels:       runtime=XXXmin, storage=XXXGB
         # END TODO
 
@@ -412,7 +412,14 @@ if __name__ == "__main__":
         
         new_ds = new_ds.rename(
             {'ndvi':'ndvi_processed'})
+        
+        # Save for intermediate computation
+        OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
+        new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1}).to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
 
+        # Reload freshly:
+        new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False)
+        
 
 
         # --- visual check of resulting new_ds ----------------------------------
@@ -431,11 +438,11 @@ if __name__ == "__main__":
         # --- apply gapfilling and outlier detection function: historical_ndvi() ----------------------------------
 
         # prepare arguments spanning historic and new data: all lazy
-        ndvi_array_arg   = new_ds["ndvi_processed"].chunk(dict(date=-1)).persist() # NOTE: in continuous integration this is the merged_ds
-        median_array_arg = new_ds["median_ndvi"].chunk(dict(date=-1)).persist()    # NOTE: in continuous integration this is the merged_ds
-        mask_array_arg   = new_ds["mask_array"].chunk(dict(date=-1)).persist()     # NOTE: in continuous integration this is the merged_ds
-        is_obs_date_array_arg = new_ds["obs_date"].chunk(dict(date=-1)).persist()  # NOTE: in continuous integration this is the merged_ds
-        dates_array_arg  = new_ds["date"].chunk(dict(date=-1)).persist()           # NOTE: in continuous integration this is the merged_ds
+        ndvi_array_arg   = new_ds["ndvi_processed"].persist() # NOTE: in continuous integration this is the merged_ds
+        median_array_arg = new_ds["median_ndvi"].persist()    # NOTE: in continuous integration this is the merged_ds
+        mask_array_arg   = new_ds["mask_array"].persist()     # NOTE: in continuous integration this is the merged_ds
+        is_obs_date_array_arg = new_ds["obs_date"].persist()  # NOTE: in continuous integration this is the merged_ds
+        dates_array_arg  = new_ds["date"].persist()           # NOTE: in continuous integration this is the merged_ds
         start_date_arg   = dates_array_arg.values[0] # NOTE: in the historic case
         # using persist() reduces graph size
 
@@ -466,7 +473,7 @@ if __name__ == "__main__":
             vectorize=True, 
             dask="parallelized",
             output_dtypes=[np.dtype('int16'), np.dtype('int8')],
-            # dask_gufunc_kwargs={"allow_rechunk": True},
+            dask_gufunc_kwargs={"allow_rechunk": True},
         )
         # ndvi_processed.isel(pixel=1, date=slice(3160,3170)).compute() # TODO: check why this is [ 4845,  4835,  4826,  4819, 32767, 32767, 32767, 32767, 32767, 32767]
 
