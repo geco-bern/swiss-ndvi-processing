@@ -34,6 +34,13 @@ echo "Python executable: $(which python)"
 echo "Python version: $(python --version)"
 echo
 
+## Fix "OSError: [Errno 24] Too many open files: '/proc/1742817/stat'"
+## Raise the OS file descriptor limit: (otherwise erroring with)
+#ulimit -n   # default is 1024
+#ulimit -n 65536  # set to 65k
+#ulimit -n
+# ALTERNATIVELY: use 200k pixel chunks, with 100M pixels this means we are only using 500 connections, i.e. less than the 1024 default
+
 # ============================================================
 # Configuration
 # ============================================================

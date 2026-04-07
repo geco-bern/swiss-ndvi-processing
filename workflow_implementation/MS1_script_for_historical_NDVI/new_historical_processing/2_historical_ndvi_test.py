@@ -227,14 +227,16 @@ if __name__ == "__main__":
         #  Load -------- and new observation data sets
         # =====================================================
         DATE_CHUNKS = 365
-        PIXEL_CHUNKS = 40000
+        PIXEL_CHUNKS = 200000
         DATE_CHUNKS_OUT = 365
 
         # --- load historic dataset ------------------------------------
         # --- ONLY IN CONTINUOUS ---
 
         # --- load new data dataset ------------------------------------
-        new_observations_ds = xr.open_dataset(INPUT_ZARR, chunks={}, mask_and_scale= False).drop_vars("ndsi")
+        new_observations_ds = xr.open_dataset(INPUT_ZARR, chunks={}, mask_and_scale= False,
+                                              consolidated=True  # use consolidated on open to avoid "OSError: [Errno 24] Too many open files: '/proc/1742817/stat'"
+                                              ).drop_vars("ndsi")
         # NOTE: delay the datetime chunking , "datetime": -1
         # NOTE: and directly drop unused ndsi
         
@@ -418,8 +420,8 @@ if __name__ == "__main__":
         OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
         new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1}).to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
         # Reload freshly:
-        new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False)
-        
+        new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False,
+                                 consolidated=True)  # use consolidated on open to avoid "OSError: [Errno 24] Too many open files: '/proc/1742817/stat'"
 
 
         # --- visual check of resulting new_ds ----------------------------------
