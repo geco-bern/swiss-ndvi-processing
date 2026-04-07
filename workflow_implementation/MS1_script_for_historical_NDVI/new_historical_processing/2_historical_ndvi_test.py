@@ -215,9 +215,6 @@ if __name__ == "__main__":
     
         print(client.dashboard_link)
 
-        # already having medians computed
-
-        #INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged_small.zarr" 
         INPUT_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
         INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
         OUT_PATH = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
@@ -231,7 +228,7 @@ if __name__ == "__main__":
         DATE_CHUNKS_OUT = 365
 
         # --- load historic dataset ------------------------------------
-        # --- ONLY IN CONTINUOUS ---
+        # --- ONLY DONE IN CONTINUOUS INTEGRATION ---
 
         # --- load new data dataset ------------------------------------
         new_observations_ds = xr.open_dataset(INPUT_ZARR, chunks={}, mask_and_scale= False,
@@ -252,7 +249,7 @@ if __name__ == "__main__":
         # with 10_000 pixels:     runtime=286s, storage=39MB
         # with 100_000 pixels:    runtime=XXs, storage=XXKB
         # with 1_000_000 pixels:  runtime=442min, storage=3.8GB
-        # wit all pixels:       runtime=XXXmin, storage=XXXGB
+        # wit all pixels:         runtime=XXXmin, storage=XXXGB
         # END TODO
 
         # =====================================================
@@ -316,9 +313,6 @@ if __name__ == "__main__":
                                 # fills missing days with NaN; fill later if desired
             .fillna(NO_COVERAGE).astype(np.int16)
         )
-            
-        # ndvi_daily_between_obs.date.values
-        # ndvi_daily_since_last_historic.date.values
 
         # FOR DEVELOPMENT: observation_dates[1] # 2025-12-09
         # FOR DEVELOPMENT: observation_dates[2] # 2025-12-09
@@ -380,11 +374,6 @@ if __name__ == "__main__":
         # NOTE: here is end of 4_merge_zarr.py in the continuous case
 
         # NOTE: here is the start of 5_analyse_demo_efficient.py in the continuous case
-        # def show_ds_structure(ds):
-        #     for c in list(ds.coords) + list(ds.data_vars):
-        #         print(str(c).ljust(15) + ":   " + str(ds[c].encoding))
-        #show_ds_structure(new_ds)
-        #show_ds_structure(lookuptable)
 
         print("First dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(0,10)), unit='D')), flush=True)
         print("Last dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(-10,None)), unit='D')), flush=True)
@@ -415,8 +404,8 @@ if __name__ == "__main__":
         new_ds = new_ds.rename(
             {'ndvi':'ndvi_processed'})
         
-        # NOTE: this requires 400GB of free, additional disk space (for all images from 2017-04-01 to 2025-12-31)
         # Save for intermediate computation (disk-backed rechunking)
+        # NOTE: this requires 400GB of free, additional disk space (for all images from 2017-04-01 to 2025-12-31)
         OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
         new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1}).to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
         # Reload freshly:
@@ -448,17 +437,6 @@ if __name__ == "__main__":
         start_date_arg   = dates_array_arg.values[0] # NOTE: in the historic case
         # using persist() reduces graph size
 
-        # reduce graph size by using futures
-        # dates_future  = client.scatter(dates_array)
-        # ndvi_future   = client.scatter(ndvi_array)
-        # median_future = client.scatter(median_array)
-        # dates_future  = client.scatter(dates_array)
-        # mask_future   = client.scatter(mask_array)
-        # then reference *_future inside tasks/closures instead of passing *_array
-        # visualize(dates_future)
-
-        # reduce graph size by handing NumPy arrays to dask:
-        # dates_daskarray = da.from_array(dates_array)   # Hand NumPy array to Dask
 
         # call gufunc where core dim is "time" (1D arrays per pixel)
         ndvi_processed, mask_processed = xr.apply_ufunc(
@@ -477,22 +455,7 @@ if __name__ == "__main__":
             output_dtypes=[np.dtype('int16'), np.dtype('int8')],
             dask_gufunc_kwargs={"allow_rechunk": True},
         )
-        # ndvi_processed.isel(pixel=1, date=slice(3160,3170)).compute() # TODO: check why this is [ 4845,  4835,  4826,  4819, 32767, 32767, 32767, 32767, 32767, 32767]
 
-        # FROM THE PREVIOUS HISTORIC VERSION: # call ufunc where core dim is "time" (1D arrays per pixel)
-        # FROM THE PREVIOUS HISTORIC VERSION: ndvi_processed, mask_array = xr.apply_ufunc(
-        # FROM THE PREVIOUS HISTORIC VERSION:     historical_ndvi,
-        # FROM THE PREVIOUS HISTORIC VERSION:     ndvi_avg,
-        # FROM THE PREVIOUS HISTORIC VERSION:     medians,
-        # FROM THE PREVIOUS HISTORIC VERSION:     input_core_dims=[["datetime"],["date"]],    # each call gets 1D time arrays
-        # FROM THE PREVIOUS HISTORIC VERSION:     output_core_dims=[["date"],["date"]],
-        # FROM THE PREVIOUS HISTORIC VERSION:     vectorize=True, 
-        # FROM THE PREVIOUS HISTORIC VERSION:     dask="parallelized",
-        # FROM THE PREVIOUS HISTORIC VERSION:     kwargs={"obs_date" : obs_date},
-        # FROM THE PREVIOUS HISTORIC VERSION:     output_dtypes=[np.int16, np.int8],
-        # FROM THE PREVIOUS HISTORIC VERSION:     dask_gufunc_kwargs={"allow_rechunk": True},
-        # FROM THE PREVIOUS HISTORIC VERSION: )
-        
         # Ensure both outputs are computed in ONE scheduler pass (avoids re-running apply_ufunc twice)
         ndvi_processed, mask_processed = dask.persist(ndvi_processed, mask_processed)
         dask.distributed.wait([ndvi_processed, mask_processed])
@@ -500,13 +463,6 @@ if __name__ == "__main__":
         # g = mask_processed.__dask_graph__()
         g = ndvi_processed.__dask_graph__()
         print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
-        #                    586_503 pixels:                 | 16_041_205 pixels:              | 105_715_396 pixels:
-        # without persist(): 49    layers, and 196760 tasks  | 49    layers, and 1289428 tasks | xxx layers, and xxx tasks
-        # with persist():    16-17 layers, and  31953 tasks  | 16-17 layers, and  872665 tasks | xxx layers, and xxx tasks
-        # without persist(): .............. and 10.58 MiB
-        # with persist():    size 23.08 MiB and 10.58 MiB
-        
-        # visualize(ndvi_processed)
 
         # create the dataset to write 
         out_ds = xr.Dataset(
