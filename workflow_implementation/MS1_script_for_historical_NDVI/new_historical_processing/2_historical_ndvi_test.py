@@ -346,7 +346,8 @@ if __name__ == "__main__":
         status_df = pd.DataFrame({"daily": daily_dates_since_last_historic})
         status_df["obs_date"] = status_df["daily"].where(status_df["daily"].isin(grouped.index))
         status_df["obs_times"] = status_df["daily"].map(grouped).fillna("")
-        print(status_df, flush=True)
+        with pd.option_context("display.max_rows", 4000):
+            print(status_df, flush=True)
         print(f"In total: {len(status_df["daily"])} days, {sum(status_df["obs_date"].notnull())} obs_dates, {len(times)} obs_times. ")
 
         # Append day-of-year (for merging of median expected NDVI from model)

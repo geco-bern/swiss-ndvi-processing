@@ -39,6 +39,7 @@ if __name__ == '__main__':
         # date_arg = "2024-07-31" # for dates requested...
         # date_arg = "all_dates"
         # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test6.zarr" # TODO: remove -test
+        # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test8.zarr" # TODO: remove -test
 
 
     # Load (processed) NDVI data set to output specific dates
@@ -181,12 +182,13 @@ if __name__ == '__main__':
                 # NDVI_status_curr_date_gridded.rio.to_raster(output_tiff_mask2)
 
     # rsync 
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v3_compr/20240722-nonCOG_historic.tiff ~/Downloads/test/tiffs_historic/
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v3_compr/20240722_historic.tiff ~/Downloads/test/tiffs_historic/
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240722_historic.tiff ~/Downloads/test/tiffs_historic/
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240722-nonCOG_historic.tiff ~/Downloads/test/tiffs_historic/
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_compr_1000mX1000m/20240731-nonCOG_historic.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v3/20240722-nonCOG_historic.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v3/20240722_historic.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_1000mX1000m/20240722_historic.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_1000mX1000m/20240722-nonCOG_historic.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_1000mX1000m/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_1000mX1000m/20240731-nonCOG_historic.tiff ~/Downloads/test/tiffs_historic/
 
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7_compr/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7_compr/20240731_historic_mask.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7/20240731_historic_mask.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7b/ ~/Downloads/test/tiffs_historic/
