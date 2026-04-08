@@ -393,44 +393,9 @@ if __name__ == "__main__":
         
         new_ds = new_ds.rename({'ndvi':'ndvi_processed'})
         
-        # Manifest new_ds before applying apply_ufunc()) (either by store+reload, or by persist+wait)
         print("Newly derived dataset:", flush = True)
         print(new_ds, flush = True)
-        # print(type(new_ds['ndvi_processed'].data), getattr(new_ds['ndvi_processed'].data, "chunks", None))
 
-        print(f"Start writing temporary: [{datetime.now():%Y-%m-%d %H:%M:%S}]",flush=True)
-        g = new_ds.__dask_graph__()
-        print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
-        ##  Save for intermediate computation (disk-backed rechunking)
-        ##  NOTE: this requires 400GB of free, additional disk space (for all images from 2017-04-01 to 2025-12-31)
-        ## variant 1) save and reload()
-            # OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
-            # new_ds = new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1})
-            # new_ds.to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
-            # Reload freshly:
-            # new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False,
-            #                         consolidated=True)  # use consolidated on open to avoid "OSError: [Errno 24] Too many open files: '/proc/1742817/stat'"
-        ## variant 2) persist() (and wait)
-        new_ds = new_ds.persist()     # Do persist instead of write and reload. [persist() is like compute() but does not collect]
-        dask.distributed.wait(new_ds) # While persist() goes on in the background, wait() stops the script until persist() is done.
-        
-        print(f"End writing temporary: [{datetime.now():%Y-%m-%d %H:%M:%S}]",flush=True)
-        g = new_ds.__dask_graph__()
-        print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
-        # This now should show a simplified dask graph, compared to before the persist() operation.
-
-        # --- visual check of resulting new_ds ----------------------------------
-        # import matplotlib.pyplot as plt
-        # plt.figure(figsize=(7.2, 4), dpi = 200)
-
-        # new_ds_subset = new_ds.isel(pixel=[0,1,2, 2100, 3500, 4900])
-        # new_ds_subset["median_ndvi"].plot.line(x='date',hue='pixel')
-
-        # indexer = (new_ds_subset["mask_array"] == 2).compute()
-        # new_ds_subset2 = new_ds_subset.where(indexer, drop=True)
-        # new_ds_subset2["ndvi_processed"].plot.scatter(x='date',hue='pixel',marker="x")
-        
-        # plt.savefig('test.png')
         
         # --- apply gapfilling and outlier detection function: historical_ndvi() ----------------------------------
 
@@ -489,6 +454,43 @@ if __name__ == "__main__":
             # FOR DEVELOPMENT:
             #g = batch_ds.__dask_graph__()
             #print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
+
+            # Manifest batch_ds before applying apply_ufunc()) (either by store+reload, or by persist+wait)
+            # print(type(batch_ds['ndvi_processed'].data), getattr(batch_ds['ndvi_processed'].data, "chunks", None))
+
+            print(f"Start writing temporary: [{datetime.now():%Y-%m-%d %H:%M:%S}]",flush=True)
+            g = batch_ds.__dask_graph__()
+            print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
+            ##  Save for intermediate computation (disk-backed rechunking)
+            ##  NOTE: this requires 400GB of free, additional disk space (for all images from 2017-04-01 to 2025-12-31)
+            ## variant 1) save and reload()
+                # OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
+                # batch_ds = batch_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1})
+                # batch_ds.to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
+                # Reload freshly:
+                # batch_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False,
+                #                         consolidated=True)  # use consolidated on open to avoid "OSError: [Errno 24] Too many open files: '/proc/1742817/stat'"
+            ## variant 2) persist() (and wait)
+            batch_ds = batch_ds.persist()     # Do persist instead of write and reload. [persist() is like compute() but does not collect]
+            dask.distributed.wait(batch_ds) # While persist() goes on in the background, wait() stops the script until persist() is done.
+            
+            print(f"End writing temporary: [{datetime.now():%Y-%m-%d %H:%M:%S}]",flush=True)
+            g = batch_ds.__dask_graph__()
+            print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
+            # This now should show a simplified dask graph, compared to before the persist() operation.
+
+            # --- visual check of resulting batch_ds ----------------------------------
+            # import matplotlib.pyplot as plt
+            # plt.figure(figsize=(7.2, 4), dpi = 200)
+
+            # batch_ds_subset = batch_ds.isel(pixel=[0,1,2, 2100, 3500, 4900])
+            # batch_ds_subset["median_ndvi"].plot.line(x='date',hue='pixel')
+
+            # indexer = (batch_ds_subset["mask_array"] == 2).compute()
+            # batch_ds_subset2 = batch_ds_subset.where(indexer, drop=True)
+            # batch_ds_subset2["ndvi_processed"].plot.scatter(x='date',hue='pixel',marker="x")
+            
+            # plt.savefig('test.png')
 
             # call gufunc where core dim is "time" (1D arrays per pixel)
             # NOTE: lowest-hanging performance fruit: compile historical_ndvi with numba,
