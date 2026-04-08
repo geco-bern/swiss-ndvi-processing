@@ -205,14 +205,14 @@ def historical_ndvi(ndvi_array, median_array, mask_array, is_observation_date, d
 
 if __name__ == "__main__":
 
-    N_WORKERS = 80
-    # TODO: test later 120 workers, with each 30GB memory_limit, BATCH_SIZE = 120K, INNER_PIXEL_CHUNK=1K
+    N_WORKERS = 120
+    # TODO: test later 120 workers, with each 30GB memory_limit, BATCH_SIZE = 200K, INNER_PIXEL_CHUNK=83
     # TODO: test later 150 workers, with each 24GB memory_limit, BATCH_SIZE = 150K, INNER_PIXEL_CHUNK=1K
 
     with Client(
         n_workers=N_WORKERS,
         threads_per_worker=1,
-        memory_limit='40GB',
+        memory_limit='30GB',
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
         dashboard_address=':1235') as client:
     
@@ -239,7 +239,6 @@ if __name__ == "__main__":
         new_observations_ds = xr.open_dataset(INPUT_ZARR, chunks={}, mask_and_scale= False,
                                               consolidated=True  # use consolidated on open to avoid "OSError: [Errno 24] Too many open files: '/proc/1742817/stat'"
                                               ).drop_vars("ndsi")
-        # NOTE: delay the datetime chunking , "datetime": -1
         # NOTE: and directly drop unused ndsi
         
         # --- load median values for each doy --------------------------
@@ -250,16 +249,18 @@ if __name__ == "__main__":
 
         #TODO: remove this when development
         # subset pixels for development: FOR DEVELOPMENT:
-        # new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(130e3))) # , datetime = slice(0,30)
+        new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(600e3))) # , datetime = slice(0,30)
         # with 10 pixels:         runtime=55s,  storage=304KB
         # with 100 pixels:        runtime=54s,  storage=644KB
         # with 1_000 pixels:      runtime=61s, storage=4.1MB
         # with 10_000 pixels:     runtime=141s, storage=39MB
         # with 100_000 pixels:    runtime=1080s, storage=XXKB
         # with 120_000 pixels:    runtime=565s, storage=463MB
-        # with 150_000 pixels:    runtime=640s, storage=463MB
+        # with 130_000 pixels:    runtime=720s, storage=502MB
+        # with 150_000 pixels:    runtime=640s, storage=XXXMB
         # with 160_000 pixels:    runtime=865s, storage=617MB
-        # with 1_000_000 pixels:  runtime=105min, storage=3.8GB
+        # with 600_000 pixels:    runtime=3090s, storage=3.3GB
+        # with 1_000_000 pixels:  runtime=6300s, storage=3.8GB
         # with 5_000_000 pixels:  runtime=XXXmin, storage=XXXGB
         # with all pixels:        runtime=XXXmin, storage=380GB
         # END TODO
@@ -331,19 +332,10 @@ if __name__ == "__main__":
         # FOR DEVELOPMENT: plot_da_map(ndvi_daily_since_last_historic["ndvi"].sel(date= observation_dates[1]),
         # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = f"NDVI_2025-12-09_combined_{agg}.png")
         
-        # Print status
-        print(
-            f"Initialized n={len(daily_dates_since_last_historic)} daily dates:",
-            #f"\nfrom {daily_dates_since_last_historic.min().date()}"+
-            #f" to {daily_dates_since_last_historic.max().date()}"+
-            # f"\nwith observations on days at:"+
-            # f"\n"+"\n".join([f"  {d.strftime('%Y-%m-%d')}: {dt.strftime('%Y-%m-%d_%Hh%M')}" 
-            #    for (d, dt) in zip(observation_dates, observation_datetimes)]),
-            flush=True,
-        )
+        # Print multiple status messages for log
+        print(f"Initialized n={len(daily_dates_since_last_historic)} daily dates:", flush=True)
         # group observation times (as strings) by date
-        times = pd.Series(observation_datetimes.strftime("%H:%M:%S"), 
-                        index=observation_datetimes.floor("D"))
+        times = pd.Series(observation_datetimes.strftime("%H:%M:%S"),  index=observation_datetimes.floor("D"))
         grouped = times.groupby(level=0).agg(lambda s: ",".join(s))
 
         # build DataFrame: 'daily', 'obs_date' (date or NaT), 'obs_times' (comma-joined times or NaN)
@@ -359,38 +351,23 @@ if __name__ == "__main__":
         ndvi_daily_since_last_historic = ndvi_daily_since_last_historic.assign_coords(
             doy   = ('date', doy_array.astype(np.int32))
         )
-        
+
         # Keep track which dates were actually observation dates:
         # add a DataArray to Dataset, which specifies the dates that were observations
         ndvi_daily_since_last_historic["obs_date"] = ndvi_daily_since_last_historic.date.isin(observation_dates)
 
         # =====================================================
-        #  Write daily dataset (containing NaN)
+        #  Write daily dataset (containing NaN until filled)
         #  for later i.   gapfilling, 
         #            ii.  outlier detection, and 
         #            iii. appending to historic
         # =====================================================
         new_ds = ndvi_daily_since_last_historic # NOTE: delay rechunking just before apply_ufunc(): (.chunk({"pixel": PIXEL_CHUNKS, "date": -1}))
-        # new_ds has: 
-        #   coords: x,y,x_idx,y_idx, pixel, date; 
-        #   vars:   ndvi,obs_date
-        #   attrs:  pixel_definition,transform_note,transform_coeffs,transform_instr,description_ndvi,description_ndsi,nodata,cloud_shadow
-        
-        # drop any coord/data var chunk encodings that conflict
-        # for name in list(new_ds.coords) + list(new_ds.data_vars):
-        #     new_ds[name].encoding.pop("chunks", None)
-        #     new_ds[name].encoding.pop("compressor", None)
-        #     new_ds[name].encoding.pop("compressors", None)
-
-        # write out    
-        # new_ds.to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
         # NOTE: here is end of 4_merge_zarr.py in the continuous case
 
         # NOTE: here is the start of 5_analyse_demo_efficient.py in the continuous case
-
         print("First dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(0,10)), unit='D')), flush=True)
         print("Last dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(-10,None)), unit='D')), flush=True)
-        # NOTE: here is end of 5_analyse_demo_efficient.py in the continuous case
 
         print("Newly downloaded dataset:", flush = True)
         print(new_ds, flush = True)
@@ -401,7 +378,7 @@ if __name__ == "__main__":
                 doy=doy_noLeap,
                 pixel=new_ds.pixel) # this is to join by pixels and doy
 
-
+        # NOTE: in historic case 'mask_array' is not absolutely needed. We do it for similarity to continuous case.
         # Add mask_array to new_ds (filled with 0 or 2 at this point):
             # mask_array == 0: the data is not an observation and is yet to be smoothed
             # mask_array == 1: the data is not an observation and is smoothed
@@ -414,22 +391,33 @@ if __name__ == "__main__":
             (new_ds["ndvi"] > INVALID))
         new_ds['mask_array'] = xr.where(mask_2or0, np.int8(2), np.int8(0))
         
-        new_ds = new_ds.rename(
-            {'ndvi':'ndvi_processed'})
+        new_ds = new_ds.rename({'ndvi':'ndvi_processed'})
         
-        # Save for intermediate computation (disk-backed rechunking)
-        # NOTE: this requires 400GB of free, additional disk space (for all images from 2017-04-01 to 2025-12-31)
-        OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
-        new_ds = new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1})
+        # Manifest new_ds before applying apply_ufunc()) (either by store+reload, or by persist+wait)
         print("Newly derived dataset:", flush = True)
         print(new_ds, flush = True)
         # print(type(new_ds['ndvi_processed'].data), getattr(new_ds['ndvi_processed'].data, "chunks", None))
 
-        new_ds.to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
-        # Reload freshly:
-        new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False,
-                                 consolidated=True)  # use consolidated on open to avoid "OSError: [Errno 24] Too many open files: '/proc/1742817/stat'"
-
+        print(f"Start writing temporary: [{datetime.now():%Y-%m-%d %H:%M:%S}]",flush=True)
+        g = new_ds.__dask_graph__()
+        print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
+        ##  Save for intermediate computation (disk-backed rechunking)
+        ##  NOTE: this requires 400GB of free, additional disk space (for all images from 2017-04-01 to 2025-12-31)
+        ## variant 1) save and reload()
+            # OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
+            # new_ds = new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1})
+            # new_ds.to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
+            # Reload freshly:
+            # new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False,
+            #                         consolidated=True)  # use consolidated on open to avoid "OSError: [Errno 24] Too many open files: '/proc/1742817/stat'"
+        ## variant 2) persist() (and wait)
+        new_ds = new_ds.persist()     # Do persist instead of write and reload. [persist() is like compute() but does not collect]
+        dask.distributed.wait(new_ds) # While persist() goes on in the background, wait() stops the script until persist() is done.
+        
+        print(f"End writing temporary: [{datetime.now():%Y-%m-%d %H:%M:%S}]",flush=True)
+        g = new_ds.__dask_graph__()
+        print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
+        # This now should show a simplified dask graph, compared to before the persist() operation.
 
         # --- visual check of resulting new_ds ----------------------------------
         # import matplotlib.pyplot as plt
@@ -453,12 +441,26 @@ if __name__ == "__main__":
         # Attempt at doing this not for the whole data set but in batches of 1_000_000 pixels:
         # BATCH_SIZE = 1_000_000  # pixels per outer loop iteration
         # INNER_PIXEL_CHUNK = int(16_667)  # ~1M / 60 workers → 1 task per worker per round
-        BATCH_SIZE = int(3*PIXEL_CHUNKS)  # pixels per outer loop iteration
-        INNER_PIXEL_CHUNK = ceil(BATCH_SIZE / N_WORKERS)  # ~60K / 60 workers → 1 task per worker per round
+        BATCH_SIZE = int(5*PIXEL_CHUNKS)  # pixels per outer loop iteration
+        # INNER_PIXEL_CHUNK = ceil(BATCH_SIZE / N_WORKERS)  # ~60K / 60 workers → 1 task per worker per round
                                               # Set INNER_PIXEL_CHUNK ≈ BATCH_SIZE / N_WORKERS 
                                               # (e.g. 60_000 / 60 ≈ 1_000) so each worker 
                                               # gets close to 1 task per round → full utilization 
                                               # with minimal scheduling overhead.
+        INNER_PIXEL_CHUNK = ceil(BATCH_SIZE / N_WORKERS / 20)  # ~60K / 60 workers / 4 → 4 task per worker per round
+            # Splitting this into 40_000 batch size, with 8 workers / 4 results in 1250 pixels. 
+            # Such a 1250 chunk takes about 3 mins to be computed for 3195 days. I.e. about 12 mins for one BATCH_SIZE of 40_000.
+            # When storing, this amounts to 154MB and goes very fast. => We can probably increase batch size x5 to 200_000 without issue.
+
+            # Splitting this into 200_000 batch size, with 120 workers / 2 results in 830 pixels. 
+            # Such a 830 chunk takes about 300 seconds to be computed for 3195 days. I.e. about 10 mins (actually 16 mins) for one BATCH_SIZE of 200_000.
+            # When storing, a 200_000 BATCH_SIZE amounts to 771MB and goes very fast.
+
+            # Splitting this into 200_000 batch size, with 120 workers / 20 results in 83 pixels. 
+            # Such a 83 chunk takes about 30 seconds to be computed for 3195 days. I.e. about 10 mins (actually 14 mins) for one BATCH_SIZE of 200_000.
+            # When storing, a 200_000 BATCH_SIZE amounts to 771MB and goes very fast.
+
+
         n_pixels = len(new_ds.pixel)
         n_batches = (n_pixels + BATCH_SIZE - 1) // BATCH_SIZE
 
@@ -484,19 +486,24 @@ if __name__ == "__main__":
                 .isel(pixel=slice(pix_start, pix_end))
                 .chunk({"pixel": INNER_PIXEL_CHUNK, "date": -1})  # no allow_rechunk needed
             )
+            # FOR DEVELOPMENT:
+            #g = batch_ds.__dask_graph__()
+            #print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
 
             # call gufunc where core dim is "time" (1D arrays per pixel)
+            # NOTE: lowest-hanging performance fruit: compile historical_ndvi with numba,
+            #       see: https://docs.xarray.dev/en/stable/examples/apply_ufunc_vectorize_1d.html
             ndvi_out, mask_out = xr.apply_ufunc(
                 historical_ndvi,
                 batch_ds["ndvi_processed"],
                 batch_ds["median_ndvi"],
                 batch_ds["mask_array"],
                 batch_ds["obs_date"],
-                input_core_dims=[["date"], ["date"], ["date"], ["date"]],
+                input_core_dims=[["date"], ["date"], ["date"], ["date"]],   # These are dimensions that should not be broadcast
                 output_core_dims=[["date"], ["date"]],
                 kwargs={"dates_array": dates_array_arg,   # pass as NumPy, not Dask
                         "starting_date": start_date_arg},
-                vectorize=True,
+                vectorize=True,        # This vectorizes `historical_ndvi` automatically with `numpy.vectorize`. NOTE: convenient but slow, see: 
                 dask="parallelized",
                 output_dtypes=[np.dtype('int16'), np.dtype('int8')],
                 # allow_rechunk no longer needed: batch is already chunked correctly above
@@ -505,7 +512,7 @@ if __name__ == "__main__":
             g = ndvi_out.__dask_graph__()
             print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
 
-            # compute this batch with all workers
+            # compute this batch with all workers (and collect on driver node for single save by driver node)
             ndvi_out, mask_out = dask.compute(ndvi_out, mask_out)
             # compute() collects them to the scheduler node (driver) and does driver-side write (batch needs to fit into memory)
             # alternatively persist()+wait() would force computation without collection, leaving results on the worker nodes,
@@ -527,7 +534,6 @@ if __name__ == "__main__":
 
             print(f"Partial writing to new file: {OUT_PATH}", flush=True)
             # Explicit encoding: simple compressor for each data var
-            # encoding = {v: {"compressors": None      } for v in out_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
             encoding = {v: {"compressors": COMPRESSOR} for v in out_ds.data_vars}
 
             # drop any coord/data var chunk encodings that conflict
@@ -537,6 +543,7 @@ if __name__ == "__main__":
                 out_ds[name].encoding.pop("compressors", None)                      # TODO: remove this again if possible
                 
             # write: create on first batch, append on subsequent
+            # write is done only by driver node (due to the compute() above), not by any worker node
             if batch_idx == 0:
                 out_ds.to_zarr(OUT_PATH, mode="w", encoding=encoding, zarr_format=3)
             else:
@@ -545,9 +552,9 @@ if __name__ == "__main__":
                 # date dimension. Since all batches come from the same new_ds, 
                 # this is guaranteed.
 
-                # The final to_zarr write is incremental — you don't need to 
-                # hold all 100M pixel results in memory at once, which was 
-                # the main memory bottleneck of the previous approach.
+                # The final write `.to_zarr()` is incremental — you don't need to 
+                # hold all 100M pixel results in memory at once, only 200K from the BATCH_SIZE.
+                # This was the main memory bottleneck of the previous approach.
 
             # progress log
             elapsed  = (datetime.now() - t0).total_seconds()
@@ -568,13 +575,13 @@ if __name__ == "__main__":
     print(OUT_PATH, flush = True)
 
     # cleanup the temporary file:
-    if os.path.exists(OUT_ZARR_TMP):
-        shutil.rmtree(OUT_ZARR_TMP)
+    # if os.path.exists(OUT_ZARR_TMP):
+    #     shutil.rmtree(OUT_ZARR_TMP)
         
     sys.exit(0)
 
 
 
-# from dash:
-# rsync -ahz --info=progress2 -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test7.zarr /data_3/scratch
+# from GECO-Workstation-02:
+# rsync -ahz --info=progress2 -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr /data_3/scratch
 # 
