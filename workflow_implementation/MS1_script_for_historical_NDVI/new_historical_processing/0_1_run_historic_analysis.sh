@@ -19,6 +19,10 @@ trap 'echo "[ERROR] Script failed: $CURRENT_SCRIPT | Time: $(date)"' ERR
 timestamp(){ date "+%Y-%m-%d %H:%M:%S"; }
 format_seconds() { local s=$1; printf "%02d:%02d:%02d" $((s/3600)) $(((s%3600)/60)) $((s%60)); }
 
+# Workaround for "OSError: [Errno 24] Too many open files"
+ulimit -n 8192 # default was at 1024
+ulimit -a
+
 # ============================================================
 # Activate virtual environment
 # ============================================================
