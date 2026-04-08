@@ -205,19 +205,20 @@ def historical_ndvi(ndvi_array, median_array, mask_array, is_observation_date, d
 
 if __name__ == "__main__":
 
-    N_WORKERS = 60
+    N_WORKERS = 80
     # TODO: test later 120 workers, with each 30GB memory_limit, BATCH_SIZE = 120K, INNER_PIXEL_CHUNK=1K
     # TODO: test later 150 workers, with each 24GB memory_limit, BATCH_SIZE = 150K, INNER_PIXEL_CHUNK=1K
 
     with Client(
         n_workers=N_WORKERS,
         threads_per_worker=1,
-        memory_limit='50GB',
+        memory_limit='40GB',
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
         dashboard_address=':1235') as client:
     
         print(client, flush = True)
         print(client.dashboard_link, flush = True)
+        print(dask.config.get("scheduler"), flush = True)
 
         INPUT_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
         INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
@@ -242,7 +243,10 @@ if __name__ == "__main__":
         # NOTE: and directly drop unused ndsi
         
         # --- load median values for each doy --------------------------
-        lookuptable  = xr.open_zarr(INPUT_ZARR_LOOKUPTABLE)
+        lookuptable  = xr.open_zarr(INPUT_ZARR_LOOKUPTABLE, chunks={}, consolidated=True)
+
+        print(new_observations_ds, flush=True)
+        print(lookuptable, flush=True)
 
         #TODO: remove this when development
         # subset pixels for development: FOR DEVELOPMENT:
@@ -416,7 +420,12 @@ if __name__ == "__main__":
         # Save for intermediate computation (disk-backed rechunking)
         # NOTE: this requires 400GB of free, additional disk space (for all images from 2017-04-01 to 2025-12-31)
         OUT_ZARR_TMP = OUT_PATH+"temporary.zarr"
-        new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1}).to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
+        new_ds = new_ds.chunk({"pixel": PIXEL_CHUNKS, "date": -1})
+        print("Newly derived dataset:", flush = True)
+        print(new_ds, flush = True)
+        # print(type(new_ds['ndvi_processed'].data), getattr(new_ds['ndvi_processed'].data, "chunks", None))
+
+        new_ds.to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
         # Reload freshly:
         new_ds = xr.open_dataset(OUT_ZARR_TMP, chunks={}, mask_and_scale= False,
                                  consolidated=True)  # use consolidated on open to avoid "OSError: [Errno 24] Too many open files: '/proc/1742817/stat'"
