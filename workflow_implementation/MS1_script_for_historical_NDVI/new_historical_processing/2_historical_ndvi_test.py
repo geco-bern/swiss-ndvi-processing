@@ -10,6 +10,7 @@ import pandas as pd
 from numcodecs import blosc, Blosc, zarr3
 from zarr.codecs import BloscCodec
 import time
+from math import ceil
 
 import warnings
 warnings.filterwarnings(
@@ -205,6 +206,8 @@ def historical_ndvi(ndvi_array, median_array, mask_array, is_observation_date, d
 if __name__ == "__main__":
 
     N_WORKERS = 60
+    # TODO: test later 120 workers, with each 30GB memory_limit, BATCH_SIZE = 120K, INNER_PIXEL_CHUNK=1K
+    # TODO: test later 150 workers, with each 24GB memory_limit, BATCH_SIZE = 150K, INNER_PIXEL_CHUNK=1K
 
     with Client(
         n_workers=N_WORKERS,
@@ -213,7 +216,8 @@ if __name__ == "__main__":
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
         dashboard_address=':1235') as client:
     
-        print(client.dashboard_link)
+        print(client, flush = True)
+        print(client.dashboard_link, flush = True)
 
         INPUT_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
         INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
@@ -224,7 +228,7 @@ if __name__ == "__main__":
         #  Load -------- and new observation data sets
         # =====================================================
         DATE_CHUNKS = 365
-        PIXEL_CHUNKS = 200000
+        PIXEL_CHUNKS = 40_000
         DATE_CHUNKS_OUT = 365
 
         # --- load historic dataset ------------------------------------
@@ -238,17 +242,21 @@ if __name__ == "__main__":
         # NOTE: and directly drop unused ndsi
         
         # --- load median values for each doy --------------------------
-        lookuptable  = xr.open_zarr(INPUT_ZARR_LOOKUPTABLE).chunk({"doy": -1, "pixel": PIXEL_CHUNKS})
+        lookuptable  = xr.open_zarr(INPUT_ZARR_LOOKUPTABLE)
 
         #TODO: remove this when development
         # subset pixels for development: FOR DEVELOPMENT:
-        new_observations_ds = new_observations_ds.isel(pixel=slice(0,10**3)) # , datetime = slice(0,30)
+        # new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(130e3))) # , datetime = slice(0,30)
         # with 10 pixels:         runtime=55s,  storage=304KB
         # with 100 pixels:        runtime=54s,  storage=644KB
         # with 1_000 pixels:      runtime=61s, storage=4.1MB
         # with 10_000 pixels:     runtime=141s, storage=39MB
         # with 100_000 pixels:    runtime=1080s, storage=XXKB
+        # with 120_000 pixels:    runtime=565s, storage=463MB
+        # with 150_000 pixels:    runtime=640s, storage=463MB
+        # with 160_000 pixels:    runtime=865s, storage=617MB
         # with 1_000_000 pixels:  runtime=105min, storage=3.8GB
+        # with 5_000_000 pixels:  runtime=XXXmin, storage=XXXGB
         # with all pixels:        runtime=XXXmin, storage=380GB
         # END TODO
 
@@ -434,13 +442,22 @@ if __name__ == "__main__":
 
         # Attempt at doing this not for the whole data set but in batches of 1_000_000 pixels:
         # BATCH_SIZE = 1_000_000  # pixels per outer loop iteration
-        BATCH_SIZE = int(200_000/200)  # pixels per outer loop iteration
-        INNER_PIXEL_CHUNK = int(3_334/200)  # ~200K / 60 workers → 1 task per worker per round
+        # INNER_PIXEL_CHUNK = int(16_667)  # ~1M / 60 workers → 1 task per worker per round
+        BATCH_SIZE = int(3*PIXEL_CHUNKS)  # pixels per outer loop iteration
+        INNER_PIXEL_CHUNK = ceil(BATCH_SIZE / N_WORKERS)  # ~60K / 60 workers → 1 task per worker per round
+                                              # Set INNER_PIXEL_CHUNK ≈ BATCH_SIZE / N_WORKERS 
+                                              # (e.g. 60_000 / 60 ≈ 1_000) so each worker 
+                                              # gets close to 1 task per round → full utilization 
+                                              # with minimal scheduling overhead.
         n_pixels = len(new_ds.pixel)
         n_batches = (n_pixels + BATCH_SIZE - 1) // BATCH_SIZE
 
         # materialize coordinate arrays once (small, 1D)
-        dates_array_arg  = new_ds["date"].values          # NumPy, not Dask
+        dates_array_arg  = new_ds["date"].values    # NumPy, not Dask
+                                                    # Pass dates_array as NumPy, not a Dask array — 
+                                                    # a persisted Dask coordinate passed as a kwarg 
+                                                    # to apply_ufunc adds unnecessary graph edges. After 
+                                                    # new_ds["date"].values it is small (3195 elements, <25 KB).
         start_date_arg   = dates_array_arg[0]
         for batch_idx in range(n_batches):
             t0 = datetime.now()
@@ -478,8 +495,11 @@ if __name__ == "__main__":
             g = ndvi_out.__dask_graph__()
             print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
 
-            # compute this batch with all 60 workers
+            # compute this batch with all workers
             ndvi_out, mask_out = dask.compute(ndvi_out, mask_out)
+            # compute() collects them to the scheduler node (driver) and does driver-side write (batch needs to fit into memory)
+            # alternatively persist()+wait() would force computation without collection, leaving results on the worker nodes,
+            #     and doing worker-side write
 
             # create the dataset to write for this batch
             out_ds = xr.Dataset(
@@ -489,7 +509,7 @@ if __name__ == "__main__":
                 },
                 # coords={c: batch_ds[c] for c in batch_ds.coords}
             )
-            out_ds = out_ds.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS_OUT})
+            out_ds = out_ds.chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS_OUT}) # Because of this BATCH_SIZE must be an integer multiple of PIXEL_CHUNKS
 
             #out_ds.attrs["pixel_definition"] = new_ds.attrs["pixel_definition"]
             out_ds.attrs = new_ds.attrs
@@ -511,6 +531,13 @@ if __name__ == "__main__":
                 out_ds.to_zarr(OUT_PATH, mode="w", encoding=encoding, zarr_format=3)
             else:
                 out_ds.to_zarr(OUT_PATH, append_dim="pixel")
+                # append_dim="pixel" requires that all batches have the same 
+                # date dimension. Since all batches come from the same new_ds, 
+                # this is guaranteed.
+
+                # The final to_zarr write is incremental — you don't need to 
+                # hold all 100M pixel results in memory at once, which was 
+                # the main memory bottleneck of the previous approach.
 
             # progress log
             elapsed  = (datetime.now() - t0).total_seconds()
@@ -525,15 +552,14 @@ if __name__ == "__main__":
             )
 
         # small pause to allow dashboard websocket handshakes / metadata flush
-        time.sleep(2)
-
+        time.sleep(10)
 
 
     print(OUT_PATH, flush = True)
 
     # cleanup the temporary file:
-    # if os.path.exists(OUT_ZARR_TMP): # TODO: activate
-    #     shutil.rmtree(OUT_ZARR_TMP)  # TODO: activate
+    if os.path.exists(OUT_ZARR_TMP):
+        shutil.rmtree(OUT_ZARR_TMP)
         
     sys.exit(0)
 
