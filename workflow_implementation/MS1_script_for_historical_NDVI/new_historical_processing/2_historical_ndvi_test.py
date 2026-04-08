@@ -247,23 +247,23 @@ if __name__ == "__main__":
         print(new_observations_ds, flush=True)
         print(lookuptable, flush=True)
 
-        #TODO: remove this when development
-        # subset pixels for development: FOR DEVELOPMENT:
-        new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(600e3))) # , datetime = slice(0,30)
-        # with 10 pixels:         runtime=55s,  storage=304KB
-        # with 100 pixels:        runtime=54s,  storage=644KB
-        # with 1_000 pixels:      runtime=61s, storage=4.1MB
-        # with 10_000 pixels:     runtime=141s, storage=39MB
-        # with 100_000 pixels:    runtime=1080s, storage=XXKB
-        # with 120_000 pixels:    runtime=565s, storage=463MB
-        # with 130_000 pixels:    runtime=720s, storage=502MB
-        # with 150_000 pixels:    runtime=640s, storage=XXXMB
-        # with 160_000 pixels:    runtime=865s, storage=617MB
-        # with 600_000 pixels:    runtime=3090s, storage=3.3GB
-        # with 1_000_000 pixels:  runtime=6300s, storage=3.8GB
-        # with 5_000_000 pixels:  runtime=XXXmin, storage=XXXGB
-        # with all pixels:        runtime=XXXmin, storage=380GB
-        # END TODO
+        ##TODO: remove this when development
+        ## subset pixels for development: FOR DEVELOPMENT:
+        ## new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(600e3))) # , datetime = slice(0,30)
+        ## with 10 pixels:         runtime=55s,  storage=304KB
+        ## with 100 pixels:        runtime=54s,  storage=644KB
+        ## with 1_000 pixels:      runtime=61s, storage=4.1MB
+        ## with 10_000 pixels:     runtime=141s, storage=39MB
+        ## with 100_000 pixels:    runtime=1080s, storage=XXKB
+        ## with 120_000 pixels:    runtime=565s, storage=463MB
+        ## with 130_000 pixels:    runtime=720s, storage=502MB
+        ## with 150_000 pixels:    runtime=640s, storage=XXXMB
+        ## with 160_000 pixels:    runtime=865s, storage=617MB
+        ## with 600_000 pixels:    runtime=3090s, storage=3.3GB
+        ## with 1_000_000 pixels:  runtime=6300s, storage=3.8GB
+        ## with 5_000_000 pixels:  runtime=XXXmin, storage=XXXGB
+        ## with all pixels:        runtime=XXXmin, storage=380GB
+        ## END TODO
 
         # =====================================================
         #  Aggregate multiple daily observation

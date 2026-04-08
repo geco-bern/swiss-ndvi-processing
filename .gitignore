@@ -6,6 +6,5 @@ demo/output/gif/*.gif
 *.egg-info
 
 .venv*
-workflow_implementation/data/temporary_demo.zarr
 data_for_demo_2
 report/fig/prova2

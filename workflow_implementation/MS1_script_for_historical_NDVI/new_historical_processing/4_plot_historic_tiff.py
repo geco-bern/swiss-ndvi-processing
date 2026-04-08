@@ -20,7 +20,7 @@ from dask.distributed import Client
 if __name__ == '__main__':
 
     # Paths
-    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7"
+    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7c"
     # DASK_TEMP_DIR    = "/mnt/data1/UniBe-swiss-ndvi/tmp_data2/"
 
     os.makedirs(OUTPUT_TIFF_BASE, exist_ok=True)
@@ -39,7 +39,7 @@ if __name__ == '__main__':
         # date_arg = "2024-07-31" # for dates requested...
         # date_arg = "all_dates"
         # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test6.zarr" # TODO: remove -test
-        # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test8.zarr" # TODO: remove -test
+        # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test10.zarr" # TODO: remove -test
 
 
     # Load (processed) NDVI data set to output specific dates
