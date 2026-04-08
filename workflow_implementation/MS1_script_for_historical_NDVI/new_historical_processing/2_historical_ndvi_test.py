@@ -205,14 +205,14 @@ def historical_ndvi(ndvi_array, median_array, mask_array, is_observation_date, d
 
 if __name__ == "__main__":
 
-    N_WORKERS = 60
+    N_WORKERS = 120
     # TODO: test later 120 workers, with each 30GB memory_limit, BATCH_SIZE = 200K, INNER_PIXEL_CHUNK=83
     # TODO: test later 150 workers, with each 24GB memory_limit, BATCH_SIZE = 150K, INNER_PIXEL_CHUNK=1K
 
     with Client(
         n_workers=N_WORKERS,
         threads_per_worker=1,
-        memory_limit='60GB',
+        memory_limit='30GB',
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
         dashboard_address=':1235') as client:
     
