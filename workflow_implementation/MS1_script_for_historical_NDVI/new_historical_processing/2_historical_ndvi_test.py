@@ -270,6 +270,16 @@ if __name__ == "__main__":
         #  and resample to daily intervals (between observations)
         # =====================================================
 
+        # NOTE: lowest-hanging performance fruit: replace dask-based aggregation 
+        #       below (that leads the very large dask graphs) with something 
+        #       where we manually loop through observation dates:
+        #           - generate a new empty data set: ndvi_daily_between_obs
+        #           - loop manually through days with observations and fill in values
+        #             - if multiple obs times per day: select either first value
+        #             - if multiple obs times per day: or compute mean value
+        #       For a 200k-pixel-batch, the current aggregation already uses 10/15 mins
+        #       compute time.
+
         # Decide how to collapse sub-daily duplicates to one observed value per day
         agg = 'first' # # TODO: choose 'mean' or 'first'
         if agg == 'first':
@@ -493,7 +503,7 @@ if __name__ == "__main__":
             # plt.savefig('test.png')
 
             # call gufunc where core dim is "time" (1D arrays per pixel)
-            # NOTE: lowest-hanging performance fruit: compile historical_ndvi with numba,
+            # NOTE: 2nd lowest-hanging performance fruit: compile historical_ndvi with numba,
             #       see: https://docs.xarray.dev/en/stable/examples/apply_ufunc_vectorize_1d.html
             ndvi_out, mask_out = xr.apply_ufunc(
                 historical_ndvi,
