@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import numpy as np
 import statsmodels.api as sm
 from dask.distributed import Client
@@ -446,10 +446,10 @@ if __name__ == "__main__":
                                                     # to apply_ufunc adds unnecessary graph edges. After 
                                                     # new_ds["date"].values it is small (3195 elements, <25 KB).
         start_date_arg   = dates_array_arg[0]
+        t0 = datetime.now()
         for batch_idx in range(n_batches):
-            t0 = datetime.now()
             print(
-                f"[{t0:%Y-%m-%d %H:%M:%S}]  " + 
+                f"[{datetime.now():%Y-%m-%d %H:%M:%S}]  " + 
                 f"Starting Batch {batch_idx+1}/{n_batches}",
                 flush=True
             )
@@ -572,11 +572,12 @@ if __name__ == "__main__":
             elapsed  = (datetime.now() - t0).total_seconds()
             done_pix = pix_end
             eta_s    = elapsed / done_pix * (n_pixels - done_pix) if done_pix < n_pixels else 0
+            eta_datetime = datetime.now() + timedelta(seconds=eta_s)
             print(
                 f"[{datetime.now():%Y-%m-%d %H:%M:%S}]  "
                 f"Batch {batch_idx+1}/{n_batches}  "
                 f"pixels {pix_start:,}–{pix_end:,}  "
-                f"elapsed {elapsed/60:.1f}min  ETA {eta_s/60:.0f}min",
+                f"elapsed {elapsed/60:.1f}min  ETA {eta_s/60:.0f}min ({eta_datetime})",
                 flush=True
             )
 
@@ -596,4 +597,4 @@ if __name__ == "__main__":
 
 # from GECO-Workstation-02:
 # rsync -ahz --info=progress2 -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr /data_3/scratch
-# 
+# rsync -ahz --info=progress2 -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr /data_3/scratch; mv /data_3/scratch/historical_2026-04-04_18h16_historical_v7.zarr /data_3/scratch/historical_2026-04-04_18h16_historical_v7_2026-04-09.zarr
