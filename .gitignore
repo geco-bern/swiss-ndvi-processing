@@ -5,6 +5,8 @@ demo/output/gif/*.gif
 *.tif
 *.egg-info
 
+
+.env*
 .venv*
 data_for_demo_2
 report/fig/prova2
