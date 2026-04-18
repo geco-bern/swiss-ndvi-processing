@@ -41,7 +41,7 @@ dashboard_address=':2234')
 print(client.dashboard_link)
 
 OBS_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
-PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test10.zarr" # TODO: remove -test
+PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
 INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
 
 # =====================================================
@@ -92,25 +92,62 @@ proc_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
 # is_leap = dtindex.is_leap_year.astype(int)
 # t = torch.tensor((doy - 1) / (365 + is_leap), dtype=torch.float32)
 
+# create MultiIndex (keeping also the option of using pixelID)
+proc_ds_idx = proc_ds.assign_coords(pixelID=proc_ds["pixel"])
+obs_ds_idx = obs_ds.assign_coords(pixelID=obs_ds["pixel"])
+# create MultiIndex with three levels: x, y, pixelID
+proc_ds_midx = proc_ds_idx.set_index(pixel=["x", "y", "pixelID"])
+obs_ds_midx = obs_ds_idx.set_index(pixel=["x", "y", "pixelID"])
+
+def select_by_xy(ds_mi, xs, ys):
+    if not isinstance(xs, (list, tuple)):
+        xs = [xs]
+    if not isinstance(ys, (list, tuple)):
+        ys = [ys]
+    assert len(xs) == len(ys)
+    selections = [ds_mi.sel(pixel=(x, y, slice(None)), drop=True)
+                   for x, y in zip(xs, ys)]
+    return xr.concat(selections, dim='pixel')
+
+def select_by_pixelID(ds_mi, pid):
+    return ds_mi.sel(pixel=(slice(None), slice(None), pid), drop=True)
+
+# select_by_xy(proc_ds_midx, [2684595, 2684555, 2684525], [1295915, 1295715, 1295715])
+# select_by_pixelID(proc_ds_midx, [0, 210, 350])
+# select_by_xy(obs_ds_midx, [2684595, 2684555, 2684525], [1295915, 1295715, 1295715])
+# select_by_pixelID(obs_ds_midx, [0, 210, 350])
+
 # =====================================================
 #  Plot figures
 # =====================================================
-START_DATE="2025-04-01"
-END_DATE="2025-08-01"
-# X_COORD, Y_COORD = "2720645", "1118245"
-# X_COORD, Y_COORD = "2710385", "1116375"
-# X_COORD, Y_COORD = "2710005", "1109995"
-X_COORD, Y_COORD = "2644020", "1133790" # NOTE: Bitsch forest fire
-    #     X_COORD="2710005" # TODO: check if this is indeed a forest pixel otherwise choose other test option
-    #     Y_COORD="1109995" # TODO: check if this is indeed a forest pixel otherwise choose other test option
-X_COORD, Y_COORD = proc_ds['x'].values[0], proc_ds['y'].values[0]
-X_COORD, Y_COORD = proc_ds.isel(pixel=999)['x'].values, proc_ds['y'].isel(pixel=999).values
-
+# START_DATE="2025-04-01"
+# END_DATE="2025-08-01"
+# # X_COORD, Y_COORD = 2720645, 1118245
+# # X_COORD, Y_COORD = 2710385, 1116375
+# # X_COORD, Y_COORD = 2710005, 1109995
+# X_COORD, Y_COORD = 2644020, 1133790 # NOTE: Bitsch forest fire
+#     #     X_COORD=2710005 # TODO: check if this is indeed a forest pixel otherwise choose other test option
+#     #     Y_COORD=1109995 # TODO: check if this is indeed a forest pixel otherwise choose other test option
+# X_COORD, Y_COORD = proc_ds['x'].values[0], proc_ds['y'].values[0]
+# X_COORD, Y_COORD = proc_ds.isel(pixel=999)['x'].values, proc_ds.isel(pixel=999)['y'].values
 
 # Figure 00
 # --- visual check of resulting data sets ----------------------------------
-proc_ds_subset = proc_ds.isel(pixel=[0, 210, 350, 490]).drop(["y_idx","x_idx"])
-obs_ds_subset  = obs_ds.isel(pixel=[0, 210, 350, 490]).drop(["y_idx","x_idx"])
+proc_ds_subset = select_by_pixelID(proc_ds_midx, [0, 210, 350, 490, 999]).drop(["y_idx","x_idx"])
+obs_ds_subset = select_by_pixelID(obs_ds_midx, [0, 210, 350, 490, 999]).drop(["y_idx","x_idx"])
+# proc_ds_subset = select_by_xy(proc_ds_midx, 
+#                               [X_COORD],
+#                               [Y_COORD]).drop(["y_idx","x_idx"])
+# proc_ds_subset = select_by_xy(proc_ds_midx, 
+#                               [X_COORD],
+#                               [Y_COORD]).drop(["y_idx","x_idx"])
+# proc_ds_subset = select_by_xy(proc_ds_midx, 
+#                               [2684595],
+#                               [1295915]).drop(["y_idx","x_idx"])
+# proc_ds_midx.sel(pixel=(2684595, 1295915, slice(None)), drop=True)
+# proc_ds_midx.sel(pixel=(slice(2684595, 2684610), 1295915, slice(None)), drop=True)
+proc_ds_subset.x.values
+proc_ds_subset.y.values
 
 smoothed_cmap = {
     # 0: ("no_obs_to_smooth", "black"),
@@ -155,7 +192,6 @@ for i in range(proc_ds_subset2.pixel.size):
         y="ndvi_processed", hue="mask_array",
         cmap=cmap, add_colorbar=False) # norm=norm, 
 
-
 # plot raw observation
 indexer_obs = ((obs_ds_subset["ndvi"] < NO_COVERAGE) &
                (obs_ds_subset["ndvi"] > INVALID)).compute()
@@ -177,6 +213,8 @@ for i in range(obs_ds_subset2.pixel.size):
     ax.set_xlabel("") # remove x labels
     ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda val, pos: val / 10000)) # fix y-axis tick labels
 
+gr.set_titles(template='{coord} = {value}', maxchar=40) # increase maxchar from 30 to 40
+
 handles_for_legend = [ # legend entry for raw observations:
     Line2D([0], [0], marker='o', linestyle='', color=color, markerfacecolor=color, markersize=6, label=label)
     for _, (label, color) in obs_cmap.items()
@@ -192,9 +230,14 @@ for i in range(obs_ds_subset2.pixel.size):
     ax.legend(handles=handles_for_legend, title="", fontsize="small", loc="lower left") # add discrete legend
 
 # save plot:    
-plt.savefig('test4.png')
-    
-    
+plt.savefig('test5.png')
+
+
+
+
+
+
+
 # Figure 0 (taken from workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB.py)
 # # c) subset historic data
 # # 1) by date

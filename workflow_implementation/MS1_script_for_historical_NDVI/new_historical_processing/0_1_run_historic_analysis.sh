@@ -139,15 +139,15 @@ echo
 # ============================================================
 # run historical processing script
 echo "------------------------------------------------------------"
-echo "Running: ${SCRIPT_2}"; echo "Start time: $(timestamp)"
-START_TIME=$(date +%s)
-python -u "${SCRIPT_2}"      # NO ARGS NEEDED
-NEW_HIST_ZARR=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
-END_TIME=$(date +%s)
-ELAPSED=$((END_TIME - START_TIME))
-echo "Finished: ${SCRIPT_2}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
-echo "Processing script returned value: $NEW_HIST_ZARR"
-# NEW_HIST_ZARR="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
+#echo "Running: ${SCRIPT_2}"; echo "Start time: $(timestamp)"
+#START_TIME=$(date +%s)
+# python -u "${SCRIPT_2}"      # NO ARGS NEEDED
+# NEW_HIST_ZARR=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
+# END_TIME=$(date +%s)
+# ELAPSED=$((END_TIME - START_TIME))
+#echo "Finished: ${SCRIPT_2}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+#echo "Processing script returned value: $NEW_HIST_ZARR"
+NEW_HIST_ZARR="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
 
 # # ============================================================
 # # Clean up temporary output data
@@ -158,14 +158,14 @@ echo "Processing script returned value: $NEW_HIST_ZARR"
 
 # ============================================================
 # run tiff generation
-# echo "------------------------------------------------------------"
-# echo "Running: ${SCRIPT_3}"; echo "Start time: $(timestamp)"
-# START_TIME=$(date +%s)
-# python -u "${SCRIPT_3}" "$NEW_HIST_ZARR" "2017-07-02"     # either single dates
-# python -u "${SCRIPT_3}" "$NEW_HIST_ZARR" "all_dates"        # or whole file
-# END_TIME=$(date +%s)
-# ELAPSED=$((END_TIME - START_TIME))
-# echo "Finished: ${SCRIPT_3}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+echo "------------------------------------------------------------"
+echo "Running: ${SCRIPT_3}"; echo "Start time: $(timestamp)"
+START_TIME=$(date +%s)
+# python -u "${SCRIPT_3}" "$NEW_HIST_ZARR" "2017-07-04"     # either single dates
+python -u "${SCRIPT_3}" "$NEW_HIST_ZARR" "all_dates"        # or whole file
+END_TIME=$(date +%s)
+ELAPSED=$((END_TIME - START_TIME))
+echo "Finished: ${SCRIPT_3}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 
 # FOR DEVELOPMENT (run this on a local computer and check the generated file in QGIS):
 # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7_compr/20170602_historic.tiff ~/Downloads/test/tiffs_historic/

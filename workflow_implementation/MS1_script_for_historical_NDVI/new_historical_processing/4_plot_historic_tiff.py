@@ -20,7 +20,7 @@ from dask.distributed import Client
 if __name__ == '__main__':
 
     # Paths
-    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7c"
+    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final"
     # DASK_TEMP_DIR    = "/mnt/data1/UniBe-swiss-ndvi/tmp_data2/"
 
     os.makedirs(OUTPUT_TIFF_BASE, exist_ok=True)
@@ -40,10 +40,11 @@ if __name__ == '__main__':
         # date_arg = "all_dates"
         # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test6.zarr" # TODO: remove -test
         # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test10.zarr" # TODO: remove -test
+        # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
 
 
     # Load (processed) NDVI data set to output specific dates
-    N_WORKERS = 10               # D: This takes: 1min55s for 50 pixels and 2min22s for 100 pixels and 5min43s for 500 pixels (when loading dates_array from disk)
+    N_WORKERS = 60               # D: This takes: 1min55s for 50 pixels and 2min22s for 100 pixels and 5min43s for 500 pixels (when loading dates_array from disk)
     MEMORY_PER_WORKER = "12GB"   # D: This takes: 1min55s for 50 pixels and 2min22s for 100 pixels and 5min43s for 500 pixels (when loading dates_array from disk)
 
     with Client(
@@ -154,18 +155,53 @@ if __name__ == '__main__':
 
                 # NOTE: this should correspond to: https://github.com/geostandards-ch/cog-best-practices#lossy-numerical-raster
                 #       e.g. gdal_translate -a_srs EPSG:2056 -of COG -co COMPRESS=LERC_ZSTD -co LEVEL=22 -co NUM_THREADS=ALL_CPUS -co BIGTIFF=YES -co STATISTICS=YES -co MAX_Z_ERROR=<threshold> -tr <resolution in meter> <resolution in meter> -r Cubic -a_nodata <value> -ot <datatype> <input.tif> <output.tif>
-                NDVI_processed_curr_date_gridded.rio.to_raster(
-                    output_tiff_ndvi,
-                    driver="COG",
-                    compress="deflate",
-                    dtype="int16"
-                )
-                NDVI_status_curr_date_gridded.rio.to_raster(
-                    output_tiff_mask,
-                    driver="COG",
-                    compress="deflate",
-                    dtype="int16",
-                )
+                # NDVI_processed_curr_date_gridded.rio.to_raster(
+                #     output_tiff_ndvi,
+                #     driver="COG",
+                #     compress="deflate",
+                #     dtype="int16"
+                # )
+                arr = NDVI_processed_curr_date_gridded.values.astype("int16")
+                profile = {
+                    "driver": "COG",
+                    "dtype": "int16",
+                    "count": 1,
+                    "height": arr.shape[0],
+                    "width": arr.shape[1],
+                    "crs": "EPSG:2056",
+                    "transform": window_trans,
+                    "compress": "LERC_ZSTD",
+                    "LEVEL": 22,
+                    "NUM_THREADS": "ALL_CPUS",
+                    "BIGTIFF": "YES",
+                    "MAX_Z_ERROR": 0.02,   # tune for acceptable lossy error
+                }
+                with rasterio.open(output_tiff_ndvi, "w", **profile) as dst:
+                    dst.write(arr, 1)
+
+                # NDVI_status_curr_date_gridded.rio.to_raster(
+                #     output_tiff_mask,
+                #     driver="COG",
+                #     compress="deflate",
+                #     dtype="int16",
+                # )
+                arr = NDVI_status_curr_date_gridded.values.astype("int16")
+                profile = {
+                    "driver": "COG",
+                    "dtype": "int16",
+                    "count": 1,
+                    "height": arr.shape[0],
+                    "width": arr.shape[1],
+                    "crs": "EPSG:2056",
+                    "transform": window_trans,
+                    "compress": "LERC_ZSTD",
+                    "LEVEL": 22,
+                    "NUM_THREADS": "ALL_CPUS",
+                    "BIGTIFF": "YES",
+                    "MAX_Z_ERROR": 0.02,   # tune for acceptable lossy error
+                }
+                with rasterio.open(output_tiff_mask, "w", **profile) as dst:
+                    dst.write(arr, 1)
                 # mask_array == 0: the data is not an observation and is yet to be smoothed
                 # mask_array == 1: the data is not an observation and is smoothed
                 # mask_array == 2: the data is an observation and is yet to be smoothed
@@ -175,7 +211,7 @@ if __name__ == '__main__':
                 print(f"Created {output_tiff_ndvi}")
                 print(f"Created {output_tiff_mask}")
 
-                # # This is for testing: we additionally produce normal GeoTiff
+                # # This is for testing: we additionally produce normal (i.e. non-cloud-optimized) GeoTiff
                 # output_tiff_ndvi2 = f"{OUTPUT_TIFF_BASE}/{pd.to_datetime(curr_date).strftime('%Y%m%d')}-nonCOG_historic.tiff"
                 # output_tiff_mask2 = f"{OUTPUT_TIFF_BASE}/{pd.to_datetime(curr_date).strftime('%Y%m%d')}-nonCOG_historic_mask.tiff"
                 # NDVI_processed_curr_date_gridded.rio.to_raster(output_tiff_ndvi2)
@@ -189,6 +225,6 @@ if __name__ == '__main__':
     # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_1000mX1000m/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
     # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_1000mX1000m/20240731-nonCOG_historic.tiff ~/Downloads/test/tiffs_historic/
 
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7/20240731_historic_mask.tiff ~/Downloads/test/tiffs_historic/
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7b/ ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final/20240731_historic_mask.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final/ ~/Downloads/test/tiffs_historic/
