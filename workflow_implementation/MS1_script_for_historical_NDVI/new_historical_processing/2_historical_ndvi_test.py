@@ -168,7 +168,7 @@ if __name__ == "__main__":
 
         ##TODO: remove this when development
         ## subset pixels for development: FOR DEVELOPMENT:
-        new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(1e3))) # , datetime = slice(0,30)
+        # new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(600e3))) # , datetime = slice(0,30)
         ## with 10 pixels:         runtime=55s,  storage=304KB
         ## with 100 pixels:        runtime=54s,  storage=644KB
         ## with 1_000 pixels:      runtime=61s, storage=4.1MB
@@ -335,7 +335,7 @@ if __name__ == "__main__":
         # Attempt at doing this not for the whole data set but in batches of 1_000_000 pixels:
         # BATCH_SIZE = 1_000_000  # pixels per outer loop iteration
         # INNER_PIXEL_CHUNK = int(16_667)  # ~1M / 60 workers → 1 task per worker per round
-        BATCH_SIZE = int(5*PIXEL_CHUNKS)  # pixels per outer loop iteration
+        BATCH_SIZE = int(1*PIXEL_CHUNKS)  # pixels per outer loop iteration
         # INNER_PIXEL_CHUNK = ceil(BATCH_SIZE / N_WORKERS)  # ~60K / 60 workers → 1 task per worker per round
                                               # Set INNER_PIXEL_CHUNK ≈ BATCH_SIZE / N_WORKERS 
                                               # (e.g. 60_000 / 60 ≈ 1_000) so each worker 
