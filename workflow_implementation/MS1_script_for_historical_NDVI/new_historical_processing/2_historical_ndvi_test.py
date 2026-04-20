@@ -124,14 +124,14 @@ def historical_ndvi_1st_fast_5000_120s(ndvi_arr, median_arr, is_observation_date
 
 if __name__ == "__main__":
 
-    N_WORKERS = 40
+    N_WORKERS = 80
     # TODO: test later 120 workers, with each 30GB memory_limit, BATCH_SIZE = 200K, INNER_PIXEL_CHUNK=83
     # TODO: test later 150 workers, with each 24GB memory_limit, BATCH_SIZE = 150K, INNER_PIXEL_CHUNK=1K
 
     with Client(
         n_workers=N_WORKERS,
         threads_per_worker=1,
-        memory_limit='30GB',
+        memory_limit='20GB',
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
         dashboard_address=':1235') as client:
     
@@ -168,12 +168,12 @@ if __name__ == "__main__":
 
         ##TODO: remove this when development
         ## subset pixels for development: FOR DEVELOPMENT:
-        new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(1e2))) # , datetime = slice(0,30)
+        # new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(1e6))) # , datetime = slice(0,30)
         ## with 10 pixels:         runtime=55s,  storage=304KB
         ## with 100 pixels:        runtime=54s,  storage=644KB
         ## with 1_000 pixels:      runtime=61s, storage=4.1MB
         ## with 10_000 pixels:     runtime=141s, storage=39MB
-        ## with 100_000 pixels:    runtime=1080s, storage=XXKB
+        ## with 100_000 pixels:    runtime=1080s, storage=XXKB          historical_ndvi_1st_fast_5000_120s: 165s
         ## with 120_000 pixels:    runtime=565s, storage=463MB
         ## with 130_000 pixels:    runtime=720s, storage=502MB
         ## with 150_000 pixels:    runtime=640s, storage=XXXMB
@@ -327,7 +327,7 @@ if __name__ == "__main__":
         # Attempt at doing this not for the whole data set but in batches of 1_000_000 pixels:
         # BATCH_SIZE = 1_000_000  # pixels per outer loop iteration
         # INNER_PIXEL_CHUNK = int(16_667)  # ~1M / 60 workers → 1 task per worker per round
-        BATCH_SIZE = int(1*PIXEL_CHUNKS)  # pixels per outer loop iteration
+        BATCH_SIZE = int(5*PIXEL_CHUNKS)  # pixels per outer loop iteration
         # INNER_PIXEL_CHUNK = ceil(BATCH_SIZE / N_WORKERS)  # ~60K / 60 workers → 1 task per worker per round
                                               # Set INNER_PIXEL_CHUNK ≈ BATCH_SIZE / N_WORKERS 
                                               # (e.g. 60_000 / 60 ≈ 1_000) so each worker 
