@@ -263,7 +263,8 @@ def download_timeseries_NDVI_singlePixel(
 
 
 OBS_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
-PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
+# PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
+PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7_2025-11.zarr" # this one is cropped to November 2025
 INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
 
 # =====================================================
@@ -475,7 +476,8 @@ for i in range(obs_ds_subset2.pixel.size):
 plt.tight_layout()
 
 # save plot:    
-plt.savefig('test8.png') # TODO: make filename more expressive
+plotpath = (PROC_ZARR+"-TESTSUITE_Fig0_.png")
+plt.savefig(plotpath)
 plt.close()
 
 
@@ -494,28 +496,26 @@ plt.close()
 # --- visual comparison with fresh download ----------------------------------
 # a) download raw data directly from swisstopo
 FLAG_DOWNLOAD = True
-pixel_it = 0
-if FLAG_DOWNLOAD:
-    df_raw = download_timeseries_NDVI_singlePixel(
-        x=X_COORDS[pixel_it], 
-        y=Y_COORDS[pixel_it], 
-        start_date = FIGURE01_START_DATE, 
-        end_date = FIGURE01_END_DATE)
+for pixel_it in range(0,len(X_COORDS)):
+    if FLAG_DOWNLOAD:
+        df_raw = download_timeseries_NDVI_singlePixel(
+            x=X_COORDS[pixel_it], 
+            y=Y_COORDS[pixel_it], 
+            start_date = FIGURE01_START_DATE, 
+            end_date = FIGURE01_END_DATE)
 
-# b) subset historic data
-# b1) by coordinate (already done above)
+    # b) subset historic data
+    # b1) by coordinate (already done above)
 
-# b2) by date
-proc_ds_subset2 = proc_ds_subset.sel(date    = slice(pd.to_datetime(FIGURE01_START_DATE), pd.to_datetime(FIGURE01_END_DATE)))
-obs_ds_subset2  = obs_ds_subset.sel(datetime = slice(pd.to_datetime(FIGURE01_START_DATE), pd.to_datetime(FIGURE01_END_DATE)))
+    # b2) by date
+    proc_ds_subset2 = proc_ds_subset.sel(date    = slice(pd.to_datetime(FIGURE01_START_DATE), pd.to_datetime(FIGURE01_END_DATE)))
+    obs_ds_subset2  = obs_ds_subset.sel(datetime = slice(pd.to_datetime(FIGURE01_START_DATE), pd.to_datetime(FIGURE01_END_DATE)))
 
-# print(proc_ds_subset2)
-# print(proc_ds_subset2.compute())
-# print(obs_ds_subset2.compute())
+    # print(proc_ds_subset2)
+    # print(proc_ds_subset2.compute())
+    # print(obs_ds_subset2.compute())
 
-# c) prepare plot
-pixel_it = 1
-#for pixel_it in range(len(NAMES)):
+    # c) prepare plot
     # Get data
     dates      = proc_ds_subset2["date"].to_numpy()
     ndvi       = proc_ds_subset2["ndvi_processed"].isel(pixel=pixel_it).load().to_numpy() # select first pixel of series
@@ -566,26 +566,19 @@ pixel_it = 1
     # plt.ylim(0, 33000) # TODO: reactivate cropping at 10000
     plt.xlabel("Date")
     plt.ylabel("NDVI")
-    plt.title(f"NDVI Time Series of location: {(X_COORDS[0], Y_COORDS[0])}")
+    plt.title(f"{NAMES[pixel_it]} — ({X_COORDS[pixel_it]}, {Y_COORDS[pixel_it]})")
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
 
     # g) output figure
-
-    plt.savefig("test9")
-
-    # plotpath = (
-    #     #"/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova2/"+
-    #     # "TESTSUITE_"+
-    #     # f"{os.path.basename(HISTO_ZARR_INPUT)}_"+
-    #     # f"{FIGURE01_START_DATE.replace("-","")}to{FIGURE01_END_DATE.replace("-","")}_"+
-    #     # f"location_{X_COORDS[0]}x{Y_COORDS[0]}"+
-    #     PROC_ZARR+"-TESTSUITE_"+
-    #     f"{FIGURE01_START_DATE.replace("-","")}to{FIGURE01_END_DATE.replace("-","")}_"+
-    #     f"location_{X_COORDS[0]}x{Y_COORDS[0]}"+
-    #     ".png")
-    # plt.savefig(plotpath)
+    plotpath = (
+        # PROC_ZARR+"-"+
+        "TESTSUITE_Fig1_"+
+        f"{FIGURE01_START_DATE.replace("-","")}to{FIGURE01_END_DATE.replace("-","")}_"+
+        f"location_{X_COORDS[pixel_it]}x{Y_COORDS[pixel_it]}"+
+        ".png")
+    plt.savefig(plotpath)
     plt.close()
 
 

@@ -58,6 +58,7 @@ echo $END_DATE
 SCRIPT_0="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/0_create_lookup_table.py"
 SCRIPT_1="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py"
 SCRIPT_2="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py"
+SCRIPT_2b="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2b_crop_to_2025-11-30.py"
 SCRIPT_3="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/4_plot_historic_tiff.py"
 
 # ============================================================
@@ -138,7 +139,7 @@ echo
 
 # ============================================================
 # run historical processing script
-echo "------------------------------------------------------------"
+# echo "------------------------------------------------------------"
 #echo "Running: ${SCRIPT_2}"; echo "Start time: $(timestamp)"
 #START_TIME=$(date +%s)
 # python -u "${SCRIPT_2}"      # NO ARGS NEEDED
@@ -149,6 +150,14 @@ echo "------------------------------------------------------------"
 #echo "Processing script returned value: $NEW_HIST_ZARR"
 NEW_HIST_ZARR="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
 
+echo "------------------------------------------------------------"
+echo "Running: ${SCRIPT_2b}"; echo "Start time: $(timestamp)"
+START_TIME=$(date +%s)
+python -u "${SCRIPT_2b}"      # NO ARGS NEEDED
+END_TIME=$(date +%s)
+ELAPSED=$((END_TIME - START_TIME))
+echo "Finished: ${SCRIPT_2b}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+
 # # ============================================================
 # # Clean up temporary output data
 # # ============================================================
@@ -158,14 +167,14 @@ NEW_HIST_ZARR="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_1
 
 # ============================================================
 # run tiff generation
-echo "------------------------------------------------------------"
-echo "Running: ${SCRIPT_3}"; echo "Start time: $(timestamp)"
-START_TIME=$(date +%s)
-# python -u "${SCRIPT_3}" "$NEW_HIST_ZARR" "2017-07-04"     # either single dates
-python -u "${SCRIPT_3}" "$NEW_HIST_ZARR" "all_dates"        # or whole file
-END_TIME=$(date +%s)
-ELAPSED=$((END_TIME - START_TIME))
-echo "Finished: ${SCRIPT_3}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+# echo "------------------------------------------------------------"
+# echo "Running: ${SCRIPT_3}"; echo "Start time: $(timestamp)"
+# START_TIME=$(date +%s)
+# # python -u "${SCRIPT_3}" "$NEW_HIST_ZARR" "2017-07-04"     # either single dates
+# python -u "${SCRIPT_3}" "$NEW_HIST_ZARR" "all_dates"        # or whole file
+# END_TIME=$(date +%s)
+# ELAPSED=$((END_TIME - START_TIME))
+# echo "Finished: ${SCRIPT_3}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 
 # FOR DEVELOPMENT (run this on a local computer and check the generated file in QGIS):
 # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7_compr/20170602_historic.tiff ~/Downloads/test/tiffs_historic/
