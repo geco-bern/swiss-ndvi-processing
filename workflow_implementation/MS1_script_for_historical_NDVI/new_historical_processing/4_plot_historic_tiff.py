@@ -8,6 +8,7 @@ import numpy as np
 import xarray as xr
 import dask.array as da
 import pandas as pd
+from datetime import datetime, date, timedelta
 import os
 import argparse
 from dask.distributed import Client
@@ -155,61 +156,66 @@ if __name__ == '__main__':
 
                 # NOTE: this should correspond to: https://github.com/geostandards-ch/cog-best-practices#lossy-numerical-raster
                 #       e.g. gdal_translate -a_srs EPSG:2056 -of COG -co COMPRESS=LERC_ZSTD -co LEVEL=22 -co NUM_THREADS=ALL_CPUS -co BIGTIFF=YES -co STATISTICS=YES -co MAX_Z_ERROR=<threshold> -tr <resolution in meter> <resolution in meter> -r Cubic -a_nodata <value> -ot <datatype> <input.tif> <output.tif>
-                # NDVI_processed_curr_date_gridded.rio.to_raster(
-                #     output_tiff_ndvi,
-                #     driver="COG",
-                #     compress="deflate",
-                #     dtype="int16"
-                # )
-                arr = NDVI_processed_curr_date_gridded.values.astype("int16")
-                profile = {
-                    "driver": "COG",
-                    "dtype": "int16",
-                    "count": 1,
-                    "height": arr.shape[0],
-                    "width": arr.shape[1],
-                    "crs": "EPSG:2056",
-                    "transform": window_trans,
-                    "compress": "LERC_ZSTD",
-                    "LEVEL": 22,
-                    "NUM_THREADS": "ALL_CPUS",
-                    "BIGTIFF": "YES",
-                    "MAX_Z_ERROR": 0.02,   # tune for acceptable lossy error
-                }
-                with rasterio.open(output_tiff_ndvi, "w", **profile) as dst:
-                    dst.write(arr, 1)
 
-                # NDVI_status_curr_date_gridded.rio.to_raster(
-                #     output_tiff_mask,
-                #     driver="COG",
-                #     compress="deflate",
-                #     dtype="int16",
-                # )
-                arr = NDVI_status_curr_date_gridded.values.astype("int16")
-                profile = {
-                    "driver": "COG",
-                    "dtype": "int16",
-                    "count": 1,
-                    "height": arr.shape[0],
-                    "width": arr.shape[1],
-                    "crs": "EPSG:2056",
-                    "transform": window_trans,
-                    "compress": "LERC_ZSTD",
-                    "LEVEL": 22,
-                    "NUM_THREADS": "ALL_CPUS",
-                    "BIGTIFF": "YES",
-                    "MAX_Z_ERROR": 0.02,   # tune for acceptable lossy error
-                }
-                with rasterio.open(output_tiff_mask, "w", **profile) as dst:
-                    dst.write(arr, 1)
+                # variant 1)
+                NDVI_processed_curr_date_gridded.rio.to_raster(
+                    output_tiff_ndvi,
+                    driver="COG",
+                    compress="deflate",
+                    dtype="int16"
+                )
+                NDVI_status_curr_date_gridded.rio.to_raster(
+                    output_tiff_mask,
+                    driver="COG",
+                    compress="deflate",
+                    dtype="int16",
+                )
+                
+                # variant 2)
+                # arr = NDVI_processed_curr_date_gridded.values.astype("int16")
+                # profile = {
+                #     "driver": "COG",
+                #     "dtype": "int16",
+                #     "count": 1,
+                #     "height": arr.shape[0],
+                #     "width": arr.shape[1],
+                #     "crs": "EPSG:2056",
+                #     "transform": window_trans,
+                #     "compress": "LERC_ZSTD",
+                #     "LEVEL": 22,
+                #     "NUM_THREADS": "ALL_CPUS",
+                #     "BIGTIFF": "YES",
+                #     "MAX_Z_ERROR": 0.02,   # tune for acceptable lossy error
+                # }
+                # with rasterio.open(output_tiff_ndvi, "w", **profile) as dst:
+                #     dst.write(arr, 1)
+
+                # arr = NDVI_status_curr_date_gridded.values.astype("int16")
+                # profile = {
+                #     "driver": "COG",
+                #     "dtype": "int16",
+                #     "count": 1,
+                #     "height": arr.shape[0],
+                #     "width": arr.shape[1],
+                #     "crs": "EPSG:2056",
+                #     "transform": window_trans,
+                #     "compress": "LERC_ZSTD",
+                #     "LEVEL": 22,
+                #     "NUM_THREADS": "ALL_CPUS",
+                #     "BIGTIFF": "YES",
+                #     "MAX_Z_ERROR": 0.02,   # tune for acceptable lossy error
+                # }
+                # with rasterio.open(output_tiff_mask, "w", **profile) as dst:
+                #     dst.write(arr, 1)
                 # mask_array == 0: the data is not an observation and is yet to be smoothed
                 # mask_array == 1: the data is not an observation and is smoothed
                 # mask_array == 2: the data is an observation and is yet to be smoothed
                 # mask_array == 3: the data is an observation and is smoothed
                 # mask_array == 4: the data is an observation and is an outlier
 
-                print(f"Created {output_tiff_ndvi}")
-                print(f"Created {output_tiff_mask}")
+                print(f"[{datetime.now():%Y-%m-%d %H:%M:%S}]",flush=True)
+                print(f"Created {output_tiff_ndvi}",flush=True)
+                print(f"Created {output_tiff_mask}",flush=True)
 
                 # # This is for testing: we additionally produce normal (i.e. non-cloud-optimized) GeoTiff
                 # output_tiff_ndvi2 = f"{OUTPUT_TIFF_BASE}/{pd.to_datetime(curr_date).strftime('%Y%m%d')}-nonCOG_historic.tiff"
