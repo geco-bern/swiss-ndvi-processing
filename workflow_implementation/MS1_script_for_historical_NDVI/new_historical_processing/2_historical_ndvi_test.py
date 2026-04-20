@@ -34,178 +34,97 @@ COMPRESSOR = zarr3.Blosc(cname="zstd", clevel=3, shuffle=2)
 # is_observation_date =  is_obs_date_array_arg.values
 # dates_array = dates_array_arg.values
 # starting_date = dates_array_arg.values[0]
-def historical_ndvi(ndvi_array, median_array, mask_array, is_observation_date, dates_array, starting_date):
-    """
-    # ndvi_array          # this is the observed/gapfilled/processed NDVI value
-    # median_array        # this is the modelled median NDVI for the corresponding DOY
-    # mask_array          # this is the integer processing status
-    # is_observation_date # this is the True-False boolean if a date contains satellite images (is_observation_date?)
-    # kwargs={"dates_array":   dates_array,  # this contains all daily dates
-    #         "starting_date": start_date}   # this contains the starting date when to start ??
-    """
-
-    is_historic_case = True # this can be set to False for continuous case
-
-    if not len(ndvi_array.shape)          == 1: raise Exception( "Expected 1D array as ndvi_array" )
-    if not len(median_array.shape)        == 1: raise Exception( "Expected 1D array as median_array" )
-    if not len(mask_array.shape)          == 1: raise Exception( "Expected 1D array as mask_array" )
-    if not len(is_observation_date.shape) == 1: raise Exception( "Expected 1D array as is_observation_date" )
-    
-
-    # Ensure mask_array is writable
-    mask_array = np.array(mask_array, copy=True) # TODO: check if this is needed
-
-    # in continuous case this function receives arrays that 
-    # start with already processed (daily) historic values
-    # followed by a range of daily values, containing empty or observed NDVI
-    # ndvi_array =>  [hist, hist, hist, hist,   empty, obs, empty, empty, obs, empty, obs]
-    #            =>  [hist, hist, hist, hist,   32767, obs, 32767, 32767, obs, 32767, obs]
-    # mask_array  => [hist, hist, hist, hist,   0  ,   2  , 0  ,   0  ,   2  , 0  ,   2  ]
-    # is_obs_date => [T   , T   , F   , T   ,   F  ,   T  , F  ,   F  ,   T  , F  ,   T  ]
-    # median_array=> [hist, hist, hist, hist,   new,   new, new,   new,   new, new,   new]
-    # dates_array => [20170403,..,.., 20170406, 20170407, 20170408, 20170409, ...]
-    # starting_date => 20170407
-    
-    # in the historic case this function receives arrays that are lacking a previously generated historic part
-
-    # split the input arguments in two: (only needed for continuous case)
-
-
-    if is_historic_case:
-        crop_start = 0   # NOTE when crop_start is set to 0, this would lead to empty "_not_processed"-arrays
-
-    if not is_historic_case: # TODO: in the historic case this is deactivated
-        start_idx = np.searchsorted(dates_array, starting_date)                   
-        obs_prior = np.nonzero(is_observation_date[:start_idx])             # TODO: in the historic case this is deactivated
-        if len(obs_prior) < 3:                                              # TODO: in the historic case this is deactivated
-                return ndvi_arr_original, mask_array_original               # TODO: in the historic case this is deactivated
-        crop_start = obs_prior[-3]  # Start at 3th prior obs, use to smooth # TODO: in the historic case this is deactivated
-
-        ndvi_array_not_processed = ndvi_array[:crop_start]
-        mask_array_not_processed = mask_array[:crop_start]
-
-    ndvi_array          = ndvi_array[crop_start:]
-    median_array        = median_array[crop_start:]
-    is_observation_date = is_observation_date[crop_start:]
-    dates_array         = dates_array[crop_start:]
-    mask_array          = mask_array[crop_start:]
-
-
-    if is_historic_case:
-        days_diff = (dates_array- dates_array[0])  / np.timedelta64(1, 'D') # in continuous_case
+def historical_ndvi_1st_fast_5000_120s(ndvi_arr, median_arr, is_observation_date, dates):
         
-        # days_diff = np.arange(0, len(is_observation_date)) # TODO # TODO 5_analyse_demo_efficient defines days_diff differently
-        #TODO: Francesco, why was this different from dates_array - dates_array[0]. Was it supposed to ignore the actual dates for the historic 
-        #                 processing and assume all observations are spaced by one day exactly?
+        # initialize mask array
+        mask_array  = np.empty(len(is_observation_date), dtype=object)
+        mask_array.fill(0)
 
-    if not is_historic_case:
-        days_diff = (dates_array- dates_array[0])  / np.timedelta64(1, 'D') # in continuous_case
+        days_diff = (dates- dates[0])  / np.timedelta64(1, 'D')
+     
+        ndvi_arr = ndvi_arr / 10000
+        median_arr  = median_arr  / 10000
+        mask_valid_ndvi = (ndvi_arr > 0) & (ndvi_arr < 1)
 
-    # renaming is necessary otherwise won't work 
-    ndvi_arr = ndvi_array / 10000
-    full_median_array = median_array / 10000
+        ndvi_valid   = ndvi_arr[  mask_valid_ndvi]
+        median_valid = median_arr[mask_valid_ndvi]
+        days_diff_2  = days_diff[ mask_valid_ndvi]
 
-    mask_valid_ndvi = (ndvi_arr > 0) & (ndvi_arr < 1)
+        original_idx = np.arange(len(ndvi_arr)) # used to keep track of delta ndvi position and the outlier position
+        original_idx = original_idx[mask_valid_ndvi]
 
-    ndvi_valid = ndvi_arr[mask_valid_ndvi & is_observation_date]            # TODO 5_analyse_demo_efficient is not using is_observation_date here
-    median_valid = full_median_array[mask_valid_ndvi & is_observation_date] # TODO 5_analyse_demo_efficient is not using is_observation_date here
-    days_diff_2 = days_diff[mask_valid_ndvi & is_observation_date]          # TODO 5_analyse_demo_efficient is not using is_observation_date here
-
-    original_idx = np.arange(len(ndvi_array)) # used to keep track of delta ndvi position and the outlier position
-    original_idx = original_idx[mask_valid_ndvi & is_observation_date]      # TODO 5_analyse_demo_efficient is not using is_observation_date here
-
-    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
+        obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
         
-    # outlier detection
+        # outlier detection
 
-    delta_threshold = 0.1
-    delta_delta_threshold = 0.1
+        delta_threshold = 0.1
+        delta_delta_threshold = 0.1
 
-    delta_ndvi = ndvi_valid - median_valid
-    delta_delta_left = delta_ndvi[2:]   # TODO: shouldnt this be a difference of deltas?
-    delta_delta_rigth = delta_ndvi[:-2] # TODO: shouldnt this be a difference of deltas?
-    outlier_mask = ((abs(delta_ndvi[1:-1]) > delta_threshold) &       # TODO: shouldn't this be a OR
-                    (abs(delta_delta_left) > delta_delta_threshold) & # TODO: shouldn't this be a OR
-                    (abs(delta_delta_rigth) > delta_delta_threshold))
-    ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
-    delta_ndvi = delta_ndvi[1:-1][~outlier_mask]
-    days_diff_2 = days_diff_2[1:-1][~outlier_mask]
+        delta_ndvi = ndvi_valid - median_valid
+        delta_delta_left = delta_ndvi[2:]
+        delta_delta_rigth = delta_ndvi[:-2]
+        outlier_mask = ((abs(delta_ndvi[1:-1]) > delta_threshold) & 
+                        (abs(delta_delta_left) > delta_delta_threshold) & 
+                        (abs(delta_delta_rigth) > delta_delta_threshold))
+        ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
+        delta_ndvi = delta_ndvi[1:-1][~outlier_mask]
+        days_diff_2 = days_diff_2[1:-1][~outlier_mask]
 
-    original_idx_2 = original_idx[1:-1][~outlier_mask]
+        original_idx_2 = original_idx[1:-1][~outlier_mask]
         
 
-    # L2 smoothing of all observations except the last 6 observations
-    # some sites do not have any observation or very few
-    if len(delta_ndvi) > 6:
+        # some sites do not have any observation or very few
+        if len(delta_ndvi) > 6:
         
-        # L2 smoothing
-        # loop over the 7 rolling deltas. If the deltas are too large (extreme events as fire) 
-        # or the original values too close to the boundaries condition (0.9 and 0.1) we do linear fit
+            # L2 smoothing
+            # smooth the full data set in a single window from start to almost end
+            idx = np.arange(len(delta_ndvi)) # This uses all the indices
+            loess =  sm.nonparametric.lowess(delta_ndvi, idx, frac= 7 / len(delta_ndvi), it=3, return_sorted=False)
 
-        delta_ndvi_to_interpolate = np.full(len(delta_ndvi)-6, np.nan)
+            # combine smoothed value with values yet to smooth, after that linearly interpolate everything
 
-        idx = np.arange(0,7) # TODO: TODO 5_analyse_demo_efficient is using idx = np.arange(len(delta_ndvi))
+            delta_ndvi_to_interpolate = np.concatenate([
+                np.array([0]),
+                loess[:-4],
+                delta_ndvi[-4:],
+                np.array([0])
+            ]) 
+            dates_to_interpolate = np.concatenate([
+                np.array([0]),
+                days_diff_2,
+                np.array([days_diff[-1]])
+            ]) 
 
-        for i in np.arange(0, len(delta_ndvi)-6): # loop from 0 to 7th last
+            interpolated_values = np.interp(
+                days_diff,
+                dates_to_interpolate,
+                delta_ndvi_to_interpolate
+            )
 
-            delta_window_to_smooth = delta_ndvi[i:i+7] # window to smooth, the center value will be appended
-            ndvi_valid_to_check    = ndvi_valid[i:i+7] # this will be used to check if the absolute value is close to the boundaries condition
+            ndvi_smoothed = 10000 * (interpolated_values + median_arr)
 
-            if (np.any((ndvi_valid_to_check < 0.05) | (ndvi_valid_to_check > 0.95)) 
-                or (np.sum(delta_window_to_smooth < -0.2) >= 5)): 
-                        
-                # here, check for the NDVI close to the boundaries or extreme negative NDVI values (fire but not drought)                       
-                # in case this conditions are met, skip the smoothing and keep the non-smoothed delta
-                delta_ndvi_to_interpolate[i] = delta_window_to_smooth[3]
+            # indexing of array mask
+            mask_array[obs_mask] = 2
+            before = np.arange(len(mask_array)) < original_idx_2[-4]
 
-            else:
-                
-                # smooth the 7 rolling window
-                loess =  sm.nonparametric.lowess(delta_window_to_smooth, idx, frac= 1, it=3, return_sorted=False)
-                delta_ndvi_to_interpolate[i] = loess[3]
+            outlier_idx = original_idx[1:-1][outlier_mask]
+            valid_outlier_idx = outlier_idx[is_observation_date[outlier_idx] == 1]
 
-            
+            mask_array[ before & obs_mask ] = 3
+            mask_array[ before & (~obs_mask) ] = 1
 
-        # combine smoothed value with values yet to smooth, after that linearly interpolate everything
+            mask_array[valid_outlier_idx] = 4
 
-        delta_ndvi_to_interpolate = np.concatenate([delta_ndvi_to_interpolate, delta_ndvi[-6:]]) 
-        # TODO: in 5_analyse_demo_efficient we have: dates_to_interpolate = np.concatenate([np.array([0]),days_diff_2,np.array([days_diff[-1]])]) 
-
-        interpolated_values = np.interp(days_diff,days_diff_2,delta_ndvi_to_interpolate)
-
-        ndvi_smoothed = np.array((10000 * (interpolated_values + full_median_array)),  dtype=np.int16)
-        ndvi_smoothed = np.clip(ndvi_smoothed, 0, 10000)
-        # TODO: ndvi_smoothed is generated differently in 5_analyse_demo_efficient
-        # simply one statement: ndvi_smoothed = 10000 * (interpolated_values + medians)
-
-        # indexing of array mask 
-        mask_array[obs_mask] = 2
-        before = np.arange(len(mask_array)) <= original_idx_2[-3] # TODO: 5_analyse_demo_efficient uses: < -4 here.
-
-        outlier_idx = original_idx[1:-1][outlier_mask]
-        valid_outlier_idx = outlier_idx[is_observation_date[outlier_idx] == 1]
-
-        mask_array[ before & obs_mask ] = 3
-        mask_array[ before & (~obs_mask) ] = 1
-
-        mask_array[valid_outlier_idx] = 4
-
-        if is_historic_case:
             return ndvi_smoothed, mask_array
         
-        if not is_historic_case: # continuous case
-            mask_array_final =  np.concatenate([mask_array_not_processed, mask_array])
-            final_ndvi_value =  np.concatenate([ndvi_not_processed, ndvi_smoothed])
-            return final_ndvi_value, mask_array_final
+        else:
 
-    else:
-
-        return ndvi_array , mask_array
+            return 10000 * ndvi_arr, mask_array
 
 
 if __name__ == "__main__":
 
-    N_WORKERS = 120
+    N_WORKERS = 40
     # TODO: test later 120 workers, with each 30GB memory_limit, BATCH_SIZE = 200K, INNER_PIXEL_CHUNK=83
     # TODO: test later 150 workers, with each 24GB memory_limit, BATCH_SIZE = 150K, INNER_PIXEL_CHUNK=1K
 
@@ -222,7 +141,7 @@ if __name__ == "__main__":
 
         INPUT_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
         INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
-        OUT_PATH = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
+        OUT_PATH = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7b.zarr"
 
         # FROM 4_merge_zarr.py
         # =====================================================
@@ -249,7 +168,7 @@ if __name__ == "__main__":
 
         ##TODO: remove this when development
         ## subset pixels for development: FOR DEVELOPMENT:
-        ## new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(600e3))) # , datetime = slice(0,30)
+        new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(1e3))) # , datetime = slice(0,30)
         ## with 10 pixels:         runtime=55s,  storage=304KB
         ## with 100 pixels:        runtime=54s,  storage=644KB
         ## with 1_000 pixels:      runtime=61s, storage=4.1MB
@@ -506,15 +425,13 @@ if __name__ == "__main__":
             # NOTE: 2nd lowest-hanging performance fruit: compile historical_ndvi with numba,
             #       see: https://docs.xarray.dev/en/stable/examples/apply_ufunc_vectorize_1d.html
             ndvi_out, mask_out = xr.apply_ufunc(
-                historical_ndvi,
+                historical_ndvi_1st_fast_5000_120s,
                 batch_ds["ndvi_processed"],
                 batch_ds["median_ndvi"],
-                batch_ds["mask_array"],
                 batch_ds["obs_date"],
-                input_core_dims=[["date"], ["date"], ["date"], ["date"]],   # These are dimensions that should not be broadcast
+                input_core_dims=[["date"], ["date"], ["date"]],   # These are dimensions that should not be broadcast
                 output_core_dims=[["date"], ["date"]],
-                kwargs={"dates_array": dates_array_arg,   # pass as NumPy, not Dask
-                        "starting_date": start_date_arg},
+                kwargs={"dates": dates_array_arg},   # pass as NumPy, not Dask
                 vectorize=True,        # This vectorizes `historical_ndvi` automatically with `numpy.vectorize`. NOTE: convenient but slow, see: 
                 dask="parallelized",
                 output_dtypes=[np.dtype('int16'), np.dtype('int8')],

@@ -139,24 +139,24 @@ echo
 
 # ============================================================
 # run historical processing script
-# echo "------------------------------------------------------------"
-#echo "Running: ${SCRIPT_2}"; echo "Start time: $(timestamp)"
-#START_TIME=$(date +%s)
-# python -u "${SCRIPT_2}"      # NO ARGS NEEDED
-# NEW_HIST_ZARR=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
-# END_TIME=$(date +%s)
-# ELAPSED=$((END_TIME - START_TIME))
-#echo "Finished: ${SCRIPT_2}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
-#echo "Processing script returned value: $NEW_HIST_ZARR"
-NEW_HIST_ZARR="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
-
 echo "------------------------------------------------------------"
-echo "Running: ${SCRIPT_2b}"; echo "Start time: $(timestamp)"
+echo "Running: ${SCRIPT_2}"; echo "Start time: $(timestamp)"
 START_TIME=$(date +%s)
-python -u "${SCRIPT_2b}"      # NO ARGS NEEDED
+python -u "${SCRIPT_2}"      # NO ARGS NEEDED
+NEW_HIST_ZARR=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
 END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
-echo "Finished: ${SCRIPT_2b}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+echo "Finished: ${SCRIPT_2}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
+echo "Processing script returned value: $NEW_HIST_ZARR"
+#NEW_HIST_ZARR="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7b.zarr"
+
+# echo "------------------------------------------------------------"
+# echo "Running: ${SCRIPT_2b}"; echo "Start time: $(timestamp)"
+# START_TIME=$(date +%s)
+# python -u "${SCRIPT_2b}"      # NO ARGS NEEDED
+# END_TIME=$(date +%s)
+# ELAPSED=$((END_TIME - START_TIME))
+# echo "Finished: ${SCRIPT_2b}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 
 # # ============================================================
 # # Clean up temporary output data
