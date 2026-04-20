@@ -168,7 +168,7 @@ if __name__ == "__main__":
 
         ##TODO: remove this when development
         ## subset pixels for development: FOR DEVELOPMENT:
-        # new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(600e3))) # , datetime = slice(0,30)
+        new_observations_ds = new_observations_ds.isel(pixel=slice(0,int(1e2))) # , datetime = slice(0,30)
         ## with 10 pixels:         runtime=55s,  storage=304KB
         ## with 100 pixels:        runtime=54s,  storage=644KB
         ## with 1_000 pixels:      runtime=61s, storage=4.1MB
@@ -199,47 +199,41 @@ if __name__ == "__main__":
         #       For a 200k-pixel-batch, the current aggregation already uses 10/15 mins
         #       compute time.
 
-        # Decide how to collapse sub-daily duplicates to one observed value per day
-        agg = 'first' # # TODO: choose 'mean' or 'first'
-        if agg == 'first':
-            ndvi_daily_between_obs = (new_observations_ds
-                # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
-                #       and they are later both replace by only one of them NO_COVERAGE
-                #       effectively this removes INVALID pixels TODO: is this desired behavior?
-                .where((new_observations_ds['ndvi']  != NO_COVERAGE) &
-                        (new_observations_ds['ndvi'] != INVALID))
-                .groupby(datetime=xr.groupers.TimeResampler('1D'))
-                .first()
-                .fillna(NO_COVERAGE).astype(np.int16)
-                .rename({'datetime': 'date'})
-            )
-        elif agg == 'mean':
-            ndvi_daily_between_obs = (new_observations_ds
-                # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
-                #       and they are later both replace by only one of them NO_COVERAGE
-                #       effectively this removes INVALID pixels TODO: is this desired behavior?
-                .where((new_observations_ds['ndvi'] != NO_COVERAGE) &
-                        (new_observations_ds['ndvi'] != INVALID))
-                .astype(np.float32)
-                .groupby(datetime=xr.groupers.TimeResampler('1D'))
-                .mean(skipna=True)
-                .fillna(NO_COVERAGE).astype(np.int16)
-                .rename({'datetime': 'date'})
-            )
-        else:
-            raise ValueError(f"Unsupported agg={agg}")
-
-        # keep track which dates were actually observation dates
+        # Decide how to collapse sub-daily duplicates to one observed value per day.
+        # (Manual "first" avoids the previously used expensive groupby(TimeResampler("1D")) graph build.)
         observation_datetimes = pd.DatetimeIndex(new_observations_ds["datetime"].values)
-        observation_dates     = pd.DatetimeIndex(observation_datetimes).floor("D")
+        if not observation_datetimes.is_monotonic_increasing:
+            new_observations_ds = new_observations_ds.sortby("datetime")
+            observation_datetimes = pd.DatetimeIndex(new_observations_ds["datetime"].values)
+
+        observation_dates = observation_datetimes.floor("D")
+        first_obs_idx = np.flatnonzero(~observation_dates.duplicated(keep="first"))
+        first_obs_dates = observation_dates[first_obs_idx]
+
+        ndvi_daily_between_obs = (
+            new_observations_ds
+            .isel(datetime=first_obs_idx)
+            .drop_vars("date", errors="ignore")
+            .assign_coords(obs_day=("datetime", first_obs_dates.values))
+            .swap_dims({"datetime": "obs_day"})
+            .drop_vars("datetime")
+            .rename({"obs_day": "date"})
+        )
+
+        ndvi_daily_between_obs["ndvi"] = xr.where(
+            (ndvi_daily_between_obs["ndvi"] != NO_COVERAGE) &
+            (ndvi_daily_between_obs["ndvi"] != INVALID),
+            ndvi_daily_between_obs["ndvi"],
+            np.int16(NO_COVERAGE),
+        ).astype(np.int16)
 
         # =====================================================
         #  Initialize empty daily dataset
         # =====================================================
         # note: we call this dataset since_last_historic in the continuous update.
         #       Here this is means simply since the first observation:
-        start_date         = observation_dates.min()
-        end_date           = observation_dates.max()
+        start_date         = first_obs_dates.min()
+        end_date           = first_obs_dates.max()
 
         # build full daily index from start_date to end_date (make sure start_date/end_date are pd-compatible)
         daily_dates_since_last_historic = pd.date_range(
@@ -249,11 +243,9 @@ if __name__ == "__main__":
 
         # reindex coords to guarantee daily coverage starts at start_date
         # i.e. extending back to last historic date:
-        ndvi_daily_since_last_historic = (ndvi_daily_between_obs
-            .reindex(date=daily_dates_since_last_historic, 
-                    method=None) # None (default): don’t fill gaps;
-                                # fills missing days with NaN; fill later if desired
-            .fillna(NO_COVERAGE).astype(np.int16)
+        ndvi_daily_since_last_historic = ndvi_daily_between_obs.reindex(
+            date=daily_dates_since_last_historic, 
+            fill_value=np.int16(NO_COVERAGE),
         )
 
         # FOR DEVELOPMENT: observation_dates[1] # 2025-12-09
