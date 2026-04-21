@@ -263,8 +263,9 @@ def download_timeseries_NDVI_singlePixel(
 
 
 OBS_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
-# PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
-PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7_2025-11.zarr" # this one is cropped to November 2025
+PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
+# PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7b.zarr"
+
 INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
 
 # =====================================================
@@ -345,15 +346,21 @@ XY_COORDS = {
     # 'Ticino1': (2720645, 1118245),          # pix95774249
     # 'Ticino2': (2710385, 1116375),          # pix97148954
     # # 'Ticino3': (2710005, 1109995),
-    # # some Schaffhausen sites:
-    # 'SH1_pix0': (2684595, 1295915), #pix0
-    # 'SH2': (2684555, 1295715),      #pix210
-    # 'SH3': (2684955, 1295675),      #pix350
-    # 'SH4': (2684395, 1295635),      #pix490
-    # 'SH5': (2684895, 1295545),      #pix999
     # Wabern:
     'Wabern': (2600875, 1197275)      # pix 44088229
 }
+site_selection = "_toughSites"
+if True:  # set this to True to replace above sites
+    # some Schaffhausen sites:
+        XY_COORDS = {
+        'SH1_pix0': (2684595, 1295915), #pix0
+        'SH2': (2684555, 1295715),      #pix210
+        'SH3': (2684955, 1295675),      #pix350
+        'SH4': (2684395, 1295635),      #pix490
+        'SH5': (2684895, 1295545),      #pix999
+    }
+    site_selection = "_SHSites"
+
 NAMES    = [nm for nm in XY_COORDS.keys()]
 X_COORDS = [xy[0] for xy in XY_COORDS.values()]
 Y_COORDS = [xy[1] for xy in XY_COORDS.values()]
@@ -476,7 +483,7 @@ for i in range(obs_ds_subset2.pixel.size):
 plt.tight_layout()
 
 # save plot:    
-plotpath = (PROC_ZARR+"-TESTSUITE_Fig0_.png")
+plotpath = (PROC_ZARR+"-TESTSUITE_Fig0"+site_selection+".png")
 plt.savefig(plotpath)
 plt.close()
 
@@ -573,7 +580,7 @@ for pixel_it in range(0,len(X_COORDS)):
 
     # g) output figure
     plotpath = (
-        # PROC_ZARR+"-"+
+        PROC_ZARR+"-"+
         "TESTSUITE_Fig1_"+
         f"{FIGURE01_START_DATE.replace("-","")}to{FIGURE01_END_DATE.replace("-","")}_"+
         f"location_{X_COORDS[pixel_it]}x{Y_COORDS[pixel_it]}"+
