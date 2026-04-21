@@ -45,19 +45,19 @@ echo
 # Define historical NDVI update mode --------------
 # Script inputs: 
 #   Define which historical NDVI file to use, and whether it will be udpated in-place or copied.
-HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m.zarr" 
-HISTO_OUTPUT="/mnt/data1/UniBe-swiss-ndvi/output_data/ndvi_historic_extended.zarr" # currently unused since we append INPUT
+HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/historical_2026-04-04_18h16_historical_v7.zarr" 
+#HISTO_OUTPUT="/mnt/data1/UniBe-swiss-ndvi/output_data/ndvi_historic_extended.zarr" # currently unused since we append INPUT
 
 # Workaround creating the working copy from the backup:
-HISTO_BKP="/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m.zarr_bkp/" # Ensure we have the original untouched
-if [ -d "$HISTO_INPUT" ]; then rm -rf -- "$HISTO_INPUT"; fi
-rsync -rltDg --no-perms --chmod=ugo=rwX $HISTO_BKP $HISTO_INPUT # note the important trailing slash in source/
+#HISTO_BKP="/mnt/data1/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr" # Ensure we have the original untouched
+#if [ -d "$HISTO_INPUT" ]; then rm -rf -- "$HISTO_INPUT"; fi
+#rsync -rltDg --no-perms --chmod=ugo=rwX $HISTO_BKP $HISTO_INPUT # note the important trailing slash in source/
 
 # Define start and end date for download script --------------
 # End date:
 # END_DATE="${2:-$(date -d "yesterday" +%Y-%m-%d)}" # Yesterday
-END_DATE="2025-12-12"   # Or hardcode it alternatively
-# END_DATE="2025-12-28" # For a second test run after the first.
+END_DATE="2026-01-15"   # Or hardcode it alternatively
+# END_DATE="2026-01-28" # For a second test run after the first.
 
 # Start date:
 # Read previous start date from historical NDVI file
@@ -97,11 +97,12 @@ echo "------------------------------------------------------------"
 echo "------------------------------------------------------------"
 echo "Running: ${SCRIPTS[0]}"; echo "Start time: $(timestamp)"
 START_TIME=$(date +%s)
-# python -u "${SCRIPTS[0]}" "$START_DATE" "$END_DATE"
-#DOWNLOAD_FILE=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
+python -u "${SCRIPTS[0]}" "$START_DATE" "$END_DATE"
+DOWNLOAD_FILE=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
 #DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr" # step 1 TODO: deactivate this
 #DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-19_18h40_ndvi_01_downloaded_2025-12-12_2025-12-28.zarr" # step 2 TODO: deactivate this
-DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-24_00h27_ndvi_01_downloaded_2025-11-30_2025-12-28.zarr"
+#DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-24_00h27_ndvi_01_downloaded_2025-11-30_2025-12-28.zarr"
+#DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-04-21_08hXXXXXX_ndvi_01_downloaded_2026-01-01_2026-01-15.zarr"
 END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
 echo "Finished: ${SCRIPTS[0]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
@@ -128,10 +129,10 @@ else
 
   START_TIME=$(date +%s)
   python -u "${SCRIPTS[1]}" "$DOWNLOAD_FILE" "$HISTO_INPUT"
-  #NEW_NDVI=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
+  NEW_NDVI=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
   #NEW_NDVI="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
   #NEW_NDVI="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-19_18h40_ndvi_01_downloaded_2025-12-12_2025-12-28_processed.zarr"
-  NEW_NDVI="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-24_00h27_ndvi_01_downloaded_2025-11-30_2025-12-28_processed.zarr"
+  # NEW_NDVI="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-24_00h27_ndvi_01_downloaded_2025-11-30_2025-12-28_processed.zarr"
   END_TIME=$(date +%s)
   ELAPSED=$((END_TIME - START_TIME))
   echo "Finished: ${SCRIPTS[1]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
@@ -142,7 +143,7 @@ else
   echo "Running: ${SCRIPTS[2]}"; echo "Start time: $(timestamp)"
   START_TIME=$(date +%s)
   #python -u "${SCRIPTS[2]}" "$NEW_NDVI" "$HISTO_INPUT" --histo-output="$HISTO_OUTPUT"
-  python -u "${SCRIPTS[2]}" "$NEW_NDVI" "$HISTO_INPUT" --histo-output="$HISTO_INPUT" # NOTE: this would overwrite.
+  python -u "${SCRIPTS[2]}" "$NEW_NDVI" "$HISTO_INPUT" --histo-output="$HISTO_INPUT" # NOTE: this does overwrite.
   END_TIME=$(date +%s)
   ELAPSED=$((END_TIME - START_TIME))
   echo "Finished: ${SCRIPTS[2]}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
