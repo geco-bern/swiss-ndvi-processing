@@ -37,7 +37,7 @@ COMPRESSOR = zarr3.Blosc(cname="zstd", clevel=3, shuffle=2)
 def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, dates):
         
         # initialize mask array
-        mask_array  = np.empty(len(is_observation_date), dtype=object)
+        mask_array  = np.zeros(len(is_observation_date), dtype=object)
         mask_array.fill(0)
 
         days_diff = (dates- dates[0])  / np.timedelta64(1, 'D')
@@ -46,12 +46,14 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
         median_arr  = median_arr  / 10000
         mask_valid_ndvi = (ndvi_arr > 0) & (ndvi_arr < 1)
 
-        ndvi_valid   = ndvi_arr[  mask_valid_ndvi]
-        median_valid = median_arr[mask_valid_ndvi]
-        days_diff_2  = days_diff[ mask_valid_ndvi]
+
+        # subset only valid observations
+        ndvi_valid   = ndvi_arr[      mask_valid_ndvi]
+        median_valid = median_arr[    mask_valid_ndvi]
+        days_diff_1   = days_diff[    mask_valid_ndvi]
 
         original_idx = np.arange(len(ndvi_arr)) # used to keep track of delta ndvi position and the outlier position
-        original_idx = original_idx[mask_valid_ndvi]
+        original_idx_1 = original_idx[mask_valid_ndvi]
 
         obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
         
@@ -66,27 +68,28 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
         outlier_mask = ((abs(delta_ndvi[1:-1])  > delta_threshold) & 
                         (abs(delta_delta_left)  > delta_delta_threshold) & 
                         (abs(delta_delta_rigth) > delta_delta_threshold))
-        ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
-        delta_ndvi = delta_ndvi[1:-1][~outlier_mask]
-        days_diff_2 = days_diff_2[1:-1][~outlier_mask]
-
-        original_idx_2 = original_idx[1:-1][~outlier_mask]
+        
+        # subset only inner points and only non-outliers
+        # NOTE: unused ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
+        delta_ndvi_2 = delta_ndvi[1:-1][~outlier_mask]
+        days_diff_2 = days_diff_1[1:-1][~outlier_mask]
+        original_idx_2 = original_idx_1[1:-1][~outlier_mask]
         
 
         # some sites do not have any observation or very few
-        if len(delta_ndvi) > 6:
+        if len(delta_ndvi_2) > 6:
         
             # L2 smoothing
             # smooth the full data set in a single window from start to almost end
-            idx = np.arange(len(delta_ndvi)) # This uses all the indices
-            loess =  sm.nonparametric.lowess(delta_ndvi, idx, frac= 7 / len(delta_ndvi), it=3, return_sorted=False)
+            idx = np.arange(len(delta_ndvi_2)) # This uses all the indices
+            loess =  sm.nonparametric.lowess(delta_ndvi_2, idx, frac= 7 / len(delta_ndvi_2), it=3, return_sorted=False)
 
             # combine smoothed value with values yet to smooth, after that linearly interpolate everything
 
             delta_ndvi_to_interpolate = np.concatenate([
                 np.array([0]),
                 loess[:-4],
-                delta_ndvi[-4:],
+                delta_ndvi_2[-4:],
                 np.array([0])
             ]) 
             dates_to_interpolate = np.concatenate([
@@ -107,7 +110,7 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
             mask_array[obs_mask] = 2
             before = np.arange(len(mask_array)) < original_idx_2[-4]
 
-            outlier_idx = original_idx[1:-1][outlier_mask]
+            outlier_idx = original_idx_1[1:-1][outlier_mask]
             valid_outlier_idx = outlier_idx[is_observation_date[outlier_idx] == 1]
 
             mask_array[ before & obs_mask ] = 3
