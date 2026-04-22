@@ -34,7 +34,7 @@ COMPRESSOR = zarr3.Blosc(cname="zstd", clevel=3, shuffle=2)
 # is_observation_date =  is_obs_date_array_arg.values
 # dates_array = dates_array_arg.values
 # starting_date = dates_array_arg.values[0]
-def historical_ndvi_1st_fast_5000_120s(ndvi_arr, median_arr, is_observation_date, dates):
+def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, dates):
         
         # initialize mask array
         mask_array  = np.empty(len(is_observation_date), dtype=object)
@@ -61,10 +61,10 @@ def historical_ndvi_1st_fast_5000_120s(ndvi_arr, median_arr, is_observation_date
         delta_delta_threshold = 0.1
 
         delta_ndvi = ndvi_valid - median_valid
-        delta_delta_left = delta_ndvi[2:]
-        delta_delta_rigth = delta_ndvi[:-2]
-        outlier_mask = ((abs(delta_ndvi[1:-1]) > delta_threshold) & 
-                        (abs(delta_delta_left) > delta_delta_threshold) & 
+        delta_delta_left  = delta_ndvi[:-2] - delta_ndvi[1:-1]
+        delta_delta_rigth = delta_ndvi[2:] - delta_ndvi[1:-1]
+        outlier_mask = ((abs(delta_ndvi[1:-1])  > delta_threshold) & 
+                        (abs(delta_delta_left)  > delta_delta_threshold) & 
                         (abs(delta_delta_rigth) > delta_delta_threshold))
         ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
         delta_ndvi = delta_ndvi[1:-1][~outlier_mask]
@@ -173,7 +173,7 @@ if __name__ == "__main__":
         ## with 100 pixels:        runtime=54s,  storage=644KB
         ## with 1_000 pixels:      runtime=61s, storage=4.1MB
         ## with 10_000 pixels:     runtime=141s, storage=39MB
-        ## with 100_000 pixels:    runtime=1080s, storage=XXKB          historical_ndvi_1st_fast_5000_120s: 165s
+        ## with 100_000 pixels:    runtime=1080s, storage=XXKB          historical_ndvi_singleWindow: 165s
         ## with 120_000 pixels:    runtime=565s, storage=463MB
         ## with 130_000 pixels:    runtime=720s, storage=502MB
         ## with 150_000 pixels:    runtime=640s, storage=XXXMB
@@ -417,7 +417,7 @@ if __name__ == "__main__":
             # NOTE: 2nd lowest-hanging performance fruit: compile historical_ndvi with numba,
             #       see: https://docs.xarray.dev/en/stable/examples/apply_ufunc_vectorize_1d.html
             ndvi_out, mask_out = xr.apply_ufunc(
-                historical_ndvi_1st_fast_5000_120s,
+                historical_ndvi_singleWindow,
                 batch_ds["ndvi_processed"],
                 batch_ds["median_ndvi"],
                 batch_ds["obs_date"],
