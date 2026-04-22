@@ -11,7 +11,7 @@ import time
 from numcodecs import blosc, Blosc, zarr3
 from zarr.codecs import BloscCodec
 
-INPUT_LOOKUPTABLE  = "/mnt/data2/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
+INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr" # TODO: move to data2
 
 import warnings
 warnings.filterwarnings(

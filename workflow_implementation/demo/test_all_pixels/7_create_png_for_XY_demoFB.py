@@ -64,7 +64,7 @@ warnings.filterwarnings(
     #     FLAG_DOWNLOAD=True
 
 
-INPUT_LOOKUPTABLE  = "/mnt/data2/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr" # TODO: use this
+INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr" # TODO: move to data2
 
 
 # FOR DEVELOPMENT: x=2710005; y=1109995; start_date = START_DATE; end_date = END_DATE

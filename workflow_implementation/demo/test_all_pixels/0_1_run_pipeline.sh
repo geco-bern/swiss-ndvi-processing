@@ -56,8 +56,8 @@ HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/historical_2026-04-04_18h16_
 # Define start and end date for download script --------------
 # End date:
 # END_DATE="${2:-$(date -d "yesterday" +%Y-%m-%d)}" # Yesterday
-END_DATE="2026-01-15"   # Or hardcode it alternatively
-# END_DATE="2026-01-28" # For a second test run after the first.
+END_DATE="2026-01-06"   # Or hardcode it alternatively
+# END_DATE="2026-01-15" # For a second test run after the first.
 
 # Start date:
 # Read previous start date from historical NDVI file
