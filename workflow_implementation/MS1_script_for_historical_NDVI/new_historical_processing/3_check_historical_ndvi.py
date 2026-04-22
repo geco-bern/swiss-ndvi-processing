@@ -40,7 +40,66 @@ warnings.filterwarnings(
     message="Numcodecs codecs are not in the Zarr version 3 specification",
     module="numcodecs.zarr3"
 )
+# =====================================================
+#  Define input data sets
+# =====================================================
 
+# PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
+# PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7_2025-11.zarr" # this one is cropped to November 2025
+PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7b.zarr"
+# PROC_ZARR = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365.zarr" # this is the initially processed file (just appended with metadata x,y, x_idx, etc.)
+
+INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
+OBS_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
+
+# =====================================================
+#  Define some pixels of interest
+# =====================================================
+
+XY_COORDS = {
+    # Specific sites
+    'Bitsch': (2644035, 1133765), # pix 84856712 # NOTE: Bitsch forest fire selection Fabian
+    # some Western border:
+    # NOTE: if PixelID is off-by-one Western and Eastern border should indicate
+    'Auberson':          (2523115, 1185065), # pix 52709046
+    'La Chaux-de-Fonds': (2546995, 1217685), # pix 30185728
+    # some Eastern border:
+    'Widerberg':  (2762585, 1230445),        # pix 23069246
+    'Diepoldsau': (2768685, 1251225),        # pix 10771926
+    'Tschlin':    (2831125, 1195615),        # pix 45329883
+    # Randomly selected sites:
+    # # some Ticino sites:
+    # 'Ticino1': (2720645, 1118245),          # pix95774249
+    'Tenero': (2710385, 1116375),          # pix97148954
+    # # 'Ticino3': (2710005, 1109995),
+    # Wabern:
+    'Wabern': (2600875, 1197275)      # pix 44088229
+}
+site_selection = "_toughSites"
+
+if False:  # set this to True to replace above sites
+    # some Schaffhausen sites:
+    XY_COORDS = {
+        'SH1_pix0': (2684595, 1295915), #pix0
+        'SH2': (2684555, 1295715),      #pix210
+        'SH3': (2684955, 1295675),      #pix350
+        'SH4': (2684395, 1295635),      #pix490
+        'SH5': (2684895, 1295545),      #pix999
+    }
+    site_selection = "_SHSites"
+
+NAMES    = [nm for nm in XY_COORDS.keys()]
+X_COORDS = [xy[0] for xy in XY_COORDS.values()]
+Y_COORDS = [xy[1] for xy in XY_COORDS.values()]
+
+
+# For figure 01 we also need an interval of interest:
+FIGURE01_START_DATE="2025-04-01"
+FIGURE01_END_DATE="2025-08-01"
+
+# =====================================================
+#  Define other configuration details
+# =====================================================
 NO_COVERAGE = 32767
 NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
 INVALID     = -32768
@@ -262,12 +321,6 @@ def download_timeseries_NDVI_singlePixel(
         return(df)
 
 
-OBS_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
-# PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
-# PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7_2025-11.zarr" # this one is cropped to November 2025
-PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7b.zarr"
-
-INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
 
 # =====================================================
 #  Load data sets
@@ -326,50 +379,6 @@ def select_by_pixelID(ds_mi, pid):
 # select_by_pixelID(proc_ds_midx, [0, 210, 350])
 # select_by_xy(obs_ds_midx, [2684595, 2684555, 2684525], [1295915, 1295715, 1295715])
 # select_by_pixelID(obs_ds_midx, [0, 210, 350])
-
-# =====================================================
-#  Define some pixels of interest
-# =====================================================
-
-XY_COORDS = {
-    # Specific sites
-    'Bitsch': (2644035, 1133765), # pix 84856712 # NOTE: Bitsch forest fire selection Fabian
-    # some Western border:
-    # NOTE: if PixelID is off-by-one Western and Eastern border should indicate
-    'Auberson':          (2523115, 1185065), # pix 52709046
-    'La Chaux-de-Fonds': (2546995, 1217685), # pix 30185728
-    # some Eastern border:
-    'Widerberg':  (2762585, 1230445),        # pix 23069246
-    'Diepoldsau': (2768685, 1251225),        # pix 10771926
-    'Tschlin':    (2831125, 1195615),        # pix 45329883
-    # Randomly selected sites:
-    # # some Ticino sites:
-    # 'Ticino1': (2720645, 1118245),          # pix95774249
-    # 'Ticino2': (2710385, 1116375),          # pix97148954
-    # # 'Ticino3': (2710005, 1109995),
-    # Wabern:
-    'Wabern': (2600875, 1197275)      # pix 44088229
-}
-site_selection = "_toughSites"
-if True:  # set this to True to replace above sites
-    # some Schaffhausen sites:
-        XY_COORDS = {
-        'SH1_pix0': (2684595, 1295915), #pix0
-        'SH2': (2684555, 1295715),      #pix210
-        'SH3': (2684955, 1295675),      #pix350
-        'SH4': (2684395, 1295635),      #pix490
-        'SH5': (2684895, 1295545),      #pix999
-    }
-    site_selection = "_SHSites"
-
-NAMES    = [nm for nm in XY_COORDS.keys()]
-X_COORDS = [xy[0] for xy in XY_COORDS.values()]
-Y_COORDS = [xy[1] for xy in XY_COORDS.values()]
-
-
-# For figure 01 we also need an interval of interest:
-FIGURE01_START_DATE="2025-04-01"
-FIGURE01_END_DATE="2025-08-01"
 
 
 
@@ -448,13 +457,7 @@ for i in range(obs_ds_subset2.pixel.size):
         alpha=0.2, y = "ndvi")
 
 # layouting/formatting
-for i in range(obs_ds_subset2.pixel.size):
-    ax = gr.axs.flat[i]
-    ax.set_xlabel("") # remove x labels
-    ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda val, pos: val / 10000)) # fix y-axis tick labels
-
-gr.set_titles(template='{coord} = {value}', maxchar=40) # increase maxchar from 30 to 40
-
+# Format legend
 handles_for_legend = [ # legend entry for raw observations:
     Line2D([0], [0], marker='o', linestyle='', color=color, markerfacecolor=color, markersize=6, label=label)
     for _, (label, color) in obs_cmap.items()
@@ -465,23 +468,34 @@ handles_for_legend = [ # legend entry for raw observations:
     Line2D([0], [0], marker='x', linestyle='', color=color, markerfacecolor=color, markersize=6, label=label)
     for _, (label, color) in smoothed_cmap.items()
 ]
-for i in range(obs_ds_subset2.pixel.size):
+# Add legend
+for i in [obs_ds_subset2.pixel.size-1]: # range(obs_ds_subset2.pixel.size): # legend in last facet is enough
     ax = gr.axs.flat[i]
     ax.legend(handles=handles_for_legend, title="", fontsize="small", loc="lower left") # add discrete legend
 
+# Format x- and y-axes
+for i in range(obs_ds_subset2.pixel.size):
+    ax = gr.axs.flat[i]
+    ax.set_xlabel("") # remove x labels
+    ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda val, pos: val / 10000)) # fix y-axis tick labels
+    ax.set_ylim(0, 10000)
+
+# Format default per-facet title 'pixel = (X, Y, pixelID)'
+gr.set_titles(template='{coord} = {value}', maxchar=40) # increase maxchar from 30 to 40
 # Add per-facet title (NAME, X, Y) to each facet based on NAMES, X_COORDS, Y_COORDS
 assert obs_ds_subset2.pixel.size == len(NAMES)
 for i in range(obs_ds_subset2.pixel.size):
     ax = gr.axs.flat[i]
     label = f"{NAMES[i]} — ({X_COORDS[i]}, {Y_COORDS[i]})"
     # ax.set_title(label, fontsize="small")
-    ax.text(0.02, 1.08, label,
+    ax.text(0.02, 1.15, label,
         transform=ax.transAxes,
         va="top", ha="left",
-        fontsize="medium",
+        fontsize="large",
         bbox=dict(facecolor="none", alpha=0.7, edgecolor="none")
     )
 plt.tight_layout()
+
 
 # save plot:    
 plotpath = (PROC_ZARR+"-TESTSUITE_Fig0"+site_selection+".png")
