@@ -37,9 +37,6 @@ COMPRESSOR = zarr3.Blosc(cname="zstd", clevel=3, shuffle=2)
 def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, dates):
         
         original_idx = np.arange(len(ndvi_arr)) # used to keep track of delta ndvi position and the outlier position
-        
-        # initialize mask array
-        mask_array  = np.zeros(len(is_observation_date), dtype=object)
 
         days_diff = (dates- dates[0])  / np.timedelta64(1, 'D')
      
@@ -81,6 +78,7 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
         delta_ndvi_2 = delta_ndvi[1:-1][~outlier_mask]
         days_diff_2 = days_diff_1[1:-1][~outlier_mask]
         original_idx_2 = original_idx_1[1:-1][~outlier_mask]
+        outlier_idx    = original_idx_1[1:-1][outlier_mask]
         
         
         ### Illustration of indexing:  - (day without observation), x (observation), o (outlier observation), I (invalid observation, e.g. -0.7)
@@ -128,15 +126,21 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
             ndvi_smoothed = 10000 * (interpolated_values + median_arr)
 
             # indexing of array mask
+            mask_array  = np.zeros(len(is_observation_date), dtype=object) # initialize mask array
+            
+            # Define all observation dates (unprocessed):
             mask_array[obs_mask] = 2
-            before = np.arange(len(mask_array)) < original_idx_2[-4]
+            # unless further below specified as smoothed, the continuous implementation should overwrite 0 and 2's without hesitation.
 
-            outlier_idx = original_idx_1[1:-1][outlier_mask]
-            valid_outlier_idx = outlier_idx[is_observation_date[outlier_idx] == 1]
 
+            # Mark the finalized dates (smoothed)
+            before = np.arange(len(mask_array)) < original_idx_2[-4] # These define if a date is earlier than the center observation of our 7-obs-window. => Eligible for L2 smoothing. # NOTE that in 'ndvi_smoothed' we filled in all the dates
             mask_array[ before & obs_mask ] = 3
             mask_array[ before & (~obs_mask) ] = 1
 
+            # Mark the outlier dates (4): 
+            # TODO: do we need to distinguish between outlier+smoothed and (potential outlier) for the continuous implementation? Because above code does smooth them!
+            valid_outlier_idx = outlier_idx[is_observation_date[outlier_idx] == 1] # equivalent with: original_idx_1[1:-1][outlier_mask & is_observation_date[original_idx_1][1:-1]]
             mask_array[valid_outlier_idx] = 4
 
             return ndvi_smoothed, mask_array
