@@ -60,7 +60,8 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
         
         # outlier detection
 
-        delta_threshold = 0.1
+        # thresholds reactivated from: https://github.com/geco-bern/swiss-ndvi-processing/blob/3d257feeaa565da41606d7ee37d8b3e724fc0efe/workflow_implementation/02_test_function.py#L118
+        delta_threshold = 0.05
         delta_delta_threshold = 0.1
 
         # FOR DEVELOPMENT: import numpy as np
