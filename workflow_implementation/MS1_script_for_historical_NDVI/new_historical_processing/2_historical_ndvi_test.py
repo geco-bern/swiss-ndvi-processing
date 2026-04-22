@@ -56,13 +56,20 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
         original_idx_1 = original_idx[mask_valid_ndvi]
 
         obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
+        # NOTE: normally is_observation_date should not be needed in addition to >0 and <1 if working only with observations
+        # NOTE: however, if working with continuous implementation: then there are already backfillded values
         
         # outlier detection
 
         delta_threshold = 0.1
         delta_delta_threshold = 0.1
 
+        # FOR DEVELOPMENT: import numpy as np
+        # FOR DEVELOPMENT: ndvi_valid  = np.array([0.1, 0.5, 0.9, 0.9, 0.9, 0.5, 0.1, 0.1, 0.9, 0.5, 0.1, 0.1])
+        # FOR DEVELOPMENT: median_valid= np.array([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
         delta_ndvi = ndvi_valid - median_valid
+        
+        # outlier mask (NOTE: for inner points only: missing in the historic case the very first and very last observations)
         delta_delta_left  = delta_ndvi[:-2] - delta_ndvi[1:-1]
         delta_delta_rigth = delta_ndvi[2:] - delta_ndvi[1:-1]
         outlier_mask = ((abs(delta_ndvi[1:-1])  > delta_threshold) & 
@@ -75,6 +82,17 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
         days_diff_2 = days_diff_1[1:-1][~outlier_mask]
         original_idx_2 = original_idx_1[1:-1][~outlier_mask]
         
+        
+        ### Illustration of indexing:  - (day without observation), x (observation), o (outlier observation), I (invalid observation, e.g. -0.7)
+        ###      x---x-xx--x--x----o-x---x-x---I----x-x--     len() = 40    (ndvi_arr, median_arr, is_observation_date, dates, original_idx, days_diff, obs_mask)
+        ###      x   x xx  x  x    o x   x x   I    x x       len() = 13    ()
+        ###      x   x xx  x  x    o x   x x        x x       len() = 12    (ndvi_valid, median_valid, days_diff, original_idx_1)
+        ###          x xx  x  x    o x   x x        x         len() = 10    (outlier_mask....  and delta_delta_left, ...)
+        ###          x xx  x  x      x   x x        x         len() = 9     (delta_ndvi_2, days_diff_2, original_idx_2, idx, loess) 
+        ###          x xx  x  x                               len() = 5     (loess[:-4])
+        ###                          x   x x        x         len() = 5     (delta_ndvi_2[-4:])
+        ###      0   x xx  x  x    o x   x x        x 0       len() = 12    (delta_ndvi_to_interpolate)
+        ###      0   x xx  x  x    o x   x x        x x       len() = 12    (dates_to_interpolate)
 
         # some sites do not have any observation or very few
         if len(delta_ndvi_2) > 6:
@@ -83,9 +101,12 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
             # smooth the full data set in a single window from start to almost end
             idx = np.arange(len(delta_ndvi_2)) # This uses all the indices
             loess =  sm.nonparametric.lowess(delta_ndvi_2, idx, frac= 7 / len(delta_ndvi_2), it=3, return_sorted=False)
+            # frac: the fraction of the data used when estimating each y-value.
+            # it: The number of residual-based reweightings to perform.
+            # the above disregards actual dates, just uses a continuous index
 
             # combine smoothed value with values yet to smooth, after that linearly interpolate everything
-
+            # L1 linear interpolation
             delta_ndvi_to_interpolate = np.concatenate([
                 np.array([0]),
                 loess[:-4],
@@ -99,9 +120,9 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
             ]) 
 
             interpolated_values = np.interp(
-                days_diff,
-                dates_to_interpolate,
-                delta_ndvi_to_interpolate
+                days_diff,                  # evaluate here f()
+                dates_to_interpolate,         # observed x
+                delta_ndvi_to_interpolate     # observed f(x)
             )
 
             ndvi_smoothed = 10000 * (interpolated_values + median_arr)
