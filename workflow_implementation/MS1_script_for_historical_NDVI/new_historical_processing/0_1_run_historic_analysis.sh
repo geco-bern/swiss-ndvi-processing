@@ -148,7 +148,7 @@ END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
 echo "Finished: ${SCRIPT_2}"; echo "Duration: $(format_seconds "$ELAPSED") (hh:mm:ss)"
 echo "Processing script returned value: $NEW_HIST_ZARR"
-#NEW_HIST_ZARR="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7b.zarr"
+#NEW_HIST_ZARR="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c.zarr"
 
 # echo "------------------------------------------------------------"
 # echo "Running: ${SCRIPT_2b}"; echo "Start time: $(timestamp)"

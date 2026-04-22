@@ -46,7 +46,8 @@ warnings.filterwarnings(
 
 # PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
 # PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7_2025-11.zarr" # this one is cropped to November 2025
-PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7b.zarr"
+# PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7b.zarr"
+PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c.zarr"
 # PROC_ZARR = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365.zarr" # this is the initially processed file (just appended with metadata x,y, x_idx, etc.)
 
 INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
