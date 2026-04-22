@@ -27,13 +27,13 @@ INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
 
 COMPRESSOR = zarr3.Blosc(cname="zstd", clevel=3, shuffle=2)
 
-# FOR DEVELOPMENT:
-# ndvi_array = ndvi_array_arg.isel(pixel=1).values
-# median_array = median_array_arg.isel(pixel=1).values
-# mask_array = mask_array_arg.isel(pixel=1).values
-# is_observation_date =  is_obs_date_array_arg.values
-# dates_array = dates_array_arg.values
-# starting_date = dates_array_arg.values[0]
+# FOR DEVELOPMENT: (Note: to check on observation dates, run this with a pixel from Western border and a pixel from Eastern border.)
+# ndvi_arr = batch_ds["ndvi_processed"].isel(pixel=0).values
+# median_arr = batch_ds["median_ndvi"].isel(pixel=0).values
+# is_observation_date =  batch_ds["obs_date"].values
+# dates = dates_array_arg
+### mask_array = mask_array_arg.isel(pixel=0).values
+### starting_date = dates_array_arg.values[0]
 def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, dates):
         
         original_idx = np.arange(len(ndvi_arr)) # used to keep track of delta ndvi position and the outlier position
@@ -44,7 +44,7 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
         median_arr  = median_arr  / 10000
         mask_valid_ndvi = (ndvi_arr > 0) & (ndvi_arr < 1)
 
-        # subset only valid observations
+        # subset only valid NDVI values # NOTE: in the continuous implementation this would use previously smoothed values AND it would include both obs and non-obs TODO: both of this would be wrong, right?
         ndvi_valid   = ndvi_arr[      mask_valid_ndvi]
         median_valid = median_arr[    mask_valid_ndvi]
         days_diff_1   = days_diff[    mask_valid_ndvi]
@@ -53,22 +53,25 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
 
         obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
         # NOTE: normally is_observation_date should not be needed in addition to >0 and <1 if working only with observations
-        # NOTE: however, if working with continuous implementation: then there are already backfillded values
+        # NOTE: however, if working with continuous implementation: then there are already interpolated NDVI values
         
         # outlier detection
 
-        # thresholds reactivated from: https://github.com/geco-bern/swiss-ndvi-processing/blob/3d257feeaa565da41606d7ee37d8b3e724fc0efe/workflow_implementation/02_test_function.py#L118
+        # method below is taken (from 05c5099b: https://github.com/geco-bern/swiss-ndvi-processing/blob/0c5099bd87fa71b2d1a7801cfcf6865cd2035f6d/workflow_implementation/benchamrk_historic_ndvi_parallel.py#L7-L52)
+        #                       (TODO: alternative variant was still present in its parent: https://github.com/geco-bern/swiss-ndvi-processing/blob/3d257feeaa565da41606d7ee37d8b3e724fc0efe/workflow_implementation/02_test_function.py#L118 )
+        #                       (TODO: the variants that were tested during prototyping were however more complicated: e.g. https://github.com/geco-bern/swiss-ndvi-processing/blob/3d257feeaa565da41606d7ee37d8b3e724fc0efe/demo/script/functions.py#L51-L75)
+        # thresholds
         delta_threshold = 0.05
         delta_delta_threshold = 0.1
 
-        # FOR DEVELOPMENT: import numpy as np
+        # FOR DEVELOPMENT: import numpy as np; import statsmodels.api as sm
         # FOR DEVELOPMENT: ndvi_valid  = np.array([0.1, 0.5, 0.9, 0.9, 0.9, 0.5, 0.1, 0.1, 0.9, 0.5, 0.1, 0.1])
         # FOR DEVELOPMENT: median_valid= np.array([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
-        delta_ndvi = ndvi_valid - median_valid
+        delta_ndvi = ndvi_valid - median_valid  # TODO: why only distance to median, and not distance to median +- x*IQR ?
         
         # outlier mask (NOTE: for inner points only: missing in the historic case the very first and very last observations)
-        delta_delta_left  = delta_ndvi[:-2] - delta_ndvi[1:-1]
-        delta_delta_rigth = delta_ndvi[2:] - delta_ndvi[1:-1]
+        delta_delta_left  = delta_ndvi[:-2] - delta_ndvi[1:-1]    # TODO: why only difference with neighbor. Not considering the rate of change?
+        delta_delta_rigth = delta_ndvi[2:] - delta_ndvi[1:-1]     # TODO: why only difference with neighbor. Not considering the rate of change?
         outlier_mask = ((abs(delta_ndvi[1:-1])  > delta_threshold) & 
                         (abs(delta_delta_left)  > delta_delta_threshold) & 
                         (abs(delta_delta_rigth) > delta_delta_threshold))
@@ -82,15 +85,25 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
         
         
         ### Illustration of indexing:  - (day without observation), x (observation), o (outlier observation), I (invalid observation, e.g. -0.7)
-        ###      x---x-xx--x--x----o-x---x-x---I----x-x--     len() = 40    (ndvi_arr, median_arr, is_observation_date, dates, original_idx, days_diff, obs_mask)
+        ###      x---x-xx--x--x----o-x---x-x---I----x-x--     len() = 40    (ndvi_arr, median_arr, is_observation_date, dates, original_idx, days_diff, obs_mask, mask_array, before)
         ###      x   x xx  x  x    o x   x x   I    x x       len() = 13    ()
-        ###      x   x xx  x  x    o x   x x        x x       len() = 12    (ndvi_valid, median_valid, days_diff, original_idx_1)
+        ###      x   x xx  x  x    o x   x x        x x       len() = 12    (ndvi_valid, median_valid, days_diff_1, original_idx_1)
         ###          x xx  x  x    o x   x x        x         len() = 10    (outlier_mask....  and delta_delta_left, ...)
         ###          x xx  x  x      x   x x        x         len() = 9     (delta_ndvi_2, days_diff_2, original_idx_2, idx, loess) 
         ###          x xx  x  x                               len() = 5     (loess[:-4])
         ###                          x   x x        x         len() = 5     (delta_ndvi_2[-4:])
-        ###      0   x xx  x  x    o x   x x        x 0       len() = 12    (delta_ndvi_to_interpolate)
-        ###      0   x xx  x  x    o x   x x        x x       len() = 12    (dates_to_interpolate)
+        ###                          x                        len() = 1     (original_idx_2[-4])
+        ###      0   x xx  x  x      x   x x        x   0     len() = 12    (delta_ndvi_to_interpolate)
+        ###      0   x xx  x  x      x   x x        x   0     len() = 12    (dates_to_interpolate)
+        ###      ........................................     len() = 40    (interpolated_values)
+        ### TODO: what about this observation?:       x                     NOTE: this could explain the observed differences between the windowed (v7) and the global (v7b) approaches.
+        ### TODO: what about these two?:               --                   NOTE: it appears that the interpolation below forces delta through 0.
+        ###       I.e. what happened to L1 extrapolation between last observation and today in the continuous case?
+        ###
+        ###                          x                        len() = 1     (original_idx_2[-4])
+        ###      TTTTTTTTTTTTTTTTTTTTffffffffffffffffffff     len() = 40    ('before' defined as '< original_idx_2[-4]' )
+        ###                       o                           len() = 1     (outlier_idx encoding the original_idx)
+
 
         # some sites do not have any observation or very few
         if len(delta_ndvi_2) > 6:
@@ -99,7 +112,7 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
             # smooth the full data set in a single window from start to almost end
             idx = np.arange(len(delta_ndvi_2)) # This uses all the indices
             loess =  sm.nonparametric.lowess(delta_ndvi_2, idx, frac= 7 / len(delta_ndvi_2), it=3, return_sorted=False)
-            # frac: the fraction of the data used when estimating each y-value.
+            # frac: the fraction of the data used when estimating each y-value.                             # Here we define a 7-obs-window of influence.
             # it: The number of residual-based reweightings to perform.
             # the above disregards actual dates, just uses a continuous index
 
@@ -109,16 +122,16 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
                 np.array([0]),
                 loess[:-4],
                 delta_ndvi_2[-4:],
-                np.array([0])
+                np.array([0])              # TODO: Why force this to become 0? Effect: If below we use the current date. That means we make the linear interpolation pass through 0 today.
             ]) 
             dates_to_interpolate = np.concatenate([
                 np.array([0]),
                 days_diff_2,
-                np.array([days_diff[-1]])
+                np.array([days_diff[-1]]) # TODO: this appears to be the current date (Day 40). Not the last observation (Day 38, from above illustration). NOTE: in historic this does not matter.
             ]) 
 
             interpolated_values = np.interp(
-                days_diff,                  # evaluate here f()
+                days_diff,                    # evaluate here f()
                 dates_to_interpolate,         # observed x
                 delta_ndvi_to_interpolate     # observed f(x)
             )
@@ -126,6 +139,13 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
             ndvi_smoothed = 10000 * (interpolated_values + median_arr)
 
             # indexing of array mask
+                # mask_array == 0: the date is not an observation and is yet to be smoothed
+                # mask_array == 1: the date is not an observation and is smoothed
+                # mask_array == 2: the date is     an observation and is yet to be smoothed
+                # mask_array == 3: the date is     an observation and is smoothed
+                # mask_array == 4: the date is     an observation and is an outlier
+            
+            # Start out with 0:
             mask_array  = np.zeros(len(is_observation_date), dtype=object) # initialize mask array
             
             # Define all observation dates (unprocessed):
@@ -217,18 +237,8 @@ if __name__ == "__main__":
         #  and resample to daily intervals (between observations)
         # =====================================================
 
-        # NOTE: lowest-hanging performance fruit: replace dask-based aggregation 
-        #       below (that leads the very large dask graphs) with something 
-        #       where we manually loop through observation dates:
-        #           - generate a new empty data set: ndvi_daily_between_obs
-        #           - loop manually through days with observations and fill in values
-        #             - if multiple obs times per day: select either first value
-        #             - if multiple obs times per day: or compute mean value
-        #       For a 200k-pixel-batch, the current aggregation already uses 10/15 mins
-        #       compute time.
-
-        # Decide how to collapse sub-daily duplicates to one observed value per day.
-        # (Manual "first" avoids the previously used expensive groupby(TimeResampler("1D")) graph build.)
+        # Collapse sub-daily duplicates to one observed value per day. (using "first" approach)
+        # (Below manual "first" avoids the previously used expensive groupby(TimeResampler("1D")) graph build.)
         observation_datetimes = pd.DatetimeIndex(new_observations_ds["datetime"].values)
         if not observation_datetimes.is_monotonic_increasing:
             new_observations_ds = new_observations_ds.sortby("datetime")
@@ -328,12 +338,7 @@ if __name__ == "__main__":
                 pixel=new_ds.pixel) # this is to join by pixels and doy
 
         # NOTE: in historic case 'mask_array' is not absolutely needed. We do it for similarity to continuous case.
-        # Add mask_array to new_ds (filled with 0 or 2 at this point):
-            # mask_array == 0: the data is not an observation and is yet to be smoothed
-            # mask_array == 1: the data is not an observation and is smoothed
-            # mask_array == 2: the data is an observation and is yet to be smoothed
-            # mask_array == 3: the data is an observation and is smoothed
-            # mask_array == 4: the data is an observation and is an outlier
+        # Add mask_array to new_ds (filled with 0 or 2 at this point, see above function definition for legend):
         mask_2or0 = (
             (new_ds["obs_date"]) & 
             (new_ds["ndvi"] < NO_COVERAGE) & 
