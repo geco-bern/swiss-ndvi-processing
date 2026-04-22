@@ -36,9 +36,10 @@ COMPRESSOR = zarr3.Blosc(cname="zstd", clevel=3, shuffle=2)
 # starting_date = dates_array_arg.values[0]
 def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, dates):
         
+        original_idx = np.arange(len(ndvi_arr)) # used to keep track of delta ndvi position and the outlier position
+        
         # initialize mask array
         mask_array  = np.zeros(len(is_observation_date), dtype=object)
-        mask_array.fill(0)
 
         days_diff = (dates- dates[0])  / np.timedelta64(1, 'D')
      
@@ -46,14 +47,12 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
         median_arr  = median_arr  / 10000
         mask_valid_ndvi = (ndvi_arr > 0) & (ndvi_arr < 1)
 
-
         # subset only valid observations
         ndvi_valid   = ndvi_arr[      mask_valid_ndvi]
         median_valid = median_arr[    mask_valid_ndvi]
         days_diff_1   = days_diff[    mask_valid_ndvi]
-
-        original_idx = np.arange(len(ndvi_arr)) # used to keep track of delta ndvi position and the outlier position
         original_idx_1 = original_idx[mask_valid_ndvi]
+
 
         obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
         # NOTE: normally is_observation_date should not be needed in addition to >0 and <1 if working only with observations
