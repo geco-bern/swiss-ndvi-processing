@@ -166,7 +166,7 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
             return ndvi_smoothed, mask_array
         
         else:
-
+            mask_array  = np.zeros(len(is_observation_date), dtype=object) # initialize mask array
             return 10000 * ndvi_arr, mask_array
 
 
