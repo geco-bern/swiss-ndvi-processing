@@ -120,14 +120,14 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
             # L1 linear interpolation
             delta_ndvi_to_interpolate = np.concatenate([
                 np.array([0]),
-                loess[:-4],
-                delta_ndvi_2[-4:],
-                np.array([0])              # TODO: Why force this to become 0? Effect: If below we use the current date. That means we make the linear interpolation pass through 0 today. # NOTE: this was an error, it is possible to remove it the first and last 0
+                loess[:-3],
+                delta_ndvi_2[-3:],
+                np.array([0])              # TODO: Why force this to become 0? Effect: If below we use the current date. That means we make the linear interpolation pass through 0 today. # NOTE:this was due to covert hte full period of historical processing
             ]) 
             dates_to_interpolate = np.concatenate([
                 np.array([0]),
                 days_diff_2,
-                np.array([days_diff[-1]]) # TODO: this appears to be the current date (Day 40). Not the last observation (Day 38, from above illustration). NOTE: in historic this does not matter. NOTE: it is possible to remove the first ans last value by removing also the 0
+                np.array([days_diff[-1]]) # TODO: this appears to be the current date (Day 40). Not the last observation (Day 38, from above illustration). NOTE: in historic this does not matter, it will be overwritten in the continous setup.
             ]) 
 
             interpolated_values = np.interp(
@@ -181,7 +181,7 @@ if __name__ == "__main__":
         threads_per_worker=1,
         memory_limit='20GB',
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
-        dashboard_address=':1235') as client:
+        dashboard_address=':12345') as client:
     
         print(client, flush = True)
         print(client.dashboard_link, flush = True)

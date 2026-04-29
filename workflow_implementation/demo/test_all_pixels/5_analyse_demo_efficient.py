@@ -235,7 +235,7 @@ if __name__ == "__main__":
     # N_THREADS_PER_WORKER = 1
     
     t0=time.perf_counter()
-    DASK_TEMP_DIR = "/mnt/data2/UniBe-swiss-ndvi/tmp_data5/"
+    DASK_TEMP_DIR = "/mnt/data2/UniBe-swiss-ndvi/tmp_data6/"
     client = Client(
         n_workers=N_WORKERS,
         threads_per_worker=N_THREADS_PER_WORKER,
