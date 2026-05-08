@@ -23,18 +23,6 @@ if __name__ == "__main__":
     print(ds)
     print(ds2)
 
-    # --- 1. Setup Biome Dictionary ---
-    biomes = {
-        "Lowland_broadleaf": (2694491.82, 1126023.20),
-        "Highland_broadleaf": (2692020.28, 1121443.47),
-        "Lowland_evergreen": (2761097.61, 1194613.45),
-        "Highland_evergreen": (2781537.00, 1182975.00),
-        "Biscth_fire_affected": (2644029.37, 1134128.20),
-        "Biscth_fire_non_affected": (2644328.07, 1134342.81),
-        "Drought_affected": (2690025.48, 1287413.03),
-        "Vaia_storm_affected": (2689564.74, 1154411.88)
-    }
-
     
     dates = ds.date.values
     doys = ds.doy.values  
@@ -95,6 +83,8 @@ if __name__ == "__main__":
 
         plt.plot(dates[valid_obs],     ndvi[valid_obs],     marker="x", linestyle="None", markersize=4, color="green",  label="obs smoothed")
         plt.plot(dates[valid], median_mapped, linestyle="-", linewidth=1.2, color="black", label="median NDVI values")
+        plt.plot(dates[valid],     ndvi[valid],  linestyle="-", linewidth=1.2, color="green",  label="obs smoothed")
+
 
 
         plt.ylim(0, 1) 

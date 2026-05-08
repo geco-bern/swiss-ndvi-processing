@@ -6,13 +6,14 @@ import matplotlib.ticker as ticker
 import numpy as np
 import xarray as xr
 import warnings
+import os
 
 # ── CONFIGURATION ────────────────────────────────────────────────────────────
 HISTO_PATH = "/mnt/data1/UniBe-swiss-ndvi/backup/historical_backup.zarr"
 OBS_PATH   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr"
 
-DATE_A = "2021-06-10"
-DATE_B = "2023-07-18"
+DATE_A = "2021-08-12"
+DATE_B = "2023-07-20"
 
 warnings.filterwarnings("ignore", category=UserWarning, module="numcodecs.zarr3")
 
@@ -24,6 +25,7 @@ names_better = ["Lowland broadleaf area","Highland broadleaf area","Lowland ever
 
 X = np.array([2694491, 2692020, 2761097, 2781537, 2644029, 2644328, 2690025, 2689564])
 Y = np.array([1126023, 1121443, 1194613, 1182975, 1134128, 1134342, 1287413, 1154411])
+
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -124,8 +126,10 @@ def make_figure(cx, cy, out_path, name):
     plt.close(fig)
 
 if __name__ == "__main__":
+
     for i in range(8):
-        plotpath = "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova3/"
+        plotpath = "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/images_for_report/"
+        os.makedirs(plotpath, exist_ok= True)
         OUT_PATH = f"{plotpath}{names[i]}_area.png"
 
         make_figure(
@@ -134,3 +138,12 @@ if __name__ == "__main__":
             out_path = OUT_PATH,
             name = names_better[i]
         )
+    
+    """plotpath = "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova_3/"
+    OUT_PATH = f"{plotpath}{names[0]}_area.png"
+    make_figure(
+            cx = X[0],
+            cy = Y[0],
+            out_path = OUT_PATH,
+            name = names_better[0]
+        )"""
