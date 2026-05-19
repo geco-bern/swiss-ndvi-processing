@@ -16,3 +16,8 @@ NDVI*.png
 .venv*
 data_for_demo_2
 report/fig/prova2
+
+# Python: Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
