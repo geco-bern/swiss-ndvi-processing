@@ -10,7 +10,7 @@ set -Eeuo pipefail
 # Script Configuration
 # ============================================================
 VENV_PATH="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv"
-LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FG_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
+LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
 
 # Logging setup (terminal + file) -------------------------------
 : > "$LOG_FILE"
@@ -45,7 +45,7 @@ echo
 # Define historical NDVI update mode --------------
 # Script inputs: 
 #   Define which historical NDVI file to use, and whether it will be udpated in-place or copied.
-HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/backup/historical_backup.zarr"
+HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/input_data/historical_2026-04-04_18h16_historical_v7.zarr"
 #HISTO_OUTPUT="/mnt/data1/UniBe-swiss-ndvi/output_data/ndvi_historic_extended.zarr" # currently unused since we append INPUT
 
 # Workaround creating the working copy from the backup:
@@ -56,7 +56,7 @@ HISTO_INPUT="/mnt/data1/UniBe-swiss-ndvi/backup/historical_backup.zarr"
 # Define start and end date for download script --------------
 # End date:
 # END_DATE="${2:-$(date -d "yesterday" +%Y-%m-%d)}" # Yesterday
-END_DATE="2026-01-01"   # Or hardcode it alternatively
+END_DATE="2026-01-06"   # Or hardcode it alternatively
 # END_DATE="2026-01-15" # For a second test run after the first.
 
 # Start date:
@@ -70,7 +70,7 @@ echo $END_DATE
 SCRIPTS=(
   /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
   /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
-  /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py
+  /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
   /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/6_create_cogtiff.py
 )
 
@@ -152,7 +152,7 @@ else
   echo "------------------------------------------------------------"
   echo "Running: ${SCRIPTS[3]}"; echo "Start time: $(timestamp)"
   START_TIME=$(date +%s)
-  python "${SCRIPTS[3]}" "$START_DATE" "$END_DATE"
+  # python "${SCRIPTS[3]}" "$START_DATE" "$END_DATE"
   # # python "${SCRIPTS[3]}" "2025-08-22" "2025-09-30" # TODO remove this hardcoding
   END_TIME=$(date +%s)
   ELAPSED=$((END_TIME - START_TIME))
