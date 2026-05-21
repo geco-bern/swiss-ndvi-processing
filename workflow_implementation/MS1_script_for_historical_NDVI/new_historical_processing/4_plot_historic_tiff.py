@@ -26,7 +26,7 @@ from NDVI_utils.NDVI_plot_utils import NDVI_xarray_to_grid
 if __name__ == '__main__':
 
     # Paths
-    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7c"
+    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final"
     # DASK_TEMP_DIR    = "/mnt/data1/UniBe-swiss-ndvi/tmp_data2/"
 
     os.makedirs(OUTPUT_TIFF_BASE, exist_ok=True)
