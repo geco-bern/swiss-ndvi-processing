@@ -44,9 +44,6 @@ if __name__ == '__main__':
         # date_arg = "2024-07-22" # for dates requested...
         # date_arg = "2024-07-31" # for dates requested...
         # date_arg = "all_dates"
-        # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test6.zarr" # TODO: remove -test
-        # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7-test10.zarr" # TODO: remove -test
-        # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr"
         # INPUT_HISTORIC   = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c.zarr"
 
 

@@ -4,6 +4,8 @@ import rasterio
 import xarray as xr
 
 # below function to be used with 4_plot_historic_tiff.py and 3_check_historical_ndvi.py
+# NDVI_historic, curr_date, variable = proc_sub, DATE_A, 'ndvi_processed'
+# NDVI_historic, curr_date, variable = NDVI_historic, curr_date, 'mask_array'
 def NDVI_xarray_to_grid(NDVI_historic, curr_date, variable = 'ndvi_processed'):
 
     # Starting from v4 of our format we have access to trans in the NDVI_historic.note:
@@ -68,7 +70,8 @@ def NDVI_xarray_to_grid(NDVI_historic, curr_date, variable = 'ndvi_processed'):
     # Transform back into a xarray/rioxarray DataArray that spans the compact x-y-grid
     ds_curr_date_gridded = xr.DataArray(grid, dims=("y", "x"), 
                                         coords={"x": ux,
-                                                "y": uy,})
+                                                "y": uy[::-1], # Note reverse Y_coord for non-flipped TIFF output
+                                                })
     ds_curr_date_gridded = ds_curr_date_gridded.rio.write_transform(window_trans)
     ds_curr_date_gridded = ds_curr_date_gridded.rio.write_crs("EPSG:2056")
 
