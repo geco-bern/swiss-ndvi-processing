@@ -24,6 +24,7 @@ import argparse
 import dask.array as da
 import pystac_client
 import rasterio
+import rioxarray
 from rasterio.coords import BoundingBox
 from rasterio.crs import CRS
 import zarr
@@ -40,6 +41,14 @@ warnings.filterwarnings(
     message="Numcodecs codecs are not in the Zarr version 3 specification",
     module="numcodecs.zarr3"
 )
+
+
+# NOTE: below only works with working directory at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing
+# from workflow_implementation.MS1_script_for_historical_NDVI.new_historical_processing.NDVI_utils.NDVI_plot_utils import NDVI_xarray_to_grid
+# NOTE: below only works with working directory at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing
+from NDVI_utils.NDVI_plot_utils import NDVI_xarray_to_grid
+
+
 # =====================================================
 #  Define input data sets
 # =====================================================
@@ -48,6 +57,7 @@ warnings.filterwarnings(
 # PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7_2025-11.zarr" # this one is cropped to November 2025
 # PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7b.zarr"
 PROC_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c.zarr"
+# PROC_ZARR = "/mnt/data1/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_2025-11.zarr"
 # PROC_ZARR = "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365.zarr" # this is the initially processed file (just appended with metadata x,y, x_idx, etc.)
 
 INPUT_ZARR_LOOKUPTABLE = "/mnt/data2/UniBe-swiss-ndvi/input_data/lookup_table_median_ndvi_v7.zarr"
@@ -57,41 +67,70 @@ OBS_ZARR = "/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_
 #  Define some pixels of interest
 # =====================================================
 
-XY_COORDS = {
-    # Specific sites
-    'Bitsch': (2644035, 1133765), # pix 84856712 # NOTE: Bitsch forest fire selection Fabian
-    # some Western border:
-    # NOTE: if PixelID is off-by-one Western and Eastern border should indicate
-    'Auberson':          (2523115, 1185065), # pix 52709046
-    'La Chaux-de-Fonds': (2546995, 1217685), # pix 30185728
-    # some Eastern border:
-    'Widerberg':  (2762585, 1230445),        # pix 23069246
-    'Diepoldsau': (2768685, 1251225),        # pix 10771926
-    'Tschlin':    (2831125, 1195615),        # pix 45329883
-    # Randomly selected sites:
-    # # some Ticino sites:
-    # 'Ticino1': (2720645, 1118245),          # pix95774249
-    'Tenero': (2710385, 1116375),          # pix97148954
-    # # 'Ticino3': (2710005, 1109995),
-    # Wabern:
-    'Wabern': (2600875, 1197275)      # pix 44088229
-}
 site_selection = "_toughSites"
+site_selection = "_SHSites"
+site_selection = "_evaluationSites"
 
-if False:  # set this to True to replace above sites
-    # some Schaffhausen sites:
-    XY_COORDS = {
-        'SH1_pix0': (2684595, 1295915), #pix0
-        'SH2': (2684555, 1295715),      #pix210
-        'SH3': (2684955, 1295675),      #pix350
-        'SH4': (2684395, 1295635),      #pix490
-        'SH5': (2684895, 1295545),      #pix999
-    }
-    site_selection = "_SHSites"
+match site_selection:
+    case "_toughSites":
+        XY_COORDS = {
+            # Specific sites
+            'Bitsch': (2644035, 1133765), # pix 84856712 # NOTE: Bitsch forest fire selection Fabian
+            # some Western border:
+            # NOTE: if PixelID is off-by-one Western and Eastern border should indicate
+            'Auberson':          (2523115, 1185065), # pix 52709046
+            'La Chaux-de-Fonds': (2546995, 1217685), # pix 30185728
+            # some Eastern border:
+            'Widerberg':  (2762585, 1230445),        # pix 23069246
+            'Diepoldsau': (2768685, 1251225),        # pix 10771926
+            'Tschlin':    (2831125, 1195615),        # pix 45329883
+            # Randomly selected sites:
+            # # some Ticino sites:
+            # 'Ticino1': (2720645, 1118245),          # pix95774249
+            'Tenero': (2710385, 1116375),          # pix97148954
+            # # 'Ticino3': (2710005, 1109995),
+            # Wabern:
+            'Wabern': (2600875, 1197275)      # pix 44088229
+        }
+    case "_SHSites":
+        XY_COORDS = {   # some Schaffhausen sites:
+            'SH1_pix0': (2684595, 1295915), #pix0
+            'SH2': (2684555, 1295715),      #pix210
+            'SH3': (2684955, 1295675),      #pix350
+            'SH4': (2684395, 1295635),      #pix490
+            'SH5': (2684895, 1295545),      #pix999
+        }
+    case "_evaluationSites":
+        XY_COORDS = { # Taken from report
+            'Lowland broadleaf':                    (2694491, 1126023),
+            'Highland broadleaf':                   (2692020, 1121443),
+            'Lowland evergreen':                    (2761097, 1194613),
+            'Highland evergreen':                   (2781537, 1182974),
+            # 'Bitsch fire affected area':            (2644029, 1134128),
+            'Bitsch fire affected area':            (2644035, 1133765), # pix 84856712 # NOTE: Bitsch forest fire selection Fabian
+            'Bitsch fire nearby non-affected area': (2644328, 1134342),
+            '2018 Drought-affected area':           (2690025, 1287413),
+            'Vaia storm affected area':             (2689564, 1154411),
+        }
+
+
+SHORTNAMES = {
+    'Lowland broadleaf': '_low_blf',
+    'Highland broadleaf': '_high_blf',
+    'Lowland evergreen': '_low_enf',
+    'Highland evergreen': '_high_enf',
+    'Bitsch fire affected area': '_bitsch_fire',
+    'Bitsch fire nearby non-affected area': '_bitsch_nonfire',
+    '2018 Drought-affected area': '_drought2018',
+    'Vaia storm affected area': '_stormVaia',
+}
+
+def round_to_5_ending(n):
+    return round((n - 5) / 10) * 10 + 5
 
 NAMES    = [nm for nm in XY_COORDS.keys()]
-X_COORDS = [xy[0] for xy in XY_COORDS.values()]
-Y_COORDS = [xy[1] for xy in XY_COORDS.values()]
+X_COORDS = [round_to_5_ending(xy[0]) for xy in XY_COORDS.values()]
+Y_COORDS = [round_to_5_ending(xy[1]) for xy in XY_COORDS.values()]
 
 
 # For figure 01 we also need an interval of interest:
@@ -381,6 +420,39 @@ def select_by_pixelID(ds_mi, pid):
 # select_by_xy(obs_ds_midx, [2684595, 2684555, 2684525], [1295915, 1295715, 1295715])
 # select_by_pixelID(obs_ds_midx, [0, 210, 350])
 
+def select_area_box_by_xy(ds_mi, xs, ys, Lx=10, Ly=10):
+    # if not isinstance(xs, (list, tuple)):
+    #     xs = [xs]
+    # if not isinstance(ys, (list, tuple)):
+    #     ys = [ys]
+    # assert len(xs) == len(ys)
+    # selections = [select_area_box_by_single_xy(ds_mi, x, y, Lx=Lx, Ly=Ly)
+    #                for x, y in zip(xs, ys)]
+    # return xr.concat(selections, dim='pixel')
+    return select_area_box_by_single_xy(ds_mi, xs, ys, Lx=Lx, Ly=Ly)
+
+def select_area_box_by_single_xy(ds_mi, x_center, y_center, Lx=10, Ly=10):
+    half_x = (Lx/2.0) # in m
+    half_y = (Ly/2.0) # in m
+    xmin, xmax = x_center - half_x, x_center + half_x
+    ymin, ymax = y_center - half_y, y_center + half_y
+    # # Variant 1:
+    # mask = (ds_mi.x >= xmin) & (ds_mi.x <= xmax) & (ds_mi.y >= ymin) & (ds_mi.y <= ymax)
+    # return ds_mi.where(mask, drop=True)
+    # # Variant 2:
+    # # NOTE: this requires lexsorting first: ds_mi = ds_mi.sortby('pixel')   # reorder so tuple-slicing works
+    # ds_mi.sel(
+    #     pixel = slice((xmin, ymin, -np.inf), (xmax, ymax, np.inf)),
+    #     drop=True)
+    # Variant 3:
+    mi = ds_mi['pixel'].to_index() # multi-index
+    mask = (
+        (mi.get_level_values(0) >= xmin) & (mi.get_level_values(0) <= xmax) &
+        (mi.get_level_values(1) >= ymin) & (mi.get_level_values(1) <= ymax)
+    )
+    return ds_mi.sel(pixel=mi[mask], drop=True)
+
+
 
 
 # =====================================================
@@ -396,9 +468,6 @@ def select_by_pixelID(ds_mi, pid):
 proc_ds_subset = select_by_xy(proc_ds_midx, X_COORDS, Y_COORDS).drop(["y_idx","x_idx"])
 obs_ds_subset  = select_by_xy(obs_ds_midx,  X_COORDS, Y_COORDS).drop(["y_idx","x_idx"])
 
-proc_ds_subset.pixel.values
-
-
 smoothed_cmap = {
     # 0: ("no_obs_to_smooth", "black"),
     # 1: ("no_obs_smoothed",  "orange"),
@@ -407,14 +476,16 @@ smoothed_cmap = {
     4: ("4: obs_smoothed_outlier", "red"),
 }
 obs_cmap     = {0: ("obs_raw",   "green")}
-gapfill_cmap = {0: ("gapfilled", "black")}
+gapfill_cmap = {0: ("gapfilled", "black"),
+                1: ("median",    "lightgrey")}
 
-# proc_ds_subset["median_ndvi"].plot.line(x='datetime',hue='pixel')
+# proc_ds_subset["median_ndvi"].plot.line(x='date',row='pixelID')
 # plot all processed
 # proc_ds_subset["ndvi_processed"].plot.scatter(x='date',hue='pixel',marker=".", edgecolors="none")
 gr = proc_ds_subset["ndvi_processed"].plot.line(
     x='date',row='pixel', color = gapfill_cmap[0][1],
-    figsize=(7.2*2, 7.2*2))
+    figsize=(7.2*2, 7.2*2),
+    zorder = 3)
 
 # plot processed observation
         # mask_array == 0: the data is not an observation and is yet to be smoothed
@@ -437,10 +508,17 @@ cmap = mcolors.ListedColormap(colors)
 for i in range(proc_ds_subset2.pixel.size):
     ax = gr.axs.flat[i]
     ax.set_prop_cycle(None)
+    # add underlying median model: to use plot.line we need to subset "median_ndvi" as a xarrray.DataArray
+    proc_ds_subset["median_ndvi"].isel(pixel=i).plot.line( # do not use subset2, but simply subset
+        ax=ax, x='date', color = gapfill_cmap[1][1],
+        zorder = 0)
+
+    # add ndvi_processed:
     proc_ds_subset2.isel(pixel=i).plot.scatter(
         ax=ax, x='date', marker="x",
         y="ndvi_processed", hue="mask_array",
-        cmap=cmap, add_colorbar=False) # norm=norm, 
+        cmap=cmap, add_colorbar=False,
+        zorder = 2) # norm=norm, 
 
 # plot raw observation
 indexer_obs = ((obs_ds_subset["ndvi"] < NO_COVERAGE) &
@@ -455,7 +533,8 @@ for i in range(obs_ds_subset2.pixel.size):
     obs_ds_subset2.isel(pixel=i).plot.scatter(
         ax=ax, x='datetime',marker="o", hue=None, 
         color=obs_cmap[0][1],
-        alpha=0.2, y = "ndvi")
+        alpha=0.2, y = "ndvi",
+        zorder = 1)
 
 # layouting/formatting
 # Format legend
@@ -501,14 +580,157 @@ plt.tight_layout()
 # save plot:    
 plotpath = (PROC_ZARR+"-TESTSUITE_Fig0"+site_selection+".png")
 plt.savefig(plotpath)
+
+# save plot for report:
+plotpath = os.path.join(
+    "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig", 
+    os.path.basename(PROC_ZARR)+"-TESTSUITE_Fig0"+site_selection+".png")
+plt.savefig(plotpath)
 plt.close()
 
 
 
 
 
+# Figure 2 Maps (taken from tmp_area_visualization.py):
+
+# Test subsetting:
+# area  = select_area_box_by_xy(proc_ds_midx, 2684595, 1295915, Lx=100, Ly=20)
+# area
+
+# X_coord, Y_coord, fname_suffix, site_name = 2761095, 1194615, "_lowland_ENF", "Highland evergreen"
+def make_map(X_coord, Y_coord, fname_suffix, site_name): # TODO rename cx, cy as Lx, Ly and start using it
+    print(f"\n--- Processing: {fname_suffix} ---")
+    
+    # subset # TODO: start using X_COORDS and Y_COORDS
+    proc_ds_area  = select_area_box_by_xy(proc_ds_midx, X_coord, Y_coord, Lx=10000, Ly=10000)#.drop(["y_idx","x_idx"])
+    obs_ds_area   = select_area_box_by_xy(obs_ds_midx,  X_coord, Y_coord, Lx=10000, Ly=10000)#.drop(["y_idx","x_idx"])
+    
+    # 1. Subset Historical
+    proc_sub = proc_ds_area # NOTE: uses date
+    
+    # 2. Subset Observations (raw data)
+    obs_sub = (obs_ds_area.
+        # subset first entry for each 'date', remove datetime make date main index
+        isel(datetime = ~obs_ds_area.date.to_index().duplicated()).
+        # rename datetime to date (actually subset first time of each day)
+        swap_dims({"datetime": "date"}) # NOTE: used datetime, now uses date
+    )
+    
+    # Plotting function:
+    # ax, grid, title, cmap = axes[1, 1], obs_b, f"Obs Raw – {DATE_B}", cmap
+    def _panel(ax, grid, title, cmap="RdYlGn", vmin=0, vmax=10000):
+        extent = tuple(grid.rio.bounds()[i] for i in [0,2,3,1]) # reorder to have xmin, xmax, ymax, ymin
+        origin = "upper"
+        
+        # variant 1:
+        # cmap_obj = cmap
+
+        # ax.set_facecolor('white')
+        # im = ax.imshow(grid, origin=origin, extent=extent, 
+        #                cmap=cmap_obj, vmin=vmin, vmax=vmax, 
+        #                aspect="equal", interpolation="nearest")
+
+        # variant 2:
+        # prepare arrays (accept xarray or numpy input)
+        grid_arr = np.asarray(grid).astype(float)
+
+        # prepare masks
+        nodata_mask = (grid_arr == NO_COVERAGE) | (grid_arr == INVALID)
+        grid_arr[(grid_arr == NO_COVERAGE) | (grid_arr == INVALID)] = np.nan
+
+        # scale to NDVI range (0..1 expects vmin/vmax in same units)
+        # grid_scaled = grid_arr # / 10000.0
+        # grid_scaled[(grid_scaled < -1) | (grid_scaled > 1)] = np.nan
+
+        # layer 1) draw nodata mask as grey background where True (should highlight clouds)
+        mask_img = np.zeros_like(grid_arr, dtype=float)
+        mask_img[nodata_mask] = 1.0
+        cmap_mask = mcolors.ListedColormap(['white', 'darkgrey']) # [background, clouds]
+        ax.imshow(mask_img, origin=origin, extent=extent, 
+                  cmap=cmap_mask, vmin=0, vmax=1,
+                  aspect="equal", interpolation="nearest", zorder=1)
+
+        # layer 2) draw main data on top; NaNs (including original nodata replaced above) will use `bad` color
+        cmap_obj = plt.cm.get_cmap(cmap).copy()
+        cmap_obj.set_bad('white', alpha=0) # NaN not shown (transparent: alpha=0)
+        # norm = Normalize(vmin=vmin/10000.0, vmax=vmax/10000.0, clip=True)  # clip outside range to endpoints
+
+        im = ax.imshow(grid_arr, origin=origin, extent=extent,
+                    cmap=cmap_obj, vmin=vmin, vmax=vmax, 
+                    aspect="equal", interpolation="nearest", zorder=2)
+
+        # common code for both variants:
+        ax.set_title(title, fontsize=10, fontweight="bold", pad=6)
+        ax.tick_params(labelsize=7)
+        ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda v, _: f"{v/1e6:.5f}M"))
+        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda v, _: f"{v/1e6:.5f}M"))
+        ax.set_xlabel("x [LV95]", fontsize=7)
+        ax.set_ylabel("y [LV95]", fontsize=7)
+        
+        return im
 
 
+    # Load Processed Data (Historical Zarr uses 'date')
+    DATE_A = "2021-08-12"
+    DATE_B = "2023-07-20"
+    
+    # Create grids
+    proc_a = NDVI_xarray_to_grid(proc_sub, DATE_A, variable = 'ndvi_processed')
+    proc_b = NDVI_xarray_to_grid(proc_sub, DATE_B, variable = 'ndvi_processed')
+    obs_a  = NDVI_xarray_to_grid(obs_sub,  DATE_A, variable = 'ndvi')
+    obs_b  = NDVI_xarray_to_grid(obs_sub,  DATE_B, variable = 'ndvi')    
+
+    # Plotting
+    fig, axes = plt.subplots(2, 2, 
+                             figsize=(11, 9), 
+                             constrained_layout=True, facecolor='white',
+                             sharex=True, sharey=True)
+    fig.suptitle(f"{site_name} ({X_coord:.0f}, {Y_coord:.0f})", fontweight="bold")
+
+    title_1 = f"Processed – {pd.to_datetime(proc_sub.sel(date=DATE_A).date.values).strftime('%Y-%m-%d')}" #  %Hh%M
+    title_2 = f"Processed – {pd.to_datetime(proc_sub.sel(date=DATE_B).date.values).strftime('%Y-%m-%d')}" #  %Hh%M
+    title_3 = f"Obs Raw – {pd.to_datetime(obs_sub.sel(date= DATE_A).datetime.values).strftime('%Y-%m-%d %Hh%M')}"
+    title_4 = f"Obs Raw – {pd.to_datetime(obs_sub.sel(date= DATE_B).datetime.values).strftime('%Y-%m-%d %Hh%M')}"
+
+    cmap = "RdYlGn"
+    _panel(axes[0, 0], proc_a, title_1, cmap=cmap)
+    _panel(axes[0, 1], proc_b, title_2, cmap=cmap)
+    _panel(axes[1, 0], obs_a,  title_3, cmap=cmap)
+    im = _panel(axes[1, 1], obs_b, title_4, cmap=cmap)
+
+    # optimize layout
+    # Remove inner tick labels
+    for ax in axes.flat:
+        ax.label_outer()
+    # Reduce spacing between subplots
+    fig.subplots_adjust(
+        wspace=0.05,
+        hspace=0.05
+    )
+    # plt.tight_layout()
+
+
+    cbar = fig.colorbar(im, ax=axes, orientation="vertical", fraction=0.02, pad=0.02)
+    cbar.set_label("NDVI * 10'000")
+
+
+    # save plot:    
+    plotpath = (PROC_ZARR+"-TESTSUITE_Fig2"+site_selection+"_"+fname_suffix+".png")
+    plt.savefig(plotpath, dpi=180, bbox_inches="tight")
+
+    # save plot for report:
+    plotpath = os.path.join(
+        "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig", 
+        os.path.basename(PROC_ZARR)+"-TESTSUITE_Fig2"+site_selection+"_"+fname_suffix+".png")
+    plt.savefig(plotpath, dpi=180, bbox_inches="tight")
+    plt.close()
+
+    return proc_a
+
+for (nm,x,y) in zip(NAMES, X_COORDS, Y_COORDS):
+    print(f"{nm} — ({x},{y}) — {SHORTNAMES[nm]}")
+    make_map(x, y, fname_suffix = SHORTNAMES[nm], site_name = nm)
 
 
 
@@ -602,13 +824,15 @@ for pixel_it in range(0,len(X_COORDS)):
         f"location_{X_COORDS[pixel_it]}x{Y_COORDS[pixel_it]}"+
         ".png")
     plt.savefig(plotpath)
+
+    plotpath2 = os.path.join(
+        "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig", 
+        os.path.basename(PROC_ZARR)+"-TESTSUITE_Fig1"+
+        f"{FIGURE01_START_DATE.replace("-","")}to{FIGURE01_END_DATE.replace("-","")}_"+
+        f"location_{X_COORDS[pixel_it]}x{Y_COORDS[pixel_it]}"+
+        ".png")
+    plt.savefig(plotpath2)
     plt.close()
-
-
-
-
-
-
 
 
 

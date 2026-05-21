@@ -66,7 +66,9 @@ def NDVI_xarray_to_grid(NDVI_historic, curr_date, variable = 'ndvi_processed'):
         # mask_array == 4: the data is an observation and is an outlier
 
     # Transform back into a xarray/rioxarray DataArray that spans the compact x-y-grid
-    ds_curr_date_gridded = xr.DataArray(grid, dims=("y", "x"))
+    ds_curr_date_gridded = xr.DataArray(grid, dims=("y", "x"), 
+                                        coords={"x": ux,
+                                                "y": uy,})
     ds_curr_date_gridded = ds_curr_date_gridded.rio.write_transform(window_trans)
     ds_curr_date_gridded = ds_curr_date_gridded.rio.write_crs("EPSG:2056")
 
