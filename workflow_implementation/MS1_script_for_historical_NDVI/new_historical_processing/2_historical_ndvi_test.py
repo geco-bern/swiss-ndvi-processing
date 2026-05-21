@@ -67,14 +67,14 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
         # FOR DEVELOPMENT: import numpy as np; import statsmodels.api as sm
         # FOR DEVELOPMENT: ndvi_valid  = np.array([0.1, 0.5, 0.9, 0.9, 0.9, 0.5, 0.1, 0.1, 0.9, 0.5, 0.1, 0.1])
         # FOR DEVELOPMENT: median_valid= np.array([0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5])
-        delta_ndvi = ndvi_valid - median_valid  # TODO: why only distance to median, and not distance to median +- x*IQR ? # NOTE: Francesco The IQR covered almost all the range (also above 1). With that it won't be impossible to find any outlier
+        delta_ndvi = ndvi_valid - median_valid
         
         # outlier mask (NOTE: for inner points only: missing in the historic case the very first and very last observations)
-        delta_delta_left  = delta_ndvi[:-2] - delta_ndvi[1:-1]    # TODO: why only difference with neighbor. Not considering the rate of change? NOTE: Francesco during winter or with long lag, by including the rate of change some value with large delta won't be considered as outlier
-        delta_delta_rigth = delta_ndvi[2:] - delta_ndvi[1:-1]     # TODO: why only difference with neighbor. Not considering the rate of change?
+        delta_delta_left  = delta_ndvi[:-2] - delta_ndvi[1:-1]
+        delta_delta_right = delta_ndvi[2:] - delta_ndvi[1:-1]
         outlier_mask = ((abs(delta_ndvi[1:-1])  > delta_threshold) & 
                         (abs(delta_delta_left)  > delta_delta_threshold) & 
-                        (abs(delta_delta_rigth) > delta_delta_threshold))
+                        (abs(delta_delta_right) > delta_delta_threshold))
         
         # subset only inner points and only non-outliers
         # NOTE: unused ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
@@ -85,19 +85,20 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
         
         
         ### Illustration of indexing:  - (day without observation), x (observation), o (outlier observation), I (invalid observation, e.g. -0.7)
+        ###                            x̂ (smoothed observation)
         ###      x---x-xx--x--x----o-x---x-x---I----x-x--     len() = 40    (ndvi_arr, median_arr, is_observation_date, dates, original_idx, days_diff, obs_mask, mask_array, before)
         ###      x   x xx  x  x    o x   x x   I    x x       len() = 13    ()
         ###      x   x xx  x  x    o x   x x        x x       len() = 12    (ndvi_valid, median_valid, days_diff_1, original_idx_1)
         ###          x xx  x  x    o x   x x        x         len() = 10    (outlier_mask....  and delta_delta_left, ...)
         ###          x xx  x  x      x   x x        x         len() = 9     (delta_ndvi_2, days_diff_2, original_idx_2, idx, loess) 
-        ###          x xx  x  x                               len() = 5     (loess[:-4])
+        ###          x̂ x̂x̂  x̂  x̂                               len() = 5     (loess[:-4])
         ###                          x   x x        x         len() = 5     (delta_ndvi_2[-4:])
         ###                          x                        len() = 1     (original_idx_2[-4])
-        ###      0   x xx  x  x      x   x x        x   0     len() = 12    (delta_ndvi_to_interpolate)
-        ###      0   x xx  x  x      x   x x        x   0     len() = 12    (dates_to_interpolate)
-        ###      ........................................     len() = 40    (interpolated_values)
-        ### TODO: what about this observation?:       x                     NOTE: this could explain the observed differences between the windowed (v7) and the global (v7b) approaches.
-        ### TODO: what about these two?:               --                   NOTE: it appears that the interpolation below forces delta through 0.
+        ###      0   x̂ x̂x̂  x̂  x̂      x   x x        x   0     len() = 12    (delta_ndvi_to_interpolate)
+        ###      0   x̂ x̂x̂  x̂  x̂      x   x x        x   0     len() = 12    (dates_to_interpolate)
+        ###      0...x̂.x̂x̂..x̂..x̂..........................     len() = 40    (interpolated_values)
+        ### TODO: what about this observation?:       x                     
+        ### TODO: what about these two?:               --                   
         ###       I.e. what happened to L1 extrapolation between last observation and today in the continuous case? # NOTE: linear interpolation
         ###
         ###                          x                        len() = 1     (original_idx_2[-4])
@@ -122,12 +123,12 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
                 np.array([0]),
                 loess[:-4],
                 delta_ndvi_2[-4:],
-                np.array([0])              # TODO: Why force this to become 0? Effect: If below we use the current date. That means we make the linear interpolation pass through 0 today. # NOTE:this was due to covert hte full period of historical processing
+                np.array([0])
             ]) 
             dates_to_interpolate = np.concatenate([
                 np.array([0]),
                 days_diff_2,
-                np.array([days_diff[-1]]) # TODO: this appears to be the current date (Day 40). Not the last observation (Day 38, from above illustration). NOTE: in historic this does not matter, it will be overwritten in the continous setup.
+                np.array([days_diff[-1]])
             ]) 
 
             interpolated_values = np.interp(
@@ -159,7 +160,6 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
             mask_array[ before & (~obs_mask) ] = 1
 
             # Mark the outlier dates (4): 
-            # TODO: do we need to distinguish between outlier+smoothed and (potential outlier) for the continuous implementation? Because above code does smooth them! # NOTE: in historical NDVI, we do not have any potential outlier because all the data have a neighbour, also during the tiff creation, the last date to be created in the last fourth obs, which at that point we are sure if is an outlier or not
             valid_outlier_idx = outlier_idx[is_observation_date[outlier_idx] == 1] # equivalent with: original_idx_1[1:-1][outlier_mask & is_observation_date[original_idx_1][1:-1]]
             mask_array[valid_outlier_idx] = 4
 
@@ -173,8 +173,6 @@ def historical_ndvi_singleWindow(ndvi_arr, median_arr, is_observation_date, date
 if __name__ == "__main__":
 
     N_WORKERS = 80
-    # TODO: test later 120 workers, with each 30GB memory_limit, BATCH_SIZE = 200K, INNER_PIXEL_CHUNK=83
-    # TODO: test later 150 workers, with each 24GB memory_limit, BATCH_SIZE = 150K, INNER_PIXEL_CHUNK=1K
 
     with Client(
         n_workers=N_WORKERS,
