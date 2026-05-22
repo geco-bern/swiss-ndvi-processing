@@ -41,14 +41,17 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###                            1: L1 value (obs. or gapfilled) from historical processing (or last CI processing)
         ###                            2: L2 value (obs. or gapfilled) from historical processing (or last CI processing)
         ###
-        ###      ........................................     len() = 3000  (days_diff)
         ###      2222222222222222111111110-x--xI-o--x-x--     len() = 3000  (ndvi_arr_original, mask_array_original, is_observation_date, dates)
         ###      . ..  ..  .  .                               len() = 800   (obs_L2) Indices of observation dates
+        ###                   .                               len() = 1     (obs_L2[-1]) Index last L2 obs available
         ###            .                                      len() = 1     (crop_start) Index (-4)
         ###      2222222                                      len() = 2977  (ndvi_not_analyzed, mask_array_not_analyzed)
-        ###            2222222222111111110-x--xI-o--x-x--     len() = 23    (ndvi_arr, medians, median_arr, mask_array)
-        ###            xx--x--x----o-x---x-x--x--o--x-x--     len() = 23    (ndvi_arr)
-        ###            TTffTffTffffTfTfffTfTffTffTffTfTff     len() = 23    (obs_mask) Invalid gets dropped because outside 0 and 1.
+        ###            ..................................     len() = 34    (dates_arr)
+        ###            01234567dddddddddddddddddddddddddd     len() = 34    (days_diff)
+        ###                   01234567...................     len() = 27    (days_diff_interp = ...)
+        ###            2222222222111111110-x--xI-o--x-x--     len() = 34    (ndvi_arr, medians, median_arr, mask_array)
+        ###            xx--x--x----o-x---x-x--x--o--x-x--     len() = 34    (ndvi_arr)
+        ###            TTffTffTffffTfTfffTfTffTffTffTfTff     len() = 34    (obs_mask) Invalid gets dropped because outside 0 and 1.
         ###            xx  x  x    o x   x x  xI o  x x       len() = 13    ()
         ###            xx  x  x    o x   x x  x  o  x x       len() = 12    (ndvi_valid, median_valid, days_diff_1, original_idx)
         
@@ -59,12 +62,13 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
 
         ###                              x x  x     x         len() = 4     (delta_ndvi_2[-4:])
         ###                                x  x     x         len() = 3     (delta_ndvi_2[-3:], # L1 outlier-filtered
-        ###                   x̂                               len() = 1     (delta_ndvi_2[-5]), # last L2 available
+        ###                   x̂                               len() = 1     (delta_ndvi_2[-5]), # last L2 obs available
         ###                                           x       len() = 1     (delta_ndvi[-1])    # last observation (not outlier-filtered because there are no 2 neighbour)
         ###                          x̂   x̂                    len() = 5     (delta_ndvi_to_interpolate_inner)
         ###                   x̂      x̂   x̂ x  x     x x 0     len() = 8     (delta_ndvi_to_interpolate) 0 is only appended if today there is no observation
-        ###                   x̂      x̂   x̂ x  x     x x d     len() = 8     (dates_to_interpolate)      0 is only appended if today there is no observation
-        ###                   x̂..........................     len() = 40    (interpolated_values)
+        ###                   d                               len() = 1     (dates[obs_L2[-1]])
+        ###                   0      7   d d  d     d d d     len() = 5     (dates_to_interpolate)      0 is only appended if today there is no observation
+        ###                   x̂..........................     len() = 27    (interpolated_values)
         ###                          x̂                        len() = 1     (original_idx_2[-4])
         ### NOTE: what about these two?:               --     # REPLY: they are linearly interpolated towards 0. Giving us L0 estimation.
         ### NOTE: what about?: ......x                        # REPLY: this is just linear interpolation between already smoothed and not yet smoothed values. Note at some point in time this was called L1. But actually L1 are any observations that still could change.
@@ -78,7 +82,7 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###                          x                        len() = 1     (original_idx_2[-4])
         ###      TTTTTTTTTTTTTTTTTTTTffffffffffffffffffff     len() = 40    ('before' defined as '< original_idx_2[-4]' )
         ###                       o                           len() = 1     (outlier_idx encoding the original_idx)
-        obs_L2 = np.nonzero(is_observation_date)
+        obs_L2 = np.nonzero(is_observation_date) & (mask_array_original == 3)
 
         # Ensure mask_array is writable
         mask_array_original = np.array(mask_array_original, copy=True)
