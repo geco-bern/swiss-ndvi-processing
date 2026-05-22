@@ -44,18 +44,20 @@ def NDVI_xarray_to_grid(NDVI_historic, curr_date, variable = 'ndvi_processed'):
     if ux.size < 2 or uy.size < 2:
         raise RuntimeError("Not enough unique x/y coordinates to derive pixel size")
 
-    dx = float(ux[1] - ux[0])
-    dy = float(uy[1] - uy[0])
+    dx = abs(trans[0])
+    dy = abs(trans[4])
 
     # origin for Affine.from_origin is top-left: (min_x - dx/2, max_y + dy/2)
     origin_x = float(ux.min() - dx / 2.0)
     origin_y = float(uy.max() + dy / 2.0)
 
-    # create transform with pixel-size in x (dx) and negative y (so row index increases downward)
+    # create transform with pixel-size in x (dx) and negative y (so row index increases downward, similar to trans[4])
     window_trans = rasterio.Affine(dx, 0.0, origin_x, 0.0, -dy, origin_y)
 
     # Initialize compact window grid filled with NaN for tiff to be filled with values
     grid = np.full((height, width), np.nan) # TODO: add again: , dtype=np.int16
+    grid_x_coords = (window_trans.c + window_trans.a * (np.arange(width ) + 0.5)).astype(int) # origin_x + dx * [...]
+    grid_y_coords = (window_trans.f + window_trans.e * (np.arange(height) + 0.5)).astype(int) # origin_y + dy * [...]
 
     # Fill compact window grid using local indices
     grid[local_rows, local_cols] = NDVI_historic.sel(date=curr_date)[variable].values
@@ -69,9 +71,7 @@ def NDVI_xarray_to_grid(NDVI_historic, curr_date, variable = 'ndvi_processed'):
 
     # Transform back into a xarray/rioxarray DataArray that spans the compact x-y-grid
     ds_curr_date_gridded = xr.DataArray(grid, dims=("y", "x"), 
-                                        coords={"x": ux,
-                                                "y": uy[::-1], # Note reverse Y_coord for non-flipped TIFF output
-                                                })
+                                        coords={"x": grid_x_coords,"y": grid_y_coords})
     ds_curr_date_gridded = ds_curr_date_gridded.rio.write_transform(window_trans)
     ds_curr_date_gridded = ds_curr_date_gridded.rio.write_crs("EPSG:2056")
 
