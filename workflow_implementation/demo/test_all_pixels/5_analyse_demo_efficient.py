@@ -46,7 +46,7 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###      . ..  ..  .  .                               len() = 800   (obs_L2) Indices of observation dates
         ###             .                                     len() = 1     (crop_start) Index
         ###      2222222                                      len() = 2977  (ndvi_not_analyzed, mask_array_not_analyzed)
-        ###             222222222111111110-x---I-o--x-x--     len() = 23    (ndvi_arr, mask_valid_ndvi, medians, median_arr, mask_array)
+        ###             222222222111111110-x---I-o--x-x--     len() = 23    (ndvi_arr, medians, median_arr, mask_array)
         ###             x--x--x----o-x---x-x-----o--x-x--     len() = 23    (ndvi_arr)
         ###             TffTffTffffTfTfffTfTfffffTffTfTff     len() = 23    (obs_mask) Invalid gets dropped because outside 0 and 1.
         ###             x  x  x    o x   x x   I o  x x       len() = 13    ()
@@ -95,14 +95,13 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
 
         ndvi_arr = ndvi_arr / 10000
         median_arr  = medians  / 10000
-        mask_valid_ndvi = (ndvi_arr > 0) & (ndvi_arr < 1)
-
-        ndvi_valid = ndvi_arr[mask_valid_ndvi]
-        median_valid = median_arr[mask_valid_ndvi]
-        days_diff_1 = days_diff[mask_valid_ndvi]
-        original_idx = np.arange(len(ndvi_arr))[mask_valid_ndvi] # used to keep track of delta ndvi position and the outlier position
-        
         obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
+
+        ndvi_valid = ndvi_arr[obs_mask]
+        median_valid = median_arr[obs_mask]
+        days_diff_1 = days_diff[obs_mask]
+        original_idx = np.arange(len(ndvi_arr))[obs_mask] # used to keep track of delta ndvi position and the outlier position
+        
         
         # outlier detection
 
