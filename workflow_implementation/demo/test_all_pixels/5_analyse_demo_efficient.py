@@ -34,10 +34,8 @@ INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
 # HISTO_OUTPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km_extended2.zarr"
 # python -u $SCRIPT_FILE $NEW_NDVI $HISTO_INPUT --histo-output=$HISTO_OUTPUT > $LOG_FILE  2>&1 &
 
-def historical_ndvi(ndvi_arr_original, medians, mask_array_original, is_observation_date, dates, starting_date):
-        
-        start_idx = np.searchsorted(dates, starting_date) 
-        obs_prior = np.nonzero(is_observation_date[:start_idx])
+def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observation_date, dates):
+        obs_prior = np.nonzero(is_observation_date)
 
         # Ensure mask_array is writable
         mask_array_original = np.array(mask_array_original, copy=True)
@@ -302,7 +300,7 @@ if __name__ == "__main__":
 
     print("Last dates in historic_ds:\n  "+"\n  ".join(np.datetime_as_string(historic_ds.date.isel(date = slice(-10,None)), unit='D')), flush=True)
     print("First dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(0,10)), unit='D')), flush=True)
-    # TODO: there is an overlap, do we need to remove this for application of historical_ndvi()
+    # TODO: there is an overlap, do we need to remove this for application of continuous_ndvi()
 
     print("Current historic dataset:", flush = True)
     print(historic_ds, flush = True)
@@ -352,7 +350,7 @@ if __name__ == "__main__":
         .chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
     )
 
-    # --- apply gapfilling and outlier detection function: historical_ndvi() ----------------------------------
+    # --- apply gapfilling and outlier detection function: continuous_ndvi() ----------------------------------
 
     # prepare arguments spanning historic and new data: all lazy
     ndvi_array   = merged_ds["ndvi_processed"].persist()
@@ -380,7 +378,7 @@ if __name__ == "__main__":
     # call gufunc where core dim is "time" (1D arrays per pixel)
     output_dtypes = [ndvi_array.dtype, mask_array.dtype] # prespecify types
     ndvi_processed, mask_processed = xr.apply_ufunc(
-        historical_ndvi,
+        continuous_ndvi,
         ndvi_array,        # this is the observed/gapfilled/processed NDVI value
         median_array,      # this is the modelled median NDVI for the corresponding DOY
         mask_array,        # this is the integer processing status
@@ -389,9 +387,7 @@ if __name__ == "__main__":
         output_core_dims=[["date"],["date"]],
         vectorize=True, 
         dask="parallelized",
-        kwargs={
-             "dates": dates_array,           # this contains all daily dates
-             "starting_date": start_date},   # this contains the starting date when to start ??
+        kwargs={"dates": dates_array},           # this contains all daily dates
         output_dtypes=output_dtypes, 
         dask_gufunc_kwargs={"allow_rechunk": True},
     )
