@@ -604,12 +604,12 @@ plt.close()
 # X_coord, Y_coord, fname_suffix, site_name = 2690025, 1287413, "_drought2018", "2018 Drought-affected area"
 # X_coord, Y_coord, fname_suffix, site_name = 2689564, 1154411, "_storm", "Storm affected area"
 
-def make_map(X_coord, Y_coord, fname_suffix, site_name): # TODO rename cx, cy as Lx, Ly and start using it
+def make_map(X_coord, Y_coord, fname_suffix, site_name, Lx=10000, Ly=10000, DATE_A = FIGURE02_MAP_DATE_A, DATE_B = FIGURE02_MAP_DATE_B):
     print(f"\n--- Processing: {fname_suffix} ---")
     
     # subset # TODO: start using X_COORDS and Y_COORDS
-    proc_ds_area  = select_area_box_by_xy(proc_ds_midx, X_coord, Y_coord, Lx=10000, Ly=10000)#.drop(["y_idx","x_idx"])
-    obs_ds_area   = select_area_box_by_xy(obs_ds_midx,  X_coord, Y_coord, Lx=10000, Ly=10000)#.drop(["y_idx","x_idx"])
+    proc_ds_area  = select_area_box_by_xy(proc_ds_midx, X_coord, Y_coord, Lx=Lx, Ly=Ly)#.drop(["y_idx","x_idx"])
+    obs_ds_area   = select_area_box_by_xy(obs_ds_midx,  X_coord, Y_coord, Lx=Lx, Ly=Ly)#.drop(["y_idx","x_idx"])
     
     # 1. Subset Historical
     proc_sub = proc_ds_area # NOTE: uses date
@@ -668,18 +668,15 @@ def make_map(X_coord, Y_coord, fname_suffix, site_name): # TODO rename cx, cy as
         # common code for both variants:
         ax.set_title(title, fontsize=10, fontweight="bold", pad=6)
         ax.tick_params(labelsize=7)
-        ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda v, _: f"{v/1e6:.5f}M"))
-        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda v, _: f"{v/1e6:.5f}M"))
-        ax.set_xlabel("x [LV95]", fontsize=7)
-        ax.set_ylabel("y [LV95]", fontsize=7)
+        # ax.xaxis.set_major_formatter(ticker.FuncFormatter(lambda v, _: f"{v/1e6:.6f}m"))
+        # ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda v, _: f"{v/1e6:.6f}m"))
+        ax.set_xlabel("x [m LV95]", fontsize=7)
+        ax.set_ylabel("y [m LV95]", fontsize=7)
         
         return im
 
 
-    # Load Processed Data (Historical Zarr uses 'date')
-    DATE_A = "2021-08-12"
-    DATE_B = "2023-07-20"
-    
+    # Load Processed Data (Historical Zarr uses 'date')    
     # Create grids
     obs_a  = NDVI_xarray_to_grid(obs_sub,  DATE_A, variable = 'ndvi')
     obs_b  = NDVI_xarray_to_grid(obs_sub,  DATE_B, variable = 'ndvi')    
@@ -754,14 +751,26 @@ def make_map(X_coord, Y_coord, fname_suffix, site_name): # TODO rename cx, cy as
 
     return proc_a
 
-names_to_process = NAMES[0:5]+NAMES[6:] # remove here the Bitsch nearby site [5], since it is already covered by the Bitsch site
-Xcoord_to_process = X_COORDS[0:5]+X_COORDS[6:]
-Ycoord_to_process = Y_COORDS[0:5]+Y_COORDS[6:]
+# Plotting 10x10km maps
+names_to_process = NAMES[0:5] # remove here the Bitsch nearby site [5], since it is already covered by the Bitsch site (which is [4])
+Xcoord_to_process = X_COORDS[0:5]
+Ycoord_to_process = Y_COORDS[0:5]
 for (nm,x,y) in zip(names_to_process, Xcoord_to_process, Ycoord_to_process):
     print(f"{nm} — ({x},{y}) — {SHORTNAMES[nm]}")
     make_map(x, y, fname_suffix = SHORTNAMES[nm], site_name = nm)
 
+# Plotting 1.2x1.2km maps:
+# Drought area (Schaffhausen)
+for (nm,x,y) in zip([NAMES[6]], [X_COORDS[6]], [Y_COORDS[6]]):
+    print(f"{nm} — ({x},{y}) — {SHORTNAMES[nm]}")
+    #make_map(x, y, fname_suffix = SHORTNAMES[nm], site_name = nm,  Lx=1200, Ly=1200, DATE_A="2017-09-24", DATE_B="2018-09-24")
+    make_map(x, y, fname_suffix = SHORTNAMES[nm], site_name = nm,  Lx=1200, Ly=1200, DATE_A="2018-08-23", DATE_B="2019-08-25")
 
+# Plotting 1.5x1.5km maps:
+# Windthrow area (Airolo): only plot 1500x1500m instead of 10_000x10_000m
+for (nm,x,y) in zip([NAMES[7]], [X_COORDS[7]], [Y_COORDS[7]]):
+    print(f"{nm} — ({x},{y}) — {SHORTNAMES[nm]}")
+    make_map(x, y, fname_suffix = SHORTNAMES[nm], site_name = nm, Lx=1500, Ly=1500, DATE_A = "2019-08-08", DATE_B = "2021-08-12")
 
 
 
