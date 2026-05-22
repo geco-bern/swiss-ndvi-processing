@@ -61,13 +61,12 @@ def historical_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         delta_ndvi = np.array([0])
      
         ndvi_arr = ndvi_arr / 10000
-        medians  = medians  / 10000
-
+        median_arr  = medians  / 10000
         mask_valid_ndvi = (ndvi_arr > 0) & (ndvi_arr < 1)
 
         ndvi_valid = ndvi_arr[mask_valid_ndvi]
-        median_valid = medians[mask_valid_ndvi]
-        days_diff_2 = days_diff[mask_valid_ndvi]
+        median_valid = median_arr[mask_valid_ndvi]
+        days_diff_1 = days_diff[mask_valid_ndvi]
 
         original_idx = np.arange(len(ndvi_arr)) # used to keep track of delta ndvi position and the outlier position
         original_idx = original_idx[mask_valid_ndvi]
@@ -86,26 +85,27 @@ def historical_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
                         (abs(delta_delta_left) > delta_delta_threshold) & # TODO: shouldn't this be a OR
                         (abs(delta_delta_rigth) > delta_delta_threshold))
         ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
-        delta_ndvi = delta_ndvi[1:-1][~outlier_mask]
-        days_diff_2 = days_diff_2[1:-1][~outlier_mask]
+        delta_ndvi_2 = delta_ndvi[1:-1][~outlier_mask]
+        days_diff_2 = days_diff_1[1:-1][~outlier_mask]
 
         original_idx_2 = original_idx[1:-1][~outlier_mask]
         
 
         # some sites do not have any observation or very few
-        if len(delta_ndvi) > 6:
+        if len(delta_ndvi_2) > 6:
         
             # L2 smoothing
             # loop over the 7 rolling deltas. If the deltas are too large (extreme events as fire) 
             # or the original values too close to the boundaries condition (0.9 and 0.1) we do linear fit
 
-            delta_ndvi_to_interpolate = np.full(len(delta_ndvi)-6, np.nan)
+            delta_ndvi_to_interpolate = np.full(len(delta_ndvi_2)-6, np.nan)
 
-            idx = np.arange(len(delta_ndvi))
+            idx = np.arange(len(delta_ndvi_2))
 
-            for i in np.arange(len(delta_ndvi)-6):
+            for i in np.arange(len(delta_ndvi_2)-6):
 
-                delta_window_to_smooth = delta_ndvi[i:i+7] # window to smooth, the center value will be appended
+                # ndvi_valid_to_check: not needed for consistency with historical processing
+                delta_window_to_smooth = delta_ndvi_2[i:i+7] # window to smooth, the center value will be appended
                 ndvi_valid_to_check = ndvi_valid[i:i+7] # this will be used to check if the absolute value is close to the boundaries condition
 
                 if (np.any((ndvi_valid_to_check < 0.05) | (ndvi_valid_to_check > 0.95))or (np.sum(delta_window_to_smooth < -0.2) >= 5)): 
@@ -124,23 +124,48 @@ def historical_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
 
             # combine smoothed value with values yet to smooth, after that linearly interpolate everything
 
-            delta_ndvi_to_interpolate = np.concatenate([np.array([0]),loess[:-3],delta_ndvi[-3:],np.array([0])]) 
-            dates_to_interpolate = np.concatenate([np.array([0]),days_diff_2,np.array([days_diff[-1]])]) 
+            delta_ndvi_to_interpolate = np.concatenate([
+                np.array([0]),
+                loess[:-3],
+                delta_ndvi_2[-3:],
+                np.array([0])
+            ]) 
+            dates_to_interpolate = np.concatenate([
+                np.array([0]),
+                days_diff_2,
+                np.array([days_diff[-1]])
+            ]) 
 
-            interpolated_values = np.interp(days_diff,dates_to_interpolate,delta_ndvi_to_interpolate)
+            interpolated_values = np.interp(
+                days_diff,                    # evaluate here f()
+                dates_to_interpolate,         # observed x
+                delta_ndvi_to_interpolate     # observed f(x)
+            )
 
             ndvi_smoothed = 10000 * (interpolated_values + medians)
 
             # indexing of array mask
-            mask_array[obs_mask] = 2
-            before = np.arange(len(mask_array)) < original_idx_2[-4]
+                # mask_array == 0: the date is not an observation and is yet to be smoothed
+                # mask_array == 1: the date is not an observation and is smoothed
+                # mask_array == 2: the date is     an observation and is yet to be smoothed
+                # mask_array == 3: the date is     an observation and is smoothed
+                # mask_array == 4: the date is     an observation and is an outlier
 
-            outlier_idx = original_idx[1:-1][outlier_mask]
-            valid_outlier_idx = outlier_idx[is_observation_date[outlier_idx] == 1]
+            # Start out with 0:
+
+            # Define all observation dates (unprocessed):
+            mask_array[obs_mask] = 2
+            # unless further below specified as smoothed, the continuous implementation should overwrite 0 and 2's without hesitation.
+
+            # Mark the finalized dates (smoothed)
+            before = np.arange(len(mask_array)) < original_idx_2[-4]
 
             mask_array[ before & obs_mask ] = 3
             mask_array[ before & (~obs_mask) ] = 1
 
+            # Mark the outlier dates (4): 
+            outlier_idx = original_idx[1:-1][outlier_mask]
+            valid_outlier_idx = outlier_idx[is_observation_date[outlier_idx] == 1]
             mask_array[valid_outlier_idx] = 4
 
 
