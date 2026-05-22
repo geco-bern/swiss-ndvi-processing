@@ -110,7 +110,7 @@ match site_selection:
             'Bitsch fire affected area':            (2644035, 1133765), # pix 84856712 # NOTE: Bitsch forest fire selection Fabian
             'Bitsch fire nearby non-affected area': (2644328, 1134342),
             '2018 Drought-affected area':           (2690025, 1287413),
-            'Vaia storm affected area':             (2689564, 1154411),
+            'Storm affected area':             (2689564, 1154411),
         }
 
 
@@ -122,7 +122,7 @@ SHORTNAMES = {
     'Bitsch fire affected area': '_bitsch_fire',
     'Bitsch fire nearby non-affected area': '_bitsch_nonfire',
     '2018 Drought-affected area': '_drought2018',
-    'Vaia storm affected area': '_stormVaia',
+    'Storm affected area': '_storm',
 }
 
 def round_to_5_ending(n):
@@ -592,13 +592,18 @@ plt.close()
 
 
 
-# Figure 2 Maps (taken from tmp_area_visualization.py):
+# Figure 2,3 Maps (taken from tmp_area_visualization.py):
 
 # Test subsetting:
 # area  = select_area_box_by_xy(proc_ds_midx, 2684595, 1295915, Lx=100, Ly=20)
 # area
 
+# make_map(2761095, 1194615, "_lowland_ENF", "Highland evergreen")
 # X_coord, Y_coord, fname_suffix, site_name = 2761095, 1194615, "_lowland_ENF", "Highland evergreen"
+# X_coord, Y_coord, fname_suffix, site_name = 2644325, 1134345, "_bitsch_nonfire", "Bitsch fire nearby non-affected area"
+# X_coord, Y_coord, fname_suffix, site_name = 2690025, 1287413, "_drought2018", "2018 Drought-affected area"
+# X_coord, Y_coord, fname_suffix, site_name = 2689564, 1154411, "_storm", "Storm affected area"
+
 def make_map(X_coord, Y_coord, fname_suffix, site_name): # TODO rename cx, cy as Lx, Ly and start using it
     print(f"\n--- Processing: {fname_suffix} ---")
     
@@ -676,59 +681,83 @@ def make_map(X_coord, Y_coord, fname_suffix, site_name): # TODO rename cx, cy as
     DATE_B = "2023-07-20"
     
     # Create grids
-    proc_a = NDVI_xarray_to_grid(proc_sub, DATE_A, variable = 'ndvi_processed')
-    proc_b = NDVI_xarray_to_grid(proc_sub, DATE_B, variable = 'ndvi_processed')
     obs_a  = NDVI_xarray_to_grid(obs_sub,  DATE_A, variable = 'ndvi')
     obs_b  = NDVI_xarray_to_grid(obs_sub,  DATE_B, variable = 'ndvi')    
+    proc_a = NDVI_xarray_to_grid(proc_sub, DATE_A, variable = 'ndvi_processed')
+    proc_b = NDVI_xarray_to_grid(proc_sub, DATE_B, variable = 'ndvi_processed')
+    proc_a_mask = NDVI_xarray_to_grid(proc_sub, DATE_A, variable = 'mask_array')
+    proc_b_mask = NDVI_xarray_to_grid(proc_sub, DATE_B, variable = 'mask_array')
 
     # Plotting
-    fig, axes = plt.subplots(2, 2, 
-                             figsize=(11, 9), 
-                             constrained_layout=True, facecolor='white',
-                             sharex=True, sharey=True)
-    fig.suptitle(f"{site_name} ({X_coord:.0f}, {Y_coord:.0f})", fontweight="bold")
-
     title_1 = f"Processed – {pd.to_datetime(proc_sub.sel(date=DATE_A).date.values).strftime('%Y-%m-%d')}" #  %Hh%M
     title_2 = f"Processed – {pd.to_datetime(proc_sub.sel(date=DATE_B).date.values).strftime('%Y-%m-%d')}" #  %Hh%M
     title_3 = f"Obs Raw – {pd.to_datetime(obs_sub.sel(date= DATE_A).datetime.values).strftime('%Y-%m-%d %Hh%M')}"
     title_4 = f"Obs Raw – {pd.to_datetime(obs_sub.sel(date= DATE_B).datetime.values).strftime('%Y-%m-%d %Hh%M')}"
-
     cmap = "RdYlGn"
+
+    # Map 1: NDVI (proc vs obs)
+    fig, axes = plt.subplots(2, 2, 
+                             figsize=(9, 8), 
+                             constrained_layout=True, facecolor='white',
+                             sharex=True, sharey=True)
+    fig.suptitle(f"{site_name} ({X_coord:.0f}, {Y_coord:.0f})", fontweight="bold")
     _panel(axes[0, 0], proc_a, title_1, cmap=cmap)
     _panel(axes[0, 1], proc_b, title_2, cmap=cmap)
     _panel(axes[1, 0], obs_a,  title_3, cmap=cmap)
     im = _panel(axes[1, 1], obs_b, title_4, cmap=cmap)
-
     # optimize layout
-    # Remove inner tick labels
-    for ax in axes.flat:
-        ax.label_outer()
-    # Reduce spacing between subplots
-    fig.subplots_adjust(
-        wspace=0.05,
-        hspace=0.05
-    )
-    # plt.tight_layout()
+    for ax in axes.flat: ax.label_outer() # Remove inner tick labels
+    #fig.subplots_adjust(wspace=0.05,hspace=0.05) # Reduce spacing between subplots
+    cbar = fig.colorbar(im, ax=axes, orientation="vertical", fraction=0.02, pad=0.02, label = "NDVI * 10'000")
 
-
-    cbar = fig.colorbar(im, ax=axes, orientation="vertical", fraction=0.02, pad=0.02)
-    cbar.set_label("NDVI * 10'000")
-
-
-    # save plot:    
+    # save plot (next to zarr):
     plotpath = (PROC_ZARR+"-TESTSUITE_Fig2"+site_selection+"_"+fname_suffix+".png")
     plt.savefig(plotpath, dpi=180, bbox_inches="tight")
+    # save plot (to report folder):
+    plotpath = os.path.join("/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig", 
+                            os.path.basename(PROC_ZARR)+"-TESTSUITE_Fig2"+site_selection+"_"+fname_suffix+".png")
+    plt.savefig(plotpath, dpi=180, bbox_inches="tight")
+    plt.close()
 
-    # save plot for report:
-    plotpath = os.path.join(
-        "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig", 
-        os.path.basename(PROC_ZARR)+"-TESTSUITE_Fig2"+site_selection+"_"+fname_suffix+".png")
+
+    # Map 2: top row: outlier mask, bottom row: NDVI obs
+    cmap_mask = plt.get_cmap('PiYG', 5)    # 5 discrete colors
+    fig, axes = plt.subplots(3, 2, 
+                             figsize=(9, 8/2*3), 
+                             gridspec_kw={'hspace':0, 'wspace':0},
+                             constrained_layout=True, facecolor='white',
+                             sharex=True, sharey=True)
+    fig.suptitle(f"{site_name} ({X_coord:.0f}, {Y_coord:.0f})", fontweight="bold")
+    _panel(          axes[0, 0], proc_a_mask, title_1, vmin=0, vmax=5, cmap=cmap_mask)
+    im_mask = _panel(axes[0, 1], proc_b_mask, title_2, vmin=0, vmax=5, cmap=cmap_mask)
+    _panel(          axes[1, 0], proc_a, title_1, cmap=cmap)
+    _panel(          axes[1, 1], proc_b, title_2, cmap=cmap)
+    _panel(          axes[2, 0], obs_a,  title_3, cmap=cmap)
+    im_NDVI = _panel(axes[2, 1], obs_b,  title_4, cmap=cmap)
+    # add colorbar
+    cbar_NDVI = fig.colorbar(im_NDVI, ax=axes[2, 1],  orientation="vertical", fraction=0.02, pad=0.02, label = "NDVI * 10'000")
+    cbar_NDVI = fig.colorbar(im_NDVI, ax=axes[1, 1],  orientation="vertical", fraction=0.02, pad=0.02, label = "NDVI * 10'000")
+    cbar_mask = fig.colorbar(im_mask, ax=axes[0, 1],  orientation="vertical", fraction=0.02, pad=0.02, label = "mask")
+    cbar_mask.set_ticks(np.array([1,2,3,4,5]) - 0.5) # https://stackoverflow.com/a/18705457
+    cbar_mask.set_ticklabels(np.array([1,2,3,4,5]))  # https://stackoverflow.com/a/18705457
+    # optimize layout
+    for ax in axes.flat: ax.label_outer() # Remove inner tick labels
+
+    # save plot (next to zarr):
+    plotpath = (PROC_ZARR+"-TESTSUITE_Fig3"+site_selection+"_"+fname_suffix+".png")
+    plt.savefig(plotpath, dpi=180, bbox_inches="tight")
+    # save plot (to report folder):
+    plotpath = os.path.join("/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig", 
+                            os.path.basename(PROC_ZARR)+"-TESTSUITE_Fig3"+site_selection+"_"+fname_suffix+".png")
     plt.savefig(plotpath, dpi=180, bbox_inches="tight")
     plt.close()
 
     return proc_a
 
-for (nm,x,y) in zip(NAMES, X_COORDS, Y_COORDS):
+names_to_process = NAMES[0:5]+NAMES[6:] # remove here the Bitsch nearby site [5], since it is already covered by the Bitsch site
+Xcoord_to_process = X_COORDS[0:5]+X_COORDS[6:]
+Ycoord_to_process = Y_COORDS[0:5]+Y_COORDS[6:]
+for (nm,x,y) in zip(names_to_process, Xcoord_to_process, Ycoord_to_process):
     print(f"{nm} — ({x},{y}) — {SHORTNAMES[nm]}")
     make_map(x, y, fname_suffix = SHORTNAMES[nm], site_name = nm)
 
