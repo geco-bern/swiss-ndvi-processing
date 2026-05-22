@@ -115,16 +115,15 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         
         
         # outlier detection
-
-        delta_threshold = 0.1
+        delta_threshold = 0.05      # TODO: for consistency with historical processing
         delta_delta_threshold = 0.1
 
         delta_ndvi = ndvi_valid - median_valid
-        delta_delta_left = delta_ndvi[2:]   # TODO: shouldnt this be a difference of deltas?
-        delta_delta_rigth = delta_ndvi[:-2] # TODO: shouldnt this be a difference of deltas?
-        outlier_mask = ((abs(delta_ndvi[1:-1]) > delta_threshold) &       # TODO: shouldn't this be a OR
-                        (abs(delta_delta_left) > delta_delta_threshold) & # TODO: shouldn't this be a OR
-                        (abs(delta_delta_rigth) > delta_delta_threshold))
+        delta_delta_left = delta_ndvi[:-2] - delta_ndvi[1:-1] # TODO: for consistency with historical processing
+        delta_delta_right = delta_ndvi[2:] - delta_ndvi[1:-1] # TODO: for consistency with historical processing
+        outlier_mask = ((abs(delta_ndvi[1:-1])  > delta_threshold) & 
+                        (abs(delta_delta_left)  > delta_delta_threshold) & 
+                        (abs(delta_delta_right) > delta_delta_threshold))
         ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
         delta_ndvi_2 = delta_ndvi[1:-1][~outlier_mask]
         days_diff_2 = days_diff_1[1:-1][~outlier_mask]
@@ -170,9 +169,9 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
                 delta_ndvi[-1] # last observation (not filtered because there are no 2 neighbour)
             ]) 
             dates_to_interpolate = np.concatenate([
-                days_diff_2[-(len(delta_ndvi_to_interpolate)+3 +1):],  # dates of L2 and L1
-                # NOTE: the len of this array must be equal to len of 
-                # len(delta_ndvi_to_interpolate) + len(delta_ndvi_2[-3:]+ the last L2 available + the last obs wihtout neighbour)
+                days_diff_2[-(len(delta_ndvi_to_interpolate) +3 +1):],  # dates of L2 and L1 
+                                                                        # NOTE (+3 because of delta_ndvi_2[-3:]      # L1 filtered (must be 3)
+                                                                        #       and +1 because of delta_ndvi_2[-5])  # last L2 avail
                 np.array(days_diff_1[-1]), # date of the last observation without 2 neighbour
             ])
 
