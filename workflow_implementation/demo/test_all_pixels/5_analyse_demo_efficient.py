@@ -44,13 +44,13 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###      ........................................     len() = 3000  (days_diff)
         ###      2222222222222222111111110-x---I-o--x-x--     len() = 3000  (ndvi_arr_original, mask_array_original, is_observation_date, dates)
         ###      . ..  ..  .  .                               len() = 800   (obs_L2) Indices of observation dates
-        ###             .                                     len() = 1     (crop_start) Index
+        ###            .                                      len() = 1     (crop_start) Index (-4)
         ###      2222222                                      len() = 2977  (ndvi_not_analyzed, mask_array_not_analyzed)
-        ###             222222222111111110-x---I-o--x-x--     len() = 23    (ndvi_arr, medians, median_arr, mask_array)
-        ###             x--x--x----o-x---x-x-----o--x-x--     len() = 23    (ndvi_arr)
-        ###             TffTffTffffTfTfffTfTfffffTffTfTff     len() = 23    (obs_mask) Invalid gets dropped because outside 0 and 1.
-        ###             x  x  x    o x   x x   I o  x x       len() = 13    ()
-        ###             x  x  x    o x   x x     o  x x       len() = 12    (ndvi_valid, median_valid, days_diff_1, original_idx)
+        ###            2222222222111111110-x---I-o--x-x--     len() = 23    (ndvi_arr, medians, median_arr, mask_array)
+        ###            xx--x--x----o-x---x-x-----o--x-x--     len() = 23    (ndvi_arr)
+        ###            TTffTffTffffTfTfffTfTfffffTffTfTff     len() = 23    (obs_mask) Invalid gets dropped because outside 0 and 1.
+        ###            xx  x  x    o x   x x   I o  x x       len() = 13    ()
+        ###            xx  x  x    o x   x x     o  x x       len() = 12    (ndvi_valid, median_valid, days_diff_1, original_idx)
         
         ###             x  x  x    o x   x x     o  x         len() = 10    (outlier_mask....  and delta_delta_left, ...)
         ###             x  x  x      x   x x        x         len() = 9     (delta_ndvi_2, days_diff_2, original_idx_2, idx, loess) 
@@ -81,7 +81,9 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         if len(obs_L2) < 3:
             return ndvi_arr_original, mask_array_original
 
-        crop_start = obs_L2[-3]  # Start at 3th prior obs, use to smooth
+        crop_start = obs_L2[-4]  # Index (-4), so that even when 
+                                 # dropping left-most and right-most, we end up 
+                                 # with 3 L2 values (left half of 7 obs window) to smooth
         ndvi_arr = ndvi_arr_original[crop_start:]
         medians = medians[crop_start:]
         is_observation_date = is_observation_date[crop_start:]
