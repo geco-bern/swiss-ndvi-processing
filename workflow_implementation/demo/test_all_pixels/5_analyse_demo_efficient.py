@@ -68,8 +68,11 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###                   x̂      x̂   x̂ x  x     x x 0     len() = 8     (delta_ndvi_to_interpolate) 0 is only appended if today there is no observation
         ###                   d                               len() = 1     (dates[obs_L2[-1]])
         ###                   0      7   d d  d     d d d     len() = 5     (dates_to_interpolate)      0 is only appended if today there is no observation
-        ###                   x̂..........................     len() = 27    (interpolated_values)
-        ###                          x̂                        len() = 1     (original_idx_2[-4])
+        ###              x̂..x̂.x̂..........................     len() = 27    (interpolated_values)
+        ###                   x̂                               len() = 1     (last_L2_position)
+        ###                    ..........................     len() = ?     (mask_array,ndvi_smoothed)(cropping ritgh after last L2 to ensure no overlapping with previous timeserie)
+        ### .............x̂..x̂.x̂                               len() = ?     (ndvi_not_analyzed,mask_array_not_analyzed)(historical cropping of L2 not changed anymore)
+        ### .............x̂..x̂.x̂..........................     len() = ?     (final_ndvi_value, mask_array_final)(final merging and returing the timseries)
         ### NOTE: what about these two?:               --     # REPLY: they are linearly interpolated towards 0. Giving us L0 estimation.
         ### NOTE: what about?: ......x                        # REPLY: this is just linear interpolation between already smoothed and not yet smoothed values. Note at some point in time this was called L1. But actually L1 are any observations that still could change.
         ### NOTE: what about?:       x   x x        x         # REPLY: these are indeed non-smoothed values used for linear interpolation.
@@ -104,7 +107,7 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
 
         days_diff = (dates_arr- dates_arr[0])  / np.timedelta64(1, 'D')
         last_L2_position = (dates[obs_L2[-1]] - dates_arr[0]) / np.timedelta64(1, 'D')
-
+        historic_last_L2_position = (dates[obs_L2[-1]] - dates[0]) / np.timedelta64(1, 'D') # !!! notice that we use date and dates_arr
         ndvi_arr = ndvi_arr / 10000
         median_arr  = medians  / 10000
         obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
@@ -220,6 +223,11 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
             valid_outlier_idx = outlier_idx[is_observation_date[outlier_idx] == 1]
             mask_array[valid_outlier_idx] = 4
 
+            # Before remerging, wee need to crop the interpolated value at obs L2 to avoid overlapping
+            mask_array = mask_array[(last_L2_position+1):]
+            ndvi_smoothed = ndvi_smoothed[(last_L2_position+1):]
+            mask_array_not_analyzed = mask_array_not_analyzed[:(historic_last_L2_position+1)]
+            ndvi_not_analyzed = ndvi_not_analyzed[:(historic_last_L2_position+1)]
 
             mask_array_final =  np.concatenate([mask_array_not_analyzed, mask_array])
             final_ndvi_value =  np.concatenate([ndvi_not_analyzed, ndvi_smoothed])
