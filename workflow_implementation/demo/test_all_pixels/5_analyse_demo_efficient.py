@@ -268,7 +268,8 @@ if __name__ == "__main__":
     #   # HISTO_ZARR_OUTPUT    = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_extended.zarr" # TODO: remove this and instea do it circular
     #   # INPUT_ZARR           = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr"
     INPUT_LOOKUPTABLE = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
-    INPUT_ZARR = "/mnt/data1/UniBe-swiss-ndvi/backup/historical_backup.zarr"
+    INPUT_ZARR = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-04-29_07h16_ndvi_01_downloaded_2026-01-03_2026-01-03_processed.zarr"
+    HISTO_ZARR_INPUT = "/mnt/data1/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr/"
     # START PROCESSING:
     t0 = time.perf_counter()
 
