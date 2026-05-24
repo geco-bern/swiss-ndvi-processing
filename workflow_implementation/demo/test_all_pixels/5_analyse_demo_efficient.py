@@ -165,7 +165,7 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
                 else:
                     
                     # smooth the 7 rolling window
-                    loess =  sm.nonparametric.lowess(delta_window_to_smooth, idx, frac= 1, it=3, return_sorted=False)
+                    loess =  sm.nonparametric.lowess(delta_window_to_smooth, np.arange(0,7), frac= 1, it=3, return_sorted=False)
                     delta_ndvi_to_interpolate_inner[i] = loess[3]
 
             
@@ -224,17 +224,14 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
 
             # Mark the outlier dates (4): 
             outlier_idx = original_idx[1:-1][outlier_mask]
-            valid_outlier_idx = outlier_idx[is_observation_date[outlier_idx] == 1]
-            mask_array[valid_outlier_idx] = 4
+            mask_array[outlier_idx] = 4
 
-            # Before remerging, wee need to crop the interpolated value at obs L2 to avoid overlapping
-            mask_array = mask_array[(last_L2_position+1):]
-            ndvi_smoothed = ndvi_smoothed[(last_L2_position+1):]
-            mask_array_not_analyzed = mask_array_not_analyzed[:(historic_last_L2_position+1)]
-            ndvi_not_analyzed = ndvi_not_analyzed[:(historic_last_L2_position+1)]
 
             mask_array_final =  np.concatenate([mask_array_not_analyzed, mask_array])
             final_ndvi_value =  np.concatenate([ndvi_not_analyzed, ndvi_smoothed])
+
+            print(len(mask_array_final) == len(mask_array_original))
+            print(len(final_ndvi_value) == len(ndvi_arr_original))
 
             return final_ndvi_value, mask_array_final
         
