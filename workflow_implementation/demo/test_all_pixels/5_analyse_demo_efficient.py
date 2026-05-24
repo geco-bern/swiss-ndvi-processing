@@ -45,7 +45,7 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###      . ..  ..  .  .                               len() = 800   (obs_L2) Indices of observation dates
         ###                   .                               len() = 1     (obs_L2[-1]) Index last L2 obs available
         ###            .                                      len() = 1     (crop_start) Index (-4)
-        ###      2222222                                      len() = 2977  (ndvi_not_analyzed, mask_array_not_analyzed)
+        ###      222222                                       len() = 2977  (ndvi_not_analyzed, mask_array_not_analyzed)
         ###            ..................................     len() = 34    (dates_arr)
         ###            01234567dddddddddddddddddddddddddd     len() = 34    (days_diff)
         ###                   01234567...................     len() = 27    (days_diff_interp = ...)
@@ -54,7 +54,8 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###            TTffTffTffffTfTfffTfTffTffTffTfTff     len() = 34    (obs_mask) Invalid gets dropped because outside 0 and 1.
         ###            xx  x  x    o x   x x  xI o  x x       len() = 13    ()
         ###            xx  x  x    o x   x x  x  o  x x       len() = 12    (ndvi_valid, median_valid, days_diff_1, original_idx)
-        
+        ###                   0    o 7   x x  x  o  x x       len() = 9     days_diff_interp_1
+        ###                   0      7   x x  x     x         len() = 6     days_diff_interp_2
         ###             x  x  x    o x   x x  x  o  x         len() = 10    (outlier_mask....  and delta_delta_left, ...)
         ###
         ### NOTE: apply 7-observation window:
@@ -63,6 +64,7 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###                              x x  x     x         len() = 4     (delta_ndvi_2[-4:])
         ###                                x  x     x         len() = 3     (delta_ndvi_2[-3:], # L1 outlier-filtered
         ###                   x̂                               len() = 1     (delta_ndvi_2[-5]), # last L2 obs available
+        ###                   x̂                               len() = 1     (delta_ndvi_2[-5:-4]), # last L2 obs available     # making sure these do not change value if overwritten
         ###                                           x       len() = 1     (delta_ndvi[-1])    # last observation (not outlier-filtered because there are no 2 neighbour)
         ###                          x̂   x̂                    len() = 5     (delta_ndvi_to_interpolate_inner)
         ###                   x̂      x̂   x̂ x  x     x x 0     len() = 8     (delta_ndvi_to_interpolate) 0 is only appended if today there is no observation
@@ -87,6 +89,7 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###                       o                           len() = 1     (outlier_idx encoding the original_idx)
         mask_array_original = mask_array
         ndvi_arr_original = ndvi_array  
+        dates = dates_array
     
         medians = median_array
         obs_L2 =  np.nonzero(mask_array_original == 3)
@@ -94,15 +97,14 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         # Ensure mask_array is writable
         mask_array_original = np.array(mask_array_original, copy=True)
 
-        if len(obs_L2) < 3:
+        if len(obs_L2[0]) < 3:
             return ndvi_arr_original, mask_array_original
 
-        crop_start = obs_L2[-4]  # Index (-4), so that even when 
+        crop_start = obs_L2[0][-5]  # Index (-4), so that even when 
                                  # dropping left-most and right-most, we end up 
                                  # with 3 L2 values (left half of 7 obs window) to smooth
         ndvi_arr = ndvi_arr_original[crop_start:]
         medians = medians[crop_start:]
-        is_observation_date = is_observation_date[crop_start:]
         dates_arr = dates[crop_start:]
         mask_array = mask_array_original[crop_start:] 
 
@@ -147,9 +149,9 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
             # or the original values too close to the boundaries condition (0.9 and 0.1) we do linear fit
 
             delta_ndvi_to_interpolate_inner = np.full(len(delta_ndvi_2)-6, np.nan) # if run daily, this is only 1 value, if run less frequently it can be longer
-            idx = np.arange(len(delta_ndvi_2))
+            idx = len(delta_ndvi_2)-6
 
-            for i in np.arange(len(delta_ndvi_2)-6):
+            for i in np.arange(idx):
                 # ndvi_valid_to_check: not needed for consistency with historical processing
                 delta_window_to_smooth = delta_ndvi_2[i:i+7] # window to smooth, the center value will be appended
                 ndvi_valid_to_check = ndvi_valid[i:i+7] # this will be used to check if the absolute value is close to the boundaries condition
