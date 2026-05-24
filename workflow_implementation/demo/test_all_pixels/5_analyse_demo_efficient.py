@@ -110,11 +110,11 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         mask_array_not_analyzed = mask_array_original[:crop_start] 
 
         days_diff = (dates_arr- dates_arr[0])  / np.timedelta64(1, 'D')
-        last_L2_position = (dates[obs_L2[-1]] - dates_arr[0]) / np.timedelta64(1, 'D')
-        historic_last_L2_position = (dates[obs_L2[-1]] - dates[0]) / np.timedelta64(1, 'D') # !!! notice that we use date and dates_arr
+        last_L2_position = (dates[obs_L2[0][-1]] - dates_arr[0]) / np.timedelta64(1, 'D')
+        historic_last_L2_position = (dates[obs_L2[0][-1]] - dates[0]) / np.timedelta64(1, 'D') # !!! notice that we use date and dates_arr
         ndvi_arr = ndvi_arr / 10000
         median_arr  = medians  / 10000
-        obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
+        obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & ((mask_array == 2) | (mask_array == 3))
 
         ndvi_valid = ndvi_arr[obs_mask]
         median_valid = median_arr[obs_mask]
