@@ -173,16 +173,14 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
             # combine smoothed value with values yet to smooth, after that linearly interpolate everything
 
             delta_ndvi_to_interpolate = np.concatenate([
-                delta_ndvi_2[-5:-4], # last L2 available     # making shure these are overwritten with the same
+                delta_ndvi_2[:-4], # last L2 available     # making sure this does not change value if overwritten
                 delta_ndvi_to_interpolate_inner, # new L2 smoothed
                 delta_ndvi_2[-3:], # L1 filtered 
-                delta_ndvi[-1] # last observation (not filtered because there are no 2 neighbour)
+                delta_ndvi[-1:] # last observation (not filtered because there are no 2 neighbour)
             ]) 
             dates_to_interpolate = np.concatenate([
-                days_diff_2[-(len(delta_ndvi_to_interpolate) +3 +3):],  # dates of L2 and L1 
-                                                                        # NOTE (+3 because of delta_ndvi_2[-3:]      # L1 filtered (must be 3)
-                                                                        #       and +3 because of delta_ndvi_2[-5:-4])  # last L2 avail
-                np.array(days_diff_1[-1]), # date of the last observation without 2 neighbour
+                days_diff_2,  # NOTE: By including ALL delta_ndvi_2 exept the new soomothed value, len delta_ndvi_2 == len(days_diff_2)
+                days_diff_1[-1:] # date of the last observation without 2 neighbour
             ])
 
             # If the current day is an observation above is sufficient.
