@@ -93,7 +93,45 @@ dates_tiff_array = np.arange(
 
 
 # Load (processed) NDVI data set to output specific dates
+INPUT_BASE = "/mnt/data1/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr/"
 NDVI_processed = xr.open_zarr(INPUT_BASE)
+OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final/"
+
+
+
+def fire_tfff_creation():
+
+    dates_done = np.array(
+    [f"{s[:4]}-{s[4:6]}-{s[6:8]}" for s in os.listdir(OUTPUT_TIFF_BASE)],
+    dtype='datetime64[D]')
+    dates_array  = NDVI_processed["date"].values.astype("datetime64[D]")
+
+    n_pixels = NDVI_processed.dims["pixel"]
+    smoothed_covered = True
+    i = 0
+    while smoothed_covered:
+
+        last_date = dates_done[-1]
+        dates_to_check = dates_array[dates_array > last_date]
+
+        date_to_check = dates_to_check[i]
+        date_idx = ((date_to_check- dates_array[0])  / np.timedelta64(1, 'D')).astype(int)
+        mask_array   = NDVI_processed["mask_array"].isel(date = date_idx).values
+        covered_value = np.sum((mask_array == 3) | (mask_array == 1))
+        if covered_value / n_pixels > 0.95:
+
+            print(f"fire tiff for pos",date_idx)
+            i = i +1
+
+        else:
+            print("stop")
+            smoothed_covered = False
+
+
+
+
+
+    pass
 
 # Define grid underlying PixelID and needed transformations
 # TODO: actually append this similarly to x and y as (x_idx, and y_idx) to historic data set already.
