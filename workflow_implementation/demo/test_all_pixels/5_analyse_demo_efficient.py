@@ -85,7 +85,11 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###                          x                        len() = 1     (original_idx_2[-4])
         ###      TTTTTTTTTTTTTTTTTTTTffffffffffffffffffff     len() = 40    ('before' defined as '< original_idx_2[-4]' )
         ###                       o                           len() = 1     (outlier_idx encoding the original_idx)
-        obs_L2 = np.nonzero(is_observation_date) & (mask_array_original == 3)
+        mask_array_original = mask_array
+        ndvi_arr_original = ndvi_array  
+    
+        medians = median_array
+        obs_L2 =  np.nonzero(mask_array_original == 3)
 
         # Ensure mask_array is writable
         mask_array_original = np.array(mask_array_original, copy=True)
