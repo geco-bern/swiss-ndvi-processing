@@ -416,11 +416,11 @@ if __name__ == "__main__":
     # --- apply gapfilling and outlier detection function: continuous_ndvi() ----------------------------------
 
     # prepare arguments spanning historic and new data: all lazy
-    ndvi_array   = merged_ds["ndvi_processed"].persist()
-    median_array = merged_ds["median_ndvi"].persist()
-    dates_array  = merged_ds["date"].persist()
-    mask_array   = merged_ds["mask_array"].persist()
-    obs_dates    = merged_ds["obs_date"].persist()
+    ndvi_array   = merged_ds["ndvi_processed"].isel(pixel=0).values # .persist()
+    median_array = merged_ds["median_ndvi"].isel(pixel=0).values  # .persist()
+    dates_array  = merged_ds["date"].values  # .persist()
+    mask_array   = merged_ds["mask_array"].isel(pixel=0).values  # .persist()
+    obs_dates    = merged_ds["obs_date"].values  # .persist()
     # using persist() reduces graph size
 
     # specifying where new data starts
