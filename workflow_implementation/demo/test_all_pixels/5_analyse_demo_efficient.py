@@ -34,25 +34,25 @@ INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
 # HISTO_OUTPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km_extended2.zarr"
 # python -u $SCRIPT_FILE $NEW_NDVI $HISTO_INPUT --histo-output=$HISTO_OUTPUT > $LOG_FILE  2>&1 &
 
-def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observation_date, dates):
+def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original, is_observation_date, dates_arr_original):
         ### Illustration of indexing:  - (day without observation), x (observation), o (outlier observation), I (invalid observation, e.g. -0.7)
         ###                            x̂ (smoothed observation), . unspecified (used for different things)
         ###                            0: L0 value (obs. or gapfilled) from historical processing (or last CI processing)
         ###                            1: L1 value (obs. or gapfilled) from historical processing (or last CI processing)
         ###                            2: L2 value (obs. or gapfilled) from historical processing (or last CI processing)
         ###
-        ### [...]2222222222222222111111110-x--xI-o--x-x--     len() = 3000  (ndvi_arr_original, mask_array_original, is_observation_date, dates)
+        ### [...]2222222222222222111111110-x--xI-o--x-x--     len() = 3000  (ndvi_arr_original, median_arr_original, mask_array_original, is_observation_date, dates_arr_original)
         ### [...]. ..  ..  .  .                               len() = 800   (obs_L2) Indices of observation dates
         ###                   .                               len() = 1     (obs_L2[-1]) Index last L2 obs available
         ###            .                                      len() = 1     (crop_start) Index (-4)
         ### [...]222222                                       len() = 2977  (ndvi_not_processed, mask_not_processed)
-        ###            ..................................     len() = 34    (dates_arr)
+        ###            ..................................     len() = 34    (dates_crop)
         ###            01234567dddddddddddddddddddddddddd     len() = 34    (days_diff)
-        ###            2222222222111111110-x--xI-o--x-x--     len() = 34    (ndvi_arr, medians, median_arr, mask_arr)
-        ###            x̂x̂--x̂--x̂----o-x---x-x--x--o--x-x--     len() = 34    (ndvi_arr)
+        ###            2222222222111111110-x--xI-o--x-x--     len() = 34    (ndvi_crop, median_crop, mask_crop)
+        ###            x̂x̂--x̂--x̂----o-x---x-x--x--o--x-x--     len() = 34    (ndvi_crop)
         ###            TTffTffTffffTfTfffTfTffTffTffTfTff     len() = 34    (valid_obs_mask) Invalid gets dropped because outside 0 and 1.
         ###            x̂x̂  x̂  x̂    o x   x x  xI o  x x       len() = 13    ()
-        ###            x̂x̂  x̂  x̂    o x   x x  x  o  x x       len() = 12    (ndvi_valid, median_valid, days_diff_1, obs_original_idx)
+        ###            x̂x̂  x̂  x̂    o x   x x  x  o  x x       len() = 12    (ndvi_1, median_1, days_diff_1, obs_original_idx)
         ###            01  4  7    d d   d d  d  d  d d       len() = 12    (days_diff_1)
         ###             x̂  x̂  x̂    o x   x x  x  o  x         len() = 10    (outlier_mask....  and delta_delta_left, ...)
         ###
@@ -65,8 +65,8 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ### Define newly smoothed L2 values:
         ###                          x̂   x̂                    len() = 5     (delta_ndvi_to_interpolate_inner)
         ### concatenate these components:
-        ###             x̂  x̂  x̂      x   x x  x     x         len() = 8     (delta_ndvi_2, days_diff_2, ndvi_valid_2, obs_original_idx_2, idx, loess) 
-        ###                                           x       len() = 1     (days_diff_1[-1:], delta_ndvi[-1:])
+        ###             x̂  x̂  x̂      x   x x  x     x         len() = 8     (delta_ndvi_2, days_diff_2, ndvi_valid_2, nonOutlier_idx_2, idx, loess) 
+        ###                                           x       len() = 1     (days_diff_1[-1:], delta_ndvi_1[-1:])
         ###
         ###             x̂  x̂  x̂                               len() = 3     delta_ndvi_2[:3] # 3x latest, previous L2 values
         ###                          x̂   x̂                    len() = 5     (delta_ndvi_to_interpolate_inner)
@@ -75,31 +75,31 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###             x̂  x̂  x̂      x̂   x̂ x  x     x x       len() = 9     (dates_to_interpolate) = (days_diff_2+days_diff_1[-1:]) # last is only appended if today there is no observation
         ###             1  4  7      d   d d  d     d d d     len() = 9     (dates_to_interpolate)
         ###                                                                 last value (=zero-NDVI-delta) is only appended if today there is no observation
-        ###             x̂  x̂  x̂      x̂   x̂ x  x     x x       len() = 9     (delta_ndvi_to_interpolate) = delta_ndvi_2[:3]+delta_ndvi_to_interpolate_inner+delta_ndvi_2[-3:],delta_ndvi[-1:]
+        ###             x̂  x̂  x̂      x̂   x̂ x  x     x x       len() = 9     (delta_ndvi_to_interpolate) = delta_ndvi_2[:3]+delta_ndvi_to_interpolate_inner+delta_ndvi_2[-3:],delta_ndvi_1[-1:]
         ###             x̂  x̂  x̂      x̂   x̂ x  x     x x 0     len() = 10    (delta_ndvi_to_interpolate) 0 is only appended if today there is no observation
         ###                                                                 last value (=zero-NDVI-delta) is only appended if today there is no observation
         ### and use them to do linear interpolation, to these targets:
         ###            01234567dddddddddddddddddddddddddd     len() = 34    (days_diff)
-        ###            ?x̂..x̂..x̂..........................     len() = 34    (interpolated_values, ndvi_processed, mask_arr) # TODO: what about the 0-position? TODO: this is a BUG, since if we use numpy.interp() to predict the 0-position it will be overwritten with the 1-position
+        ###            ?x̂..x̂..x̂..........................     len() = 34    (interpolated_values, ndvi_processed, mask_crop) # TODO: what about the 0-position? TODO: this is a BUG, since if we use numpy.interp() to predict the 0-position it will be overwritten with the 1-position
         ### Then do final concatenation for update:
         ### [...]......                                       len() = 2977  (ndvi_not_processed,mask_not_processed)(historical cropping of L2 not changed anymore)
         ### [...]......?x̂..x̂..x̂..........................     len() = 3000  (final_ndvi_value, mask_array_final)(final merging and returning the timeseries) TODO: ?-position is updated wrongly. this is a BUG
         ###
         ### For the masking we use following helper variables:
-        ###                          x                        len() = 1     (obs_original_idx_2[-4])
-        ###      TTTTTTTTTTTTTTTTTTTTffffffffffffffffffff     len() = 40    ('before' defined as '< obs_original_idx_2[-4]' )
-        ###                       o              o            len() = 2     (outlier_idx encoding the obs_original_idx)
+        ###                          x                        len() = 1     (nonOutlier_idx_2[-4])
+        ###      TTTTTTTTTTTTTTTTTTTTffffffffffffffffffff     len() = 40    ('before' defined as '< nonOutlier_idx_2[-4]' )
+        ###                       o              o            len() = 2     (outlier_idx_2 encoding the obs_original_idx)
         ###
         ### NOTE: what about these two?:               --     # REPLY: they are linearly interpolated towards 0. Giving us L0 estimation.
         ### NOTE: what about?: ......x                        # REPLY: this is just linear interpolation between already smoothed and not yet smoothed values. 
         ###                                                            These are now called L2, since they will not change anymore.
-        ### NOTE: what about?:       x̂   x̂ x  x     x         # REPLY: these are indeed non-smoothed values used for linear interpolation.
+        ### NOTE: what about?:       x̂   x̂ x  x     x         # REPLY: these are 2 smoothed and 3 non-smoothed values used for linear interpolation.
         ### NOTE: There is no backpropagation of outliers. 
         ###       E.g. even when we have a new observation:
         ###                                         x-x--x:   let's call these [t-1], [t0], and [t+1]
         ###       Prior to having [t+1]-observation: [t0] could not be determined outlier.
         ###       With this new   [t+1]-observation: [t0] might now be determined outlier, if all three conditions (left, right, median) are met simultaneously.
-        ###       Even in that case:                 [t-1] will not become an outlier.  TODO... with this new [t+1]-observation: [t-1] will not become an outlier because it does not depend on [t+1].
+        ###       Even in that case:                 [t-1]'s outlier status will not change. Since it only depends on [t-2,t0,median-1]. Thus t-1 is fixed and there is no backpropagation.
 
         obs_L2 =  np.nonzero(mask_array_original == 3)
 
@@ -109,45 +109,50 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         if len(obs_L2[0]) < 3:
             return ndvi_arr_original, mask_array_original
 
+        # Crop (subset) whole time series to last part to be processed,
+        # defined so that it contains enough L2 to do the smoothing => variable suffix '_crop':
         crop_start = obs_L2[0][-5]  # Index (-4), so that even when 
                                  # dropping left-most and right-most, we end up 
                                  # with 3 L2 values (left half of 7 obs window) to smooth
-        ndvi_arr = ndvi_arr_original[crop_start:]
-        medians = medians[crop_start:]
-        dates_arr = dates[crop_start:]
-        mask_arr = mask_array_original[crop_start:] 
+        ndvi_crop = ndvi_arr_original[crop_start:]
+        median_crop = median_arr_original[crop_start:]
+        dates_crop = dates_arr_original[crop_start:]
+        mask_crop = mask_array_original[crop_start:] 
 
         ndvi_not_processed = ndvi_arr_original[:crop_start] 
         mask_not_processed = mask_array_original[:crop_start] 
 
-        days_diff = (dates_arr- dates_arr[0])  / np.timedelta64(1, 'D')
-        ndvi_arr = ndvi_arr / 10000
-        median_arr  = medians  / 10000
+        days_diff = (dates_crop- dates_crop[0])  / np.timedelta64(1, 'D')
+        ndvi_crop = ndvi_crop / 10000
+        median_crop = median_crop  / 10000
         
-        # filter for validity and if it is an observation:
-        valid_obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & ((mask_arr == 2) | (mask_arr == 3))
+        # filter for validity and if it is an observation => variable suffix '_1':
+        valid_obs_mask = (ndvi_crop > 0) & (ndvi_crop < 1) & ((mask_crop == 2) | (mask_crop == 3))
 
-        ndvi_valid = ndvi_arr[valid_obs_mask]
-        median_valid = median_arr[valid_obs_mask]
+        ndvi_1      = ndvi_crop[valid_obs_mask]
+        median_1    = median_crop[valid_obs_mask]
         days_diff_1 = days_diff[valid_obs_mask]
-        obs_original_idx = np.arange(len(ndvi_arr))[valid_obs_mask] # used to keep track of delta ndvi position and the outlier position
+        obs_original_idx = np.arange(len(ndvi_crop))[valid_obs_mask] # used to keep track of delta ndvi position and the outlier position
         
         
         # outlier detection
         delta_threshold = 0.05
         delta_delta_threshold = 0.1
 
-        delta_ndvi = ndvi_valid - median_valid
-        delta_delta_left = delta_ndvi[:-2] - delta_ndvi[1:-1]
-        delta_delta_right = delta_ndvi[2:] - delta_ndvi[1:-1]
-        outlier_mask = ((abs(delta_ndvi[1:-1])  > delta_threshold) & 
+        delta_ndvi_1 = ndvi_1 - median_1
+        delta_delta_left = delta_ndvi_1[:-2] - delta_ndvi_1[1:-1]
+        delta_delta_right = delta_ndvi_1[2:] - delta_ndvi_1[1:-1]
+        outlier_mask = ((abs(delta_ndvi_1[1:-1])  > delta_threshold) & 
                         (abs(delta_delta_left)  > delta_delta_threshold) & 
                         (abs(delta_delta_right) > delta_delta_threshold))
-        ndvi_valid_2 = ndvi_valid[1:-1][~outlier_mask]
-        delta_ndvi_2 = delta_ndvi[1:-1][~outlier_mask]
+        
+        # outlier removal (and left-, right-most obs removal) => variable suffix '_2'
+        ndvi_valid_2 = ndvi_1[1:-1][~outlier_mask]
+        delta_ndvi_2 = delta_ndvi_1[1:-1][~outlier_mask]
         days_diff_2  = days_diff_1[1:-1][~outlier_mask]
-
-        obs_original_idx_2 = obs_original_idx[1:-1][~outlier_mask]
+        
+        outlier_idx_2 = obs_original_idx[1:-1][outlier_mask]
+        nonOutlier_idx_2 = obs_original_idx[1:-1][~outlier_mask]
         
 
         # some sites do not have any observation or very few
@@ -185,7 +190,7 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
                 delta_ndvi_2[:3],               # last L2 available     # making sure these do not change values
                 delta_ndvi_to_interpolate_inner, # new L2, newly smoothed
                 delta_ndvi_2[-3:],               # L1 outlier-filtered
-                delta_ndvi[-1:]                  # last observation (not outlier-filtered because there is no right-hand neighbor (yet))
+                delta_ndvi_1[-1:]                  # last observation (not outlier-filtered because there is no right-hand neighbor (yet))
             ]) 
             dates_to_interpolate = np.concatenate([
                 days_diff_2,  # NOTE: By including ALL delta_ndvi_2 except the new smoothed value, len delta_ndvi_2 == len(days_diff_2)
@@ -211,34 +216,35 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
                 delta_ndvi_to_interpolate     # observed f(x)
             )
 
-            ndvi_processed = 10000 * (interpolated_values + median_arr)
+            ndvi_processed = 10000 * (interpolated_values + median_crop)
 
+
+            # Store processing status (L0, L1, L2) encoded as following 5 values:
             # indexing of array mask
-                # mask_arr == 0: the date is not an observation and is yet to be smoothed
-                # mask_arr == 1: the date is not an observation and is smoothed
-                # mask_arr == 2: the date is     an observation and is yet to be smoothed
-                # mask_arr == 3: the date is     an observation and is smoothed
-                # mask_arr == 4: the date is     an observation and is an outlier
+                # mask_array == 0: the date is not an observation and is yet to be smoothed
+                # mask_array == 1: the date is not an observation and is smoothed
+                # mask_array == 2: the date is     an observation and is yet to be smoothed
+                # mask_array == 3: the date is     an observation and is smoothed
+                # mask_array == 4: the date is     an observation and is an outlier
 
             # Start out with 0:
 
             # Define all observation dates (unprocessed):
-            mask_arr[valid_obs_mask] = 2
+            mask_crop[valid_obs_mask] = 2
             # unless further below specified as smoothed, the continuous implementation should overwrite 0 and 2's without hesitation.
 
             # Mark the finalized dates (smoothed)
-            before = np.arange(len(mask_arr)) < obs_original_idx_2[-4]
+            before = np.arange(len(mask_crop)) < nonOutlier_idx_2[-4]
 
-            mask_arr[ before & valid_obs_mask ] = 3
-            mask_arr[ before & (~valid_obs_mask) ] = 1
+            mask_crop[ before & valid_obs_mask ] = 3
+            mask_crop[ before & (~valid_obs_mask) ] = 1
 
             # Mark the outlier dates (4): 
-            outlier_idx = obs_original_idx[1:-1][outlier_mask]
-            mask_arr[outlier_idx] = 4
+            mask_crop[outlier_idx_2] = 4
 
 
             # Concatenate return values:
-            mask_array_final =  np.concatenate([mask_not_processed, mask_arr])
+            mask_array_final =  np.concatenate([mask_not_processed, mask_crop])
             final_ndvi_value =  np.concatenate([ndvi_not_processed, ndvi_processed])
 
             return final_ndvi_value, mask_array_final
@@ -459,7 +465,7 @@ if __name__ == "__main__":
         output_core_dims=[["date"],["date"]],
         vectorize=True, 
         dask="parallelized",
-        kwargs={"dates": dates_array},           # this contains all daily dates
+        kwargs={"dates_arr_original": dates_array},           # this contains all daily dates
         output_dtypes=output_dtypes, 
         dask_gufunc_kwargs={"allow_rechunk": True},
     )
