@@ -34,8 +34,8 @@ INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
 # HISTO_OUTPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km_extended2.zarr"
 # python -u $SCRIPT_FILE $NEW_NDVI $HISTO_INPUT --histo-output=$HISTO_OUTPUT > $LOG_FILE  2>&1 &
 
-# NOTE: for development: ndvi_arr_original, median_arr_original, mask_array_original, is_observation_date, dates_arr_original = ndvi_array, median_array, mask_array, obs_dates, dates_array
-def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original, is_observation_date, dates_arr_original):
+# NOTE: for development: ndvi_arr_original, median_arr_original, mask_array_original, dates_arr_original = ndvi_array, median_array, mask_array, dates_array
+def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original, dates_arr_original):
         ### Illustration of indexing:  - (day without observation), x (observation), o (outlier observation), I (invalid observation, e.g. -0.7)
         ###                            x̂ (smoothed observation), . unspecified (used for different things)
         ###                            0: L0 value (obs. or gapfilled) from historical processing (or last CI processing)
@@ -477,8 +477,7 @@ if __name__ == "__main__":
         ndvi_array,        # this is the observed/gapfilled/processed NDVI value
         median_array,      # this is the modelled median NDVI for the corresponding DOY
         mask_array,        # this is the integer processing status
-        obs_dates,         # this is the True-False boolean if a date contains satellite images (is_observation_date?)
-        input_core_dims=[["date"], ["date"],["date"], ["date"]],    # each call gets 1D time arrays
+        input_core_dims=[["date"], ["date"], ["date"]],    # each call gets 1D time arrays
         output_core_dims=[["date"],["date"]],
         vectorize=True, 
         dask="parallelized",
