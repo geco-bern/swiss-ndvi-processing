@@ -1,5 +1,7 @@
 import datetime as dt
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 import statsmodels.api as sm
 from dask.distributed import Client
 from dask import visualize
@@ -697,6 +699,37 @@ if __name__ == "__main__":
                    f"{HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}.")
             raise ValueError(msg)    
 
+
+    
+    # output a visual overview of the update:
+    updated_df_mfrac, updated_df_Lfrac, dates_L2_now_finalized = get_L2_coverage_for_each_date(
+        # xr.Dataset({"mask_array": mask_processed}).sel(date = dates_array.values[-MAX_DAYS_L1_OVERWRITE:])
+        updated_historic_ds.sel(date = dates_array.values[-MAX_DAYS_L1_OVERWRITE:]),
+        target_fraction_L2 = TARGET_PERCENTAGE_L2/100
+    )
+    
+    # plot the pixel fractions of each level: (before and after update)
+    fig, axes = plt.subplots(2,2, figsize=(14, 5), sharex=True, sharey=True)
+    axes[0,0].stackplot( df_mfrac.index, df_mfrac.T.values, labels=df_mfrac.columns, step='post' )
+    axes[0,1].stackplot( df_Lfrac.index, df_Lfrac.T.values, labels=df_Lfrac.columns, step='post' )
+    axes[0,0].set_title("Data storage before processing")
+    axes[0,1].set_title("Data storage before processing")
+
+    axes[1,0].stackplot( updated_df_mfrac.index, updated_df_mfrac.T.values, labels=updated_df_mfrac.columns, step='post' )
+    axes[1,1].stackplot( updated_df_Lfrac.index, updated_df_Lfrac.T.values, labels=updated_df_Lfrac.columns, step='post' )
+    axes[1,0].set_title("Updated data storage after processing")
+    axes[1,1].set_title("Updated data storage after processing")
+
+    # format plot
+    [ax.set_ylim(0, 1)                      for ax in axes.flatten()]
+    [ax.set_ylabel("Forest pixel fraction") for ax in axes[:,0].flatten()]
+    [ax.set_xlabel("Date")                  for ax in axes[1,:].flatten()]
+    axes[0,0].legend(title="mask_array_code", loc="upper left")
+    axes[0,1].legend(title="Processing status", loc="upper left")
+    plt.tight_layout()
+    # curr_datetime=dt.datetime.today().strftime('%Y-%m-%d_%Hh%M')
+    plt.savefig(HISTO_ZARR_OUTPUT.replace(".zarr", ".zarr_update.png"))
+    
     client.close()
 
     t1 = time.perf_counter()
