@@ -46,6 +46,7 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         ### [...]. ..  ..  .  .                               len() = 800   (obs_L2) Indices of observation dates
         ###                   .                               len() = 1     (obs_L2[-1]) Index last L2 obs available
         ###            .                                      len() = 1     (crop_start) Index (-4)
+        ###                        . .                        len() = 2     (obs_L1) Indices of observation dates
         ### [...]222222                                       len() = 2977  (ndvi_not_processed, mask_not_processed)
         ###            ..................................     len() = 34    (dates_crop)
         ###            01234567dddddddddddddddddddddddddd     len() = 34    (days_diff)
@@ -107,17 +108,18 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         ###       With this new   [t+1]-observation: [t0] might now be determined outlier, if all three conditions (left, right, median) are met simultaneously.
         ###       Even in that case:                 [t-1]'s outlier status will not change. Since it only depends on [t-2,t0,median-1]. Thus t-1 is fixed and there is no backpropagation.
 
-        obs_L2 =  np.nonzero(mask_array_original == 3) # NOTE: this also drops outliers (mask_array==4).
+        obs_L2 =  np.nonzero(mask_array_original == 3)[0] # NOTE: this also drops outliers (mask_array==4).
+        # obs_L1 =  np.nonzero(mask_array_original == 2)[0] # (unused)
 
         # Ensure mask_array is writable
         mask_array_original = np.array(mask_array_original, copy=True)
 
-        if len(obs_L2[0]) < 3:
+        if len(obs_L2) < 3:
             return ndvi_arr_original, mask_array_original
 
         # A) Crop (subset) whole time series to last part to be processed,
         # defined so that it contains enough L2 to do the smoothing => variable suffix '_crop':
-        crop_start = obs_L2[0][-4]  # Index (-4), so that even when 
+        crop_start = obs_L2[-4]  # Index (-4), so that even when 
                                  # dropping left-most (and right-most), we end up 
                                  # with 3 L2 values (i.e. the left half of 7 obs window) to smooth
         ndvi_crop = ndvi_arr_original[crop_start:]
@@ -133,8 +135,8 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         median_crop = median_crop  / 10000
         
 
-        # B) Filter for validity and if it is an observation (as opposed to an interpolated value) => variable suffix '_1':
-        valid_obs_mask = (ndvi_crop > 0) & (ndvi_crop < 1) & ((mask_crop == 2) | (mask_crop == 3))
+        # B) Filter for validity and if it is an observation (as opposed to an interpolated value) and ensure it was not identified as outlier previously => variable suffix '_1':
+        valid_obs_mask = (ndvi_crop > 0) & (ndvi_crop < 1) & ((mask_crop == 2) | (mask_crop == 3)) # Note that this keeps L1 and L2 observations, and drops L2 outliers (mask_crop == 4)
 
         ndvi_1      = ndvi_crop[valid_obs_mask]
         median_1    = median_crop[valid_obs_mask]
@@ -243,7 +245,7 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
             # Code starts out with default values of 0 or 2 (defined when new_ds['mask_array'] was appended)
 
             # Define all observation dates:
-            mask_crop[valid_obs_mask] = 2 # Note that this overwrites the mask value of already processed obs (3,4). TODO: this is a BUG as this is re-applied to smoothed values, probably marking them as non-outlier
+            mask_crop[valid_obs_mask] = 2 # NOTE: this overwrites the mask value of already processed L2 obs (mask_array == 3). (But not of L2-outliers (mask_array == 4), since they were correctly not considered for valid_obs_mask).
             # TODO: BUG all of this processing status should not overwrite previously processed L2 values. Therefore start at earliest at 
 
             # Mark the L2-finalized values (smoothed), i.e. all those to the left of the last center point
