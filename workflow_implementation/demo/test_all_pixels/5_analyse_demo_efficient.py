@@ -448,15 +448,11 @@ if __name__ == "__main__":
     # --- apply gapfilling and outlier detection function: continuous_ndvi() ----------------------------------
 
     # prepare arguments spanning historic and new data: all lazy
-    ndvi_array   = merged_ds["ndvi_processed"].values # .persist()
-    median_array = merged_ds["median_ndvi"].values  # .persist()
-    dates_array  = merged_ds["date"].values  # .persist()
-    mask_array   = merged_ds["mask_array"].values  # .persist()
-    obs_dates    = merged_ds["obs_date"].values  # .persist()
+    ndvi_array   = merged_ds["ndvi_processed"].persist()
+    median_array = merged_ds["median_ndvi"].persist()
+    dates_array  = merged_ds["date"].persist()
+    mask_array   = merged_ds["mask_array"].persist()
     # using persist() reduces graph size
-
-    # specifying where new data starts
-    start_date = historic_ds['date'].max().values
 
     # reduce graph size by using futures
     # dates_future  = client.scatter(dates_array)
@@ -499,6 +495,9 @@ if __name__ == "__main__":
     # visualize(ndvi_processed)
 
     # --- append the new processed data to the historic_ds ----------------------------------
+
+    # specifying where new data starts ()
+    start_date = historic_ds['date'].max().values # TODO: actually this should start earlier to be able to overwrite L1 values to L2 status.
 
     historic_ds_to_extend = (
         historic_ds
