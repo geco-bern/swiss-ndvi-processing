@@ -66,7 +66,7 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         ###                          x̂   x̂                    len() = 5     (delta_ndvi_to_interpolate_inner)
         ### With these 7-obs windows (looping one after the other):
         ###            [x̂  x̂  x̂      x   x x  x]              len() = 7     (for i = 0: delta_ndvi_2[i:i+7])
-        ###               [x̂  x̂      x   x x  x     x]        len() = 7     (for i = 1: delta_ndvi_2[i:i+7]) # TODO: small BUG: this should use the smoothed value from the run from i=0
+        ###               [x̂  x̂      x̂   x x  x     x]        len() = 7     (for i = 1: delta_ndvi_2[i:i+7]) # NOTE that this uses the smoothed value from the run from i=0 (different from the historic application)
         ### concatenate these components:
         ###             x̂  x̂  x̂      x   x x  x     x         len() = 8     (delta_ndvi_2, days_diff_2, ndvi_valid_2, nonOutlier_idx_2, idx, loess) 
         ###                                           x       len() = 1     (days_diff_1[-1:], delta_ndvi_1[-1:])
@@ -186,8 +186,9 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
                 else:
                     # normal case:
                     # smooth the 7 rolling window
-                    loess =  sm.nonparametric.lowess(delta_window_to_smooth, np.arange(0,7), frac= 1, it=3, return_sorted=False) # TODO: this should use updated x̂ from the first loop (instead of x)
-                    delta_ndvi_to_interpolate_inner[i] = loess[3]
+                    loess = sm.nonparametric.lowess(delta_window_to_smooth, np.arange(0,7), frac= 1, it=3, return_sorted=False)
+                    delta_ndvi_to_interpolate_inner[i] = loess[3] # store x̂ in `delta_ndvi_to_interpolate_inner` for linear interpolation below
+                    delta_ndvi_2[i+3] = loess[3]                  # also use loess-smoothed value x̂ for next iteration
 
 
             # E) Linear interpolation of L2, L1 and L0 values:
