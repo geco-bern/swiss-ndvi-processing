@@ -71,8 +71,8 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         ###               [x̂  x̂      x̂   x x  x     x]        len() = 7     (for i = 1: delta_ndvi_2[i:i+7]) # NOTE that this uses the smoothed value from the run from i=0 (different from the historic application)
         ### concatenate these components:
         ###             x̂  x̂  x̂      x   x x  x     x         len() = 8     (delta_ndvi_2, days_diff_2, ndvi_valid_2, nonOutlier_idx_2) 
-        ###                                           x       len() = 1     (days_diff_1[-1:], delta_ndvi_1[-1:])
-        ###            x̂                                      len() = 1     (days_diff_1[0:1], delta_ndvi_1[0:1])
+        ###            x̂                                      len() = 1     left-most obs (days_diff_1[0:1], delta_ndvi_1[0:1])
+        ###                                           x       len() = 1     right-most obs (days_diff_1[-1:], delta_ndvi_1[-1:])
         ###
         ###             x̂  x̂  x̂                               len() = 3     (delta_ndvi_2[:3]) # 3x latest, previous L2 values
         ###                          x̂   x̂                    len() = 5     (delta_ndvi_to_interpolate_inner)
@@ -97,7 +97,7 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         ###                       o              o            len() = 2     (outlier_idx_2 encoding the obs_original_idx)
         ###
         ### NOTE: what about these two?:               --     # REPLY: they are linearly interpolated towards 0. Giving us L0 estimation.
-        ### NOTE: what about?: ......x                        # REPLY: this is just linear interpolation between already smoothed and not yet smoothed values. 
+        ### NOTE: what about?: ......x                        # REPLY: these are just linearly interpolated between already smoothed and not yet smoothed values. 
         ###                                                            These are now called L2, since they will not change anymore.
         ### NOTE: what about?:       x̂   x̂ x  x     x         # REPLY: these are 2 smoothed and 3 non-smoothed values used for linear interpolation.
         ### NOTE: There is no backpropagation of outliers. 
@@ -118,8 +118,8 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         # A) Crop (subset) whole time series to last part to be processed,
         # defined so that it contains enough L2 to do the smoothing => variable suffix '_crop':
         crop_start = obs_L2[0][-4]  # Index (-4), so that even when 
-                                 # dropping left-most and right-most, we end up 
-                                 # with 3 L2 values (left half of 7 obs window) to smooth
+                                 # dropping left-most (and right-most), we end up 
+                                 # with 3 L2 values (i.e. the left half of 7 obs window) to smooth
         ndvi_crop = ndvi_arr_original[crop_start:]
         median_crop = median_arr_original[crop_start:]
         dates_crop = dates_arr_original[crop_start:]
@@ -242,12 +242,12 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
 
             # Code starts out with default values of 0 or 2 (defined when new_ds['mask_array'] was appended)
 
-            # Define all observation dates (unprocessed):
-            mask_crop[valid_obs_mask] = 2
-            # unless further below specified as smoothed, the continuous implementation should overwrite 0 and 2's without hesitation.
+            # Define all observation dates:
+            mask_crop[valid_obs_mask] = 2 # Note that this overwrites the mask value of already processed obs (3,4). TODO: this is a BUG as this is re-applied to smoothed values, probably marking them as non-outlier
+            # TODO: BUG all of this processing status should not overwrite previously processed L2 values. Therefore start at earliest at 
 
-            # Mark the finalized dates (smoothed)
-            before = np.arange(len(mask_crop)) < nonOutlier_idx_2[-4]
+            # Mark the L2-finalized values (smoothed), i.e. all those to the left of the last center point
+            before = np.arange(len(mask_crop)) < nonOutlier_idx_2[-4] # marks all L2-finalized
 
             mask_crop[ before & valid_obs_mask ] = 3
             mask_crop[ before & (~valid_obs_mask) ] = 1
