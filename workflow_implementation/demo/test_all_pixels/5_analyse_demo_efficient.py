@@ -352,7 +352,6 @@ if __name__ == "__main__":
     t0 = time.perf_counter()
 
     # Definition of output format of new
-    # TODO: when going circular this is probably not needed anymore.
     COMPRESSOR = zarr3.Blosc(cname="zstd", clevel=3, shuffle=2)
     
     # N_WORKERS = 10           # e) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 120s (incl Zarr); 586503 pixels => XXs; 16041205 pixels => XXs; 105715396 pixels => XXs
@@ -465,10 +464,13 @@ if __name__ == "__main__":
         {'ndvi_obs':'ndvi_processed',
             'ndsi_obs':'ndsi_processed'}
     ).drop_vars('ndsi_processed')
+    
     # Bind together with historic:
+    start_date_new = historic_ds.date.max() +  np.timedelta64(1,'D') # this ensures no overlap
     merged_ds = (
         xr.concat(
-            [historic_ds, new_ds], 
+            [historic_ds, 
+             new_ds.sel(date = slice(start_date_new, None))], 
             dim="date")
         .sortby("date")
         .chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
@@ -654,7 +656,6 @@ if __name__ == "__main__":
             # except Exception as e:
             HISTO_ZARR_OUTPUT = HISTO_ZARR_INPUT + ".updated_" + dt.datetime.now().strftime("%Y%m%d_%Hh%M")
             print(f"writing to new file\n  {HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
-            print(f"Appending failed: {e}. Writing whole file to {renamed_output}", flush=True)
             fallback_action_overwrite_zarr(HISTO_ZARR_OUTPUT)
             TODO_replace_original_HISTO_ZARR_INPUT = HISTO_ZARR_OUTPUT
 
