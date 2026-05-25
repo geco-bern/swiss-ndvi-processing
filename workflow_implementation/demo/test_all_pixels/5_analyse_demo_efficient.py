@@ -64,6 +64,9 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         ### NOTE: apply linear interpolation window (and within that a 7-observation window for smoothing):
         ### Define newly smoothed L2 values:
         ###                          x̂   x̂                    len() = 5     (delta_ndvi_to_interpolate_inner)
+        ### With these 7-obs windows (looping one after the other):
+        ###            [x̂  x̂  x̂      x   x x  x]              len() = 7     (for i = 0: delta_ndvi_2[i:i+7])
+        ###               [x̂  x̂      x   x x  x     x]        len() = 7     (for i = 1: delta_ndvi_2[i:i+7]) # TODO: small BUG: this should use the smoothed value from the run from i=0
         ### concatenate these components:
         ###             x̂  x̂  x̂      x   x x  x     x         len() = 8     (delta_ndvi_2, days_diff_2, ndvi_valid_2, nonOutlier_idx_2, idx, loess) 
         ###                                           x       len() = 1     (days_diff_1[-1:], delta_ndvi_1[-1:])
@@ -109,7 +112,7 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         if len(obs_L2[0]) < 3:
             return ndvi_arr_original, mask_array_original
 
-        # Crop (subset) whole time series to last part to be processed,
+        # A) Crop (subset) whole time series to last part to be processed,
         # defined so that it contains enough L2 to do the smoothing => variable suffix '_crop':
         crop_start = obs_L2[0][-5]  # Index (-4), so that even when 
                                  # dropping left-most and right-most, we end up 
@@ -126,7 +129,8 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         ndvi_crop = ndvi_crop / 10000
         median_crop = median_crop  / 10000
         
-        # filter for validity and if it is an observation => variable suffix '_1':
+
+        # B) Filter for validity and if it is an observation (as opposed to an interpolated value) => variable suffix '_1':
         valid_obs_mask = (ndvi_crop > 0) & (ndvi_crop < 1) & ((mask_crop == 2) | (mask_crop == 3))
 
         ndvi_1      = ndvi_crop[valid_obs_mask]
@@ -135,7 +139,7 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         obs_original_idx = np.arange(len(ndvi_crop))[valid_obs_mask] # used to keep track of delta ndvi position and the outlier position
         
         
-        # outlier detection
+        # C) Outlier detection
         delta_threshold = 0.05
         delta_delta_threshold = 0.1
 
@@ -158,18 +162,19 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         # some sites do not have any observation or very few
         if len(delta_ndvi_2) > 6:
         
-            # L2 smoothing
+            # D) LOESS smoothing of new L2 values: x => x̂
             # loop over the 7 rolling deltas. If the deltas are too negative for 5 or more observations (e.g. extreme events as fire) 
             # or if the original values too close to the boundaries (1.0 and 0.0) we keep the non-smoothed value to do the linear interpolation
             # otherwise we smooth the value (wit LOESS) to then do the linear interpolation
 
-            delta_ndvi_to_interpolate_inner = np.full(len(delta_ndvi_2)-6, np.nan) # if run daily, this is only 1 value, if run less frequently it can be longer
-            idx = len(delta_ndvi_2)-6
+            # D1: Fill up the inner part of the vector for linear interpolation (this can be only 1 observation or it can be multiple observations 
+            #     if the code is run less frequently)
+            delta_ndvi_to_interpolate_inner = np.full(len(delta_ndvi_2)-6, np.nan)
 
-            for i in np.arange(idx):
+            for i in np.arange(len(delta_ndvi_to_interpolate_inner)):
                 # ndvi_valid_to_check: not needed for consistency with historical processing
-                delta_window_to_smooth = delta_ndvi_2[i:i+7] # window to smooth, the center value will be appended
-                ndvi_valid_to_check = ndvi_valid_2[i:i+7] # this will be used to check if the absolute value is close to the boundaries condition
+                delta_window_to_smooth = delta_ndvi_2[i:i+7] # window to smooth, the center value will be smoothed
+                ndvi_valid_to_check    = ndvi_valid_2[i:i+7] # this will be used to check if the absolute value is close to the boundaries condition
 
                 if (np.any((ndvi_valid_to_check < 0.05) | (ndvi_valid_to_check > 0.95))or (np.sum(delta_window_to_smooth < -0.2) >= 5)): 
                     # exceptional case:
@@ -180,13 +185,15 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
                 else:
                     # normal case:
                     # smooth the 7 rolling window
-                    loess =  sm.nonparametric.lowess(delta_window_to_smooth, np.arange(0,7), frac= 1, it=3, return_sorted=False)
+                    loess =  sm.nonparametric.lowess(delta_window_to_smooth, np.arange(0,7), frac= 1, it=3, return_sorted=False) # TODO: this should use updated x̂ from the first loop (instead of x)
                     delta_ndvi_to_interpolate_inner[i] = loess[3]
 
 
-            # combine smoothed value with values yet to smooth, after that linearly interpolate everything
+            # E) Linear interpolation of L2, L1 and L0 values:
+            # Combine inner (new L2 values) with previous L2 values, and new L1 values for linear interpolation.
 
             delta_ndvi_to_interpolate = np.concatenate([
+                # TODO: here we are missing an NDVI value corresponding the the left-most value, that was removed in 
                 delta_ndvi_2[:3],               # last L2 available     # making sure these do not change values
                 delta_ndvi_to_interpolate_inner, # new L2, newly smoothed
                 delta_ndvi_2[-3:],               # L1 outlier-filtered
@@ -197,8 +204,9 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
                 days_diff_1[-1:] # date of the last observation without 2 right-hand neighbor
             ])
 
-            # if the current day is an observation above is sufficient.
-            # if the current day is not an observation, perform L0 linear decay:
+            # Special case for L0 extra- or interpolation:
+            #   if the current day is an observation above is sufficient.
+            #   if the current day is not an observation, perform L0 linear decay:
             if (days_diff_1[-1] != days_diff[-1]):
                 delta_ndvi_to_interpolate = np.concatenate([
                     delta_ndvi_to_interpolate,
@@ -216,18 +224,18 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
                 delta_ndvi_to_interpolate     # observed f(x)
             )
 
+            # prepare return value for NDVI:
             ndvi_processed = 10000 * (interpolated_values + median_crop)
-
 
             # Store processing status (L0, L1, L2) encoded as following 5 values:
             # indexing of array mask
-                # mask_array == 0: the date is not an observation and is yet to be smoothed
-                # mask_array == 1: the date is not an observation and is smoothed
-                # mask_array == 2: the date is     an observation and is yet to be smoothed
-                # mask_array == 3: the date is     an observation and is smoothed
+                # mask_array == 0: the date is not an observation and is yet to be smoothed (L1 or L0)
+                # mask_array == 1: the date is not an observation and is already smoothed (L2)
+                # mask_array == 2: the date is     an observation and is yet to be smoothed (L1)
+                # mask_array == 3: the date is     an observation and is already smoothed (L2)
                 # mask_array == 4: the date is     an observation and is an outlier
 
-            # Start out with 0:
+            # Code starts out with default values of 0 or 2 (defined when new_ds['mask_array'] was appended)
 
             # Define all observation dates (unprocessed):
             mask_crop[valid_obs_mask] = 2
