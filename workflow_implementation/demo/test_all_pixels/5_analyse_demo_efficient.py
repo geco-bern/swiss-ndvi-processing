@@ -34,6 +34,7 @@ INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
 # HISTO_OUTPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_10kmX10km_extended2.zarr"
 # python -u $SCRIPT_FILE $NEW_NDVI $HISTO_INPUT --histo-output=$HISTO_OUTPUT > $LOG_FILE  2>&1 &
 
+# NOTE: for development: ndvi_arr_original, median_arr_original, mask_array_original, is_observation_date, dates_arr_original = ndvi_array, median_array, mask_array, obs_dates, dates_array
 def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original, is_observation_date, dates_arr_original):
         ### Illustration of indexing:  - (day without observation), x (observation), o (outlier observation), I (invalid observation, e.g. -0.7)
         ###                            x̂ (smoothed observation), . unspecified (used for different things)
@@ -52,9 +53,10 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         ###            x̂x̂--x̂--x̂----o-x---x-x--x--o--x-x--     len() = 34    (ndvi_crop)
         ###            TTffTffTffffTfTfffTfTffTffTffTfTff     len() = 34    (valid_obs_mask) Invalid gets dropped because outside 0 and 1.
         ###            x̂x̂  x̂  x̂    o x   x x  xI o  x x       len() = 13    ()
-        ###            x̂x̂  x̂  x̂    o x   x x  x  o  x x       len() = 12    (ndvi_1, median_1, days_diff_1, obs_original_idx)
+        ###            x̂x̂  x̂  x̂    o x   x x  x  o  x x       len() = 12    (delta_ndvi_1, ndvi_1, median_1, days_diff_1, obs_original_idx)
         ###            01  4  7    d d   d d  d  d  d d       len() = 12    (days_diff_1)
         ###             x̂  x̂  x̂    o x   x x  x  o  x         len() = 10    (outlier_mask....  and delta_delta_left, ...)
+        ###             x̂  x̂  x̂      x   x x  x     x         len() = 8     (delta_ndvi_2, days_diff_2) 
         ###
         ### OBJECTIVE: kkkkkkkkuuuuuuuuuuu111111111111100     meaning: k=keep unchanged, 
         ###                                                            u=update value to L2 level, 
@@ -68,7 +70,7 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         ###            [x̂  x̂  x̂      x   x x  x]              len() = 7     (for i = 0: delta_ndvi_2[i:i+7])
         ###               [x̂  x̂      x̂   x x  x     x]        len() = 7     (for i = 1: delta_ndvi_2[i:i+7]) # NOTE that this uses the smoothed value from the run from i=0 (different from the historic application)
         ### concatenate these components:
-        ###             x̂  x̂  x̂      x   x x  x     x         len() = 8     (delta_ndvi_2, days_diff_2, ndvi_valid_2, nonOutlier_idx_2, idx, loess) 
+        ###             x̂  x̂  x̂      x   x x  x     x         len() = 8     (delta_ndvi_2, days_diff_2, ndvi_valid_2, nonOutlier_idx_2) 
         ###                                           x       len() = 1     (days_diff_1[-1:], delta_ndvi_1[-1:])
         ###            x̂                                      len() = 1     (days_diff_1[0:1], delta_ndvi_1[0:1])
         ###
@@ -210,7 +212,7 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
             # Special case for L0 extra- or interpolation:
             #   if the current day is an observation above is sufficient.
             #   if the current day is not an observation, perform L0 linear decay:
-            if (days_diff_1[-1] != days_diff[-1]):
+            if (abs(days_diff_1[-1] - days_diff[-1])>0.1): # equivalent to if days_diff_1[-1] != days_diff[-1]
                 delta_ndvi_to_interpolate = np.concatenate([
                     delta_ndvi_to_interpolate,
                     np.array([0]) # L0 linear decay
@@ -302,9 +304,11 @@ if __name__ == "__main__":
     #   # HISTO_ZARR_INPUT     = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr.zarr"
     #   # HISTO_ZARR_OUTPUT    = "/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_extended.zarr" # TODO: remove this and instea do it circular
     #   # INPUT_ZARR           = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_ndvi_04_merged-v4_4th.zarr"
-    # TODO: this is BUG. Was it used for development? Now outcommented: INPUT_LOOKUPTABLE = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
-    # TODO: this is BUG. Was it used for development? Now outcommented: INPUT_ZARR = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-04-29_07h16_ndvi_01_downloaded_2026-01-03_2026-01-03_processed.zarr"
-    # TODO: this is BUG. Was it used for development? Now outcommented: HISTO_ZARR_INPUT = "/mnt/data1/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr/"
+    #   # INPUT_LOOKUPTABLE = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
+    #   # INPUT_ZARR = "/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-04-29_07h16_ndvi_01_downloaded_2026-01-03_2026-01-03_processed.zarr"
+    #   # HISTO_ZARR_INPUT = "/mnt/data1/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr/"
+    #   # HISTO_ZARR_INPUT = "/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c.zarr/"
+    
     # START PROCESSING:
     t0 = time.perf_counter()
 
