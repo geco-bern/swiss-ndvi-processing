@@ -68,14 +68,14 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###             x̂  x̂  x̂      x   x x  x     x         len() = 8     (delta_ndvi_2, days_diff_2, ndvi_valid_2, obs_original_idx_2, idx, loess) 
         ###                                           x       len() = 1     (days_diff_1[-1:], delta_ndvi[-1:])
         ###
-        ###             x̂  x̂  x̂      x                        len() = 4     delta_ndvi_2[:-4] # TODO: BUG this should be only the previous L2 levels, i.e. the first 3 levels delta_ndvi_2[:3]
+        ###             x̂  x̂  x̂                               len() = 3     delta_ndvi_2[:3] # 3x latest, previous L2 values
         ###                          x̂   x̂                    len() = 5     (delta_ndvi_to_interpolate_inner)
         ###                                x  x     x         len() = 3     (delta_ndvi_2[-3:], # L1 outlier-filtered
         ### to:
         ###             x̂  x̂  x̂      x̂   x̂ x  x     x x       len() = 9     (dates_to_interpolate) = (days_diff_2+days_diff_1[-1:]) # last is only appended if today there is no observation
         ###             1  4  7      d   d d  d     d d d     len() = 9     (dates_to_interpolate)
         ###                                                                 last value (=zero-NDVI-delta) is only appended if today there is no observation
-        ###             x̂  x̂  x̂      x̂   x̂ x  x     x x       len() = 9     (delta_ndvi_to_interpolate) = delta_ndvi_2[:-4]+delta_ndvi_to_interpolate_inner+delta_ndvi_2[-3:],delta_ndvi[-1:]
+        ###             x̂  x̂  x̂      x̂   x̂ x  x     x x       len() = 9     (delta_ndvi_to_interpolate) = delta_ndvi_2[:3]+delta_ndvi_to_interpolate_inner+delta_ndvi_2[-3:],delta_ndvi[-1:]
         ###             x̂  x̂  x̂      x̂   x̂ x  x     x x 0     len() = 10    (delta_ndvi_to_interpolate) 0 is only appended if today there is no observation
         ###                                                                 last value (=zero-NDVI-delta) is only appended if today there is no observation
         ### and use them to do linear interpolation, to these targets:
@@ -101,11 +101,6 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ###       With this new   [t+1]-observation: [t0] might now be determined outlier, if all three conditions (left, right, median) are met simultaneously.
         ###       Even in that case:                 [t-1] will not become an outlier.  TODO... with this new [t+1]-observation: [t-1] will not become an outlier because it does not depend on [t+1].
 
-        #TODO: BUG: this is wrong. Was it just used for development? Now outcommented: mask_array_original = mask_array
-        #TODO: BUG: this is wrong. Was it just used for development? Now outcommented: ndvi_arr_original = ndvi_array  
-        #TODO: BUG: this is wrong. Was it just used for development? Now outcommented: dates = dates_array
-    
-        #TODO: BUG: this is wrong. Was it just used for development? Now outcommented: medians = median_array
         obs_L2 =  np.nonzero(mask_array_original == 3)
 
         # Ensure mask_array is writable
@@ -187,7 +182,7 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
             # combine smoothed value with values yet to smooth, after that linearly interpolate everything
 
             delta_ndvi_to_interpolate = np.concatenate([
-                delta_ndvi_2[:-4],               # last L2 available     # making sure these do not change values
+                delta_ndvi_2[:3],               # last L2 available     # making sure these do not change values
                 delta_ndvi_to_interpolate_inner, # new L2, newly smoothed
                 delta_ndvi_2[-3:],               # L1 outlier-filtered
                 delta_ndvi[-1:]                  # last observation (not outlier-filtered because there is no right-hand neighbor (yet))
@@ -216,7 +211,7 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
                 delta_ndvi_to_interpolate     # observed f(x)
             )
 
-            ndvi_processed = 10000 * (interpolated_values + medians) # TODO: BUG: this is wrong since medians goes from 0 to 10000. We need to use median_arr.
+            ndvi_processed = 10000 * (interpolated_values + median_arr)
 
             # indexing of array mask
                 # mask_arr == 0: the date is not an observation and is yet to be smoothed
