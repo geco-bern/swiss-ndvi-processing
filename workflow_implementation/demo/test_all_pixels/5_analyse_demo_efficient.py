@@ -120,22 +120,22 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         ndvi_arr = ndvi_arr_original[crop_start:]
         medians = medians[crop_start:]
         dates_arr = dates[crop_start:]
-        mask_array = mask_array_original[crop_start:] 
+        mask_arr = mask_array_original[crop_start:] 
 
-        ndvi_not_analyzed =  ndvi_arr_original[:crop_start] 
-        mask_array_not_analyzed = mask_array_original[:crop_start] 
+        ndvi_not_processed = ndvi_arr_original[:crop_start] 
+        mask_not_processed = mask_array_original[:crop_start] 
 
         days_diff = (dates_arr- dates_arr[0])  / np.timedelta64(1, 'D')
-        last_L2_position = (dates[obs_L2[0][-1]] - dates_arr[0]) / np.timedelta64(1, 'D')
-        historic_last_L2_position = (dates[obs_L2[0][-1]] - dates[0]) / np.timedelta64(1, 'D') # !!! notice that we use date and dates_arr
         ndvi_arr = ndvi_arr / 10000
         median_arr  = medians  / 10000
-        obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & ((mask_array == 2) | (mask_array == 3))
+        
+        # filter for validity and if it is an observation:
+        valid_obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & ((mask_arr == 2) | (mask_arr == 3))
 
-        ndvi_valid = ndvi_arr[obs_mask]
-        median_valid = median_arr[obs_mask]
-        days_diff_1 = days_diff[obs_mask]
-        original_idx = np.arange(len(ndvi_arr))[obs_mask] # used to keep track of delta ndvi position and the outlier position
+        ndvi_valid = ndvi_arr[valid_obs_mask]
+        median_valid = median_arr[valid_obs_mask]
+        days_diff_1 = days_diff[valid_obs_mask]
+        obs_original_idx = np.arange(len(ndvi_arr))[valid_obs_mask] # used to keep track of delta ndvi position and the outlier position
         
         
         # outlier detection
@@ -148,11 +148,11 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
         outlier_mask = ((abs(delta_ndvi[1:-1])  > delta_threshold) & 
                         (abs(delta_delta_left)  > delta_delta_threshold) & 
                         (abs(delta_delta_right) > delta_delta_threshold))
-        ndvi_valid = ndvi_valid[1:-1][~outlier_mask]
+        ndvi_valid_2 = ndvi_valid[1:-1][~outlier_mask]
         delta_ndvi_2 = delta_ndvi[1:-1][~outlier_mask]
-        days_diff_2 = days_diff_1[1:-1][~outlier_mask]
+        days_diff_2  = days_diff_1[1:-1][~outlier_mask]
 
-        original_idx_2 = original_idx[1:-1][~outlier_mask]
+        obs_original_idx_2 = obs_original_idx[1:-1][~outlier_mask]
         
 
         # some sites do not have any observation or very few
@@ -169,7 +169,7 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
             for i in np.arange(idx):
                 # ndvi_valid_to_check: not needed for consistency with historical processing
                 delta_window_to_smooth = delta_ndvi_2[i:i+7] # window to smooth, the center value will be appended
-                ndvi_valid_to_check = ndvi_valid[i:i+7] # this will be used to check if the absolute value is close to the boundaries condition
+                ndvi_valid_to_check = ndvi_valid_2[i:i+7] # this will be used to check if the absolute value is close to the boundaries condition
 
                 if (np.any((ndvi_valid_to_check < 0.05) | (ndvi_valid_to_check > 0.95))or (np.sum(delta_window_to_smooth < -0.2) >= 5)): 
                     # exceptional case:
@@ -219,34 +219,32 @@ def continuous_ndvi(ndvi_arr_original, medians, mask_array_original, is_observat
             ndvi_processed = 10000 * (interpolated_values + medians) # TODO: BUG: this is wrong since medians goes from 0 to 10000. We need to use median_arr.
 
             # indexing of array mask
-                # mask_array == 0: the date is not an observation and is yet to be smoothed
-                # mask_array == 1: the date is not an observation and is smoothed
-                # mask_array == 2: the date is     an observation and is yet to be smoothed
-                # mask_array == 3: the date is     an observation and is smoothed
-                # mask_array == 4: the date is     an observation and is an outlier
+                # mask_arr == 0: the date is not an observation and is yet to be smoothed
+                # mask_arr == 1: the date is not an observation and is smoothed
+                # mask_arr == 2: the date is     an observation and is yet to be smoothed
+                # mask_arr == 3: the date is     an observation and is smoothed
+                # mask_arr == 4: the date is     an observation and is an outlier
 
             # Start out with 0:
 
             # Define all observation dates (unprocessed):
-            mask_array[obs_mask] = 2
+            mask_arr[valid_obs_mask] = 2
             # unless further below specified as smoothed, the continuous implementation should overwrite 0 and 2's without hesitation.
 
             # Mark the finalized dates (smoothed)
-            before = np.arange(len(mask_array)) < original_idx_2[-4]
+            before = np.arange(len(mask_arr)) < obs_original_idx_2[-4]
 
-            mask_array[ before & obs_mask ] = 3
-            mask_array[ before & (~obs_mask) ] = 1
+            mask_arr[ before & valid_obs_mask ] = 3
+            mask_arr[ before & (~valid_obs_mask) ] = 1
 
             # Mark the outlier dates (4): 
-            outlier_idx = original_idx[1:-1][outlier_mask]
-            mask_array[outlier_idx] = 4
+            outlier_idx = obs_original_idx[1:-1][outlier_mask]
+            mask_arr[outlier_idx] = 4
 
 
-            mask_array_final =  np.concatenate([mask_array_not_analyzed, mask_array])
-            final_ndvi_value =  np.concatenate([ndvi_not_analyzed, ndvi_smoothed])
-
-            print(len(mask_array_final) == len(mask_array_original))
-            print(len(final_ndvi_value) == len(ndvi_arr_original))
+            # Concatenate return values:
+            mask_array_final =  np.concatenate([mask_not_processed, mask_arr])
+            final_ndvi_value =  np.concatenate([ndvi_not_processed, ndvi_processed])
 
             return final_ndvi_value, mask_array_final
         
