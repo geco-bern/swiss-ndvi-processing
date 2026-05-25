@@ -70,23 +70,24 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         ### concatenate these components:
         ###             x̂  x̂  x̂      x   x x  x     x         len() = 8     (delta_ndvi_2, days_diff_2, ndvi_valid_2, nonOutlier_idx_2, idx, loess) 
         ###                                           x       len() = 1     (days_diff_1[-1:], delta_ndvi_1[-1:])
+        ###            x̂                                      len() = 1     (days_diff_1[0:1], delta_ndvi_1[0:1])
         ###
-        ###             x̂  x̂  x̂                               len() = 3     delta_ndvi_2[:3] # 3x latest, previous L2 values
+        ###             x̂  x̂  x̂                               len() = 3     (delta_ndvi_2[:3]) # 3x latest, previous L2 values
         ###                          x̂   x̂                    len() = 5     (delta_ndvi_to_interpolate_inner)
         ###                                x  x     x         len() = 3     (delta_ndvi_2[-3:], # L1 outlier-filtered
         ### to:
-        ###             x̂  x̂  x̂      x̂   x̂ x  x     x x       len() = 9     (dates_to_interpolate) = (days_diff_2+days_diff_1[-1:]) # last is only appended if today there is no observation
-        ###             1  4  7      d   d d  d     d d d     len() = 9     (dates_to_interpolate)
+        ###            x̂x̂  x̂  x̂      x̂   x̂ x  x     x x       len() = 9     (dates_to_interpolate) = [days_diff_1[0:1], days_diff_2, days_diff_1[-1:]]
+        ###            01  4  7      d   d d  d     d d d     len() = 9     (dates_to_interpolate)    # last value of today is only appended if today there is no observation
         ###                                                                 last value (=zero-NDVI-delta) is only appended if today there is no observation
-        ###             x̂  x̂  x̂      x̂   x̂ x  x     x x       len() = 9     (delta_ndvi_to_interpolate) = delta_ndvi_2[:3]+delta_ndvi_to_interpolate_inner+delta_ndvi_2[-3:],delta_ndvi_1[-1:]
-        ###             x̂  x̂  x̂      x̂   x̂ x  x     x x 0     len() = 10    (delta_ndvi_to_interpolate) 0 is only appended if today there is no observation
+        ###            x̂x̂  x̂  x̂      x̂   x̂ x  x     x x       len() = 9     (delta_ndvi_to_interpolate) = [delta_ndvi_1[0:1], delta_ndvi_2[:3],delta_ndvi_to_interpolate_inner,delta_ndvi_2[-3:],delta_ndvi_1[-1:]]
+        ###            x̂x̂  x̂  x̂      x̂   x̂ x  x     x x 0     len() = 10    (delta_ndvi_to_interpolate)   # 0 for today is only appended if today there is no observation
         ###                                                                 last value (=zero-NDVI-delta) is only appended if today there is no observation
         ### and use them to do linear interpolation, to these targets:
         ###            01234567dddddddddddddddddddddddddd     len() = 34    (days_diff)
-        ###            ?x̂..x̂..x̂..........................     len() = 34    (interpolated_values, ndvi_processed, mask_crop) # TODO: what about the 0-position? TODO: this is a BUG, since if we use numpy.interp() to predict the 0-position it will be overwritten with the 1-position
+        ###            x̂x̂..x̂..x̂..........................     len() = 34    (interpolated_values, ndvi_processed, mask_crop)
         ### Then do final concatenation for update:
         ### [...]......                                       len() = 2977  (ndvi_not_processed,mask_not_processed)(historical cropping of L2 not changed anymore)
-        ### [...]......?x̂..x̂..x̂..........................     len() = 3000  (final_ndvi_value, mask_array_final)(final merging and returning the timeseries) TODO: ?-position is updated wrongly. this is a BUG
+        ### [...]......x̂x̂..x̂..x̂..........................     len() = 3000  (final_ndvi_value, mask_array_final)(final merging and returning the timeseries)
         ###
         ### For the masking we use following helper variables:
         ###                          x                        len() = 1     (nonOutlier_idx_2[-4])
@@ -104,7 +105,7 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
         ###       With this new   [t+1]-observation: [t0] might now be determined outlier, if all three conditions (left, right, median) are met simultaneously.
         ###       Even in that case:                 [t-1]'s outlier status will not change. Since it only depends on [t-2,t0,median-1]. Thus t-1 is fixed and there is no backpropagation.
 
-        obs_L2 =  np.nonzero(mask_array_original == 3)
+        obs_L2 =  np.nonzero(mask_array_original == 3) # NOTE: this also drops outliers (mask_array==4).
 
         # Ensure mask_array is writable
         mask_array_original = np.array(mask_array_original, copy=True)
@@ -114,7 +115,7 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
 
         # A) Crop (subset) whole time series to last part to be processed,
         # defined so that it contains enough L2 to do the smoothing => variable suffix '_crop':
-        crop_start = obs_L2[0][-5]  # Index (-4), so that even when 
+        crop_start = obs_L2[0][-4]  # Index (-4), so that even when 
                                  # dropping left-most and right-most, we end up 
                                  # with 3 L2 values (left half of 7 obs window) to smooth
         ndvi_crop = ndvi_arr_original[crop_start:]
@@ -193,14 +194,15 @@ def continuous_ndvi(ndvi_arr_original, median_arr_original, mask_array_original,
             # Combine inner (new L2 values) with previous L2 values, and new L1 values for linear interpolation.
 
             delta_ndvi_to_interpolate = np.concatenate([
-                # TODO: here we are missing an NDVI value corresponding the the left-most value, that was removed in 
-                delta_ndvi_2[:3],               # last L2 available     # making sure these do not change values
+                delta_ndvi_1[0:1],               # (left-most observation)     # making sure this does not change values
+                delta_ndvi_2[:3],                # last three L2 available     # making sure these do not change values
                 delta_ndvi_to_interpolate_inner, # new L2, newly smoothed
-                delta_ndvi_2[-3:],               # L1 outlier-filtered
-                delta_ndvi_1[-1:]                  # last observation (not outlier-filtered because there is no right-hand neighbor (yet))
+                delta_ndvi_2[-3:],               # L1 observations outlier-filtered
+                delta_ndvi_1[-1:]                # last observation (right-most observation, not outlier-filtered because there is no right-hand neighbor (yet))
             ]) 
             dates_to_interpolate = np.concatenate([
-                days_diff_2,  # NOTE: By including ALL delta_ndvi_2 except the new smoothed value, len delta_ndvi_2 == len(days_diff_2)
+                days_diff_1[0:1],
+                days_diff_2,     # NOTE: By including ALL delta_ndvi_2 except the new smoothed value, len delta_ndvi_2 == len(days_diff_2)
                 days_diff_1[-1:] # date of the last observation without 2 right-hand neighbor
             ])
 
