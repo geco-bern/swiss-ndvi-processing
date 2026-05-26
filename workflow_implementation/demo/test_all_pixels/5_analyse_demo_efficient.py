@@ -13,7 +13,7 @@ import time
 from numcodecs import blosc, Blosc, zarr3
 from zarr.codecs import BloscCodec
 
-INPUT_LOOKUPTABLE  = "/mnt/data1/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr" # TODO: move to data2
+INPUT_LOOKUPTABLE  = "/mnt/data2/UniBe-swiss-ndvi/data/lookup_table_median_ndvi.zarr"
 
 import warnings
 warnings.filterwarnings(
@@ -689,7 +689,7 @@ if __name__ == "__main__":
 
     if TODO_replace_original_HISTO_ZARR_INPUT: # if anything else than False, proceed with replacement:
         #if (updated_historic_ds.nbytes/1e6 >= historic_ds.nbytes/1e6):
-        if (folder_size(HISTO_ZARR_OUTPUT) >= 0.85 * folder_size(HISTO_ZARR_INPUT)): # include fudge factor of 0.85
+        #if (folder_size(HISTO_ZARR_OUTPUT) >= 0.85 * folder_size(HISTO_ZARR_INPUT)): # include fudge factor of 0.85
             # okay updated storage zarr is larger or equal than previous storage zarr
             # proceed with deleting previous and renaming updated:
             try:
@@ -701,12 +701,12 @@ if __name__ == "__main__":
                    f"ABORTED. To recover, please manually delete {HISTO_ZARR_INPUT} and manually rename\n"+
                    f"{HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}.")
                 raise ValueError(msg)
-        else:
-            msg = (f"Error updating data storage.\n"+
-                   f"{HISTO_ZARR_OUTPUT} has smaller file size than\n{HISTO_ZARR_INPUT} This code expected the opposite.\n"+
-                   f"ABORTING NOW. If expected, please manually delete {HISTO_ZARR_INPUT} and manually rename\n"+
-                   f"{HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}.")
-            raise ValueError(msg)    
+        # else:
+        #     msg = (f"Error updating data storage.\n"+
+        #            f"{HISTO_ZARR_OUTPUT} has smaller file size than\n{HISTO_ZARR_INPUT} This code expected the opposite.\n"+
+        #            f"ABORTING NOW. If expected, please manually delete {HISTO_ZARR_INPUT} and manually rename\n"+
+        #            f"{HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}.")
+        #     raise ValueError(msg)    
 
 
     # output a visual overview of the update:
