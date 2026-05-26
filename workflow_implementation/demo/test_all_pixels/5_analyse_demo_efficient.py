@@ -395,379 +395,377 @@ if __name__ == "__main__":
     
     t0=time.perf_counter()
     DASK_TEMP_DIR = "/mnt/data2/UniBe-swiss-ndvi/tmp_data6/"
-    client = Client(
+    with Client(
         n_workers=N_WORKERS,
         threads_per_worker=N_THREADS_PER_WORKER,
         memory_limit=MEMORY_PER_WORKER,
         local_directory= DASK_TEMP_DIR,
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
-        dashboard_address=':8342')
-    print(client, flush = True)
-    print(client.dashboard_link, flush = True) # use this dashboard to follow progress
+        dashboard_address=':8341',
+    ) as client:
+        print(client, flush=True)
+        print(client.dashboard_link, flush = True) # use this dashboard to follow progress
+        # print(dask.config.get("scheduler"), flush=True)
 
-    # DATE_CHUNKS  = historic_ds.chunks['date'][0]  # should be 30 days # TODO: why not this?
-    # PIXEL_CHUNKS = historic_ds.chunks['pixel'][0]                     # TODO: why not this?
+        # DATE_CHUNKS  = historic_ds.chunks['date'][0]  # should be 30 days # TODO: why not this?
+        # PIXEL_CHUNKS = historic_ds.chunks['pixel'][0]                     # TODO: why not this?
 
-    historic_ds  = xr.open_zarr(HISTO_ZARR_INPUT, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-    new_ds       = xr.open_zarr(INPUT_ZARR, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": -1})
-    lookuptable  = xr.open_zarr(INPUT_LOOKUPTABLE).chunk({"pixel": PIXEL_CHUNKS})
+        historic_ds  = xr.open_zarr(HISTO_ZARR_INPUT, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+        new_ds       = xr.open_zarr(INPUT_ZARR, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": -1})
+        lookuptable  = xr.open_zarr(INPUT_LOOKUPTABLE).chunk({"pixel": PIXEL_CHUNKS})
+        # NOTE: minor fix lookuptable does not have pixel as int32 but as int64. This prevents appending to zarr.
+        lookuptable = lookuptable.assign_coords(
+            # change number types of dimensions (pixel is that way 420MB instead of 840MB)
+            pixel = ('pixel', lookuptable.pixel.values.astype(np.int32)),
+            doy   = ('date', lookuptable.doy.values.astype(np.int32)))
 
-    
-    # NOTE: minor fix lookuptable does not have pixel as int32 but as int64. This prevents appending to zarr.
-    lookuptable = lookuptable.assign_coords(
-        # change number types of dimensions (pixel is that way 420MB instead of 840MB)
-        pixel = ('pixel', lookuptable.pixel.values.astype(np.int32)),
-        doy   = ('date', lookuptable.doy.values.astype(np.int32)))
+        # def show_ds_structure(ds):
+        #     for c in list(ds.coords) + list(ds.data_vars):
+        #         print(str(c).ljust(15) + ":   " + str(ds[c].encoding))
+        
+        #show_ds_structure(historic_ds)
+        #show_ds_structure(new_ds)
+        #show_ds_structure(lookuptable)
 
-    # def show_ds_structure(ds):
-    #     for c in list(ds.coords) + list(ds.data_vars):
-    #         print(str(c).ljust(15) + ":   " + str(ds[c].encoding))
-    
-    #show_ds_structure(historic_ds)
-    #show_ds_structure(new_ds)
-    #show_ds_structure(lookuptable)
+        print("Last dates in historic_ds:\n  "+"\n  ".join(np.datetime_as_string(historic_ds.date.isel(date = slice(-10,None)), unit='D')), flush=True)
+        print("First dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(0,10)), unit='D')), flush=True)
 
-    print("Last dates in historic_ds:\n  "+"\n  ".join(np.datetime_as_string(historic_ds.date.isel(date = slice(-10,None)), unit='D')), flush=True)
-    print("First dates in newly downloaded:\n  "+"\n  ".join(np.datetime_as_string(new_ds.date.isel(date = slice(0,10)), unit='D')), flush=True)
-
-    print("Current historic dataset:", flush = True)
-    print(historic_ds, flush = True)
-    print("Newly downloaded dataset:", flush = True)
-    print(new_ds, flush = True)
-
-
-    # --- assess processing status visually ----------------------------------
-    # check how many days of the storage must be rewritten (L1 => L2 update)
-    # historic_ds  = xr.open_zarr("/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr_bkp", chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-    df_mfrac, df_Lfrac, dates_L2_previously_finalized = get_L2_coverage_for_each_date(
-        historic_ds.sel(date = historic_ds["date"].values[-MAX_DAYS_L1_OVERWRITE:]),
-        target_fraction_L2 = TARGET_PERCENTAGE_L2/100
-    )
-    # output a visual overview of the update:
-    # plot the pixel fractions of each level: (before and after update)
-    fig, axes = plt.subplots(2,2, figsize=(14, 5), sharex=True, sharey=True)
-    axes[0,0].stackplot( df_mfrac.index, df_mfrac.T.values, labels=df_mfrac.columns, step='post' )
-    axes[0,1].stackplot( df_Lfrac.index, df_Lfrac.T.values, labels=df_Lfrac.columns, step='post' )
-    axes[0,0].set_title("Data storage before processing")
-    axes[0,1].set_title("Data storage before processing")
-    # format plot
-    [ax.set_ylim(0, 1)                      for ax in axes.flatten()]
-    [ax.set_ylabel("Forest pixel fraction") for ax in axes[:,0].flatten()]
-    [ax.set_xlabel("Date")                  for ax in axes[1,:].flatten()]
-    axes[0,0].legend(title="mask_array_code", loc="upper left")
-    axes[0,1].legend(title="Processing status", loc="upper left")
-    plt.tight_layout()
-    plot_filename = HISTO_ZARR_OUTPUT.replace(".zarr", ".zarr_update")+".png"
-    plt.savefig(plot_filename)
-    print(f"Created visual overview of update at: {plot_filename}", flush=True)
-
-    
-    # --- concatenate full datasets along time ----------------------------------
-    # Add median NDVI from model    
-    # to new_ds:
-    doy_noLeap = xr.where(new_ds.doy == 366, 365, new_ds.doy) # remove leap year if encountered
-    new_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
-            doy=doy_noLeap,
-            pixel=new_ds.pixel) # this is to join by pixels and doy
-    # to historic_ds: # TODO: note that each time we are adding the medians to the historic data again and again. Maybe just add it once and store it?
-    doy_noLeap = xr.where(historic_ds.doy == 366, 365, historic_ds.doy) # remove leap year if encountered
-    historic_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
-            doy=doy_noLeap,
-            pixel=historic_ds.pixel) # this is to join by pixels and doy
+        print("Current historic dataset:", flush = True)
+        print(historic_ds, flush = True)
+        print("Newly downloaded dataset:", flush = True)
+        print(new_ds, flush = True)
 
 
-    # Add mask_array to new_ds (filled with 0 or 2 at this point):
-        # mask_array == 0: the data is not an observation and is yet to be smoothed
-        # mask_array == 1: the data is not an observation and is smoothed
-        # mask_array == 2: the data is an observation and is yet to be smoothed
-        # mask_array == 3: the data is an observation and is smoothed
-        # mask_array == 4: the data is an observation and is an outlier
-    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: mask_0or2_1D = xr.where(new_ds["obs_date"], 2, 0).astype(np.int8)   # dims: date
-    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: mask_0or2_2D = mask_0or2_1D.expand_dims({"pixel": new_ds.pixel})
-    # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: new_ds = new_ds.assign(mask_array=mask_0or2_2D)
-    mask_2or0 = (
-        (new_ds["obs_date"]) & 
-        (new_ds["ndvi_obs"] < NO_COVERAGE) & 
-        (new_ds["ndvi_obs"] > INVALID))
-    new_ds['mask_array'] = xr.where(mask_2or0, np.int8(2), np.int8(0))
+        # --- assess processing status visually ----------------------------------
+        # check how many days of the storage must be rewritten (L1 => L2 update)
+        # historic_ds  = xr.open_zarr("/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr_bkp", chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+        df_mfrac, df_Lfrac, dates_L2_previously_finalized = get_L2_coverage_for_each_date(
+            historic_ds.sel(date = historic_ds["date"].values[-MAX_DAYS_L1_OVERWRITE:]),
+            target_fraction_L2 = TARGET_PERCENTAGE_L2/100
+        )
+        # output a visual overview of the update:
+        # plot the pixel fractions of each level: (before and after update)
+        fig, axes = plt.subplots(2,2, figsize=(14, 5), sharex=True, sharey=True)
+        axes[0,0].stackplot( df_mfrac.index, df_mfrac.T.values, labels=df_mfrac.columns, step='post' )
+        axes[0,1].stackplot( df_Lfrac.index, df_Lfrac.T.values, labels=df_Lfrac.columns, step='post' )
+        axes[0,0].set_title("Data storage before processing")
+        axes[0,1].set_title("Data storage before processing")
+        # format plot
+        [ax.set_ylim(0, 1)                      for ax in axes.flatten()]
+        [ax.set_ylabel("Forest pixel fraction") for ax in axes[:,0].flatten()]
+        [ax.set_xlabel("Date")                  for ax in axes[1,:].flatten()]
+        axes[0,0].legend(title="mask_array_code", loc="upper left")
+        axes[0,1].legend(title="Processing status", loc="upper left")
+        plt.tight_layout()
+        plot_filename = HISTO_ZARR_OUTPUT.replace(".zarr", ".zarr_update")+".png"
+        plt.savefig(plot_filename)
+        print(f"Created visual overview of update at: {plot_filename}", flush=True)
 
-    # --- concatenate full datasets along time ----------------------------------
-    new_ds = new_ds.rename(
-        {'ndvi_obs':'ndvi_processed',
-            'ndsi_obs':'ndsi_processed'}
-    ).drop_vars('ndsi_processed')
-    
-    # Bind together with historic:
-    start_date_new = historic_ds.date.max() +  np.timedelta64(1,'D') # this ensures no overlap
-    merged_ds = (
-        xr.concat(
-            [historic_ds, 
-             new_ds.sel(date = slice(start_date_new, None))], 
-            dim="date")
-        .sortby("date")
-        .chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-    )
+        
+        # --- concatenate full datasets along time ----------------------------------
+        # Add median NDVI from model    
+        # to new_ds:
+        doy_noLeap = xr.where(new_ds.doy == 366, 365, new_ds.doy) # remove leap year if encountered
+        new_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
+                doy=doy_noLeap,
+                pixel=new_ds.pixel) # this is to join by pixels and doy
+        # to historic_ds: # TODO: note that each time we are adding the medians to the historic data again and again. Maybe just add it once and store it?
+        doy_noLeap = xr.where(historic_ds.doy == 366, 365, historic_ds.doy) # remove leap year if encountered
+        historic_ds["median_ndvi"] = lookuptable["median_ndvi"].sel(
+                doy=doy_noLeap,
+                pixel=historic_ds.pixel) # this is to join by pixels and doy
 
-    # --- apply gapfilling and outlier detection function: continuous_ndvi() ----------------------------------
 
-    # prepare arguments spanning historic and new data: all lazy
-    ndvi_array   = merged_ds["ndvi_processed"].persist() # .isel(pixel=slice(0,500))
-    median_array = merged_ds["median_ndvi"].persist() # .isel(pixel=slice(0,500))
-    dates_array  = merged_ds["date"].persist()
-    mask_array   = merged_ds["mask_array"].persist() # .isel(pixel=slice(0,500))
-    # using persist() reduces graph size
+        # Add mask_array to new_ds (filled with 0 or 2 at this point):
+            # mask_array == 0: the data is not an observation and is yet to be smoothed
+            # mask_array == 1: the data is not an observation and is smoothed
+            # mask_array == 2: the data is an observation and is yet to be smoothed
+            # mask_array == 3: the data is an observation and is smoothed
+            # mask_array == 4: the data is an observation and is an outlier
+        # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: mask_0or2_1D = xr.where(new_ds["obs_date"], 2, 0).astype(np.int8)   # dims: date
+        # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: mask_0or2_2D = mask_0or2_1D.expand_dims({"pixel": new_ds.pixel})
+        # THIS WAS TOO SIMPLE SINCE AN OBS_DATE DOES NOT COVER ALL OF CH: new_ds = new_ds.assign(mask_array=mask_0or2_2D)
+        mask_2or0 = (
+            (new_ds["obs_date"]) & 
+            (new_ds["ndvi_obs"] < NO_COVERAGE) & 
+            (new_ds["ndvi_obs"] > INVALID))
+        new_ds['mask_array'] = xr.where(mask_2or0, np.int8(2), np.int8(0))
 
-    # reduce graph size by using futures
-    # dates_future  = client.scatter(dates_array)
-    # ndvi_future   = client.scatter(ndvi_array)
-    # median_future = client.scatter(median_array)
-    # dates_future  = client.scatter(dates_array)
-    # mask_future   = client.scatter(mask_array)
-    # then reference *_future inside tasks/closures instead of passing *_array
-    # visualize(dates_future)
-
-    # reduce graph size by handing NumPy arrays to dask:
-    # dates_daskarray = da.from_array(dates_array)   # Hand NumPy array to Dask
-
-    # call gufunc where core dim is "time" (1D arrays per pixel)
-    output_dtypes = [ndvi_array.dtype, mask_array.dtype] # prespecify types
-    ndvi_processed, mask_processed = xr.apply_ufunc(
-        continuous_ndvi,
-        ndvi_array,        # this is the observed/gapfilled/processed NDVI value
-        median_array,      # this is the modelled median NDVI for the corresponding DOY
-        mask_array,        # this is the integer processing status
-        input_core_dims=[["date"], ["date"], ["date"]],    # each call gets 1D time arrays
-        output_core_dims=[["date"],["date"]],
-        vectorize=True, 
-        dask="parallelized",
-        kwargs={"dates_arr_original": dates_array},           # this contains all daily dates
-        output_dtypes=output_dtypes, 
-        dask_gufunc_kwargs={"allow_rechunk": True},
-    )
-    # ndvi_processed.isel(pixel=1, date=slice(3160,3170)).compute() # TODO: check why this is [ 4845,  4835,  4826,  4819, 32767, 32767, 32767, 32767, 32767, 32767]
-    
-    # g = mask_processed.__dask_graph__()
-    g = ndvi_processed.__dask_graph__()
-    print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
-    #                    8 pixels:                   |46_818 pixels:              | 586_503 pixels:             | 16_041_205 pixels:           | 105_715_396 pixels:
-    # without persist(): 57 layers, and 39715        |62 layers, and 40195 tasks  | 62 layers, and 40730 tasks  | XX layers, and XXXXXXX tasks | xxx layers, and xxx tasks
-    # with persist():    11 layers, and 11 tasks     |11 layers, and    21 tasks  | 11 layers, and   151 tasks  | XX layers, and  XXXXXX tasks | xxx layers, and xxx tasks
-    # without persist():                             |.............. and 10.58 MiB
-    # with persist():                                |size 23.08 MiB and 10.58 MiB
-    
-    # visualize(ndvi_processed)
-
-    # --- append the new processed data to the historic_ds ----------------------------------
-
-    if len(dates_L2_previously_finalized) == 0: 
-        raise ValueError(f"No dates found among last {MAX_DAYS_L1_OVERWRITE} days, "+
-                         f"that have L2-fraction above {TARGET_PERCENTAGE_L2}%")
-
-    # specifying where overwriting of old data starts ()
-    end_date   = max(dates_L2_previously_finalized).to_numpy()
-    start_date = max(dates_L2_previously_finalized).to_numpy() + np.timedelta64(1,'D')
-    
-    historic_ds_to_extend = (
-        historic_ds.sel(date = slice(None, end_date))
-        .drop_vars('median_ndvi')        # TODO: note that each time we are adding the medians to the historic data again and again. Maybe just add it once and store it?
-        # .isel(date = slice(-10, None)) # NOTE just for development
-        # .isel(pixel=slice(0,500)) # TODO: remove again - this is just for development
-    )
-
-    ds_to_append = (
-        xr.Dataset({"ndvi_processed": ndvi_processed.sel(date = slice(start_date, None)), 
-                     "mask_array":    mask_processed.sel(date = slice(start_date, None))})
-        .chunk({"pixel": PIXEL_CHUNKS, 
-                 "date": DATE_CHUNKS_OUT})
-    )
-    # add metadata
-    ds_to_append.attrs["pixel_definition"] = historic_ds.attrs["pixel_definition"]
-
-    # FOR DEVELOPMENT: outfile = HISTO_ZARR_OUTPUT
-    def fallback_action_overwrite_zarr(outfile):
-        # concatenate to complete dataset
-        extended_historic_ds = (
-            xr.concat([historic_ds_to_extend, ds_to_append], dim="date")
+        # --- concatenate full datasets along time ----------------------------------
+        new_ds = new_ds.rename(
+            {'ndvi_obs':'ndvi_processed',
+                'ndsi_obs':'ndsi_processed'}
+        ).drop_vars('ndsi_processed')
+        
+        # Bind together with historic:
+        start_date_new = historic_ds.date.max() +  np.timedelta64(1,'D') # this ensures no overlap
+        merged_ds = (
+            xr.concat(
+                [historic_ds, 
+                new_ds.sel(date = slice(start_date_new, None))], 
+                dim="date")
             .sortby("date")
+            .chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+        )
+
+        # --- apply gapfilling and outlier detection function: continuous_ndvi() ----------------------------------
+
+        # prepare arguments spanning historic and new data: all lazy
+        ndvi_array   = merged_ds["ndvi_processed"].persist() # .isel(pixel=slice(0,500))
+        median_array = merged_ds["median_ndvi"].persist() # .isel(pixel=slice(0,500))
+        dates_array  = merged_ds["date"].persist()
+        mask_array   = merged_ds["mask_array"].persist() # .isel(pixel=slice(0,500))
+        # using persist() reduces graph size
+
+        # reduce graph size by using futures
+        # dates_future  = client.scatter(dates_array)
+        # ndvi_future   = client.scatter(ndvi_array)
+        # median_future = client.scatter(median_array)
+        # dates_future  = client.scatter(dates_array)
+        # mask_future   = client.scatter(mask_array)
+        # then reference *_future inside tasks/closures instead of passing *_array
+        # visualize(dates_future)
+
+        # reduce graph size by handing NumPy arrays to dask:
+        # dates_daskarray = da.from_array(dates_array)   # Hand NumPy array to Dask
+
+        # call gufunc where core dim is "time" (1D arrays per pixel)
+        output_dtypes = [ndvi_array.dtype, mask_array.dtype] # prespecify types
+        ndvi_processed, mask_processed = xr.apply_ufunc(
+            continuous_ndvi,
+            ndvi_array,        # this is the observed/gapfilled/processed NDVI value
+            median_array,      # this is the modelled median NDVI for the corresponding DOY
+            mask_array,        # this is the integer processing status
+            input_core_dims=[["date"], ["date"], ["date"]],    # each call gets 1D time arrays
+            output_core_dims=[["date"],["date"]],
+            vectorize=True, 
+            dask="parallelized",
+            kwargs={"dates_arr_original": dates_array},           # this contains all daily dates
+            output_dtypes=output_dtypes, 
+            dask_gufunc_kwargs={"allow_rechunk": True},
+        )
+        # ndvi_processed.isel(pixel=1, date=slice(3160,3170)).compute() # TODO: check why this is [ 4845,  4835,  4826,  4819, 32767, 32767, 32767, 32767, 32767, 32767]
+        
+        # g = mask_processed.__dask_graph__()
+        g = ndvi_processed.__dask_graph__()
+        print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
+        #                    8 pixels:                   |46_818 pixels:              | 586_503 pixels:             | 16_041_205 pixels:           | 105_715_396 pixels:
+        # without persist(): 57 layers, and 39715        |62 layers, and 40195 tasks  | 62 layers, and 40730 tasks  | XX layers, and XXXXXXX tasks | xxx layers, and xxx tasks
+        # with persist():    11 layers, and 11 tasks     |11 layers, and    21 tasks  | 11 layers, and   151 tasks  | XX layers, and  XXXXXX tasks | xxx layers, and xxx tasks
+        # without persist():                             |.............. and 10.58 MiB
+        # with persist():                                |size 23.08 MiB and 10.58 MiB
+        
+        # visualize(ndvi_processed)
+
+        # --- append the new processed data to the historic_ds ----------------------------------
+        if len(dates_L2_previously_finalized) == 0: 
+            raise ValueError(f"No dates found among last {MAX_DAYS_L1_OVERWRITE} days, "+
+                            f"that have L2-fraction above {TARGET_PERCENTAGE_L2}%")
+
+        # specifying where overwriting of old data starts ()
+        end_date   = max(dates_L2_previously_finalized).to_numpy()
+        start_date = max(dates_L2_previously_finalized).to_numpy() + np.timedelta64(1,'D')
+        
+        historic_ds_to_extend = (
+            historic_ds.sel(date = slice(None, end_date))
+            .drop_vars('median_ndvi')        # TODO: note that each time we are adding the medians to the historic data again and again. Maybe just add it once and store it?
+            # .isel(date = slice(-10, None)) # NOTE just for development
+            # .isel(pixel=slice(0,500)) # TODO: remove again - this is just for development
+        )
+
+        ds_to_append = (
+            xr.Dataset({"ndvi_processed": ndvi_processed.sel(date = slice(start_date, None)), 
+                        "mask_array":    mask_processed.sel(date = slice(start_date, None))})
             .chunk({"pixel": PIXEL_CHUNKS, 
                     "date": DATE_CHUNKS_OUT})
         )
+        ds_to_append.attrs["pixel_definition"] = historic_ds.attrs["pixel_definition"] # add metadata
 
-        g = extended_historic_ds.__dask_graph__()
-        print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
-        # Constructed graph with 36 layers, and 1045 tasks.
-        #                    8 pixels:                   |46_818 pixels:              |586_503 pixels:             | 16_041_205 pixels:         | 105_715_396 pixels:
-        # without persist(): 74 layers, and 39789 tasks  |79 layers, and 40319 tasks  |XX layers, and XXXXX tasks  | XX layers, and XXXXX tasks | xxx layers, and xxx tasks
-        # with persist():    32 layers, and    89 tasks  |36 layers, and   161 tasks  |36 layers, and  1045 tasks  | XX layers, and XXXXX tasks | xxx layers, and xxx tasks
+        # FOR DEVELOPMENT: outfile = HISTO_ZARR_OUTPUT
+        def fallback_action_overwrite_zarr(outfile):
+            # concatenate to complete dataset
+            extended_historic_ds = (
+                xr.concat([historic_ds_to_extend, ds_to_append], dim="date")
+                .sortby("date")
+                .chunk({"pixel": PIXEL_CHUNKS, 
+                        "date": DATE_CHUNKS_OUT})
+            )
 
-        # Explicit encoding: simple compressor for each data var
-        # encoding = {v: {"compressors": None      } for v in extended_historic_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
-        encoding = {v: {"compressors": COMPRESSOR} for v in extended_historic_ds.data_vars}
+            g = extended_historic_ds.__dask_graph__()
+            print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
+            # Constructed graph with 36 layers, and 1045 tasks.
+            #                    8 pixels:                   |46_818 pixels:              |586_503 pixels:             | 16_041_205 pixels:         | 105_715_396 pixels:
+            # without persist(): 74 layers, and 39789 tasks  |79 layers, and 40319 tasks  |XX layers, and XXXXX tasks  | XX layers, and XXXXX tasks | xxx layers, and xxx tasks
+            # with persist():    32 layers, and    89 tasks  |36 layers, and   161 tasks  |36 layers, and  1045 tasks  | XX layers, and XXXXX tasks | xxx layers, and xxx tasks
 
-        # drop any coord/data var chunk encodings that conflict   # TODO: is this needed?
-        for name in list(extended_historic_ds.coords) + list(extended_historic_ds.data_vars): # TODO: remove this again if possilbe
-            extended_historic_ds[name].encoding.pop("chunks", None)                           # TODO: remove this again if possilbe
-            extended_historic_ds[name].encoding.pop("compressor", None)                       # TODO: remove this again if possilbe
-            extended_historic_ds[name].encoding.pop("compressors", None)                      # TODO: remove this again if possilbe
+            # Explicit encoding: simple compressor for each data var
+            # encoding = {v: {"compressors": None      } for v in extended_historic_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
+            encoding = {v: {"compressors": COMPRESSOR} for v in extended_historic_ds.data_vars}
 
-        # overwrite (mode="w")
-        extended_historic_ds.to_zarr(
-            outfile, 
-            mode="w", 
-            compute=True,
-            encoding=encoding, 
-            zarr_format=3
+            # drop any coord/data var chunk encodings that conflict   # TODO: is this needed?
+            for name in list(extended_historic_ds.coords) + list(extended_historic_ds.data_vars): # TODO: remove this again if possilbe
+                extended_historic_ds[name].encoding.pop("chunks", None)                           # TODO: remove this again if possilbe
+                extended_historic_ds[name].encoding.pop("compressor", None)                       # TODO: remove this again if possilbe
+                extended_historic_ds[name].encoding.pop("compressors", None)                      # TODO: remove this again if possilbe
+
+            # overwrite (mode="w")
+            extended_historic_ds.to_zarr(
+                outfile, 
+                mode="w", 
+                compute=True,
+                encoding=encoding, 
+                zarr_format=3
+            )
+
+        TODO_replace_original_HISTO_ZARR_INPUT = False # if nothing written do not replace original
+        if len(ds_to_append['date'].values) == 0: # this might be 0 if these dates have already been appended to the historic NDVI
+            warnings.warn("Did not modify historic NDVI since no dates to overwrite were found.")
+            raise ValueError("Did not modify historic NDVI since no dates to overwrite were found.")
+        else:
+            if HISTO_ZARR_OUTPUT == HISTO_ZARR_INPUT:
+                # NOTE: since we are updating existing values, appending doesn't work: print(f"appending to file\n  {HISTO_ZARR_OUTPUT}", flush=True)
+                # NOTE: since we are updating existing values, appending doesn't work: try:
+                # NOTE: since we are updating existing values, appending doesn't work:     print("Appending new dates to existing zarr store...", flush=True)
+                # NOTE: since we are updating existing values, appending doesn't work:     # NOTE: Ensure that we can append and the zarr structure remains intact and unchanged:
+                # NOTE: since we are updating existing values, appending doesn't work:     # We had the issue that secondary coords got demoted to data variables.
+                # NOTE: since we are updating existing values, appending doesn't work:     #   If there are mismatches (in coordinates or in dtypes ^*) it is 
+                # NOTE: since we are updating existing values, appending doesn't work:     #   possible that secondary coordiantes get demoted from coordinates 
+                # NOTE: since we are updating existing values, appending doesn't work:     #   to data variables. This breaks the workflow of continuous 
+                # NOTE: since we are updating existing values, appending doesn't work:     #   appending from the next run on.
+                # NOTE: since we are updating existing values, appending doesn't work:     #      ^* During development we encountered the issue that 
+                # NOTE: since we are updating existing values, appending doesn't work:     #         HISTO_ZARR_OUTPUT had mask_array encoded as bool while 
+                # NOTE: since we are updating existing values, appending doesn't work:     #         in ds_to_append it was correctly encoded as int8. This
+                # NOTE: since we are updating existing values, appending doesn't work:     #         mismatch lead to ["x_idx", "y", "y_idx", "x"] being demoted 
+                # NOTE: since we are updating existing values, appending doesn't work:     #         to data variables
+                # NOTE: since we are updating existing values, appending doesn't work:     # BOTTOM LINE: ensure the data set to append uses exactly same 
+                # NOTE: since we are updating existing values, appending doesn't work:     #              structure as the one to be appended:            
+                # NOTE: since we are updating existing values, appending doesn't work:     # Opening HISTO_ZARR_OUTPUT is not needed, but just for checking the structure
+                # NOTE: since we are updating existing values, appending doesn't work:     existing = xr.open_zarr(HISTO_ZARR_OUTPUT)
+                # NOTE: since we are updating existing values, appending doesn't work:     assert sorted(list(ds_to_append.dims)) == sorted(list(existing.dims)), "Aborted append: dimensions are not equal"
+                # NOTE: since we are updating existing values, appending doesn't work:     assert sorted(list(ds_to_append.coords)) == sorted(list(existing.coords)), "Aborted append: coordinates are not equal" # this is not strictly needed
+                # NOTE: since we are updating existing values, appending doesn't work:     assert sorted(list(ds_to_append.data_vars)) == sorted(list(existing.data_vars)), "Aborted append: list of data variables are not equal" # this is not strictly needed
+                # NOTE: since we are updating existing values, appending doesn't work:     for c in [c for c in list(ds_to_append.coords) if c not in ['date','doy']]:  # e.g. ["pixel", "x_idx", "y", "y_idx", "x"]:
+                # NOTE: since we are updating existing values, appending doesn't work:         assert ds_to_append[c].dtype == existing[c].dtype
+                # NOTE: since we are updating existing values, appending doesn't work:         assert ds_to_append[c].shape == existing[c].shape
+                # NOTE: since we are updating existing values, appending doesn't work:         # optional but safest:
+                # NOTE: since we are updating existing values, appending doesn't work:         assert (ds_to_append[c].values == existing[c].values).all()
+                # NOTE: since we are updating existing values, appending doesn't work:     for c in list(ds_to_append.data_vars): # e.g ndvi_processed, mask_array
+                # NOTE: since we are updating existing values, appending doesn't work:         assert ds_to_append[c].dtype == existing[c].dtype
+                # NOTE: since we are updating existing values, appending doesn't work:     # show_ds_structure(ds_to_append)
+                # NOTE: since we are updating existing values, appending doesn't work:
+                # NOTE: since we are updating existing values, appending doesn't work:     # NOTE: dropping secondary coordinates (non-dimension coordinates) 
+                # NOTE: since we are updating existing values, appending doesn't work:     #       seems safest to append
+                # NOTE: since we are updating existing values, appending doesn't work:     # Only keep main coords (and doy) for correct appending:
+                # NOTE: since we are updating existing values, appending doesn't work:     ds_to_append.drop_vars(["x_idx", "y", "y_idx", "x"]).to_zarr(
+                # NOTE: since we are updating existing values, appending doesn't work:         HISTO_ZARR_OUTPUT,
+                # NOTE: since we are updating existing values, appending doesn't work:         mode="a-",
+                # NOTE: since we are updating existing values, appending doesn't work:         append_dim="date",
+                # NOTE: since we are updating existing values, appending doesn't work:         compute=True,
+                # NOTE: since we are updating existing values, appending doesn't work:         encoding={},  # NOTE: since we append encoding must not be provided
+                # NOTE: since we are updating existing values, appending doesn't work:     )
+                # NOTE: since we are updating existing values, appending doesn't work:     # dds = xr.open_dataset(HISTO_ZARR_OUTPUT)
+                # NOTE: since we are updating existing values, appending doesn't work:   
+                # NOTE: since we are updating existing values, appending doesn't work:     # Post-writing check of resulting file content, if this fails do 
+                # NOTE: since we are updating existing values, appending doesn't work:     # the fallback procedure and resolve to a full rewrite. 
+                # NOTE: since we are updating existing values, appending doesn't work:     # NOTE: Unsure: Is a full rewrite still possible given that we 
+                # NOTE: since we are updating existing values, appending doesn't work:     #       attempted to overwrite values with the appending above? 
+                # NOTE: since we are updating existing values, appending doesn't work:     #       I do believe so, since we used (mode = "a-"), but not 100% sure.
+                # NOTE: since we are updating existing values, appending doesn't work:     n_appended = ds_to_append.sizes['date']
+                # NOTE: since we are updating existing values, appending doesn't work:     old_and_new_dates = (xr.open_dataset(HISTO_ZARR_OUTPUT)
+                # NOTE: since we are updating existing values, appending doesn't work:         .isel(date = slice(-n_appended-1,-n_appended+1))
+                # NOTE: since we are updating existing values, appending doesn't work:         .date.values) 
+                # NOTE: since we are updating existing values, appending doesn't work:     if (old_and_new_dates[1] - old_and_new_dates[0]) != np.timedelta64(1, 'D'):
+                # NOTE: since we are updating existing values, appending doesn't work:         raise ValueError(f"Dates of resulting data set are not exactly 1 day apart at interface: {old_and_new_dates}")
+                # NOTE: since we are updating existing values, appending doesn't work:     else:
+                # NOTE: since we are updating existing values, appending doesn't work:         print("Append successfully completed.", flush=True)
+
+                # except Exception as e:
+                HISTO_ZARR_OUTPUT = HISTO_ZARR_INPUT + ".updated_" + dt.datetime.now().strftime("%Y%m%d_%Hh%Mm%Ss") # temporarily overwrite HISTO_ZARR_OUTPUT
+                print(f"writing to new file\n  {HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
+                fallback_action_overwrite_zarr(HISTO_ZARR_OUTPUT)
+                TODO_replace_original_HISTO_ZARR_INPUT = HISTO_ZARR_OUTPUT
+
+                # print(f"Appending failed: {e}. Falling back to rewrite.", flush=True)
+                # # Backup original store (move directory) and write full dataset
+                # backup = HISTO_ZARR_INPUT + ".backup_" + dt.datetime.now().strftime("%Y%m%d_%Hh%M")
+                # try:
+                #     shutil.move(HISTO_ZARR_INPUT, backup)
+                #     print(f"Backed up original store to {backup}", flush=True)
+                # except Exception as e2:
+                #     print(f"Backup failed: {e2} -- continuing to overwrite.", flush=True)
+                # 
+                # # duplicate of else
+                # fallback_action_overwrite_zarr()
+            else:
+                print(f"writing to new file\n  {HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
+                fallback_action_overwrite_zarr(HISTO_ZARR_OUTPUT)
+                TODO_replace_original_HISTO_ZARR_INPUT = False
+
+        # assert that output can be opened
+
+        def folder_size(path):
+            total = 0
+            for dirpath, dirnames, filenames in os.walk(path):
+                for name in filenames:
+                    fp = os.path.join(dirpath, name)
+                    if os.path.isfile(fp):
+                        total += os.path.getsize(fp)
+            return total
+
+        if TODO_replace_original_HISTO_ZARR_INPUT: # if anything else than False, proceed with replacement:
+            #if (updated_historic_ds.nbytes/1e6 >= historic_ds.nbytes/1e6):
+            #if (folder_size(HISTO_ZARR_OUTPUT) >= 0.85 * folder_size(HISTO_ZARR_INPUT)): # include fudge factor of 0.85
+                # okay updated storage zarr is larger or equal than previous storage zarr
+                # proceed with deleting previous and renaming updated:
+                try:
+                    shutil.rmtree(HISTO_ZARR_INPUT)
+                    shutil.move(HISTO_ZARR_OUTPUT, HISTO_ZARR_INPUT)
+                    print(f"Updated original store {HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}", flush=True)
+                    HISTO_ZARR_OUTPUT = HISTO_ZARR_INPUT # make output reflect the renaming (undoing the temporary effect)
+                except Exception as e2:
+                    msg = (f"Error updating data storage: {e2} --\n"+
+                    f"ABORTED. To recover, please manually delete {HISTO_ZARR_INPUT} and manually rename\n"+
+                    f"{HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}.")
+                    raise ValueError(msg)
+            # else:
+            #     msg = (f"Error updating data storage.\n"+
+            #            f"{HISTO_ZARR_OUTPUT} has smaller file size than\n{HISTO_ZARR_INPUT} This code expected the opposite.\n"+
+            #            f"ABORTING NOW. If expected, please manually delete {HISTO_ZARR_INPUT} and manually rename\n"+
+            #            f"{HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}.")
+            #     raise ValueError(msg)    
+
+        # extend previous visual overview of the update:
+        # updated_historic_ds  = xr.open_zarr("/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-1kmX1km.zarr.updated_20260526_10h25m51s", chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+        # updated_historic_ds  = xr.open_zarr("/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr.updated_20260526_11h28m54s", chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+        updated_historic_ds  = xr.open_zarr(HISTO_ZARR_OUTPUT, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+        updated_df_mfrac, updated_df_Lfrac, dates_L2_now_finalized = get_L2_coverage_for_each_date(
+            # xr.Dataset({"mask_array": mask_processed}).sel(date = dates_array.values[-MAX_DAYS_L1_OVERWRITE:])
+            updated_historic_ds.sel(date = updated_historic_ds["date"].values[-MAX_DAYS_L1_OVERWRITE:]),
+            target_fraction_L2 = TARGET_PERCENTAGE_L2/100
         )
 
-    TODO_replace_original_HISTO_ZARR_INPUT = False # if nothing written do not replace original
-    if len(ds_to_append['date'].values) == 0: # this might be 0 if these dates have already been appended to the historic NDVI
-        warnings.warn("Did not modify historic NDVI since no dates to overwrite were found.")
-        raise ValueError("Did not modify historic NDVI since no dates to overwrite were found.")
-    else:
-        if HISTO_ZARR_OUTPUT == HISTO_ZARR_INPUT:
-            # NOTE: since we are updating existing values, appending doesn't work: print(f"appending to file\n  {HISTO_ZARR_OUTPUT}", flush=True)
-            # NOTE: since we are updating existing values, appending doesn't work: try:
-            # NOTE: since we are updating existing values, appending doesn't work:     print("Appending new dates to existing zarr store...", flush=True)
-            # NOTE: since we are updating existing values, appending doesn't work:     # NOTE: Ensure that we can append and the zarr structure remains intact and unchanged:
-            # NOTE: since we are updating existing values, appending doesn't work:     # We had the issue that secondary coords got demoted to data variables.
-            # NOTE: since we are updating existing values, appending doesn't work:     #   If there are mismatches (in coordinates or in dtypes ^*) it is 
-            # NOTE: since we are updating existing values, appending doesn't work:     #   possible that secondary coordiantes get demoted from coordinates 
-            # NOTE: since we are updating existing values, appending doesn't work:     #   to data variables. This breaks the workflow of continuous 
-            # NOTE: since we are updating existing values, appending doesn't work:     #   appending from the next run on.
-            # NOTE: since we are updating existing values, appending doesn't work:     #      ^* During development we encountered the issue that 
-            # NOTE: since we are updating existing values, appending doesn't work:     #         HISTO_ZARR_OUTPUT had mask_array encoded as bool while 
-            # NOTE: since we are updating existing values, appending doesn't work:     #         in ds_to_append it was correctly encoded as int8. This
-            # NOTE: since we are updating existing values, appending doesn't work:     #         mismatch lead to ["x_idx", "y", "y_idx", "x"] being demoted 
-            # NOTE: since we are updating existing values, appending doesn't work:     #         to data variables
-            # NOTE: since we are updating existing values, appending doesn't work:     # BOTTOM LINE: ensure the data set to append uses exactly same 
-            # NOTE: since we are updating existing values, appending doesn't work:     #              structure as the one to be appended:            
-            # NOTE: since we are updating existing values, appending doesn't work:     # Opening HISTO_ZARR_OUTPUT is not needed, but just for checking the structure
-            # NOTE: since we are updating existing values, appending doesn't work:     existing = xr.open_zarr(HISTO_ZARR_OUTPUT)
-            # NOTE: since we are updating existing values, appending doesn't work:     assert sorted(list(ds_to_append.dims)) == sorted(list(existing.dims)), "Aborted append: dimensions are not equal"
-            # NOTE: since we are updating existing values, appending doesn't work:     assert sorted(list(ds_to_append.coords)) == sorted(list(existing.coords)), "Aborted append: coordinates are not equal" # this is not strictly needed
-            # NOTE: since we are updating existing values, appending doesn't work:     assert sorted(list(ds_to_append.data_vars)) == sorted(list(existing.data_vars)), "Aborted append: list of data variables are not equal" # this is not strictly needed
-            # NOTE: since we are updating existing values, appending doesn't work:     for c in [c for c in list(ds_to_append.coords) if c not in ['date','doy']]:  # e.g. ["pixel", "x_idx", "y", "y_idx", "x"]:
-            # NOTE: since we are updating existing values, appending doesn't work:         assert ds_to_append[c].dtype == existing[c].dtype
-            # NOTE: since we are updating existing values, appending doesn't work:         assert ds_to_append[c].shape == existing[c].shape
-            # NOTE: since we are updating existing values, appending doesn't work:         # optional but safest:
-            # NOTE: since we are updating existing values, appending doesn't work:         assert (ds_to_append[c].values == existing[c].values).all()
-            # NOTE: since we are updating existing values, appending doesn't work:     for c in list(ds_to_append.data_vars): # e.g ndvi_processed, mask_array
-            # NOTE: since we are updating existing values, appending doesn't work:         assert ds_to_append[c].dtype == existing[c].dtype
-            # NOTE: since we are updating existing values, appending doesn't work:     # show_ds_structure(ds_to_append)
-            # NOTE: since we are updating existing values, appending doesn't work:
-            # NOTE: since we are updating existing values, appending doesn't work:     # NOTE: dropping secondary coordinates (non-dimension coordinates) 
-            # NOTE: since we are updating existing values, appending doesn't work:     #       seems safest to append
-            # NOTE: since we are updating existing values, appending doesn't work:     # Only keep main coords (and doy) for correct appending:
-            # NOTE: since we are updating existing values, appending doesn't work:     ds_to_append.drop_vars(["x_idx", "y", "y_idx", "x"]).to_zarr(
-            # NOTE: since we are updating existing values, appending doesn't work:         HISTO_ZARR_OUTPUT,
-            # NOTE: since we are updating existing values, appending doesn't work:         mode="a-",
-            # NOTE: since we are updating existing values, appending doesn't work:         append_dim="date",
-            # NOTE: since we are updating existing values, appending doesn't work:         compute=True,
-            # NOTE: since we are updating existing values, appending doesn't work:         encoding={},  # NOTE: since we append encoding must not be provided
-            # NOTE: since we are updating existing values, appending doesn't work:     )
-            # NOTE: since we are updating existing values, appending doesn't work:     # dds = xr.open_dataset(HISTO_ZARR_OUTPUT)
-            # NOTE: since we are updating existing values, appending doesn't work:   
-            # NOTE: since we are updating existing values, appending doesn't work:     # Post-writing check of resulting file content, if this fails do 
-            # NOTE: since we are updating existing values, appending doesn't work:     # the fallback procedure and resolve to a full rewrite. 
-            # NOTE: since we are updating existing values, appending doesn't work:     # NOTE: Unsure: Is a full rewrite still possible given that we 
-            # NOTE: since we are updating existing values, appending doesn't work:     #       attempted to overwrite values with the appending above? 
-            # NOTE: since we are updating existing values, appending doesn't work:     #       I do believe so, since we used (mode = "a-"), but not 100% sure.
-            # NOTE: since we are updating existing values, appending doesn't work:     n_appended = ds_to_append.sizes['date']
-            # NOTE: since we are updating existing values, appending doesn't work:     old_and_new_dates = (xr.open_dataset(HISTO_ZARR_OUTPUT)
-            # NOTE: since we are updating existing values, appending doesn't work:         .isel(date = slice(-n_appended-1,-n_appended+1))
-            # NOTE: since we are updating existing values, appending doesn't work:         .date.values) 
-            # NOTE: since we are updating existing values, appending doesn't work:     if (old_and_new_dates[1] - old_and_new_dates[0]) != np.timedelta64(1, 'D'):
-            # NOTE: since we are updating existing values, appending doesn't work:         raise ValueError(f"Dates of resulting data set are not exactly 1 day apart at interface: {old_and_new_dates}")
-            # NOTE: since we are updating existing values, appending doesn't work:     else:
-            # NOTE: since we are updating existing values, appending doesn't work:         print("Append successfully completed.", flush=True)
+        print(f"Previously, L2-finalized dates (L2-frac > {TARGET_PERCENTAGE_L2/100}) in updated data set:\n  "+
+            "\n  ".join(np.datetime_as_string(dates_L2_previously_finalized[-6:], unit='D')), 
+            flush=True)
 
-            # except Exception as e:
-            HISTO_ZARR_OUTPUT = HISTO_ZARR_INPUT + ".updated_" + dt.datetime.now().strftime("%Y%m%d_%Hh%Mm%Ss")
-            print(f"writing to new file\n  {HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
-            fallback_action_overwrite_zarr(HISTO_ZARR_OUTPUT)
-            TODO_replace_original_HISTO_ZARR_INPUT = HISTO_ZARR_OUTPUT
+        print(f"Newest, L2-finalized dates (L2-frac > {TARGET_PERCENTAGE_L2/100}) in updated data set:\n  "+
+            "\n  ".join(np.datetime_as_string(dates_L2_now_finalized[-6:], unit='D')), 
+            flush=True)
 
-            # print(f"Appending failed: {e}. Falling back to rewrite.", flush=True)
-            # # Backup original store (move directory) and write full dataset
-            # backup = HISTO_ZARR_INPUT + ".backup_" + dt.datetime.now().strftime("%Y%m%d_%Hh%M")
-            # try:
-            #     shutil.move(HISTO_ZARR_INPUT, backup)
-            #     print(f"Backed up original store to {backup}", flush=True)
-            # except Exception as e2:
-            #     print(f"Backup failed: {e2} -- continuing to overwrite.", flush=True)
-            # 
-            # # duplicate of else
-            # fallback_action_overwrite_zarr()
-        else:
-            print(f"writing to new file\n  {HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
-            fallback_action_overwrite_zarr(HISTO_ZARR_OUTPUT)
-            TODO_replace_original_HISTO_ZARR_INPUT = False
+        print("Updated dataset:", flush = True)
+        print(historic_ds, flush = True)
 
-    # assert that output can be opened
-
-    def folder_size(path):
-        total = 0
-        for dirpath, dirnames, filenames in os.walk(path):
-            for name in filenames:
-                fp = os.path.join(dirpath, name)
-                if os.path.isfile(fp):
-                    total += os.path.getsize(fp)
-        return total
-
-    if TODO_replace_original_HISTO_ZARR_INPUT: # if anything else than False, proceed with replacement:
-        #if (updated_historic_ds.nbytes/1e6 >= historic_ds.nbytes/1e6):
-        #if (folder_size(HISTO_ZARR_OUTPUT) >= 0.85 * folder_size(HISTO_ZARR_INPUT)): # include fudge factor of 0.85
-            # okay updated storage zarr is larger or equal than previous storage zarr
-            # proceed with deleting previous and renaming updated:
-            try:
-                shutil.rmtree(HISTO_ZARR_INPUT)
-                shutil.move(HISTO_ZARR_OUTPUT, HISTO_ZARR_INPUT)
-                print(f"Updated original store {HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}", flush=True)
-            except Exception as e2:
-                msg = (f"Error updating data storage: {e2} --\n"+
-                   f"ABORTED. To recover, please manually delete {HISTO_ZARR_INPUT} and manually rename\n"+
-                   f"{HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}.")
-                raise ValueError(msg)
-        # else:
-        #     msg = (f"Error updating data storage.\n"+
-        #            f"{HISTO_ZARR_OUTPUT} has smaller file size than\n{HISTO_ZARR_INPUT} This code expected the opposite.\n"+
-        #            f"ABORTING NOW. If expected, please manually delete {HISTO_ZARR_INPUT} and manually rename\n"+
-        #            f"{HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}.")
-        #     raise ValueError(msg)    
-
-    # extend previous visual overview of the update:
-    # updated_historic_ds  = xr.open_zarr("/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-1kmX1km.zarr.updated_20260526_10h25m51s", chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-    # updated_historic_ds  = xr.open_zarr("/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr.updated_20260526_11h28m54s", chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-    updated_historic_ds  = xr.open_zarr(HISTO_ZARR_OUTPUT, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
-    updated_df_mfrac, updated_df_Lfrac, dates_L2_now_finalized = get_L2_coverage_for_each_date(
-        # xr.Dataset({"mask_array": mask_processed}).sel(date = dates_array.values[-MAX_DAYS_L1_OVERWRITE:])
-        updated_historic_ds.sel(date = updated_historic_ds["date"].values[-MAX_DAYS_L1_OVERWRITE:]),
-        target_fraction_L2 = TARGET_PERCENTAGE_L2/100
-    )
-
-    print(f"Previously, L2-finalized dates (L2-frac > {TARGET_PERCENTAGE_L2/100}) in updated data set:\n  "+
-          "\n  ".join(np.datetime_as_string(dates_L2_previously_finalized[-6:], unit='D')), 
-          flush=True)
-
-    print(f"Newest, L2-finalized dates (L2-frac > {TARGET_PERCENTAGE_L2/100}) in updated data set:\n  "+
-          "\n  ".join(np.datetime_as_string(dates_L2_now_finalized[-6:], unit='D')), 
-          flush=True)
-
-    print("Updated dataset:", flush = True)
-    print(historic_ds, flush = True)
-
-    axes[1,0].stackplot( updated_df_mfrac.index, updated_df_mfrac.T.values, labels=updated_df_mfrac.columns, step='post' )
-    axes[1,1].stackplot( updated_df_Lfrac.index, updated_df_Lfrac.T.values, labels=updated_df_Lfrac.columns, step='post' )
-    axes[1,0].set_title("Updated data storage after processing")
-    axes[1,1].set_title("Updated data storage after processing")
-    axes[1,0].legend(title="mask_array_code", loc="upper left")
-    axes[1,1].legend(title="Processing status", loc="upper left")
-    plt.tight_layout()
-    plt.savefig("test.png")
-    plt.savefig(plot_filename)
-    print(plot_filename, flush = True)
-    
-    client.close()
+        axes[1,0].stackplot( updated_df_mfrac.index, updated_df_mfrac.T.values, labels=updated_df_mfrac.columns, step='post' )
+        axes[1,1].stackplot( updated_df_Lfrac.index, updated_df_Lfrac.T.values, labels=updated_df_Lfrac.columns, step='post' )
+        axes[1,0].set_title("Updated data storage after processing")
+        axes[1,1].set_title("Updated data storage after processing")
+        axes[1,0].legend(title="mask_array_code", loc="upper left")
+        axes[1,1].legend(title="Processing status", loc="upper left")
+        plt.tight_layout()
+        plt.savefig("test.png")
+        plt.savefig(plot_filename)
+        print(plot_filename, flush = True)
+        
 
     t1 = time.perf_counter()
     print(f"Total runtime: {t1 - t0:.2f} seconds")

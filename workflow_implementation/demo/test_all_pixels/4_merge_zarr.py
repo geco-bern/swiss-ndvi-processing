@@ -65,211 +65,211 @@ if __name__ == "__main__":
 
     N_WORKERS = 50
     MEMORY_PER_WORKER = "24GB"
-    cluster = LocalCluster(
+    with Client(
         n_workers=N_WORKERS,
         threads_per_worker=1,
         processes=True,
         memory_limit=MEMORY_PER_WORKER,
         dashboard_address=":8343",
         local_directory= DASK_TEMP_DIR,
-    )
-    client = Client(cluster)
-    print(client, flush = True)
-    print(client.dashboard_link, flush = True) # use this dashboard to follow progress
+    ) as client:
+        print(client, flush=True)
+        print(client.dashboard_link, flush = True) # use this dashboard to follow progress
+        # print(dask.config.get("scheduler"), flush=True)
 
 
-    # =====================================================
-    #  Load historic and new observation data sets
-    # =====================================================
-    DATE_CHUNKS = 365
-    PIXEL_CHUNKS = 40000
-    # DATE_CHUNKS  = historic_ds.chunks['date'][0]  # should be 30 days # TODO: why not this?
-    # PIXEL_CHUNKS = historic_ds.chunks['pixel'][0]                     # TODO: why not this?
+        # =====================================================
+        #  Load historic and new observation data sets
+        # =====================================================
+        DATE_CHUNKS = 365
+        PIXEL_CHUNKS = 40000
+        # DATE_CHUNKS  = historic_ds.chunks['date'][0]  # should be 30 days # TODO: why not this?
+        # PIXEL_CHUNKS = historic_ds.chunks['pixel'][0]                     # TODO: why not this?
 
 
-    # --- load historic dataset ------------------------------------
-    historic_ds = xr.open_zarr(HISTO_ZARR, chunks={})
+        # --- load historic dataset ------------------------------------
+        historic_ds = xr.open_zarr(HISTO_ZARR, chunks={})
 
-    # --- load new data dataset ------------------------------------
-    new_observations_ds = xr.open_dataset(DOWNLOAD_ZARR, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "datetime": -1})
+        # --- load new data dataset ------------------------------------
+        new_observations_ds = xr.open_dataset(DOWNLOAD_ZARR, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "datetime": -1})
 
-    # Subset new_observations_ds to correspond to same pixels as in historic_ds
-    if (len(historic_ds.pixel.values) < len(new_observations_ds.pixel.values)):
-        print(f"Subsetting downloaded data to spatial extent of historic file:\n{HISTO_ZARR}", flush = True)
-        print(f"Subsetting {len(historic_ds.pixel.values)} (historic) of {len(new_observations_ds.pixel.values)} (downloaded) pixels.", flush = True)
-    
-    new_observations_ds = new_observations_ds.sel(pixel=historic_ds.pixel)
-    
-    # attempt to plot
-        # new_observations_ds
-        # xmin, xmax = 2600000, 2601500
-        # ymin, ymax = 1196000, 1197500
-        # pixels_subset_mask = (
-        #     (new_observations_ds.x.values >= xmin) &
-        #     (new_observations_ds.x.values <= xmax) &
-        #     (new_observations_ds.y.values >= ymin) &
-        #     (new_observations_ds.y.values <= ymax)
-        # )
-        # new_observations_ds["ndvi"].x.values
-        # new_observations_subset_ds = new_observations_ds["ndvi"].isel(pixel=pixels_subset_mask.nonzero()[0])
-        # plot_da_map(new_observations_subset_ds.isel(datetime = 0))
-    
-    # =====================================================
-    #  Aggregate multiple daily observation
-    #  and resample to daily intervals (between observations)
-    # =====================================================
-
-    # FOR DEVELOPMENT: new_observations_ds["ndvi"].isel(datetime = 1) # 2025-12-09T10:33:29
-    # FOR DEVELOPMENT: new_observations_ds["ndvi"].isel(datetime = 2) # 2025-12-09T10:44:51
-    # FOR DEVELOPMENT: plot_da_map(new_observations_ds["ndvi"].isel(datetime = 1),
-    # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = 'NDVI_2025-12-09_10h33.png')
-    # FOR DEVELOPMENT: plot_da_map(new_observations_ds["ndvi"].isel(datetime = 2),
-    # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = 'NDVI_2025-12-09_10h44.png')
-    
-    INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
-    NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
-    
-    # Decide how to collapse sub-daily duplicates to one observed value per day
-    agg = 'first' # # TODO: choose 'mean' or 'first'
-    if agg == 'first':
-        ndvi_daily_between_obs = (new_observations_ds
-            # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
-            #       and they are later both replace by only one of them NO_COVERAGE
-            #       effectively this removes INVALID pixels TODO: is this desired behavior?
-            .where((new_observations_ds['ndvi']  != NO_COVERAGE) &
-                    (new_observations_ds['ndvi'] != INVALID))
-            .groupby(datetime=xr.groupers.TimeResampler('1D'))
-            .first()
-            .fillna(NO_COVERAGE).astype(np.int16)
-            .rename({'datetime': 'date'})
-        )
-    elif agg == 'mean':
-        ndvi_daily_between_obs = (new_observations_ds
-            # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
-            #       and they are later both replace by only one of them NO_COVERAGE
-            #       effectively this removes INVALID pixels TODO: is this desired behavior?
-            .where((new_observations_ds['ndvi'] != NO_COVERAGE) &
-                    (new_observations_ds['ndvi'] != INVALID))
-            .astype(np.float32)
-            .groupby(datetime=xr.groupers.TimeResampler('1D'))
-            .mean(skipna=True)
-            .fillna(NO_COVERAGE).astype(np.int16)
-            .rename({'datetime': 'date'})
-        )
-    else:
-        raise ValueError(f"Unsupported agg={agg}")
-
-    # keep track which dates were actually observation dates
-    observation_datetimes = pd.DatetimeIndex(new_observations_ds["datetime"].values)
-    observation_dates     = pd.DatetimeIndex(observation_datetimes).floor("D")
-
-
-    # =====================================================
-    #  Initialize empty daily dataset to append to historic
-    #  i.e. extend it back to last historic date
-    # =====================================================
-    last_historic_date = historic_ds['date'].max().values
-    start_date         = np.datetime_as_string(last_historic_date + 1, unit='D')  # Note the shift +1, since we want to avoid a duplicate
-    end_date           = observation_dates.max()
-
-    # build full daily index from start_date to end_date (make sure start_date/end_date are pd-compatible)
-    daily_dates_since_last_historic = pd.date_range(
-        start=pd.to_datetime(start_date).floor("D"),
-        end=pd.to_datetime(end_date).floor("D"),
-        freq="D")
-
-    # reindex coords to guarantee daily coverage starts at start_date
-    # i.e. extending back to last historic date:
-    ndvi_daily_since_last_historic = (ndvi_daily_between_obs
-        .reindex(date=daily_dates_since_last_historic, 
-                 method=None) # None (default): don’t fill gaps;
-                              # fills missing days with NaN; fill later if desired
-        .fillna(NO_COVERAGE).astype(np.int16)
-    )
+        # Subset new_observations_ds to correspond to same pixels as in historic_ds
+        if (len(historic_ds.pixel.values) < len(new_observations_ds.pixel.values)):
+            print(f"Subsetting downloaded data to spatial extent of historic file:\n{HISTO_ZARR}", flush = True)
+            print(f"Subsetting {len(historic_ds.pixel.values)} (historic) of {len(new_observations_ds.pixel.values)} (downloaded) pixels.", flush = True)
         
-    # ndvi_daily_between_obs.date.values
-    # ndvi_daily_since_last_historic.date.values
+        new_observations_ds = new_observations_ds.sel(pixel=historic_ds.pixel)
+        
+        # attempt to plot
+            # new_observations_ds
+            # xmin, xmax = 2600000, 2601500
+            # ymin, ymax = 1196000, 1197500
+            # pixels_subset_mask = (
+            #     (new_observations_ds.x.values >= xmin) &
+            #     (new_observations_ds.x.values <= xmax) &
+            #     (new_observations_ds.y.values >= ymin) &
+            #     (new_observations_ds.y.values <= ymax)
+            # )
+            # new_observations_ds["ndvi"].x.values
+            # new_observations_subset_ds = new_observations_ds["ndvi"].isel(pixel=pixels_subset_mask.nonzero()[0])
+            # plot_da_map(new_observations_subset_ds.isel(datetime = 0))
+        
+        # =====================================================
+        #  Aggregate multiple daily observation
+        #  and resample to daily intervals (between observations)
+        # =====================================================
 
-    # FOR DEVELOPMENT: observation_dates[1] # 2025-12-09
-    # FOR DEVELOPMENT: observation_dates[2] # 2025-12-09
-    # FOR DEVELOPMENT: plot_da_map(ndvi_daily_since_last_historic["ndvi"].sel(date= observation_dates[1]),
-    # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = f"NDVI_2025-12-09_combined_{agg}.png")
-    
-    # Print status
-    print(
-        f"Initialized n={len(daily_dates_since_last_historic)} daily dates:",
-        #f"\nfrom {daily_dates_since_last_historic.min().date()}"+
-        #f" to {daily_dates_since_last_historic.max().date()}"+
-        # f"\nwith observations on days at:"+
-        # f"\n"+"\n".join([f"  {d.strftime('%Y-%m-%d')}: {dt.strftime('%Y-%m-%d_%Hh%M')}" 
-        #    for (d, dt) in zip(observation_dates, observation_datetimes)]),
-        flush=True,
-    )
-    # group observation times (as strings) by date
-    times = pd.Series(observation_datetimes.strftime("%H:%M:%S"), 
-                    index=observation_datetimes.floor("D"))
-    grouped = times.groupby(level=0).agg(lambda s: ",".join(s))
+        # FOR DEVELOPMENT: new_observations_ds["ndvi"].isel(datetime = 1) # 2025-12-09T10:33:29
+        # FOR DEVELOPMENT: new_observations_ds["ndvi"].isel(datetime = 2) # 2025-12-09T10:44:51
+        # FOR DEVELOPMENT: plot_da_map(new_observations_ds["ndvi"].isel(datetime = 1),
+        # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = 'NDVI_2025-12-09_10h33.png')
+        # FOR DEVELOPMENT: plot_da_map(new_observations_ds["ndvi"].isel(datetime = 2),
+        # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = 'NDVI_2025-12-09_10h44.png')
+        
+        INVALID = -2**15 # Filtered out pixels, e.g. cloud shadows
+        NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
+        
+        # Decide how to collapse sub-daily duplicates to one observed value per day
+        agg = 'first' # # TODO: choose 'mean' or 'first'
+        if agg == 'first':
+            ndvi_daily_between_obs = (new_observations_ds
+                # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
+                #       and they are later both replace by only one of them NO_COVERAGE
+                #       effectively this removes INVALID pixels TODO: is this desired behavior?
+                .where((new_observations_ds['ndvi']  != NO_COVERAGE) &
+                        (new_observations_ds['ndvi'] != INVALID))
+                .groupby(datetime=xr.groupers.TimeResampler('1D'))
+                .first()
+                .fillna(NO_COVERAGE).astype(np.int16)
+                .rename({'datetime': 'date'})
+            )
+        elif agg == 'mean':
+            ndvi_daily_between_obs = (new_observations_ds
+                # NOTE: by filtering out NO_COVERAGE an INVALID they both become NaN
+                #       and they are later both replace by only one of them NO_COVERAGE
+                #       effectively this removes INVALID pixels TODO: is this desired behavior?
+                .where((new_observations_ds['ndvi'] != NO_COVERAGE) &
+                        (new_observations_ds['ndvi'] != INVALID))
+                .astype(np.float32)
+                .groupby(datetime=xr.groupers.TimeResampler('1D'))
+                .mean(skipna=True)
+                .fillna(NO_COVERAGE).astype(np.int16)
+                .rename({'datetime': 'date'})
+            )
+        else:
+            raise ValueError(f"Unsupported agg={agg}")
 
-    # build DataFrame: 'daily', 'obs_date' (date or NaT), 'obs_times' (comma-joined times or NaN)
-    status_df = pd.DataFrame({"daily": daily_dates_since_last_historic})
-    status_df["obs_date"] = status_df["daily"].where(status_df["daily"].isin(grouped.index))
-    status_df["obs_times"] = status_df["daily"].map(grouped).fillna("")
-    print(status_df, flush=True)
-    # Initialized n=13 daily dates:
-    #         daily   obs_date          obs_times
-    # 0  2025-11-30        NaT                   
-    # 1  2025-12-01        NaT                   
-    # 2  2025-12-02        NaT                   
-    # 3  2025-12-03        NaT                   
-    # 4  2025-12-04        NaT                   
-    # 5  2025-12-05        NaT                   
-    # 6  2025-12-06 2025-12-06           10:23:19
-    # 7  2025-12-07        NaT                   
-    # 8  2025-12-08        NaT                   
-    # 9  2025-12-09 2025-12-09  10:33:29,10:44:51
-    # 10 2025-12-10        NaT                   
-    # 11 2025-12-11        NaT                   
-    # 12 2025-12-12 2025-12-12           10:43:39
+        # keep track which dates were actually observation dates
+        observation_datetimes = pd.DatetimeIndex(new_observations_ds["datetime"].values)
+        observation_dates     = pd.DatetimeIndex(observation_datetimes).floor("D")
 
 
-    # new_observations_ds["ndvi"].values.shape    # (4,4216)
-    # ndvi_daily_between_obs["ndvi"].values.shape # (7,4216)
-    # new_observations_ds.datetime.values         # 4 values from (2025-12-06_10h23, 2025-12-09_10h33, 2025-12-09_10h44, 2025-12-12_10h43)
-    # ndvi_daily_between_obs.datetime.values      # 7 values from (2025-12-06, ..., 2025-12-12)
+        # =====================================================
+        #  Initialize empty daily dataset to append to historic
+        #  i.e. extend it back to last historic date
+        # =====================================================
+        last_historic_date = historic_ds['date'].max().values
+        start_date         = np.datetime_as_string(last_historic_date + 1, unit='D')  # Note the shift +1, since we want to avoid a duplicate
+        end_date           = observation_dates.max()
 
-    # Append day-of-year (for merging of median expected NDVI from model)
-    doy_array = daily_dates_since_last_historic.dayofyear.values
-    ndvi_daily_since_last_historic = ndvi_daily_since_last_historic.assign_coords(
-        doy   = ('date', doy_array.astype(np.int32))
-    )
-    
-    # Keep track which dates were actually observation dates:
-    # add a DataArray to Dataset, which specifies the dates that were observations
-    ndvi_daily_since_last_historic["obs_date"] = ndvi_daily_since_last_historic.date.isin(observation_dates)
+        # build full daily index from start_date to end_date (make sure start_date/end_date are pd-compatible)
+        daily_dates_since_last_historic = pd.date_range(
+            start=pd.to_datetime(start_date).floor("D"),
+            end=pd.to_datetime(end_date).floor("D"),
+            freq="D")
 
-    # =====================================================
-    #  Write daily dataset (containing NaN)
-    #  for later i.   gapfilling, 
-    #            ii.  outlier detection, and 
-    #            iii. appending to historic
-    # =====================================================
-    new_ds = (ndvi_daily_since_last_historic
-                .rename({'ndvi':'ndvi_obs',  # TODO: this does not make sense. Given that we already interpolated ndvi would be a better name than ndvi_obs
-                         'ndsi':'ndsi_obs'}) # TODO: this does not make sense. Given that we already interpolated ndvi would be a better name than ndvi_obs
-                .chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS}))
-    # new_ds has: 
-    #   coords: x,y,x_idx,y_idx, pixel, date, datetime; 
-    #   vars:   ndvi_obs,ndsi_obs,obs_date
-    #   attrs:  pixel_definition,transform_note,transform_coeffs,transform_instr,description_ndvi,description_ndsi,nodata,cloud_shadow
-    
-    # drop any coord/data var chunk encodings that conflict
-    for name in list(new_ds.coords) + list(new_ds.data_vars):
-        new_ds[name].encoding.pop("chunks", None)
-        new_ds[name].encoding.pop("compressor", None)
-        new_ds[name].encoding.pop("compressors", None)
+        # reindex coords to guarantee daily coverage starts at start_date
+        # i.e. extending back to last historic date:
+        ndvi_daily_since_last_historic = (ndvi_daily_between_obs
+            .reindex(date=daily_dates_since_last_historic, 
+                    method=None) # None (default): don’t fill gaps;
+                                # fills missing days with NaN; fill later if desired
+            .fillna(NO_COVERAGE).astype(np.int16)
+        )
+            
+        # ndvi_daily_between_obs.date.values
+        # ndvi_daily_since_last_historic.date.values
 
-    # write out    
-    new_ds.to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
+        # FOR DEVELOPMENT: observation_dates[1] # 2025-12-09
+        # FOR DEVELOPMENT: observation_dates[2] # 2025-12-09
+        # FOR DEVELOPMENT: plot_da_map(ndvi_daily_since_last_historic["ndvi"].sel(date= observation_dates[1]),
+        # FOR DEVELOPMENT:             reduction_factor = 5, png_fname = f"NDVI_2025-12-09_combined_{agg}.png")
+        
+        # Print status
+        print(
+            f"Initialized n={len(daily_dates_since_last_historic)} daily dates:",
+            #f"\nfrom {daily_dates_since_last_historic.min().date()}"+
+            #f" to {daily_dates_since_last_historic.max().date()}"+
+            # f"\nwith observations on days at:"+
+            # f"\n"+"\n".join([f"  {d.strftime('%Y-%m-%d')}: {dt.strftime('%Y-%m-%d_%Hh%M')}" 
+            #    for (d, dt) in zip(observation_dates, observation_datetimes)]),
+            flush=True,
+        )
+        # group observation times (as strings) by date
+        times = pd.Series(observation_datetimes.strftime("%H:%M:%S"), 
+                        index=observation_datetimes.floor("D"))
+        grouped = times.groupby(level=0).agg(lambda s: ",".join(s))
+
+        # build DataFrame: 'daily', 'obs_date' (date or NaT), 'obs_times' (comma-joined times or NaN)
+        status_df = pd.DataFrame({"daily": daily_dates_since_last_historic})
+        status_df["obs_date"] = status_df["daily"].where(status_df["daily"].isin(grouped.index))
+        status_df["obs_times"] = status_df["daily"].map(grouped).fillna("")
+        print(status_df, flush=True)
+        # Initialized n=13 daily dates:
+        #         daily   obs_date          obs_times
+        # 0  2025-11-30        NaT                   
+        # 1  2025-12-01        NaT                   
+        # 2  2025-12-02        NaT                   
+        # 3  2025-12-03        NaT                   
+        # 4  2025-12-04        NaT                   
+        # 5  2025-12-05        NaT                   
+        # 6  2025-12-06 2025-12-06           10:23:19
+        # 7  2025-12-07        NaT                   
+        # 8  2025-12-08        NaT                   
+        # 9  2025-12-09 2025-12-09  10:33:29,10:44:51
+        # 10 2025-12-10        NaT                   
+        # 11 2025-12-11        NaT                   
+        # 12 2025-12-12 2025-12-12           10:43:39
+
+
+        # new_observations_ds["ndvi"].values.shape    # (4,4216)
+        # ndvi_daily_between_obs["ndvi"].values.shape # (7,4216)
+        # new_observations_ds.datetime.values         # 4 values from (2025-12-06_10h23, 2025-12-09_10h33, 2025-12-09_10h44, 2025-12-12_10h43)
+        # ndvi_daily_between_obs.datetime.values      # 7 values from (2025-12-06, ..., 2025-12-12)
+
+        # Append day-of-year (for merging of median expected NDVI from model)
+        doy_array = daily_dates_since_last_historic.dayofyear.values
+        ndvi_daily_since_last_historic = ndvi_daily_since_last_historic.assign_coords(
+            doy   = ('date', doy_array.astype(np.int32))
+        )
+        
+        # Keep track which dates were actually observation dates:
+        # add a DataArray to Dataset, which specifies the dates that were observations
+        ndvi_daily_since_last_historic["obs_date"] = ndvi_daily_since_last_historic.date.isin(observation_dates)
+
+        # =====================================================
+        #  Write daily dataset (containing NaN)
+        #  for later i.   gapfilling, 
+        #            ii.  outlier detection, and 
+        #            iii. appending to historic
+        # =====================================================
+        new_ds = (ndvi_daily_since_last_historic
+                    .rename({'ndvi':'ndvi_obs',  # TODO: this does not make sense. Given that we already interpolated ndvi would be a better name than ndvi_obs
+                            'ndsi':'ndsi_obs'}) # TODO: this does not make sense. Given that we already interpolated ndvi would be a better name than ndvi_obs
+                    .chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS}))
+        # new_ds has: 
+        #   coords: x,y,x_idx,y_idx, pixel, date, datetime; 
+        #   vars:   ndvi_obs,ndsi_obs,obs_date
+        #   attrs:  pixel_definition,transform_note,transform_coeffs,transform_instr,description_ndvi,description_ndsi,nodata,cloud_shadow
+        
+        # drop any coord/data var chunk encodings that conflict
+        for name in list(new_ds.coords) + list(new_ds.data_vars):
+            new_ds[name].encoding.pop("chunks", None)
+            new_ds[name].encoding.pop("compressor", None)
+            new_ds[name].encoding.pop("compressors", None)
+
+        # write out    
+        new_ds.to_zarr(OUT_ZARR_TMP, mode="w", zarr_format=3)
 
 
     # overview of data structures: ---------------------------------------------
