@@ -17,6 +17,11 @@ warnings.filterwarnings(
     message="Numcodecs codecs are not in the Zarr version 3 specification",
     module="numcodecs.zarr3"
 )
+warnings.filterwarnings(
+    "ignore", 
+    message="Consolidated metadata is currently not part in the Zarr format 3 specification",
+    module=r"zarr\.api\.asynchronous"
+)
 
 # HOW TO RUN FROM BASH:
 # source /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate

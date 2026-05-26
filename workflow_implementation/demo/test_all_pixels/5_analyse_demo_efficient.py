@@ -21,6 +21,11 @@ warnings.filterwarnings(
     message="Numcodecs codecs are not in the Zarr version 3 specification",
     module="numcodecs.zarr3"
 )
+warnings.filterwarnings(
+    "ignore", 
+    message="Consolidated metadata is currently not part in the Zarr format 3 specification",
+    module=r"zarr\.api\.asynchronous"
+)
 
 NO_COVERAGE = 32767
 NO_COVERAGE = 2**15 - 1 # Pixels with no data for the given time step
