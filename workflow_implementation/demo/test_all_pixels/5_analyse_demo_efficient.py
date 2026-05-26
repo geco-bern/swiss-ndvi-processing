@@ -479,10 +479,10 @@ if __name__ == "__main__":
     # --- apply gapfilling and outlier detection function: continuous_ndvi() ----------------------------------
 
     # prepare arguments spanning historic and new data: all lazy
-    ndvi_array   = merged_ds["ndvi_processed"].persist()
-    median_array = merged_ds["median_ndvi"].persist()
+    ndvi_array   = merged_ds["ndvi_processed"].persist() # .isel(pixel=slice(0,500))
+    median_array = merged_ds["median_ndvi"].persist() # .isel(pixel=slice(0,500))
     dates_array  = merged_ds["date"].persist()
-    mask_array   = merged_ds["mask_array"].persist()
+    mask_array   = merged_ds["mask_array"].persist() # .isel(pixel=slice(0,500))
     # using persist() reduces graph size
 
     # reduce graph size by using futures
@@ -654,7 +654,7 @@ if __name__ == "__main__":
             # NOTE: since we are updating existing values, appending doesn't work:         print("Append successfully completed.", flush=True)
 
             # except Exception as e:
-            HISTO_ZARR_OUTPUT = HISTO_ZARR_INPUT + ".updated_" + dt.datetime.now().strftime("%Y%m%d_%Hh%M")
+            HISTO_ZARR_OUTPUT = HISTO_ZARR_INPUT + ".updated_" + dt.datetime.now().strftime("%Y%m%d_%Hh%Mm%Ss")
             print(f"writing to new file\n  {HISTO_ZARR_INPUT}\n=> {HISTO_ZARR_OUTPUT}", flush=True)
             fallback_action_overwrite_zarr(HISTO_ZARR_OUTPUT)
             TODO_replace_original_HISTO_ZARR_INPUT = HISTO_ZARR_OUTPUT
@@ -678,30 +678,37 @@ if __name__ == "__main__":
     # assert that output can be opened
     updated_historic_ds  = xr.open_zarr(HISTO_ZARR_OUTPUT, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
 
+    def folder_size(path):
+        total = 0
+        for dirpath, dirnames, filenames in os.walk(path):
+            for name in filenames:
+                fp = os.path.join(dirpath, name)
+                if os.path.isfile(fp):
+                    total += os.path.getsize(fp)
+        return total
+
     if TODO_replace_original_HISTO_ZARR_INPUT: # if anything else than False, proceed with replacement:
-        if (updated_historic_ds.nbytes/1e6 >= historic_ds.nbytes/1e6):
+        #if (updated_historic_ds.nbytes/1e6 >= historic_ds.nbytes/1e6):
+        if (folder_size(HISTO_ZARR_OUTPUT) >= folder_size(HISTO_ZARR_INPUT)):
             # okay updated storage zarr is larger or equal than previous storage zarr
             # proceed with deleting previous and renaming updated:
             try:
-                shutil.move(HISTO_ZARR_INPUT,  HISTO_ZARR_INPUT+".bkp.zarr") # os.remove(HISTO_ZARR_INPUT) # TODO: activate this removal
+                shutil.rmtree(HISTO_ZARR_INPUT)
                 shutil.move(HISTO_ZARR_OUTPUT, HISTO_ZARR_INPUT)
-                print(f"Updated original store {HISTO_ZARR_INPUT} => {HISTO_ZARR_OUTPUT}", flush=True)
+                print(f"Updated original store {HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}", flush=True)
             except Exception as e2:
-                print(f"Backup failed: {e2} -- continuing to overwrite.", flush=True)
                 msg = (f"Error updating data storage: {e2} --\n"+
-                   f"ABORTED. To recover, please manually delete of {HISTO_ZARR_INPUT} and manually rename\n"+
+                   f"ABORTED. To recover, please manually delete {HISTO_ZARR_INPUT} and manually rename\n"+
                    f"{HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}.")
                 raise ValueError(msg)
-            
         else:
             msg = (f"Error updating data storage.\n"+
                    f"{HISTO_ZARR_OUTPUT} has smaller file size than\n{HISTO_ZARR_INPUT} This code expected the opposite.\n"+
-                   f"ABORTING NOW. If expected, please manually delete of {HISTO_ZARR_INPUT} and manually rename\n"+
+                   f"ABORTING NOW. If expected, please manually delete {HISTO_ZARR_INPUT} and manually rename\n"+
                    f"{HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}.")
             raise ValueError(msg)    
 
 
-    
     # output a visual overview of the update:
     updated_df_mfrac, updated_df_Lfrac, dates_L2_now_finalized = get_L2_coverage_for_each_date(
         # xr.Dataset({"mask_array": mask_processed}).sel(date = dates_array.values[-MAX_DAYS_L1_OVERWRITE:])
@@ -728,8 +735,7 @@ if __name__ == "__main__":
     axes[0,0].legend(title="mask_array_code", loc="upper left")
     axes[0,1].legend(title="Processing status", loc="upper left")
     plt.tight_layout()
-    # curr_datetime=dt.datetime.today().strftime('%Y-%m-%d_%Hh%M')
-    plt.savefig(HISTO_ZARR_OUTPUT.replace(".zarr", ".zarr_update.png"))
+    plt.savefig(HISTO_ZARR_OUTPUT.replace(".zarr", ".zarr_update")+".png")
     
     client.close()
 
