@@ -434,6 +434,33 @@ if __name__ == "__main__":
     print(historic_ds, flush = True)
     print("Newly downloaded dataset:", flush = True)
     print(new_ds, flush = True)
+
+
+    # --- assess processing status visually ----------------------------------
+    # check how many days of the storage must be rewritten (L1 => L2 update)
+    # historic_ds  = xr.open_zarr("/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr_bkp", chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+    df_mfrac, df_Lfrac, dates_L2_previously_finalized = get_L2_coverage_for_each_date(
+        historic_ds.sel(date = historic_ds["date"].values[-MAX_DAYS_L1_OVERWRITE:]),
+        target_fraction_L2 = TARGET_PERCENTAGE_L2/100
+    )
+    # output a visual overview of the update:
+    # plot the pixel fractions of each level: (before and after update)
+    fig, axes = plt.subplots(2,2, figsize=(14, 5), sharex=True, sharey=True)
+    axes[0,0].stackplot( df_mfrac.index, df_mfrac.T.values, labels=df_mfrac.columns, step='post' )
+    axes[0,1].stackplot( df_Lfrac.index, df_Lfrac.T.values, labels=df_Lfrac.columns, step='post' )
+    axes[0,0].set_title("Data storage before processing")
+    axes[0,1].set_title("Data storage before processing")
+    # format plot
+    [ax.set_ylim(0, 1)                      for ax in axes.flatten()]
+    [ax.set_ylabel("Forest pixel fraction") for ax in axes[:,0].flatten()]
+    [ax.set_xlabel("Date")                  for ax in axes[1,:].flatten()]
+    axes[0,0].legend(title="mask_array_code", loc="upper left")
+    axes[0,1].legend(title="Processing status", loc="upper left")
+    plt.tight_layout()
+    plot_filename = HISTO_ZARR_OUTPUT.replace(".zarr", ".zarr_update")+".png"
+    plt.savefig(plot_filename)
+    print(f"Created visual overview of update at: {plot_filename}", flush=True)
+
     
     # --- concatenate full datasets along time ----------------------------------
     # Add median NDVI from model    
@@ -522,21 +549,15 @@ if __name__ == "__main__":
     # g = mask_processed.__dask_graph__()
     g = ndvi_processed.__dask_graph__()
     print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
-    #                    46_818 pixels:              | 586_503 pixels:             | 16_041_205 pixels:           | 105_715_396 pixels:
-    # without persist(): 62 layers, and 40195 tasks  | 62 layers, and 40730 tasks  | XX layers, and XXXXXXX tasks | xxx layers, and xxx tasks
-    # with persist():    11 layers, and    21 tasks  | 11 layers, and   151 tasks  | XX layers, and  XXXXXX tasks | xxx layers, and xxx tasks
-    # without persist(): .............. and 10.58 MiB
-    # with persist():    size 23.08 MiB and 10.58 MiB
+    #                    8 pixels:                   |46_818 pixels:              | 586_503 pixels:             | 16_041_205 pixels:           | 105_715_396 pixels:
+    # without persist(): 57 layers, and 39715        |62 layers, and 40195 tasks  | 62 layers, and 40730 tasks  | XX layers, and XXXXXXX tasks | xxx layers, and xxx tasks
+    # with persist():    11 layers, and 11 tasks     |11 layers, and    21 tasks  | 11 layers, and   151 tasks  | XX layers, and  XXXXXX tasks | xxx layers, and xxx tasks
+    # without persist():                             |.............. and 10.58 MiB
+    # with persist():                                |size 23.08 MiB and 10.58 MiB
     
     # visualize(ndvi_processed)
 
     # --- append the new processed data to the historic_ds ----------------------------------
-
-    # check how many days of the storage must be rewritten (L1 => L2 update)
-    df_mfrac, df_Lfrac, dates_L2_previously_finalized = get_L2_coverage_for_each_date(
-        merged_ds.sel(date = dates_array.values[-MAX_DAYS_L1_OVERWRITE:]),
-        target_fraction_L2 = TARGET_PERCENTAGE_L2/100
-    )
 
     if len(dates_L2_previously_finalized) == 0: 
         raise ValueError(f"No dates found among last {MAX_DAYS_L1_OVERWRITE} days, "+
@@ -575,9 +596,9 @@ if __name__ == "__main__":
         g = extended_historic_ds.__dask_graph__()
         print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
         # Constructed graph with 36 layers, and 1045 tasks.
-        #                    46_818 pixels:              |586_503 pixels:             | 16_041_205 pixels:         | 105_715_396 pixels:
-        # without persist(): 79 layers, and 40319 tasks  |XX layers, and XXXXX tasks  | XX layers, and XXXXX tasks | xxx layers, and xxx tasks
-        # with persist():    36 layers, and   161 tasks  |36 layers, and  1045 tasks  | XX layers, and XXXXX tasks | xxx layers, and xxx tasks
+        #                    8 pixels:                   |46_818 pixels:              |586_503 pixels:             | 16_041_205 pixels:         | 105_715_396 pixels:
+        # without persist(): 74 layers, and 39789 tasks  |79 layers, and 40319 tasks  |XX layers, and XXXXX tasks  | XX layers, and XXXXX tasks | xxx layers, and xxx tasks
+        # with persist():    32 layers, and    89 tasks  |36 layers, and   161 tasks  |36 layers, and  1045 tasks  | XX layers, and XXXXX tasks | xxx layers, and xxx tasks
 
         # Explicit encoding: simple compressor for each data var
         # encoding = {v: {"compressors": None      } for v in extended_historic_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
@@ -683,7 +704,6 @@ if __name__ == "__main__":
             TODO_replace_original_HISTO_ZARR_INPUT = False
 
     # assert that output can be opened
-    updated_historic_ds  = xr.open_zarr(HISTO_ZARR_OUTPUT, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
 
     def folder_size(path):
         total = 0
@@ -715,34 +735,37 @@ if __name__ == "__main__":
         #            f"{HISTO_ZARR_OUTPUT} => {HISTO_ZARR_INPUT}.")
         #     raise ValueError(msg)    
 
-
-    # output a visual overview of the update:
+    # extend previous visual overview of the update:
+    # updated_historic_ds  = xr.open_zarr("/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-1kmX1km.zarr.updated_20260526_10h25m51s", chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+    # updated_historic_ds  = xr.open_zarr("/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr.updated_20260526_11h28m54s", chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+    updated_historic_ds  = xr.open_zarr(HISTO_ZARR_OUTPUT, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
     updated_df_mfrac, updated_df_Lfrac, dates_L2_now_finalized = get_L2_coverage_for_each_date(
         # xr.Dataset({"mask_array": mask_processed}).sel(date = dates_array.values[-MAX_DAYS_L1_OVERWRITE:])
-        updated_historic_ds.sel(date = dates_array.values[-MAX_DAYS_L1_OVERWRITE:]),
+        updated_historic_ds.sel(date = updated_historic_ds["date"].values[-MAX_DAYS_L1_OVERWRITE:]),
         target_fraction_L2 = TARGET_PERCENTAGE_L2/100
     )
-    
-    # plot the pixel fractions of each level: (before and after update)
-    fig, axes = plt.subplots(2,2, figsize=(14, 5), sharex=True, sharey=True)
-    axes[0,0].stackplot( df_mfrac.index, df_mfrac.T.values, labels=df_mfrac.columns, step='post' )
-    axes[0,1].stackplot( df_Lfrac.index, df_Lfrac.T.values, labels=df_Lfrac.columns, step='post' )
-    axes[0,0].set_title("Data storage before processing")
-    axes[0,1].set_title("Data storage before processing")
+
+    print(f"Previously, L2-finalized dates (L2-frac > {TARGET_PERCENTAGE_L2/100}) in updated data set:\n  "+
+          "\n  ".join(np.datetime_as_string(dates_L2_previously_finalized[-6:], unit='D')), 
+          flush=True)
+
+    print(f"Newest, L2-finalized dates (L2-frac > {TARGET_PERCENTAGE_L2/100}) in updated data set:\n  "+
+          "\n  ".join(np.datetime_as_string(dates_L2_now_finalized[-6:], unit='D')), 
+          flush=True)
+
+    print("Updated dataset:", flush = True)
+    print(historic_ds, flush = True)
 
     axes[1,0].stackplot( updated_df_mfrac.index, updated_df_mfrac.T.values, labels=updated_df_mfrac.columns, step='post' )
     axes[1,1].stackplot( updated_df_Lfrac.index, updated_df_Lfrac.T.values, labels=updated_df_Lfrac.columns, step='post' )
     axes[1,0].set_title("Updated data storage after processing")
     axes[1,1].set_title("Updated data storage after processing")
-
-    # format plot
-    [ax.set_ylim(0, 1)                      for ax in axes.flatten()]
-    [ax.set_ylabel("Forest pixel fraction") for ax in axes[:,0].flatten()]
-    [ax.set_xlabel("Date")                  for ax in axes[1,:].flatten()]
-    axes[0,0].legend(title="mask_array_code", loc="upper left")
-    axes[0,1].legend(title="Processing status", loc="upper left")
+    axes[1,0].legend(title="mask_array_code", loc="upper left")
+    axes[1,1].legend(title="Processing status", loc="upper left")
     plt.tight_layout()
-    plt.savefig(HISTO_ZARR_OUTPUT.replace(".zarr", ".zarr_update")+".png")
+    plt.savefig("test.png")
+    plt.savefig(plot_filename)
+    print(plot_filename, flush = True)
     
     client.close()
 
