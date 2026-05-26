@@ -74,6 +74,7 @@ jupyterlab_pygments==0.3.0
 jupyterlab_server==2.27.3
 jupyterlab_widgets==3.0.15
 kiwisolver==1.4.8
+lit
 lmdb==1.6.2
 locket==1.0.0
 lz4==4.3.2
@@ -154,13 +155,14 @@ sortedcontainers==2.4.0
 soupsieve==2.5
 stack-data==0.2.0
 statsmodels==0.14.5
+sympy
 tblib==3.1.0
 terminado==0.17.1
 threadpoolctl==3.6.0
 tinycss2==1.4.0
 toolz==1.0.0
 torch==2.5.1
-torchaudio==2.5.1
+torchaudio
 torchvision==0.20.1
 tornado==6.5.1
 tqdm==4.67.1

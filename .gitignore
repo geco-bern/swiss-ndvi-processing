@@ -1,6 +1,23 @@
 demo/output/gif/*.gif
 demo/output/gif/*.gif
-*.png
+img_tmp/*/*.png
+test*.png
+TESTSUITE*.png
+foo*.png
+ndvi*.png
+NDVI*.png
+
 *.log
 *.tif
 *.egg-info
+
+
+.env*
+.venv*
+data_for_demo_2
+report/fig/prova2
+
+# Python: Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
