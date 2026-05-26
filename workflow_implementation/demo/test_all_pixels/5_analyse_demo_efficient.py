@@ -689,7 +689,7 @@ if __name__ == "__main__":
 
     if TODO_replace_original_HISTO_ZARR_INPUT: # if anything else than False, proceed with replacement:
         #if (updated_historic_ds.nbytes/1e6 >= historic_ds.nbytes/1e6):
-        if (folder_size(HISTO_ZARR_OUTPUT) >= folder_size(HISTO_ZARR_INPUT)):
+        if (folder_size(HISTO_ZARR_OUTPUT) >= 0.85 * folder_size(HISTO_ZARR_INPUT)): # include fudge factor of 0.85
             # okay updated storage zarr is larger or equal than previous storage zarr
             # proceed with deleting previous and renaming updated:
             try:
