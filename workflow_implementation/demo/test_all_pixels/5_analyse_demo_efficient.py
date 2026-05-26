@@ -396,7 +396,7 @@ if __name__ == "__main__":
         memory_limit=MEMORY_PER_WORKER,
         local_directory= DASK_TEMP_DIR,
         processes=True,  # Use separate processes (not threads, but this appears to create non-shared memory)
-        dashboard_address=':8343')
+        dashboard_address=':8342')
     print(client, flush = True)
     print(client.dashboard_link, flush = True) # use this dashboard to follow progress
 
@@ -414,9 +414,9 @@ if __name__ == "__main__":
         pixel = ('pixel', lookuptable.pixel.values.astype(np.int32)),
         doy   = ('date', lookuptable.doy.values.astype(np.int32)))
 
-    def show_ds_structure(ds):
-        for c in list(ds.coords) + list(ds.data_vars):
-            print(str(c).ljust(15) + ":   " + str(ds[c].encoding))
+    # def show_ds_structure(ds):
+    #     for c in list(ds.coords) + list(ds.data_vars):
+    #         print(str(c).ljust(15) + ":   " + str(ds[c].encoding))
     
     #show_ds_structure(historic_ds)
     #show_ds_structure(new_ds)
@@ -517,9 +517,9 @@ if __name__ == "__main__":
     # g = mask_processed.__dask_graph__()
     g = ndvi_processed.__dask_graph__()
     print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
-    #                    586_503 pixels:                 | 16_041_205 pixels:              | 105_715_396 pixels:
-    # without persist(): 49    layers, and 196760 tasks  | 49    layers, and 1289428 tasks | xxx layers, and xxx tasks
-    # with persist():    16-17 layers, and  31953 tasks  | 16-17 layers, and  872665 tasks | xxx layers, and xxx tasks
+    #                    46_818 pixels:              | 586_503 pixels:             | 16_041_205 pixels:           | 105_715_396 pixels:
+    # without persist(): 62 layers, and 40195 tasks  | 62 layers, and 40730 tasks  | XX layers, and XXXXXXX tasks | xxx layers, and xxx tasks
+    # with persist():    11 layers, and    21 tasks  | 11 layers, and   151 tasks  | XX layers, and  XXXXXX tasks | xxx layers, and xxx tasks
     # without persist(): .............. and 10.58 MiB
     # with persist():    size 23.08 MiB and 10.58 MiB
     
@@ -548,17 +548,16 @@ if __name__ == "__main__":
         # .isel(pixel=slice(0,500)) # TODO: remove again - this is just for development
     )
 
-    ndvi_processed_to_append = ndvi_processed.sel(date = slice(start_date, None))
-    mask_processed_to_append = mask_processed.sel(date = slice(start_date, None))
     ds_to_append = (
-        xr.Dataset({"ndvi_processed": ndvi_processed_to_append, 
-                     "mask_array":    mask_processed_to_append})
+        xr.Dataset({"ndvi_processed": ndvi_processed.sel(date = slice(start_date, None)), 
+                     "mask_array":    mask_processed.sel(date = slice(start_date, None))})
         .chunk({"pixel": PIXEL_CHUNKS, 
                  "date": DATE_CHUNKS_OUT})
     )
     # add metadata
     ds_to_append.attrs["pixel_definition"] = historic_ds.attrs["pixel_definition"]
 
+    # FOR DEVELOPMENT: outfile = HISTO_ZARR_OUTPUT
     def fallback_action_overwrite_zarr(outfile):
         # concatenate to complete dataset
         extended_historic_ds = (
@@ -567,10 +566,13 @@ if __name__ == "__main__":
             .chunk({"pixel": PIXEL_CHUNKS, 
                     "date": DATE_CHUNKS_OUT})
         )
-        
-        # For development
-        # show_ds_structure(ds_to_append)
-        # show_ds_structure(extended_historic_ds)
+
+        g = extended_historic_ds.__dask_graph__()
+        print(f"Constructed graph with {len(g.layers)} layers, and {len(g)} tasks.", flush=True)
+        # Constructed graph with 36 layers, and 1045 tasks.
+        #                    46_818 pixels:              |586_503 pixels:             | 16_041_205 pixels:         | 105_715_396 pixels:
+        # without persist(): 79 layers, and 40319 tasks  |XX layers, and XXXXX tasks  | XX layers, and XXXXX tasks | xxx layers, and xxx tasks
+        # with persist():    36 layers, and   161 tasks  |36 layers, and  1045 tasks  | XX layers, and XXXXX tasks | xxx layers, and xxx tasks
 
         # Explicit encoding: simple compressor for each data var
         # encoding = {v: {"compressors": None      } for v in extended_historic_ds.data_vars} # TODO: why not? this should be following what was done to create v4 of historic
