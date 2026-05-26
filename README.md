@@ -1,5 +1,7 @@
 # Gapfill NDVI
 
+The workflow implementation (milestone 2) can be found in [this folder](workflow_implementation/demo). The folder contains all the steps to run the continous integration setup for a small subset of pixels (2000).
+
 ## How to Use the Package
 
 To use the package, you have to install the required libraries using pip
@@ -8,6 +10,15 @@ To use the package, you have to install the required libraries using pip
 Follow the steps outlined in `workflow_implementation/demo/00_setup.sh`.
 They create a new virtual environment `NDVI` and install the necessary packages
 with `pip`.
+
+### Setup with pip
+
+```bash
+python3 -m venv ndvi
+source ndvi/bin/activate
+pip install -r requirements.txt
+```
+
 
 # Requirements
 
