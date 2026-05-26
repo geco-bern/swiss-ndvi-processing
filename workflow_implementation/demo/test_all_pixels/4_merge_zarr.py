@@ -339,7 +339,7 @@ if __name__ == "__main__":
     client.close()
     print("All done")
 
-    print("Created file: ", flush = True)
+    print(f"4_merge_zarr.py created file: {OUT_ZARR_TMP}", flush = True)
     print(OUT_ZARR_TMP, flush = True)
     sys.exit(0)
 

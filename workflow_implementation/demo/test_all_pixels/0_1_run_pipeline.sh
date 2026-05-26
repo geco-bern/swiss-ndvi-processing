@@ -97,8 +97,8 @@ echo "------------------------------------------------------------"
 echo "------------------------------------------------------------"
 echo "Running: ${SCRIPT_0}"; echo "Start time: $(timestamp)"
 START_TIME=$(date +%s)
-python -u "${SCRIPT_0}" "$START_DATE" "$END_DATE"
-DOWNLOAD_FILE=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
+#python -u "${SCRIPT_0}" "$START_DATE" "$END_DATE"
+#DOWNLOAD_FILE=$(grep '1_... .py created file: ' "$LOG_FILE" | tail -n1 | sed 's/^1_... .py created file: //') # Capture output file path from python script
 #DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr" # step 1 TODO: deactivate this
 #DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-19_18h40_ndvi_01_downloaded_2025-12-12_2025-12-28.zarr" # step 2 TODO: deactivate this
 #DOWNLOAD_FILE="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-24_00h27_ndvi_01_downloaded_2025-11-30_2025-12-28.zarr"
@@ -129,7 +129,7 @@ else
 
   START_TIME=$(date +%s)
   python -u "${SCRIPT_1}" "$DOWNLOAD_FILE" "$HISTO_INPUT"
-  NEW_NDVI=$(awk 'END{print}' "$LOG_FILE") # Capture last print statement from python script
+  NEW_NDVI=$(grep '4_merge_zarr.py created file: ' "$LOG_FILE" | tail -n1 | sed 's/^4_merge_zarr.py created file: //') # Capture output file path from python script
   #NEW_NDVI="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12_processed.zarr"
   #NEW_NDVI="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-19_18h40_ndvi_01_downloaded_2025-12-12_2025-12-28_processed.zarr"
   # NEW_NDVI="/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-03-24_00h27_ndvi_01_downloaded_2025-11-30_2025-12-28_processed.zarr"

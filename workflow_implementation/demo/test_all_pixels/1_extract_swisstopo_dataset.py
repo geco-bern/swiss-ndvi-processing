@@ -596,6 +596,7 @@ if (len(s2_files) > 0):
     if os.path.exists(OUTPUT_ZARR_TEMP): 
        shutil.rmtree(OUTPUT_ZARR_TEMP)
 
+    print(f"'1_... .py created file: {OUTPUT_ZARR}", flush = True)
     print(OUTPUT_ZARR, flush = True)
     sys.exit(0)
 
