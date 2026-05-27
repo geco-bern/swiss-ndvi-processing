@@ -5,7 +5,7 @@ set -Eeuo pipefail
 # Script Configuration
 # ============================================================
 VENV_PATH="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv"
-LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
+LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_historical/historic_analysis_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
 
 # Logging setup (terminal + file) -------------------------------
 : > "$LOG_FILE"

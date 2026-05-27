@@ -371,10 +371,16 @@ if __name__ == "__main__":
     # MEMORY_PER_WORKER = '190GB'
     # N_THREADS_PER_WORKER = 1
 
-    N_WORKERS = 30        # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr rewrite); 586503 pixels => (434s rewrite, 90s append); 16041205 pixels => 3300s; 105715396 pixels => XXs
-    DATE_CHUNKS = -1      # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr rewrite); 586503 pixels => (434s rewrite, 90s append); 16041205 pixels => 3300s; 105715396 pixels => XXs
-    PIXEL_CHUNKS = 10000  # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr rewrite); 586503 pixels => (434s rewrite, 90s append); 16041205 pixels => 3300s; 105715396 pixels => XXs
-    MEMORY_PER_WORKER = '120GB'
+    # N_WORKERS = 30        # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr rewrite); 586503 pixels => (434s rewrite, 90s append); 16041205 pixels => 3300s; 105715396 pixels => XXs
+    # DATE_CHUNKS = -1      # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr rewrite); 586503 pixels => (434s rewrite, 90s append); 16041205 pixels => 3300s; 105715396 pixels => XXs
+    # PIXEL_CHUNKS = 10000  # c) 13 dates (2026-11-30 to 2026-12-12): 4216 pixels => 97s (incl Zarr rewrite); 586503 pixels => (434s rewrite, 90s append); 16041205 pixels => 3300s; 105715396 pixels => XXs
+    # MEMORY_PER_WORKER = '120GB'
+    # N_THREADS_PER_WORKER = 1
+   
+    N_WORKERS = 80
+    DATE_CHUNKS = -1
+    PIXEL_CHUNKS = 40000
+    MEMORY_PER_WORKER = '16GB'
     N_THREADS_PER_WORKER = 1
 
     PIXEL_CHUNKS    = 40000 # 10000  # TODO: with v5 move back from 500k,30 to 10k,365 or 40k,365
