@@ -14,8 +14,8 @@ import argparse
 from dask.distributed import Client
 
 # NOTE: below only works with working directory at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing
-# from workflow_implementation.MS1_script_for_historical_NDVI.new_historical_processing.NDVI_utils.NDVI_plot_utils import NDVI_xarray_to_grid
-# NOTE: below only works with working directory at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing
+# from workflow_implementation.MS1_script_for_historical_NDVI.NDVI_utils.NDVI_plot_utils import NDVI_xarray_to_grid
+# NOTE: below only works with working directory at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI
 from NDVI_utils.NDVI_plot_utils import NDVI_xarray_to_grid
 
 # run this python script to create a TIFF
