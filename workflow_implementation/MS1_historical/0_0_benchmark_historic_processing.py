@@ -9,8 +9,8 @@ import shutil
 
 # OLD:  nohup python -u /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/benchamrk_historic_ndvi_parallel.py > /home/francesco/data_scratch/swiss-ndvi-processing/workflow_implementation/historic_analysis.log &
 # OLD: nohup python -u "/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/ignore this/benchamrk_historic_ndvi_parallel.py" > /data_3/scratch/fabian/2026-04-10_ndvi_benchamrk_historic_ndvi_parallel_2026-04-10_ndvi_benchamrk_historic_ndvi_parallel_2e22cb0b5c71b5f8e7ecc4b9634059926957930c.zarr.log &
-# nohup python -u "/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/0_0_benchmark_historic_processing.py" > /data_3/scratch/fabian/2026-04-10_ndvi_benchamrk_historic_ndvi_parallel_2026-04-10_ndvi_benchamrk_historic_ndvi_parallel_05d66be11177ff198a7f741b340e7a4fb1de642a.zarr.log &
-# python -u "/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/0_0_benchmark_historic_processing.py"
+# nohup python -u "/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/MS1_historical/new_historical_processing/0_0_benchmark_historic_processing.py" > /data_3/scratch/fabian/2026-04-10_ndvi_benchamrk_historic_ndvi_parallel_2026-04-10_ndvi_benchamrk_historic_ndvi_parallel_05d66be11177ff198a7f741b340e7a4fb1de642a.zarr.log &
+# python -u "/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/MS1_historical/new_historical_processing/0_0_benchmark_historic_processing.py"
 
 # TODO: this one to modify:
 def historical_ndvi_to_optimize(ndvi_array, median_array, mask_array, is_observation_date, dates_array, starting_date):
