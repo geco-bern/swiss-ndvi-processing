@@ -1,0 +1,957 @@
+Starting download for:
+2024-01-01_10h24
+2024-01-03_10h13
+2024-01-11_10h24
+2024-01-12_10h43
+2024-01-13_10h13
+2024-01-14_10h34
+2024-01-16_10h22
+2024-01-19_10h32
+2024-01-27_10h43
+2024-01-29_10h32
+2024-02-03_10h32
+2024-02-05_10h21
+2024-02-06_10h42
+2024-02-12_10h10
+2024-02-15_10h20
+2024-02-20_10h20
+2024-02-23_10h30
+2024-02-25_10h19
+2024-03-07_10h39
+2024-03-08_10h08
+2024-03-11_10h18
+2024-03-14_10h28
+2024-03-19_10h26
+2024-03-22_10h36
+2024-03-23_10h06
+2024-04-02_10h05
+2024-04-05_10h15
+2024-04-06_10h36
+2024-04-11_10h36
+2024-04-12_10h05
+2024-04-13_10h30
+2024-04-25_10h15
+2024-04-30_10h20
+2024-05-10_10h20
+2024-05-11_10h36
+2024-05-20_10h20
+2024-05-28_10h25
+2024-06-04_10h15
+2024-06-05_10h40
+2024-06-06_10h06
+2024-06-10_10h36
+2024-06-12_10h30
+2024-06-15_10h40
+2024-06-19_10h20
+2024-06-24_10h15
+2024-06-25_10h36
+2024-06-27_10h25
+2024-07-02_10h26
+2024-07-04_10h15
+2024-07-05_10h40
+2024-07-09_10h20
+2024-07-11_10h05
+2024-07-14_10h15
+2024-07-17_10h25
+2024-07-19_10h20
+2024-07-20_10h36
+2024-07-21_10h05
+2024-07-24_10h15
+2024-07-25_10h40
+2024-07-27_10h25
+2024-07-29_10h20
+2024-07-30_10h36
+2024-07-31_10h05
+2024-08-01_10h30
+2024-08-03_10h15
+2024-08-04_10h40
+2024-08-06_10h25
+2024-08-09_10h36
+2024-08-10_10h05
+2024-08-11_10h30
+2024-08-13_10h15
+2024-08-14_10h40
+2024-08-15_10h05
+2024-08-16_10h25
+2024-08-19_10h36
+2024-08-21_10h30
+2024-08-23_10h15
+2024-08-24_10h40
+2024-08-28_10h20
+2024-08-29_10h36
+2024-08-30_10h05
+2024-08-31_10h30
+2024-09-03_10h40
+2024-09-07_10h20
+2024-09-15_10h25
+2024-09-18_10h36
+2024-09-20_10h27
+2024-09-29_10h07
+2024-09-30_10h28
+2024-10-05_10h28
+2024-10-07_10h19
+2024-10-25_10h30
+2024-10-28_10h40
+2024-10-29_10h10
+2024-10-30_10h31
+2024-11-01_10h20
+2024-11-02_10h42
+2024-11-03_10h12
+2024-11-04_10h31
+2024-11-06_10h22
+2024-11-07_10h41
+2024-11-09_10h32
+2024-11-11_10h21
+2024-11-14_10h32
+2024-11-16_10h23
+2024-11-18_10h12
+2024-11-23_10h13
+2024-11-27_10h43
+2024-11-29_10h34
+2024-12-01_10h23
+2024-12-11_10h23
+2024-12-12_10h44
+2024-12-13_10h14
+2024-12-16_10h24
+2024-12-21_10h23
+2024-12-23_10h14
+2024-12-24_10h33
+2024-12-26_10h24
+2024-12-27_10h43
+2024-12-28_10h13
+2024-12-29_10h34
+2024-12-31_10h23
+bbox_swisstopo_2056, width_swisstopo, height_swisstopo
+BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0)
+37728
+24542
+Total of global grid used for pixel ID (based on forest mask): 
+Box: BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0) pixels
+Grid: (24542, 37728) = 925_920_576 pixels, of which 105_715_396 are identified as forest pixels.
+Reference raster metadata:
+{'transform': Affine(10.0, 0.0, 2474090.0,
+       0.0, -10.0, 1310530.0), 'crs': CRS.from_wkt('PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'), 'width': np.float64(37728.0), 'height': np.float64(24542.0)}
+  0%|          | 0/122 [00:00<?, ?it/s]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 0 (2024-01-01 10:24:31+00:00) processed successfully.
+  1%|          | 1/122 [08:30<17:10:01, 510.75s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 1 (2024-01-03 10:13:29+00:00) processed successfully.
+  2%|▏         | 2/122 [09:24<8:03:20, 241.67s/it] /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 2 (2024-01-11 10:24:01+00:00) processed successfully.
+  2%|▏         | 3/122 [18:14<12:20:44, 373.48s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 3 (2024-01-12 10:43:19+00:00) processed successfully.
+  3%|▎         | 4/122 [19:33<8:26:12, 257.39s/it] /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 4 (2024-01-13 10:13:09+00:00) processed successfully.
+  4%|▍         | 5/122 [20:27<5:58:22, 183.78s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 5 (2024-01-14 10:34:01+00:00) processed successfully.
+  5%|▍         | 6/122 [29:57<10:09:31, 315.28s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 6 (2024-01-16 10:22:59+00:00) processed successfully.
+  6%|▌         | 7/122 [39:25<12:42:45, 397.96s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 7 (2024-01-19 10:32:49+00:00) processed successfully.
+  7%|▋         | 8/122 [49:28<14:39:50, 463.07s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 8 (2024-01-27 10:43:11+00:00) processed successfully.
+  7%|▋         | 9/122 [50:51<10:48:38, 344.42s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 9 (2024-01-29 10:32:09+00:00) processed successfully.
+  8%|▊         | 10/122 [1:01:01<13:15:48, 426.33s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 10 (2024-02-03 10:32:31+00:00) processed successfully.
+  9%|▉         | 11/122 [1:10:09<14:17:46, 463.66s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 11 (2024-02-05 10:21:29+00:00) processed successfully.
+ 10%|▉         | 12/122 [1:19:10<14:53:00, 487.10s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 12 (2024-02-06 10:42:21+00:00) processed successfully.
+ 11%|█         | 13/122 [1:20:41<11:06:48, 367.05s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 13 (2024-02-12 10:10:39+00:00) processed successfully.
+ 11%|█▏        | 14/122 [1:21:42<8:14:17, 274.61s/it] /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 14 (2024-02-15 10:20:29+00:00) processed successfully.
+ 12%|█▏        | 15/122 [1:29:53<10:05:52, 339.74s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 15 (2024-02-20 10:20:51+00:00) processed successfully.
+ 13%|█▎        | 16/122 [1:38:59<11:50:20, 402.08s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 16 (2024-02-23 10:30:31+00:00) processed successfully.
+ 14%|█▍        | 17/122 [1:48:42<13:18:47, 456.46s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 17 (2024-02-25 10:19:19+00:00) processed successfully.
+ 15%|█▍        | 18/122 [1:56:42<13:23:28, 463.55s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 18 (2024-03-07 10:39:11+00:00) processed successfully.
+ 16%|█▌        | 19/122 [1:58:06<9:59:38, 349.31s/it] /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 19 (2024-03-08 10:08:41+00:00) processed successfully.
+ 16%|█▋        | 20/122 [1:59:03<7:24:48, 261.65s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 20 (2024-03-11 10:18:31+00:00) processed successfully.
+ 17%|█▋        | 21/122 [2:08:10<9:44:41, 347.34s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 21 (2024-03-14 10:28:11+00:00) processed successfully.
+ 18%|█▊        | 22/122 [2:18:15<11:47:43, 424.64s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 22 (2024-03-19 10:26:39+00:00) processed successfully.
+ 19%|█▉        | 23/122 [2:27:24<12:42:29, 462.11s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 23 (2024-03-22 10:36:39+00:00) processed successfully.
+ 20%|█▉        | 24/122 [2:28:45<9:27:58, 347.74s/it] /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 24 (2024-03-23 10:06:49+00:00) processed successfully.
+ 20%|██        | 25/122 [2:29:41<7:00:13, 259.94s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 25 (2024-04-02 10:05:49+00:00) processed successfully.
+ 21%|██▏       | 26/122 [2:30:39<5:19:08, 199.47s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 26 (2024-04-05 10:15:59+00:00) processed successfully.
+ 22%|██▏       | 27/122 [2:37:35<6:58:54, 264.58s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 27 (2024-04-06 10:36:21+00:00) processed successfully.
+ 23%|██▎       | 28/122 [2:38:24<5:12:58, 199.77s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 28 (2024-04-11 10:36:19+00:00) processed successfully.
+ 24%|██▍       | 29/122 [2:39:40<4:12:15, 162.75s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 29 (2024-04-12 10:05:59+00:00) processed successfully.
+ 25%|██▍       | 30/122 [2:40:35<3:19:42, 130.24s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 30 (2024-04-13 10:30:31+00:00) processed successfully.
+ 25%|██▌       | 31/122 [2:50:09<6:39:22, 263.33s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 31 (2024-04-25 10:15:59+00:00) processed successfully.
+ 26%|██▌       | 32/122 [2:58:46<8:29:33, 339.70s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 32 (2024-04-30 10:20:21+00:00) processed successfully.
+ 27%|██▋       | 33/122 [3:04:38<8:29:16, 343.33s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 33 (2024-05-10 10:20:21+00:00) processed successfully.
+ 28%|██▊       | 34/122 [3:12:39<9:24:13, 384.70s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 34 (2024-05-11 10:36:29+00:00) processed successfully.
+ 29%|██▊       | 35/122 [3:13:57<7:04:24, 292.69s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 35 (2024-05-20 10:20:21+00:00) processed successfully.
+ 30%|██▉       | 36/122 [3:22:18<8:29:03, 355.16s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 36 (2024-05-28 10:25:59+00:00) processed successfully.
+ 30%|███       | 37/122 [3:31:01<9:34:20, 405.42s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 37 (2024-06-04 10:15:59+00:00) processed successfully.
+ 31%|███       | 38/122 [3:39:39<10:14:39, 439.04s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 38 (2024-06-05 10:40:31+00:00) processed successfully.
+ 32%|███▏      | 39/122 [3:40:57<7:37:49, 330.96s/it] /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 39 (2024-06-06 10:06:01+00:00) processed successfully.
+ 33%|███▎      | 40/122 [3:41:56<5:40:37, 249.24s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 40 (2024-06-10 10:36:29+00:00) processed successfully.
+ 34%|███▎      | 41/122 [3:43:16<4:27:48, 198.38s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 41 (2024-06-12 10:30:31+00:00) processed successfully.
+ 34%|███▍      | 42/122 [3:52:29<6:46:41, 305.02s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 42 (2024-06-15 10:40:31+00:00) processed successfully.
+ 35%|███▌      | 43/122 [3:53:47<5:11:35, 236.65s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 43 (2024-06-19 10:20:31+00:00) processed successfully.
+ 36%|███▌      | 44/122 [4:02:12<6:52:38, 317.41s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 44 (2024-06-24 10:15:59+00:00) processed successfully.
+ 37%|███▋      | 45/122 [4:10:20<7:52:53, 368.48s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 45 (2024-06-25 10:36:31+00:00) processed successfully.
+ 38%|███▊      | 46/122 [4:11:37<5:55:46, 280.88s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 46 (2024-06-27 10:25:59+00:00) processed successfully.
+ 39%|███▊      | 47/122 [4:21:08<7:39:57, 367.97s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 47 (2024-07-02 10:26:01+00:00) processed successfully.
+ 39%|███▉      | 48/122 [4:30:18<8:41:21, 422.72s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 48 (2024-07-04 10:15:59+00:00) processed successfully.
+ 40%|████      | 49/122 [4:38:21<8:56:14, 440.74s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 49 (2024-07-05 10:40:21+00:00) processed successfully.
+ 41%|████      | 50/122 [4:39:39<6:38:17, 331.90s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 50 (2024-07-09 10:20:31+00:00) processed successfully.
+ 42%|████▏     | 51/122 [4:46:50<7:08:01, 361.71s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 51 (2024-07-11 10:05:59+00:00) processed successfully.
+ 43%|████▎     | 52/122 [4:47:47<5:15:07, 270.11s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 52 (2024-07-14 10:15:59+00:00) processed successfully.
+ 43%|████▎     | 53/122 [4:56:16<6:33:12, 341.92s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 53 (2024-07-17 10:25:59+00:00) processed successfully.
+ 44%|████▍     | 54/122 [5:05:20<7:36:13, 402.55s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 54 (2024-07-19 10:20:21+00:00) processed successfully.
+ 45%|████▌     | 55/122 [5:13:10<7:51:57, 422.64s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 55 (2024-07-20 10:36:29+00:00) processed successfully.
+ 46%|████▌     | 56/122 [5:14:28<5:51:27, 319.50s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 56 (2024-07-21 10:05:59+00:00) processed successfully.
+ 47%|████▋     | 57/122 [5:15:24<4:20:20, 240.31s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 57 (2024-07-24 10:15:59+00:00) processed successfully.
+ 48%|████▊     | 58/122 [5:23:17<5:30:53, 310.21s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 58 (2024-07-25 10:40:21+00:00) processed successfully.
+ 48%|████▊     | 59/122 [5:24:38<4:13:19, 241.26s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 59 (2024-07-27 10:25:59+00:00) processed successfully.
+ 49%|████▉     | 60/122 [5:33:04<5:31:22, 320.68s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 60 (2024-07-29 10:20:21+00:00) processed successfully.
+ 50%|█████     | 61/122 [5:40:13<5:59:13, 353.34s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 61 (2024-07-30 10:36:29+00:00) processed successfully.
+ 51%|█████     | 62/122 [5:41:30<4:30:30, 270.51s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 62 (2024-07-31 10:05:59+00:00) processed successfully.
+ 52%|█████▏    | 63/122 [5:41:50<3:11:58, 195.23s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 63 (2024-08-01 10:30:31+00:00) processed successfully.
+ 52%|█████▏    | 64/122 [5:50:57<4:50:40, 300.70s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 64 (2024-08-03 10:15:59+00:00) processed successfully.
+ 53%|█████▎    | 65/122 [5:59:06<5:39:26, 357.31s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 65 (2024-08-04 10:40:21+00:00) processed successfully.
+ 54%|█████▍    | 66/122 [6:00:23<4:14:59, 273.21s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 66 (2024-08-06 10:25:59+00:00) processed successfully.
+ 55%|█████▍    | 67/122 [6:09:32<5:26:11, 355.85s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 67 (2024-08-09 10:36:29+00:00) processed successfully.
+ 56%|█████▌    | 68/122 [6:11:38<4:18:12, 286.89s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 68 (2024-08-10 10:05:59+00:00) processed successfully.
+ 57%|█████▋    | 69/122 [6:12:32<3:11:46, 217.10s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 69 (2024-08-11 10:30:31+00:00) processed successfully.
+ 57%|█████▋    | 70/122 [6:22:23<4:45:14, 329.13s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 70 (2024-08-13 10:15:59+00:00) processed successfully.
+ 58%|█████▊    | 71/122 [6:30:21<5:17:49, 373.92s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 71 (2024-08-14 10:40:21+00:00) processed successfully.
+ 59%|█████▉    | 72/122 [6:31:39<3:57:31, 285.03s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 72 (2024-08-15 10:05:51+00:00) processed successfully.
+ 60%|█████▉    | 73/122 [6:32:34<2:56:25, 216.03s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 73 (2024-08-16 10:25:59+00:00) processed successfully.
+ 61%|██████    | 74/122 [6:42:01<4:17:01, 321.27s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 74 (2024-08-19 10:36:29+00:00) processed successfully.
+ 61%|██████▏   | 75/122 [6:43:18<3:14:21, 248.11s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 75 (2024-08-21 10:30:21+00:00) processed successfully.
+ 62%|██████▏   | 76/122 [6:52:56<4:25:59, 346.95s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 76 (2024-08-23 10:15:59+00:00) processed successfully.
+ 63%|██████▎   | 77/122 [7:00:57<4:50:28, 387.30s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 77 (2024-08-24 10:40:21+00:00) processed successfully.
+ 64%|██████▍   | 78/122 [7:02:17<3:36:22, 295.05s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 78 (2024-08-28 10:20:21+00:00) processed successfully.
+ 65%|██████▍   | 79/122 [7:10:43<4:16:50, 358.38s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 79 (2024-08-29 10:36:29+00:00) processed successfully.
+ 66%|██████▌   | 80/122 [7:12:08<3:13:23, 276.27s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 80 (2024-08-30 10:05:59+00:00) processed successfully.
+ 66%|██████▋   | 81/122 [7:13:07<2:24:13, 211.06s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 81 (2024-08-31 10:30:21+00:00) processed successfully.
+ 67%|██████▋   | 82/122 [7:21:27<3:18:34, 297.86s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 82 (2024-09-03 10:40:21+00:00) processed successfully.
+ 68%|██████▊   | 83/122 [7:22:45<2:30:46, 231.97s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 83 (2024-09-07 10:20:21+00:00) processed successfully.
+ 69%|██████▉   | 84/122 [7:30:46<3:14:15, 306.73s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 84 (2024-09-15 10:25:59+00:00) processed successfully.
+ 70%|██████▉   | 85/122 [7:40:07<3:56:04, 382.83s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 85 (2024-09-18 10:36:19+00:00) processed successfully.
+ 70%|███████   | 86/122 [7:41:29<2:55:35, 292.65s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 86 (2024-09-20 10:27:21+00:00) processed successfully.
+ 71%|███████▏  | 87/122 [7:49:14<3:20:54, 344.41s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 87 (2024-09-29 10:07:19+00:00) processed successfully.
+ 72%|███████▏  | 88/122 [7:50:09<2:26:00, 257.67s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 88 (2024-09-30 10:28:31+00:00) processed successfully.
+ 73%|███████▎  | 89/122 [7:59:05<3:07:32, 341.00s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 89 (2024-10-05 10:28:09+00:00) processed successfully.
+ 74%|███████▍  | 90/122 [8:08:45<3:40:06, 412.70s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 90 (2024-10-07 10:19:21+00:00) processed successfully.
+ 75%|███████▍  | 91/122 [8:16:44<3:43:30, 432.58s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 91 (2024-10-25 10:30:29+00:00) processed successfully.
+ 75%|███████▌  | 92/122 [8:26:31<3:59:25, 478.85s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 92 (2024-10-28 10:40:49+00:00) processed successfully.
+ 76%|███████▌  | 93/122 [8:27:48<2:53:11, 358.32s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 93 (2024-10-29 10:10:39+00:00) processed successfully.
+ 77%|███████▋  | 94/122 [8:28:42<2:04:40, 267.17s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 94 (2024-10-30 10:31:51+00:00) processed successfully.
+ 78%|███████▊  | 95/122 [8:37:56<2:38:56, 353.21s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 95 (2024-11-01 10:20:59+00:00) processed successfully.
+ 79%|███████▊  | 96/122 [8:47:04<2:58:24, 411.70s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 96 (2024-11-02 10:42:11+00:00) processed successfully.
+ 80%|███████▉  | 97/122 [8:48:21<2:09:38, 311.13s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 97 (2024-11-03 10:12:01+00:00) processed successfully.
+ 80%|████████  | 98/122 [8:49:16<1:33:42, 234.26s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 98 (2024-11-04 10:31:19+00:00) processed successfully.
+ 81%|████████  | 99/122 [8:58:37<2:07:25, 332.41s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 99 (2024-11-06 10:22:21+00:00) processed successfully.
+ 82%|████████▏ | 100/122 [9:05:56<2:13:34, 364.29s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 100 (2024-11-07 10:41:39+00:00) processed successfully.
+ 83%|████████▎ | 101/122 [9:07:10<1:37:02, 277.29s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 101 (2024-11-09 10:32:41+00:00) processed successfully.
+ 84%|████████▎ | 102/122 [9:16:33<2:00:56, 362.83s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 102 (2024-11-11 10:21:49+00:00) processed successfully.
+ 84%|████████▍ | 103/122 [9:23:25<1:59:35, 377.65s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 103 (2024-11-14 10:32:09+00:00) processed successfully.
+ 85%|████████▌ | 104/122 [9:32:45<2:09:43, 432.41s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 104 (2024-11-16 10:23:11+00:00) processed successfully.
+ 86%|████████▌ | 105/122 [9:41:21<2:09:39, 457.62s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 105 (2024-11-18 10:12:19+00:00) processed successfully.
+ 87%|████████▋ | 106/122 [9:42:13<1:29:32, 335.76s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 106 (2024-11-23 10:13:41+00:00) processed successfully.
+ 88%|████████▊ | 107/122 [9:43:09<1:02:58, 251.90s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 107 (2024-11-27 10:43:09+00:00) processed successfully.
+ 89%|████████▊ | 108/122 [9:44:34<47:04, 201.74s/it]  /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 108 (2024-11-29 10:34:01+00:00) processed successfully.
+ 89%|████████▉ | 109/122 [9:53:50<1:06:47, 308.24s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 109 (2024-12-01 10:23:19+00:00) processed successfully.
+ 90%|█████████ | 110/122 [10:00:55<1:08:36, 343.07s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 110 (2024-12-11 10:23:39+00:00) processed successfully.
+ 91%|█████████ | 111/122 [10:08:29<1:09:01, 376.51s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 111 (2024-12-12 10:44:41+00:00) processed successfully.
+ 92%|█████████▏| 112/122 [10:09:48<47:52, 287.30s/it]  /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 112 (2024-12-13 10:14:31+00:00) processed successfully.
+ 93%|█████████▎| 113/122 [10:10:45<32:43, 218.16s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 113 (2024-12-16 10:24:31+00:00) processed successfully.
+ 93%|█████████▎| 114/122 [10:19:09<40:31, 303.91s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 114 (2024-12-21 10:23:39+00:00) processed successfully.
+ 94%|█████████▍| 115/122 [10:28:03<43:30, 372.91s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 115 (2024-12-23 10:14:31+00:00) processed successfully.
+ 95%|█████████▌| 116/122 [10:29:03<27:53, 278.98s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 116 (2024-12-24 10:33:49+00:00) processed successfully.
+ 96%|█████████▌| 117/122 [10:38:38<30:38, 367.79s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 117 (2024-12-26 10:24:41+00:00) processed successfully.
+ 97%|█████████▋| 118/122 [10:46:38<26:45, 401.32s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 118 (2024-12-27 10:43:49+00:00) processed successfully.
+ 98%|█████████▊| 119/122 [10:47:51<15:09, 303.06s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 119 (2024-12-28 10:13:39+00:00) processed successfully.
+ 98%|█████████▊| 120/122 [10:48:45<07:36, 228.22s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 120 (2024-12-29 10:34:41+00:00) processed successfully.
+ 99%|█████████▉| 121/122 [10:58:10<05:29, 329.17s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py:433: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 121 (2024-12-31 10:23:39+00:00) processed successfully.
+100%|██████████| 122/122 [11:06:00<00:00, 371.43s/it]100%|██████████| 122/122 [11:06:00<00:00, 327.54s/it]
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2024-01-01_2024-12-31.zarr

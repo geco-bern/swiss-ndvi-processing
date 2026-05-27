@@ -1,0 +1,358 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2026-01-01
+2026-01-03
+============================================================
+Pipeline started at: 2026-04-29 06:55:23
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FG_2026-04-29_06h55m20.log
+============================================================
+
+Running: with arguments: 2026-01-01 2026-01-03
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-04-29 06:55:23
+Starting download for:
+2026-01-01_10h43
+2026-01-03_10h34
+bbox_swisstopo_2056, width_swisstopo, height_swisstopo
+BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0)
+37728
+24542
+Total of global grid used for pixel ID (based on forest mask): 
+Box: BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0) pixels
+Grid: (24542, 37728) = 925_920_576 pixels, of which 105_715_396 are identified as forest pixels.
+Reference raster metadata:
+{'transform': Affine(10.0, 0.0, 2474090.0,
+       0.0, -10.0, 1310530.0), 'crs': CRS.from_wkt('PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'), 'width': np.float64(37728.0), 'height': np.float64(24542.0)}
+  0%|          | 0/2 [00:00<?, ?it/s]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 0 processed successfully.
+ 50%|█████     | 1/2 [01:16<01:16, 76.64s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 1 processed successfully.
+100%|██████████| 2/2 [09:55<00:00, 336.98s/it]100%|██████████| 2/2 [09:55<00:00, 297.93s/it]
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-04-29_06h55_ndvi_01_downloaded_2026-01-01_2026-01-03.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:12:36 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-04-29_06h55_ndvi_01_downloaded_2026-01-01_2026-01-03.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Start time: 2026-04-29 07:07:59
+<Client: 'tcp://127.0.0.1:38187' processes=50 threads=50, memory=1.09 TiB>
+http://127.0.0.1:8343/status
+Initialized n=3 daily dates:
+       daily   obs_date obs_times
+0 2026-01-01 2026-01-01  10:43:39
+1 2026-01-02        NaT          
+2 2026-01-03 2026-01-03  10:34:41
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 814.02 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+2026-04-29 07:10:34,739 - tornado.application - ERROR - Uncaught exception GET /status/ws (127.0.0.1)
+HTTPServerRequest(protocol='http', host='localhost:8343', method='GET', uri='/status/ws', version='HTTP/1.1', remote_ip='127.0.0.1')
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/websocket.py", line 965, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/web.py", line 3375, in wrapper
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/views/ws.py", line 149, in open
+    raise ProtocolError("Token is expired. Configure the app with a larger value for --session-token-expiration if necessary")
+bokeh.protocol.exceptions.ProtocolError: Token is expired. Configure the app with a larger value for --session-token-expiration if necessary
+All done
+Created file: 
+/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-04-29_06h55_ndvi_01_downloaded_2026-01-01_2026-01-03_processed.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Duration: 00:03:12 (hh:mm:ss)
+Merging script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-04-29_06h55_ndvi_01_downloaded_2026-01-01_2026-01-03_processed.zarr
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py
+Start time: 2026-04-29 07:11:11
+<Client: 'tcp://127.0.0.1:44371' processes=30 threads=30, memory=3.27 TiB>
+http://127.0.0.1:8343/status
+Last dates in historic_ds:
+  2025-12-23
+  2025-12-24
+  2025-12-25
+  2025-12-26
+  2025-12-27
+  2025-12-28
+  2025-12-29
+  2025-12-30
+  2025-12-31
+  2026-01-01
+First dates in newly downloaded:
+  2026-01-01
+  2026-01-02
+  2026-01-03
+Current historic dataset:
+<xarray.Dataset> Size: 1TB
+Dimensions:         (pixel: 105715396, date: 3196)
+Coordinates:
+    x_idx           (pixel) int32 423MB dask.array<chunksize=(40000,), meta=np.ndarray>
+  * date            (date) datetime64[ns] 26kB 2017-04-03 ... 2026-01-01
+  * pixel           (pixel) int32 423MB 0 1 2 ... 105715393 105715394 105715395
+    doy             (date) int32 13kB dask.array<chunksize=(3196,), meta=np.ndarray>
+    y_idx           (pixel) int32 423MB dask.array<chunksize=(40000,), meta=np.ndarray>
+    x               (pixel) int32 423MB dask.array<chunksize=(40000,), meta=np.ndarray>
+    y               (pixel) int32 423MB dask.array<chunksize=(40000,), meta=np.ndarray>
+Data variables:
+    ndvi_processed  (pixel, date) int16 676GB dask.array<chunksize=(40000, 3196), meta=np.ndarray>
+    mask_array      (pixel, date) int8 338GB dask.array<chunksize=(40000, 3196), meta=np.ndarray>
+Attributes:
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Newly downloaded dataset:
+<xarray.Dataset> Size: 3GB
+Dimensions:   (pixel: 105715396, date: 3)
+Coordinates:
+    y_idx     (pixel) int32 423MB dask.array<chunksize=(40000,), meta=np.ndarray>
+    doy       (date) int32 12B dask.array<chunksize=(3,), meta=np.ndarray>
+    x_idx     (pixel) int32 423MB dask.array<chunksize=(40000,), meta=np.ndarray>
+  * date      (date) datetime64[ns] 24B 2026-01-01 2026-01-02 2026-01-03
+    x         (pixel) int32 423MB dask.array<chunksize=(40000,), meta=np.ndarray>
+    y         (pixel) int32 423MB dask.array<chunksize=(40000,), meta=np.ndarray>
+  * pixel     (pixel) int32 423MB 0 1 2 3 ... 105715393 105715394 105715395
+Data variables:
+    obs_date  (date) bool 3B dask.array<chunksize=(3,), meta=np.ndarray>
+    ndsi_obs  (date, pixel) int16 634MB dask.array<chunksize=(3, 40000), meta=np.ndarray>
+    ndvi_obs  (date, pixel) int16 634MB dask.array<chunksize=(3, 40000), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Constructed graph with 60 layers, and 177114 tasks.
+appending to file
+  /mnt/data1/UniBe-swiss-ndvi/backup/historical_backup.zarr
+Appending new dates to existing zarr store...
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 403.36 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+2026-04-29 07:13:23,163 - distributed.scheduler - WARNING - Detected different `run_spec` for key ('getitem-002e15d3047e8e54d439365abe4c00c0', 1) between two consecutive calls to `update_graph`. This can cause failures and deadlocks down the line. Please ensure unique key names. If you are using a standard dask collections, consider releasing all the data before resubmitting another computation. More details and help can be found at https://github.com/dask/dask/issues/9888. 
+Debugging information
+---------------------
+old task state: released
+old run_spec: Alias(('getitem-002e15d3047e8e54d439365abe4c00c0', 1)->('concatenate-open_dataset-doy-original-getitem-002e15d3047e8e54d439365abe4c00c0', 1))
+new run_spec: Alias(('getitem-002e15d3047e8e54d439365abe4c00c0', 1)->('concatenate-getitem-002e15d3047e8e54d439365abe4c00c0', 1))
+old dependencies: {('concatenate-open_dataset-doy-original-getitem-002e15d3047e8e54d439365abe4c00c0', 1)}
+new dependencies: frozenset({('concatenate-getitem-002e15d3047e8e54d439365abe4c00c0', 1)})
+
+2026-04-29 07:13:30,748 - distributed.worker - ERROR - Compute Failed
+Key:       ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 988)
+State:     executing
+Task:  <Task ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 988) vectorize_historical_ndvi(...)>
+Exception: 'TypeError("ufunc \'bitwise_and\' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule \'\'safe\'\'")'
+Traceback: '  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2544, in __call__\n    return self._call_as_normal(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2537, in _call_as_normal\n    return self._vectorize_call(func=func, args=vargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2618, in _vectorize_call\n    res = self._vectorize_call_with_signature(func, args)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2656, in _vectorize_call_with_signature\n    results = func(*(arg[index] for arg in args))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 84, in historical_ndvi\n    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~\n'
+
+2026-04-29 07:13:31,048 - distributed.worker - ERROR - Compute Failed
+Key:       ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 999)
+State:     executing
+Task:  <Task ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 999) vectorize_historical_ndvi(...)>
+Exception: 'TypeError("ufunc \'bitwise_and\' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule \'\'safe\'\'")'
+Traceback: '  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2544, in __call__\n    return self._call_as_normal(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2537, in _call_as_normal\n    return self._vectorize_call(func=func, args=vargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2618, in _vectorize_call\n    res = self._vectorize_call_with_signature(func, args)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2656, in _vectorize_call_with_signature\n    results = func(*(arg[index] for arg in args))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 84, in historical_ndvi\n    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~\n'
+
+Appending failed: ufunc 'bitwise_and' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe''.
+Writing whole file to /mnt/data1/UniBe-swiss-ndvi/backup/historical_backup.zarr.failedAppending_20260429071331
+Writing full dataset to /mnt/data1/UniBe-swiss-ndvi/backup/historical_backup.zarr.failedAppending_20260429071331
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 403.36 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 403.36 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 403.36 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 403.36 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 1.59 GiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+2026-04-29 07:15:06,211 - distributed.scheduler - WARNING - Detected different `run_spec` for key ('getitem-002e15d3047e8e54d439365abe4c00c0', 1) between two consecutive calls to `update_graph`. This can cause failures and deadlocks down the line. Please ensure unique key names. If you are using a standard dask collections, consider releasing all the data before resubmitting another computation. More details and help can be found at https://github.com/dask/dask/issues/9888. 
+Debugging information
+---------------------
+old task state: released
+old run_spec: Alias(('getitem-002e15d3047e8e54d439365abe4c00c0', 1)->('concatenate-open_dataset-doy-original-getitem-002e15d3047e8e54d439365abe4c00c0', 1))
+new run_spec: Alias(('getitem-002e15d3047e8e54d439365abe4c00c0', 1)->('concatenate-getitem-002e15d3047e8e54d439365abe4c00c0', 1))
+old dependencies: {('concatenate-open_dataset-doy-original-getitem-002e15d3047e8e54d439365abe4c00c0', 1)}
+new dependencies: frozenset({('concatenate-getitem-002e15d3047e8e54d439365abe4c00c0', 1)})
+
+2026-04-29 07:15:20,907 - distributed.worker - ERROR - Compute Failed
+Key:       ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 998)
+State:     executing
+Task:  <Task ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 998) vectorize_historical_ndvi(...)>
+Exception: 'TypeError("ufunc \'bitwise_and\' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule \'\'safe\'\'")'
+Traceback: '  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2544, in __call__\n    return self._call_as_normal(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2537, in _call_as_normal\n    return self._vectorize_call(func=func, args=vargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2618, in _vectorize_call\n    res = self._vectorize_call_with_signature(func, args)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2656, in _vectorize_call_with_signature\n    results = func(*(arg[index] for arg in args))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 84, in historical_ndvi\n    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~\n'
+
+2026-04-29 07:15:21,866 - distributed.worker - ERROR - Compute Failed
+Key:       ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 994)
+State:     executing
+Task:  <Task ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 994) vectorize_historical_ndvi(...)>
+Exception: 'TypeError("ufunc \'bitwise_and\' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule \'\'safe\'\'")'
+Traceback: '  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2544, in __call__\n    return self._call_as_normal(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2537, in _call_as_normal\n    return self._vectorize_call(func=func, args=vargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2618, in _vectorize_call\n    res = self._vectorize_call_with_signature(func, args)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2656, in _vectorize_call_with_signature\n    results = func(*(arg[index] for arg in args))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 84, in historical_ndvi\n    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~\n'
+
+2026-04-29 07:15:21,869 - distributed.worker - ERROR - Compute Failed
+Key:       ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 996)
+State:     executing
+Task:  <Task ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 996) vectorize_historical_ndvi(...)>
+Exception: 'TypeError("ufunc \'bitwise_and\' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule \'\'safe\'\'")'
+Traceback: '  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2544, in __call__\n    return self._call_as_normal(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2537, in _call_as_normal\n    return self._vectorize_call(func=func, args=vargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2618, in _vectorize_call\n    res = self._vectorize_call_with_signature(func, args)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2656, in _vectorize_call_with_signature\n    results = func(*(arg[index] for arg in args))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 84, in historical_ndvi\n    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~\n'
+
+2026-04-29 07:15:21,881 - distributed.worker - ERROR - Compute Failed
+Key:       ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 999)
+State:     executing
+Task:  <Task ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 999) vectorize_historical_ndvi(...)>
+Exception: 'TypeError("ufunc \'bitwise_and\' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule \'\'safe\'\'")'
+Traceback: '  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2544, in __call__\n    return self._call_as_normal(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2537, in _call_as_normal\n    return self._vectorize_call(func=func, args=vargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2618, in _vectorize_call\n    res = self._vectorize_call_with_signature(func, args)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2656, in _vectorize_call_with_signature\n    results = func(*(arg[index] for arg in args))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 84, in historical_ndvi\n    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~\n'
+
+2026-04-29 07:15:21,973 - distributed.worker - ERROR - Compute Failed
+Key:       ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 997)
+State:     executing
+Task:  <Task ('vectorize_historical_ndvi-a39daf2a54309a06a67cedc7c99f43fc', 997) vectorize_historical_ndvi(...)>
+Exception: 'TypeError("ufunc \'bitwise_and\' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule \'\'safe\'\'")'
+Traceback: '  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2544, in __call__\n    return self._call_as_normal(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2537, in _call_as_normal\n    return self._vectorize_call(func=func, args=vargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2618, in _vectorize_call\n    res = self._vectorize_call_with_signature(func, args)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2656, in _vectorize_call_with_signature\n    results = func(*(arg[index] for arg in args))\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 84, in historical_ndvi\n    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~\n'
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 425, in <module>
+    .to_zarr(
+     ^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/core/dataset.py", line 2270, in to_zarr
+    return to_zarr(  # type: ignore[call-overload,misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/api.py", line 2240, in to_zarr
+    writes = writer.sync(
+             ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/common.py", line 358, in sync
+    delayed_store = chunkmanager.store(
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/namedarray/daskmanager.py", line 247, in store
+    return store(
+           ^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/array/core.py", line 1221, in store
+    dask.compute(arrays, **kwargs)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/base.py", line 681, in compute
+    results = schedule(expr, keys, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2544, in __call__
+    return self._call_as_normal(*args, **kwargs)
+  ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2537, in _call_as_normal
+    return self._vectorize_call(func=func, args=vargs)
+  ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2618, in _vectorize_call
+    res = self._vectorize_call_with_signature(func, args)
+^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2656, in _vectorize_call_with_signature
+    results = func(*(arg[index] for arg in args))
+^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 84, in historical_ndvi
+    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
+      ^^^^^^^^^^^^^^^^^
+TypeError: ufunc 'bitwise_and' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe''
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 450, in <module>
+    fallback_action_overwrite_zarr(fallback_output)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 404, in fallback_action_overwrite_zarr
+    extended_historic_ds.to_zarr(outfile, mode="w", compute=True,
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/core/dataset.py", line 2270, in to_zarr
+    return to_zarr(  # type: ignore[call-overload,misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/api.py", line 2240, in to_zarr
+    writes = writer.sync(
+             ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/common.py", line 358, in sync
+    delayed_store = chunkmanager.store(
+                    ^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/namedarray/daskmanager.py", line 247, in store
+    return store(
+           ^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/array/core.py", line 1221, in store
+    dask.compute(arrays, **kwargs)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/base.py", line 681, in compute
+    results = schedule(expr, keys, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2544, in __call__
+    return self._call_as_normal(*args, **kwargs)
+  ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2537, in _call_as_normal
+    return self._vectorize_call(func=func, args=vargs)
+  ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2618, in _vectorize_call
+    res = self._vectorize_call_with_signature(func, args)
+^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py", line 2656, in _vectorize_call_with_signature
+    results = func(*(arg[index] for arg in args))
+^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py", line 84, in historical_ndvi
+    obs_mask = (ndvi_arr > 0) & (ndvi_arr < 1) & is_observation_date
+      ^^^^^^^^^^^^^^^^^
+TypeError: ufunc 'bitwise_and' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe''
+2026-04-29 07:15:26,951 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('xarray-store-map-ecedb775bab2a868615786c6b6175da2', 910))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:26,951 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('xarray-store-map-ecedb775bab2a868615786c6b6175da2', 934))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:26,953 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('xarray-store-map-ecedb775bab2a868615786c6b6175da2', 914))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:26,957 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('xarray-store-map-ecedb775bab2a868615786c6b6175da2', 909))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:26,959 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('xarray-store-map-ecedb775bab2a868615786c6b6175da2', 91))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:26,959 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('xarray-store-map-ecedb775bab2a868615786c6b6175da2', 915))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:26,960 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('xarray-store-map-ecedb775bab2a868615786c6b6175da2', 912))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:26,964 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('xarray-store-map-ecedb775bab2a868615786c6b6175da2', 916))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:26,964 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('xarray-store-map-ecedb775bab2a868615786c6b6175da2', 911))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:26,967 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('xarray-store-map-ecedb775bab2a868615786c6b6175da2', 913))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:26,969 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:38435' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('rechunk-merge-97057c09ec2a7521cec8395147bbd4cc', 0)} (stimulus_id='handle-worker-cleanup-1777446926.9695585')
+2026-04-29 07:15:26,972 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:33405' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('rechunk-merge-b211e90dcc08f6faac086876e9716b4e', 0)} (stimulus_id='handle-worker-cleanup-1777446926.9719906')
+2026-04-29 07:15:27,069 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('array-850a2ca18be98242e0e60b08627bb645', 180))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:27,078 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('array-850a2ca18be98242e0e60b08627bb645', 827))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:27,081 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('array-850a2ca18be98242e0e60b08627bb645', 436))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-04-29 07:15:27,086 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('array-850a2ca18be98242e0e60b08627bb645', 854))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+[ERROR] Script failed: N/A | Time: Wed Apr 29 07:15:32 AM UTC 2026

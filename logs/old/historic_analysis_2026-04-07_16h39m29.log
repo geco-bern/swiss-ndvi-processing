@@ -1,0 +1,220 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2017-04-01
+2025-11-30
+Current commit:
+f18e93ece28f44b89452318c0b51d4faa9648bc9
+
+Commit details:
+* f18e93e (HEAD -> setup-tunder-FB, origin/setup-tunder-FB) perf: Improve performance by manual looping through chunks for apply_ufunc()
+* c456659 docs: Streamline hist_script 2 by removing comments
+* 0bbc09d Attempt to fix: "OSError: [Errno 24] Too many open files"
+* 52c3f15 Update bash script for historic to run only processing (temp. deactivate tiffs)
+* 7acb879 Close dask client cleanly for tiff-generation
+* 5dacadf Update timeseries plot for validation
+* 85df6a0 Make tiff generation loop through all dates
+* 8aa07d5 Fix: rotated GeoTiff (fixing downstream at tiff generation, keeping wrong x_idx, y_idx)
+* 99474a9 Add tiff generation (BUG: rotated)
+| * ea8c9ef (refs/stash) On setup-tunder-FB: avoiding storage leads to large reshuffles
+|/| 
+
+Working tree status:
+On branch setup-tunder-FB
+Your branch is up to date with 'origin/setup-tunder-FB'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   2_historical_ndvi_test.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+============================================================
+Historic processing started at: 2026-04-07 16:39:29
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_2026-04-07_16h39m29.log
+============================================================
+
+Running: with arguments: 2017-04-01 2025-11-30
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Start time: 2026-04-07 16:39:29
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py
+Start time: 2026-04-07 16:39:29
+http://127.0.0.1:1235/status
+Initialized n=3195 daily dates:
+          daily   obs_date          obs_times
+0    2017-04-03 2017-04-03           10:40:21
+1    2017-04-04        NaT                   
+2    2017-04-05        NaT                   
+3    2017-04-06        NaT                   
+4    2017-04-07        NaT                   
+...         ...        ...                ...
+3190 2025-12-27 2025-12-27           10:44:51
+3191 2025-12-28 2025-12-28           10:14:41
+3192 2025-12-29 2025-12-29  10:33:39,10:45:01
+3193 2025-12-30 2025-12-30           10:14:51
+3194 2025-12-31 2025-12-31           10:24:41
+
+[3195 rows x 3 columns]
+In total: 3195 days, 1160 obs_dates, 1190 obs_times. 
+First dates in newly downloaded:
+  2017-04-03
+  2017-04-04
+  2017-04-05
+  2017-04-06
+  2017-04-07
+  2017-04-08
+  2017-04-09
+  2017-04-10
+  2017-04-11
+  2017-04-12
+Last dates in newly downloaded:
+  2025-12-22
+  2025-12-23
+  2025-12-24
+  2025-12-25
+  2025-12-26
+  2025-12-27
+  2025-12-28
+  2025-12-29
+  2025-12-30
+  2025-12-31
+Newly downloaded dataset:
+<xarray.Dataset> Size: 769MB
+Dimensions:   (date: 3195, pixel: 120000)
+Coordinates:
+  * pixel     (pixel) int32 480kB 0 1 2 3 4 ... 119996 119997 119998 119999
+  * date      (date) datetime64[ns] 26kB 2017-04-03 2017-04-04 ... 2025-12-31
+    x_idx     (pixel) int32 480kB dask.array<chunksize=(40000,), meta=np.ndarray>
+    y_idx     (pixel) int32 480kB dask.array<chunksize=(40000,), meta=np.ndarray>
+    x         (pixel) int32 480kB dask.array<chunksize=(40000,), meta=np.ndarray>
+    y         (pixel) int32 480kB dask.array<chunksize=(40000,), meta=np.ndarray>
+    doy       (date) int32 13kB 93 94 95 96 97 98 99 ... 360 361 362 363 364 365
+Data variables:
+    ndvi      (date, pixel) int16 767MB dask.array<chunksize=(1, 40000), meta=np.ndarray>
+    obs_date  (date) bool 3kB True False False False ... True True True True
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 16:41:42]  Starting Batch 1/1
+Constructed graph with 30 layers, and 4347 tasks.
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 1.07 GiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+[2026-04-07 16:50:27]  Batch 1/1  pixels 0–120,000  elapsed 8.8min  ETA 0min
+2026-04-07 16:50:29,623 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:43608 remote=tcp://127.0.0.1:41301>: Stream is closed
+2026-04-07 16:50:29,656 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:43632 remote=tcp://127.0.0.1:41301>: Stream is closed
+2026-04-07 16:50:29,657 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:43616 remote=tcp://127.0.0.1:41301>: Stream is closed
+/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py
+Duration: 00:11:04 (hh:mm:ss)
+Processing script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr

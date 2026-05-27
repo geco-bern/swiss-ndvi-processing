@@ -1,0 +1,211 @@
+============================================================
+Pipeline started at: 2026-03-19 07:29:21
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FB_2026-03-19_07h29m21.log
+============================================================
+
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-11-30
+Running: with arguments: 2025-11-30 2025-12-12
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-03-19 07:29:23
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Start time: 2026-03-19 07:29:23
+<Client: 'tcp://127.0.0.1:38959' processes=50 threads=50, memory=1.09 TiB>
+http://127.0.0.1:8343/status
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numcodecs/zarr3.py:94: UserWarning: Numcodecs codecs are not in the Zarr version 3 specification and may not be supported by other zarr implementations.
+  warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numcodecs/zarr3.py:94: UserWarning: Numcodecs codecs are not in the Zarr version 3 specification and may not be supported by other zarr implementations.
+  warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py:88: UserWarning: The specified chunks separate the stored chunks along dimension "pixel" starting at index 10000. This could degrade performance. Instead, consider rechunking after loading.
+  new_observations_ds = xr.open_dataset(SOURCE_ZARR, chunks={"pixel": PIXEL_CHUNKS, "date": -1})
+Subsetting downloaded data to spatial extent of historic file:
+/mnt/data1/UniBe-swiss-ndvi/data/ndvi_historic_v4_compr_10kmX10km.zarr
+Subsetting 586503 (historic) of 105715396 (downloaded) pixels.
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/array/core.py:4997: PerformanceWarning: Increasing number of chunks by factor of 13
+  result = blockwise(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/array/core.py:4997: PerformanceWarning: Increasing number of chunks by factor of 13
+  result = blockwise(
+Initialized n=13 daily dates:
+        daily   obs_date          obs_times
+0  2025-11-30        NaT                   
+1  2025-12-01        NaT                   
+2  2025-12-02        NaT                   
+3  2025-12-03        NaT                   
+4  2025-12-04        NaT                   
+5  2025-12-05        NaT                   
+6  2025-12-06 2025-12-06           10:23:19
+7  2025-12-07        NaT                   
+8  2025-12-08        NaT                   
+9  2025-12-09 2025-12-09  10:33:29,10:44:51
+10 2025-12-10        NaT                   
+11 2025-12-11        NaT                   
+12 2025-12-12 2025-12-12           10:43:39
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 13.00 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+All done
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Duration: 00:00:25 (hh:mm:ss)
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Start time: 2026-03-19 07:29:48
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numcodecs/zarr3.py:94: UserWarning: Numcodecs codecs are not in the Zarr version 3 specification and may not be supported by other zarr implementations.
+  warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numcodecs/zarr3.py:94: UserWarning: Numcodecs codecs are not in the Zarr version 3 specification and may not be supported by other zarr implementations.
+  warn(
+http://127.0.0.1:8343/status
+<xarray.Dataset> Size: 6GB
+Dimensions:         (date: 3164, pixel: 586503)
+Coordinates:
+  * date            (date) datetime64[ns] 25kB 2017-04-03 ... 2025-11-30
+  * pixel           (pixel) int32 2MB 100480370 100480371 ... 103515166
+    x_idx           (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    y               (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    doy             (date) int32 13kB dask.array<chunksize=(365,), meta=np.ndarray>
+    y_idx           (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    x               (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+Data variables:
+    ndvi_processed  (pixel, date) int16 4GB dask.array<chunksize=(10000, 365), meta=np.ndarray>
+    mask_array      (pixel, date) bool 2GB dask.array<chunksize=(10000, 365), meta=np.ndarray>
+Attributes:
+    note:     \n    # Define grid underlying PixelID and needed transformatio...
+<xarray.Dataset> Size: 42MB
+Dimensions:   (date: 13, pixel: 586503)
+Coordinates:
+  * date      (date) datetime64[ns] 104B 2025-11-30 2025-12-01 ... 2025-12-12
+  * pixel     (pixel) int32 2MB 100480370 100480371 ... 103515165 103515166
+    doy       (date) int32 52B dask.array<chunksize=(13,), meta=np.ndarray>
+    y_idx     (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    x_idx     (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    x         (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    y         (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+Data variables:
+    ndvi_obs  (date, pixel) int16 15MB dask.array<chunksize=(13, 10000), meta=np.ndarray>
+    ndsi_obs  (date, pixel) int16 15MB dask.array<chunksize=(13, 10000), meta=np.ndarray>
+    obs_date  (date) bool 13B dask.array<chunksize=(13,), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py:281: FutureWarning: zarr_version is deprecated, use zarr_format
+  out_ds.to_zarr(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/group.py:2469: UserWarning: The `compressor` argument is deprecated. Use `compressors` instead.
+  compressors = _parse_deprecated_compressor(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/group.py:2469: UserWarning: The `compressor` argument is deprecated. Use `compressors` instead.
+  compressors = _parse_deprecated_compressor(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 23.79 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+2026-03-19 07:30:30,121 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 340f5574d7b4eb2272492acb0928dfc8 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 0, 8, 0, 16) executed on worker tcp://127.0.0.1:34903
+2026-03-19 07:30:30,157 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle f7b64ac17237dc6f635947c65533a2a5 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 0, 5, 0, 11) executed on worker tcp://127.0.0.1:40847
+2026-03-19 07:30:30,224 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 37bab668387d453c5d1b668071c2663b initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 0, 2, 0, 5) executed on worker tcp://127.0.0.1:41649
+2026-03-19 07:30:30,352 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 0d55c2a1900157391eaa4610bf2660a4 initialized by task ('rechunk-merge-rechunk-split-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 0, 2, 0, 9) executed on worker tcp://127.0.0.1:35389
+2026-03-19 07:30:30,393 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle a72a0caa8cc0ca162b95c6009a8184ab initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 0, 6, 0, 21) executed on worker tcp://127.0.0.1:33335
+2026-03-19 07:30:30,484 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 66446d582f6d44aebbf2f0c913f71bac initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:43393
+2026-03-19 07:30:30,495 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d065d22d87fee841c8072360a9911438 initialized by task ('rechunk-merge-rechunk-split-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 0, 3, 0, 13) executed on worker tcp://127.0.0.1:33151
+2026-03-19 07:30:31,024 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 7be9cd2c91611433c42f6468b8942561 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 0, 6, 0, 12) executed on worker tcp://127.0.0.1:35823
+2026-03-19 07:30:31,191 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle dccf5cee1158d0da7128f56295efe5ae initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 0, 7, 0, 23) executed on worker tcp://127.0.0.1:42925
+2026-03-19 07:30:31,216 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e73af1ae00c535f5fe3b07089b2b4ff8 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 0, 3, 0, 7) executed on worker tcp://127.0.0.1:37389
+2026-03-19 07:30:31,359 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 383a85540d85a4b0d1c46e51d636fd43 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:33265
+2026-03-19 07:30:31,471 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fd39fafde3f1de7c26b624d26c448e0c initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 0, 4, 0, 14) executed on worker tcp://127.0.0.1:36139
+2026-03-19 07:30:31,960 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d9d1d578776c1806945dfcce5172b96a initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 0, 1, 0, 3) executed on worker tcp://127.0.0.1:41747
+2026-03-19 07:30:33,552 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle f7b64ac17237dc6f635947c65533a2a5 deactivated due to stimulus 'task-finished-1773905433.3560214'
+2026-03-19 07:30:33,649 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d065d22d87fee841c8072360a9911438 deactivated due to stimulus 'task-finished-1773905433.632875'
+2026-03-19 07:30:33,698 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 37bab668387d453c5d1b668071c2663b deactivated due to stimulus 'task-finished-1773905433.5219376'
+2026-03-19 07:30:34,030 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 340f5574d7b4eb2272492acb0928dfc8 deactivated due to stimulus 'task-finished-1773905433.9069283'
+2026-03-19 07:30:34,030 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fd39fafde3f1de7c26b624d26c448e0c deactivated due to stimulus 'task-finished-1773905433.6356435'
+2026-03-19 07:30:34,056 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle dccf5cee1158d0da7128f56295efe5ae deactivated due to stimulus 'task-finished-1773905433.8769827'
+2026-03-19 07:30:34,153 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 7be9cd2c91611433c42f6468b8942561 deactivated due to stimulus 'task-finished-1773905433.950979'
+2026-03-19 07:30:34,223 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 66446d582f6d44aebbf2f0c913f71bac deactivated due to stimulus 'task-finished-1773905434.004465'
+2026-03-19 07:30:34,254 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 383a85540d85a4b0d1c46e51d636fd43 deactivated due to stimulus 'task-finished-1773905434.1943572'
+2026-03-19 07:30:34,298 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d9d1d578776c1806945dfcce5172b96a deactivated due to stimulus 'task-finished-1773905434.0719407'
+2026-03-19 07:30:34,436 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle a72a0caa8cc0ca162b95c6009a8184ab deactivated due to stimulus 'task-finished-1773905434.269255'
+2026-03-19 07:30:34,652 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e73af1ae00c535f5fe3b07089b2b4ff8 deactivated due to stimulus 'task-finished-1773905434.4600449'
+2026-03-19 07:30:35,109 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fb9eb2b8b4963b069dc175fc2716be34 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 0, 7, 0, 15) executed on worker tcp://127.0.0.1:35823
+2026-03-19 07:30:35,214 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fead4e9409f55c41c446b02fa71b5c41 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 0, 1, 0, 3) executed on worker tcp://127.0.0.1:33265
+2026-03-19 07:30:35,271 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 4f07d784c8f5ae9febc9a2b46dd08183 initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 0, 5, 0, 19) executed on worker tcp://127.0.0.1:33151
+2026-03-19 07:30:35,426 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 07fc3d3a0ebb47ba7f2cb81253c71c29 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 0, 4, 0, 9) executed on worker tcp://127.0.0.1:38783
+2026-03-19 07:30:35,542 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 0fd76c65986ebb215ba7666954207399 initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 0, 8, 0, 26) executed on worker tcp://127.0.0.1:36139
+2026-03-19 07:30:37,313 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 07fc3d3a0ebb47ba7f2cb81253c71c29 deactivated due to stimulus 'task-finished-1773905437.1654963'
+2026-03-19 07:30:37,509 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 0d55c2a1900157391eaa4610bf2660a4 deactivated due to stimulus 'task-finished-1773905437.3896601'
+2026-03-19 07:30:37,753 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fead4e9409f55c41c446b02fa71b5c41 deactivated due to stimulus 'task-finished-1773905437.6030447'
+2026-03-19 07:30:37,776 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 0fd76c65986ebb215ba7666954207399 deactivated due to stimulus 'task-finished-1773905437.589964'
+2026-03-19 07:30:37,861 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 4f07d784c8f5ae9febc9a2b46dd08183 deactivated due to stimulus 'task-finished-1773905437.8245313'
+2026-03-19 07:30:38,224 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fb9eb2b8b4963b069dc175fc2716be34 deactivated due to stimulus 'task-finished-1773905438.2164934'
+2026-03-19 07:30:50,789 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d9b006de0cedb758484be29b3511740c initialized by task ('rechunk-merge-rechunk-split-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 1, 2, 1, 9) executed on worker tcp://127.0.0.1:34903
+2026-03-19 07:30:51,225 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle b0a8e97dd64c355a9a9d0940d9d29afa initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 1, 3, 1, 12) executed on worker tcp://127.0.0.1:39227
+2026-03-19 07:30:51,519 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 78fbbc135f5d60a030151105770f4d7d initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 1, 7, 1, 25) executed on worker tcp://127.0.0.1:42925
+2026-03-19 07:30:51,609 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle aa8dd04d5f863db7fa544e63a78adfbe initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 1, 4, 1, 14) executed on worker tcp://127.0.0.1:45999
+2026-03-19 07:30:51,760 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle a8b295a9438eb8c05fa103a78caab38e initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 1, 1, 1, 4) executed on worker tcp://127.0.0.1:33265
+2026-03-19 07:30:51,836 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d5fac677a5db3a623d78fd9a7c0bfb40 initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 1, 6, 1, 22) executed on worker tcp://127.0.0.1:38783
+2026-03-19 07:30:51,953 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d252328d06362a1d2eaf77a8c284cd8b initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 1, 5, 1, 17) executed on worker tcp://127.0.0.1:41649
+2026-03-19 07:30:52,258 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 47e2788cc27097683041d73ec33adaf9 initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 1, 0, 1, 2) executed on worker tcp://127.0.0.1:38783
+2026-03-19 07:30:52,413 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle b0a8e97dd64c355a9a9d0940d9d29afa deactivated due to stimulus 'task-finished-1773905452.3987198'
+2026-03-19 07:30:52,537 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle a8b295a9438eb8c05fa103a78caab38e deactivated due to stimulus 'task-finished-1773905452.5028853'
+2026-03-19 07:30:52,569 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle aa8dd04d5f863db7fa544e63a78adfbe deactivated due to stimulus 'task-finished-1773905452.5569694'
+2026-03-19 07:30:52,573 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d9b006de0cedb758484be29b3511740c deactivated due to stimulus 'task-finished-1773905452.5684311'
+2026-03-19 07:30:52,606 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d5fac677a5db3a623d78fd9a7c0bfb40 deactivated due to stimulus 'task-finished-1773905452.595436'
+2026-03-19 07:30:52,661 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 41f8acbf6ef6602ec620aaa745076a5a initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 1, 7, 1, 14) executed on worker tcp://127.0.0.1:41747
+2026-03-19 07:30:52,663 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 78fbbc135f5d60a030151105770f4d7d deactivated due to stimulus 'task-finished-1773905452.6430252'
+2026-03-19 07:30:52,669 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d252328d06362a1d2eaf77a8c284cd8b deactivated due to stimulus 'task-finished-1773905452.6577065'
+2026-03-19 07:30:52,816 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9a046480d51e14a12f6785f091ef6e06 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 1, 4, 1, 9) executed on worker tcp://127.0.0.1:39227
+2026-03-19 07:30:52,872 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fbc20cf69792dc68d62ef9458294c544 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 1, 3, 1, 6) executed on worker tcp://127.0.0.1:33265
+2026-03-19 07:30:52,942 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle f347f06b780f91f5ba75a3a2a286aee7 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 1, 2, 1, 5) executed on worker tcp://127.0.0.1:35823
+2026-03-19 07:30:53,020 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 066a626dcf148dd74965b2349f3fa0f1 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 1, 1, 1, 2) executed on worker tcp://127.0.0.1:45999
+2026-03-19 07:30:53,114 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle f5f3dde54e526622139a5b86c5a9139d initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 1, 6, 1, 12) executed on worker tcp://127.0.0.1:33335
+2026-03-19 07:30:53,187 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle cf00677382536f1b796bbf8dd2135e49 initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 1, 5, 1, 11) executed on worker tcp://127.0.0.1:43469
+2026-03-19 07:30:53,278 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle a06f9fb085681951b1c424d28f69cc9f initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 1, 0, 1, 1) executed on worker tcp://127.0.0.1:33265
+2026-03-19 07:30:53,336 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 47e2788cc27097683041d73ec33adaf9 deactivated due to stimulus 'task-finished-1773905453.326428'
+2026-03-19 07:30:53,363 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9a046480d51e14a12f6785f091ef6e06 deactivated due to stimulus 'task-finished-1773905453.3525078'
+2026-03-19 07:30:53,371 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 8819a2b205536d773ff59a963ee395fd initialized by task ('rechunk-merge-rechunk-transfer-44137896d44816fa4dfe0a601ade8ea3', 1, 8, 1, 16) executed on worker tcp://127.0.0.1:39227
+2026-03-19 07:30:53,416 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 41f8acbf6ef6602ec620aaa745076a5a deactivated due to stimulus 'task-finished-1773905453.4052818'
+2026-03-19 07:30:53,424 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 066a626dcf148dd74965b2349f3fa0f1 deactivated due to stimulus 'task-finished-1773905453.41547'
+2026-03-19 07:30:53,450 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 37083fd1cf2991fe737c268986a8dee4 initialized by task ('rechunk-merge-rechunk-transfer-59547de9443379085fdf1d89dd7f1bbe', 1, 8, 1, 27) executed on worker tcp://127.0.0.1:41649
+2026-03-19 07:30:53,460 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle f347f06b780f91f5ba75a3a2a286aee7 deactivated due to stimulus 'task-finished-1773905453.4527318'
+2026-03-19 07:30:53,578 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle f5f3dde54e526622139a5b86c5a9139d deactivated due to stimulus 'task-finished-1773905453.5657248'
+2026-03-19 07:30:53,818 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle a06f9fb085681951b1c424d28f69cc9f deactivated due to stimulus 'task-finished-1773905453.8069167'
+2026-03-19 07:30:53,848 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fbc20cf69792dc68d62ef9458294c544 deactivated due to stimulus 'task-finished-1773905453.834489'
+2026-03-19 07:30:53,859 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 8819a2b205536d773ff59a963ee395fd deactivated due to stimulus 'task-finished-1773905453.839819'
+2026-03-19 07:30:53,868 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle cf00677382536f1b796bbf8dd2135e49 deactivated due to stimulus 'task-finished-1773905453.8478405'
+2026-03-19 07:30:54,092 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 37083fd1cf2991fe737c268986a8dee4 deactivated due to stimulus 'task-finished-1773905453.9866788'
+done
+Total runtime: 72.90 seconds
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Duration: 00:01:18 (hh:mm:ss)
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/6_create_cogtiff.py
+Start time: 2026-03-19 07:31:06
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/6_create_cogtiff.py
+Duration: 00:00:00 (hh:mm:ss)
+============================================================
+Pipeline completed successfully
+End time: 2026-03-19 07:31:06
+Total runtime: 00:01:45 (hh:mm:ss)
+============================================================

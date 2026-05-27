@@ -1,0 +1,568 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-12-31
+2026-01-06
+============================================================
+Pipeline started at: 2026-05-25 22:36:31
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_2026-05-25_22h36m30.log
+============================================================
+
+Running: with arguments: 2025-12-31 2026-01-06
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-05-25 22:36:31
+Starting download for:
+2025-12-31_10h24
+2026-01-01_10h43
+2026-01-03_10h34
+2026-01-05_10h23
+2026-01-05_10h30
+2026-01-06_10h44
+bbox_swisstopo_2056, width_swisstopo, height_swisstopo
+BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0)
+37728
+24542
+Total of global grid used for pixel ID (based on forest mask): 
+Box: BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0) pixels
+Grid: (24542, 37728) = 925_920_576 pixels, of which 105_715_396 are identified as forest pixels.
+Reference raster metadata:
+{'transform': Affine(10.0, 0.0, 2474090.0,
+       0.0, -10.0, 1310530.0), 'crs': CRS.from_wkt('PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'), 'width': np.float64(37728.0), 'height': np.float64(24542.0)}
+  0%|          | 0/6 [00:00<?, ?it/s]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 0 processed successfully.
+ 17%|█▋        | 1/6 [07:03<35:19, 423.96s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 1 processed successfully.
+ 33%|███▎      | 2/6 [08:19<14:36, 219.21s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 2 processed successfully.
+ 50%|█████     | 3/6 [16:08<16:39, 333.30s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 3 processed successfully.
+ 67%|██████▋   | 4/6 [23:39<12:39, 379.50s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 4 processed successfully.
+ 83%|████████▎ | 5/6 [32:16<07:09, 429.34s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 5 processed successfully.
+100%|██████████| 6/6 [33:30<00:00, 308.47s/it]100%|██████████| 6/6 [33:30<00:00, 335.13s/it]
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:36:21 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Start time: 2026-05-25 23:12:52
+<Client: 'tcp://127.0.0.1:35545' processes=50 threads=50, memory=1.09 TiB>
+http://127.0.0.1:8343/status
+Subsetting downloaded data to spatial extent of historic file:
+/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr
+Subsetting 8 (historic) of 105715396 (downloaded) pixels.
+Initialized n=7 daily dates:
+       daily   obs_date          obs_times
+0 2025-12-31 2025-12-31           10:24:41
+1 2026-01-01 2026-01-01           10:43:39
+2 2026-01-02        NaT                   
+3 2026-01-03 2026-01-03           10:34:41
+4 2026-01-04        NaT                   
+5 2026-01-05 2026-01-05  10:23:29,10:30:41
+6 2026-01-06 2026-01-06           10:44:41
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+All done
+Created file: 
+/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+2026-05-25 23:13:02,202 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60754 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,203 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60784 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,205 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60764 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,205 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60742 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,206 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60752 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,207 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60744 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,208 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60788 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,210 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60820 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,210 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60808 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,212 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60770 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,214 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60854 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,212 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60794 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,216 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60836 remote=tcp://127.0.0.1:35545>: Stream is closed
+2026-05-25 23:13:02,221 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60844 remote=tcp://127.0.0.1:35545>: Stream is closed
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Duration: 00:00:11 (hh:mm:ss)
+Merging script returned value: distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:60844 remote=tcp://127.0.0.1:35545>: Stream is closed
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Start time: 2026-05-25 23:13:03
+<Client: 'tcp://127.0.0.1:43137' processes=30 threads=30, memory=3.27 TiB>
+http://127.0.0.1:8343/status
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py", line 408, in <module>
+    new_ds       = xr.open_zarr(INPUT_ZARR, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": -1})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 1535, in open_zarr
+    ds = open_dataset(
+         ^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/api.py", line 687, in open_dataset
+    backend_ds = backend.open_dataset(
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 1608, in open_dataset
+    store = ZarrStore.open_group(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 732, in open_group
+    ) = _get_open_params(
+        ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 1811, in _get_open_params
+    zarr_root_group = zarr.open_consolidated(store, **open_kwargs)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/synchronous.py", line 215, in open_consolidated
+    sync(async_api.open_consolidated(*args, use_consolidated=use_consolidated, **kwargs))
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/sync.py", line 163, in sync
+    raise return_result
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/sync.py", line 119, in _runner
+    return await coro
+           ^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py", line 352, in open_consolidated
+    return await open_group(*args, use_consolidated=use_consolidated, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py", line 827, in open_group
+    raise FileNotFoundError(f"Unable to find group: {store_path}")
+FileNotFoundError: Unable to find group: file:///home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp:/127.0.0.1:60844 remote=tcp:/127.0.0.1:35545>: Stream is closed
+[ERROR] Script failed: N/A | Time: Mon May 25 23:13:10 UTC 2026

@@ -1,0 +1,64 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-12-12
+2025-12-12
+============================================================
+Pipeline started at: 2026-03-22 22:50:26
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FB_2026-03-22_22h50m24.log
+============================================================
+
+Running: with arguments: 2025-12-12 2025-12-12
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-03-22 22:50:26
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Start time: 2026-03-22 22:50:26
+<Client: 'tcp://127.0.0.1:38063' processes=50 threads=50, memory=1.09 TiB>
+http://127.0.0.1:8343/status
+2026-03-22 22:50:55,804 - tornado.application - ERROR - Exception in callback functools.partial(<function TCPServer._handle_connection.<locals>.<lambda> at 0x75e03d4e62a0>, <Task finished name='Task-80325' coro=<BaseTCPListener._handle_stream() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py:655> exception=MemoryError((6073139484287059271,), dtype('uint8'))>)
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/ioloop.py", line 758, in _run_callback
+    ret = callback()
+          ^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/tcpserver.py", line 387, in <lambda>
+    gen.convert_yielded(future), lambda f: f.result()
+                                           ^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 667, in _handle_stream
+    await self.on_connection(comm)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/core.py", line 288, in on_connection
+    return await super().on_connection(comm, handshake_overrides)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/core.py", line 267, in on_connection
+    handshake = await comm.read()
+                ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 228, in read
+    frames_nosplit = await read_bytes_rw(stream, frames_nosplit_nbytes)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 360, in read_bytes_rw
+    buf = host_array(n)
+          ^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/protocol/utils.py", line 29, in host_array
+    return numpy.empty((n,), dtype="u1").data
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+numpy._core._exceptions._ArrayMemoryError: Unable to allocate 5.27 EiB for an array with shape (6073139484287059271,) and data type uint8
+Initialized n=1 daily dates:
+       daily   obs_date obs_times
+0 2025-12-12 2025-12-12  10:43:39
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 815.86 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(

@@ -1,0 +1,57 @@
+nohup: ignoring input
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numcodecs/zarr3.py:94: UserWarning: Numcodecs codecs are not in the Zarr version 3 specification and may not be supported by other zarr implementations.
+  warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numcodecs/zarr3.py:94: UserWarning: Numcodecs codecs are not in the Zarr version 3 specification and may not be supported by other zarr implementations.
+  warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/tmp_extract_timeseries_for_report.py:19: UserWarning: The specified chunks separate the stored chunks along dimension "pixel" starting at index 500. This could degrade performance. Instead, consider rechunking after loading.
+  ds = xr.open_zarr(INPUT_ZARR, chunks={"date": -1, "pixel": 500})
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/tmp_extract_timeseries_for_report.py:21: UserWarning: The specified chunks separate the stored chunks along dimension "pixel" starting at index 500. This could degrade performance. Instead, consider rechunking after loading.
+  ds2 = xr.open_zarr(INPUT_LOOKUPTABLE, chunks={"date": -1, "pixel": 500})
+<xarray.Dataset> Size: 1TB
+Dimensions:         (pixel: 105715396, date: 3195)
+Coordinates:
+    y_idx           (pixel) int32 423MB dask.array<chunksize=(500,), meta=np.ndarray>
+    doy             (date) int32 13kB dask.array<chunksize=(3195,), meta=np.ndarray>
+  * date            (date) datetime64[ns] 26kB 2017-04-03 ... 2025-12-31
+    x               (pixel) int32 423MB dask.array<chunksize=(500,), meta=np.ndarray>
+  * pixel           (pixel) int32 423MB 0 1 2 ... 105715393 105715394 105715395
+    x_idx           (pixel) int32 423MB dask.array<chunksize=(500,), meta=np.ndarray>
+    y               (pixel) int32 423MB dask.array<chunksize=(500,), meta=np.ndarray>
+Data variables:
+    ndvi_processed  (pixel, date) int16 676GB dask.array<chunksize=(500, 3195), meta=np.ndarray>
+    mask_array      (pixel, date) int8 338GB dask.array<chunksize=(500, 3195), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+<xarray.Dataset> Size: 78GB
+Dimensions:      (pixel: 105715396, doy: 365)
+Coordinates:
+  * pixel        (pixel) int32 423MB 0 1 2 3 ... 105715393 105715394 105715395
+  * doy          (doy) int32 1kB 1 2 3 4 5 6 7 8 ... 359 360 361 362 363 364 365
+Data variables:
+    median_ndvi  (pixel, doy) int16 77GB dask.array<chunksize=(500, 365), meta=np.ndarray>
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numcodecs/zarr3.py:94: UserWarning: Numcodecs codecs are not in the Zarr version 3 specification and may not be supported by other zarr implementations.
+  warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numcodecs/zarr3.py:94: UserWarning: Numcodecs codecs are not in the Zarr version 3 specification and may not be supported by other zarr implementations.
+  warn(
+low_broad: X=2694495, Y=1126025, pixel_idx=90415334
+Saved: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova3/low_broad.png
+high_broad: X=2692015, Y=1121445, pixel_idx=93677703
+Saved: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova3/high_broad.png
+low_ever: X=2761095, Y=1194615, pixel_idx=46053259
+Saved: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova3/low_ever.png
+high_ever: X=2781535, Y=1182975, pixel_idx=54232662
+Saved: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova3/high_ever.png
+fire: X=2644025, Y=1134145, pixel_idx=84599346
+Saved: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova3/fire.png
+non_fire: X=2644325, Y=1134345, pixel_idx=84468278
+Saved: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova3/non_fire.png
+drought: X=2690025, Y=1287415, pixel_idx=427960
+Saved: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova3/drought.png
+storm: X=2689565, Y=1154415, pixel_idx=73583022
+Saved: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/prova3/storm.png

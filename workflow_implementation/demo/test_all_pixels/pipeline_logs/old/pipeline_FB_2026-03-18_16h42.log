@@ -1,0 +1,11 @@
+============================================================
+Pipeline started at: 2026-03-18 16:42:43
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FB_2026-03-18_16h42.log
+============================================================
+
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-11-30
+0_1_run_pipeline.sh: line 88: END_DATE: unbound variable

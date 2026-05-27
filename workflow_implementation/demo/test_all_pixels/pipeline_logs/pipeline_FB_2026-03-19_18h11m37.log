@@ -1,0 +1,5 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+rm: descend into write-protected directory '/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v4_compr_1000mX1000m.zarr'? 

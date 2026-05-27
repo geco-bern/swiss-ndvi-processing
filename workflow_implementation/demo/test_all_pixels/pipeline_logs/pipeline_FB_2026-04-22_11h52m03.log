@@ -1,0 +1,256 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-12-31
+2026-01-15
+============================================================
+Pipeline started at: 2026-04-22 11:52:07
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FB_2026-04-22_11h52m03.log
+============================================================
+
+Running: with arguments: 2025-12-31 2026-01-15
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-04-22 11:52:07
+Starting download for:
+2025-12-31_10h24
+2026-01-01_10h43
+2026-01-03_10h34
+2026-01-05_10h23
+2026-01-05_10h30
+2026-01-06_10h44
+2026-01-07_10h14
+2026-01-09_10h10
+2026-01-13_10h34
+2026-01-15_10h22
+bbox_swisstopo_2056, width_swisstopo, height_swisstopo
+BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0)
+37728
+24542
+Total of global grid used for pixel ID (based on forest mask): 
+Box: BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0) pixels
+Grid: (24542, 37728) = 925_920_576 pixels, of which 105_715_396 are identified as forest pixels.
+Reference raster metadata:
+{'transform': Affine(10.0, 0.0, 2474090.0,
+       0.0, -10.0, 1310530.0), 'crs': CRS.from_wkt('PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'), 'width': np.float64(37728.0), 'height': np.float64(24542.0)}
+  0%|          | 0/10 [00:00<?, ?it/s]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 0 processed successfully.
+ 10%|█         | 1/10 [07:00<1:03:02, 420.32s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 1 processed successfully.
+ 20%|██        | 2/10 [08:14<28:54, 216.81s/it]  /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 2 processed successfully.
+ 30%|███       | 3/10 [16:05<38:49, 332.79s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 3 processed successfully.
+ 40%|████      | 4/10 [23:40<38:07, 381.21s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 4 processed successfully.
+ 50%|█████     | 5/10 [32:17<35:49, 429.92s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 5 processed successfully.
+ 60%|██████    | 6/10 [33:31<20:35, 308.98s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 6 processed successfully.
+ 70%|███████   | 7/10 [34:23<11:15, 225.10s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 7 processed successfully.
+ 80%|████████  | 8/10 [35:16<05:40, 170.21s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 8 processed successfully.
+ 90%|█████████ | 9/10 [43:17<04:27, 267.48s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:371: RuntimeWarning: invalid value encountered in divide
+  ndvi = (nir - red) / (nir + red)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:398: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:428: UserWarning: no explicit representation of timezones available for np.datetime64
+  timesteps_ds[t] = np.datetime64(timestep_dttm).astype("datetime64[ns]").astype("int64")
+Time step 9 processed successfully.
+100%|██████████| 10/10 [50:27<00:00, 317.58s/it]100%|██████████| 10/10 [50:27<00:00, 302.76s/it]
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-04-22_11h52_ndvi_01_downloaded_2025-12-31_2026-01-15.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:52:52 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-04-22_11h52_ndvi_01_downloaded_2025-12-31_2026-01-15.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Start time: 2026-04-22 12:44:59
+<Client: 'tcp://127.0.0.1:46675' processes=50 threads=50, memory=1.09 TiB>
+http://127.0.0.1:8343/status
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/array/core.py:4997: PerformanceWarning: Increasing number of chunks by factor of 16
+  result = blockwise(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/array/core.py:4997: PerformanceWarning: Increasing number of chunks by factor of 16
+  result = blockwise(
+Initialized n=16 daily dates:
+        daily   obs_date          obs_times
+0  2025-12-31 2025-12-31           10:24:41
+1  2026-01-01 2026-01-01           10:43:39
+2  2026-01-02        NaT                   
+3  2026-01-03 2026-01-03           10:34:41
+4  2026-01-04        NaT                   
+5  2026-01-05 2026-01-05  10:23:29,10:30:41
+6  2026-01-06 2026-01-06           10:44:41
+7  2026-01-07 2026-01-07           10:14:21
+8  2026-01-08        NaT                   
+9  2026-01-09 2026-01-09           10:10:51
+10 2026-01-10        NaT                   
+11 2026-01-11        NaT                   
+12 2026-01-12        NaT                   
+13 2026-01-13 2026-01-13           10:34:11
+14 2026-01-14        NaT                   
+15 2026-01-15 2026-01-15           10:22:59
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 827.07 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+All done
+Created file: 
+/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-04-22_11h52_ndvi_01_downloaded_2025-12-31_2026-01-15_processed.zarr
+2026-04-22 12:52:55,796 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:46572 remote=tcp://127.0.0.1:46675>: Stream is closed
+2026-04-22 12:52:55,803 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:46576 remote=tcp://127.0.0.1:46675>: Stream is closed
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Duration: 00:08:05 (hh:mm:ss)
+Merging script returned value: distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:46576 remote=tcp://127.0.0.1:46675>: Stream is closed
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Start time: 2026-04-22 12:53:04
+<Client: 'tcp://127.0.0.1:41339' processes=30 threads=30, memory=3.27 TiB>
+http://127.0.0.1:8343/status
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py", line 253, in <module>
+    new_ds       = xr.open_zarr(INPUT_ZARR, chunks={}).chunk({"pixel": PIXEL_CHUNKS, "date": -1})
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 1535, in open_zarr
+    ds = open_dataset(
+         ^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/api.py", line 687, in open_dataset
+    backend_ds = backend.open_dataset(
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 1608, in open_dataset
+    store = ZarrStore.open_group(
+            ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 732, in open_group
+    ) = _get_open_params(
+        ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 1811, in _get_open_params
+    zarr_root_group = zarr.open_consolidated(store, **open_kwargs)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/synchronous.py", line 215, in open_consolidated
+    sync(async_api.open_consolidated(*args, use_consolidated=use_consolidated, **kwargs))
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/sync.py", line 163, in sync
+    raise return_result
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/sync.py", line 119, in _runner
+    return await coro
+           ^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py", line 352, in open_consolidated
+    return await open_group(*args, use_consolidated=use_consolidated, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py", line 827, in open_group
+    raise FileNotFoundError(f"Unable to find group: {store_path}")
+FileNotFoundError: Unable to find group: file:///home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp:/127.0.0.1:46576 remote=tcp:/127.0.0.1:46675>: Stream is closed
+[ERROR] Script failed: N/A | Time: Wed Apr 22 12:53:14 UTC 2026

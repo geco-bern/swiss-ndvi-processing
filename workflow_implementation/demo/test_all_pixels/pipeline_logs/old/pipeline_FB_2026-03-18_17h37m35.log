@@ -1,0 +1,30 @@
+============================================================
+Pipeline started at: 2026-03-18 17:37:35
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FB_2026-03-18_17h37m35.log
+============================================================
+
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-11-30
+Running: with arguments: 2025-11-30 2025-12-04
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-03-18 17:37:37
+No data downloaded.
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:00:03 (hh:mm:ss)
+Download script returned value: No data downloaded.
+
+------------------------------------------------------------
+NO NEW SATELLITE IMAGE DOWNLOADS FOUND for 2025-11-30/2025-12-04
+Data directory is empty: No data downloaded.
+Skipping execution of scripts 2-6
+------------------------------------------------------------
+============================================================
+Pipeline completed successfully
+End time: 2026-03-18 17:37:40
+Total runtime: 00:00:05 (hh:mm:ss)
+============================================================

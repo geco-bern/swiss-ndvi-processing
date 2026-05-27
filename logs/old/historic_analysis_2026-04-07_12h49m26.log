@@ -1,0 +1,64 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2017-04-01
+2025-11-30
+Current commit:
+7acb879832dbb81cb3e982852e72d99205636178
+
+Commit details:
+* 7acb879 (HEAD -> setup-tunder-FB) Close dask client cleanly for tiff-generation
+* 5dacadf (origin/setup-tunder-FB) Update timeseries plot for validation
+* 85df6a0 Make tiff generation loop through all dates
+* 8aa07d5 Fix: rotated GeoTiff (fixing downstream at tiff generation, keeping wrong x_idx, y_idx)
+* 99474a9 Add tiff generation (BUG: rotated)
+| * ea8c9ef (refs/stash) On setup-tunder-FB: avoiding storage leads to large reshuffles
+|/| 
+| * 744b18e index on setup-tunder-FB: 9a9f193 Improve performance again with storing and "allow_rechunk"
+|/  
+| * 26b27a7 (temp2) Control chunking and remove "allow_rechunk"
+|/  
+* 9a9f193 Improve performance again with storing and "allow_rechunk"
+* 10f2bd6 Avoid intermediate storage (it did not improve performance for 1000 pixels)
+
+Working tree status:
+On branch setup-tunder-FB
+Your branch is ahead of 'origin/setup-tunder-FB' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   0_1_run_historic_analysis.sh
+	modified:   2_historical_ndvi_test.py
+	modified:   4_plot_historic_tiff.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+============================================================
+Historic processing started at: 2026-04-07 12:49:26
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_2026-04-07_12h49m26.log
+============================================================
+
+Running: with arguments: 2017-04-01 2025-11-30
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Start time: 2026-04-07 12:49:26
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr
+
+<Client: 'tcp://127.0.0.1:38439' processes=10 threads=10, memory=111.76 GiB>
+http://127.0.0.1:8346/status
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numcodecs/zarr3.py:94: UserWarning: Numcodecs codecs are not in the Zarr version 3 specification and may not be supported by other zarr implementations.
+  warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/numcodecs/zarr3.py:94: UserWarning: Numcodecs codecs are not in the Zarr version 3 specification and may not be supported by other zarr implementations.
+  warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/pyproj/crs/_cf1x8.py:514: UserWarning: angle from rectified to skew grid parameter lost in conversion to CF
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/rioxarray/raster_writer.py:301: RuntimeWarning: invalid value encountered in cast
+  data = encode_cf_variable(out_data.variable).values.astype(
+Created /mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7_temp/20170702_historic.tiff
+Created /mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7_temp/20170702_historic_mask.tiff

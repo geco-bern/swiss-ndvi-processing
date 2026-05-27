@@ -1,0 +1,23 @@
+============================================================
+Pipeline started at: 2026-03-17 16:02:16
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FB_2026-03-17_16h02.log
+============================================================
+
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-11-30
+Running: with arguments: 2025-11-30 2025-12-06
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-03-17 16:02:18
+  0%|          | 0/1 [00:00<?, ?it/s]100%|██████████| 1/1 [00:00<00:00,  1.10it/s]100%|██████████| 1/1 [00:00<00:00,  1.10it/s]
+  0%|          | 0/1 [00:00<?, ?it/s]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:223: RuntimeWarning: invalid value encountered in divide
+  red = red.astype("float32") / 10000.0
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py:250: RuntimeWarning: invalid value encountered in divide
+  green = green.astype("float32") / 10000.0
+100%|██████████| 1/1 [06:49<00:00, 409.12s/it]100%|██████████| 1/1 [06:49<00:00, 409.12s/it]
+0_1_run_pipeline.sh: line 93: =========================================================: command not found
+[ERROR] Script failed: N/A | Time: Tue Mar 17 04:09:34 PM UTC 2026

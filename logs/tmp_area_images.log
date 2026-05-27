@@ -1,0 +1,25 @@
+nohup: ignoring input
+
+--- Processing: Lowland broadleaf area ---
+Saved figure → /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/images_for_report/low_broad_area.png
+
+--- Processing: Highland broadleaf area ---
+Saved figure → /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/images_for_report/high_broad_area.png
+
+--- Processing: Lowland evergreen area ---
+Saved figure → /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/images_for_report/low_ever_area.png
+
+--- Processing: Highland evergreen area ---
+Saved figure → /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/images_for_report/high_ever_area.png
+
+--- Processing: Biscth fire affected area ---
+Saved figure → /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/images_for_report/fire_area.png
+
+--- Processing: Biscth fire non affected area ---
+Saved figure → /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/images_for_report/non_fire_area.png
+
+--- Processing: Drought affected area ---
+Saved figure → /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/images_for_report/drought_area.png
+
+--- Processing: Vaia storm affected area ---
+Saved figure → /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/report/fig/images_for_report/storm_area.png

@@ -1,0 +1,861 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2017-04-01
+2025-11-30
+Current commit:
+dbaf9d954260565d742e6e792e3b609453dc7559
+
+Commit details:
+*-.   88bb8c2 (refs/stash) On setup-tunder-FB: compiled numba
+|\ \  
+| | * 8b8f2eb untracked files on setup-tunder-FB: dbaf9d9 Cleanup and go for full dataset
+| * e9ec04a index on setup-tunder-FB: dbaf9d9 Cleanup and go for full dataset
+|/  
+* dbaf9d9 (HEAD -> setup-tunder-FB) Cleanup and go for full dataset
+* 27177aa (origin/setup-tunder-FB) perf: Go to 200k batches, use 120 workers, persist() instead of intermediate save
+* e246125 Switch N_WORKERS = 80
+* 7e74716 Update logging
+* 4cf4e3f Fix Batch size to 3*PIXEL_CHUNKS
+* f18e93e perf: Improve performance by manual looping through chunks for apply_ufunc()
+* c456659 docs: Streamline hist_script 2 by removing comments
+
+Working tree status:
+On branch setup-tunder-FB
+Your branch is ahead of 'origin/setup-tunder-FB' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+
+============================================================
+Historic processing started at: 2026-04-08 22:00:08
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_2026-04-08_22h00m08.log
+============================================================
+
+Running: with arguments: 2017-04-01 2025-11-30
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Start time: 2026-04-08 22:00:08
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py
+Start time: 2026-04-08 22:00:08
+2026-04-08 22:00:11,049 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 714, in start
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,055 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,062 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,064 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,065 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,066 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,068 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,069 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,070 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,071 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,072 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,073 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,074 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,075 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,078 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,079 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,080 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,081 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,082 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,084 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,085 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,086 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,087 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,088 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,089 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,090 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 42, in __init__
+    self._reader, self._writer = connection.Pipe(duplex=False)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 544, in Pipe
+    fd1, fd2 = os.pipe()
+               ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,091 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 713, in start
+    self.init_result_q = mp_ctx.Queue()
+                         ^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 103, in Queue
+    return Queue(maxsize, ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/queues.py", line 43, in __init__
+    self._rlock = ctx.Lock()
+                  ^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 68, in Lock
+    return Lock(ctx=self.get_context())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 169, in __init__
+  File "/usr/lib/python3.12/multiprocessing/synchronize.py", line 57, in __init__
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,096 - distributed.nanny - ERROR - Nanny failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 750, in start
+    await self.process.start()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 215, in _start
+    process.start()
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 289, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 53, in _launch
+    parent_r, child_w = os.pipe()
+                        ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,098 - distributed.nanny - ERROR - Nanny failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 750, in start
+    await self.process.start()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 215, in _start
+    process.start()
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 289, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 53, in _launch
+    parent_r, child_w = os.pipe()
+                        ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,099 - distributed.nanny - ERROR - Nanny failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 750, in start
+    await self.process.start()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 215, in _start
+    process.start()
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 289, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 53, in _launch
+    parent_r, child_w = os.pipe()
+                        ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,100 - distributed.nanny - ERROR - Nanny failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 750, in start
+    await self.process.start()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 215, in _start
+    process.start()
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 289, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 53, in _launch
+    parent_r, child_w = os.pipe()
+                        ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,100 - distributed.nanny - ERROR - Nanny failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 750, in start
+    await self.process.start()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 215, in _start
+    process.start()
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 289, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 53, in _launch
+    parent_r, child_w = os.pipe()
+                        ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+2026-04-08 22:00:11,110 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 750, in start
+    await self.process.start()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 215, in _start
+    process.start()
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 289, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 53, in _launch
+    parent_r, child_w = os.pipe()
+                        ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 756, in start
+    await self.process.terminate()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 133, in terminate
+    self._popen.terminate()
+    ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'terminate'
+2026-04-08 22:00:11,113 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 750, in start
+    await self.process.start()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 215, in _start
+    process.start()
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 289, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 53, in _launch
+    parent_r, child_w = os.pipe()
+                        ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 756, in start
+    await self.process.terminate()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 133, in terminate
+    self._popen.terminate()
+    ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'terminate'
+2026-04-08 22:00:11,115 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 750, in start
+    await self.process.start()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 215, in _start
+    process.start()
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 289, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 53, in _launch
+    parent_r, child_w = os.pipe()
+                        ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 756, in start
+    await self.process.terminate()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 133, in terminate
+    self._popen.terminate()
+    ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'terminate'
+2026-04-08 22:00:11,117 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 750, in start
+    await self.process.start()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 215, in _start
+    process.start()
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 289, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 53, in _launch
+    parent_r, child_w = os.pipe()
+                        ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 756, in start
+    await self.process.terminate()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 133, in terminate
+    self._popen.terminate()
+    ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'terminate'
+2026-04-08 22:00:11,119 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 750, in start
+    await self.process.start()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 215, in _start
+    process.start()
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 121, in start
+    self._popen = self._Popen(self)
+                  ^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/context.py", line 289, in _Popen
+    return Popen(process_obj)
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 32, in __init__
+    super().__init__(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_fork.py", line 19, in __init__
+    self._launch(process_obj)
+  File "/usr/lib/python3.12/multiprocessing/popen_spawn_posix.py", line 53, in _launch
+    parent_r, child_w = os.pipe()
+                        ^^^^^^^^^
+OSError: [Errno 24] Too many open files
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 756, in start
+    await self.process.terminate()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/process.py", line 55, in _call_and_set_future
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/process.py", line 133, in terminate
+    self._popen.terminate()
+    ^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'terminate'

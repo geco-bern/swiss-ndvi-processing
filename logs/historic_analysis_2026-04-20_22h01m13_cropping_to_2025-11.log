@@ -1,0 +1,71 @@
+real-time non-blocking time  (microseconds, -R) unlimited
+core file size              (blocks, -c) 0
+data seg size               (kbytes, -d) unlimited
+scheduling priority                 (-e) 0
+file size                   (blocks, -f) unlimited
+pending signals                     (-i) 16512639
+max locked memory           (kbytes, -l) 528414700
+max memory size             (kbytes, -m) unlimited
+open files                          (-n) 8192
+pipe size                (512 bytes, -p) 8
+POSIX message queues         (bytes, -q) 819200
+real-time priority                  (-r) 0
+stack size                  (kbytes, -s) 8192
+cpu time                   (seconds, -t) unlimited
+max user processes                  (-u) 16512639
+virtual memory              (kbytes, -v) unlimited
+file locks                          (-x) unlimited
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2017-04-01
+2025-11-30
+Current commit:
+fac54a1b3f3e664f06a7847336e14276b7035251
+
+Commit details:
+* fac54a1 (HEAD -> setup-tunder-FB) Add cropping script (to end historic NDVI properly) at 2025-11-30
+* 5f251b5 Update verification plots
+* 5405586 Update creation of COGTIFF (actually run)
+* 8f8839b Update creation of COGTIFF
+* 41f9c96 (origin/setup-tunder-FB) refactor: make function variants in historical benchmark comparable
+* c422b75 Add benchmark between different historical codes
+* 05d66be Fix ETA calculation
+* 642e0ff Add comments on potential performance gains
+* 16dd7cb perf: Increase limit of simultaneously open files 1024=>8192
+* 73cd2a0 Revert "perf: 120 => 60 cores"
+
+Working tree status:
+On branch setup-tunder-FB
+Your branch is ahead of 'origin/setup-tunder-FB' by 4 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   0_1_run_historic_analysis.sh
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+============================================================
+Historic processing started at: 2026-04-20 22:01:13
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_2026-04-20_22h01m13.log
+============================================================
+
+Running: with arguments: 2017-04-01 2025-11-30
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Start time: 2026-04-20 22:01:13
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2b_crop_to_2025-11-30.py
+Start time: 2026-04-20 22:01:13
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2b_crop_to_2025-11-30.py
+Duration: 00:20:44 (hh:mm:ss)

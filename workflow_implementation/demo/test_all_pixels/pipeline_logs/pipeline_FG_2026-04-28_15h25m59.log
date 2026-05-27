@@ -1,0 +1,22 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-12-31
+2025-12-12
+============================================================
+Pipeline started at: 2026-04-28 15:26:03
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FG_2026-04-28_15h25m59.log
+============================================================
+
+Running: with arguments: 2025-12-31 2025-12-12
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-04-28 15:26:03
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py", line 102, in <module>
+    s2_files = s2_files[~remove_idx] # These are kept
+                        ^^^^^^^^^^^
+TypeError: ufunc 'invert' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe''
+[ERROR] Script failed: N/A | Time: Tue Apr 28 03:26:06 PM UTC 2026

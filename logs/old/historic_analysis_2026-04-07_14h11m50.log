@@ -1,0 +1,967 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2017-04-01
+2025-11-30
+Current commit:
+c1547ac5436e63b0828575e7656654af9aba2c35
+
+Commit details:
+* c1547ac (HEAD -> setup-tunder-FB) perf: Improve performance by manual looping through chunks for apply_ufunc()
+* c456659 docs: Streamline hist_script 2 by removing comments
+* 0bbc09d Attempt to fix: "OSError: [Errno 24] Too many open files"
+* 52c3f15 (origin/setup-tunder-FB) Update bash script for historic to run only processing (temp. deactivate tiffs)
+* 7acb879 Close dask client cleanly for tiff-generation
+* 5dacadf Update timeseries plot for validation
+* 85df6a0 Make tiff generation loop through all dates
+* 8aa07d5 Fix: rotated GeoTiff (fixing downstream at tiff generation, keeping wrong x_idx, y_idx)
+* 99474a9 Add tiff generation (BUG: rotated)
+| * ea8c9ef (refs/stash) On setup-tunder-FB: avoiding storage leads to large reshuffles
+|/| 
+
+Working tree status:
+On branch setup-tunder-FB
+Your branch is ahead of 'origin/setup-tunder-FB' by 3 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   2_historical_ndvi_test.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+============================================================
+Historic processing started at: 2026-04-07 14:11:50
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_2026-04-07_14h11m50.log
+============================================================
+
+Running: with arguments: 2017-04-01 2025-11-30
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Start time: 2026-04-07 14:11:50
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py
+Start time: 2026-04-07 14:11:50
+http://127.0.0.1:1235/status
+Initialized n=3195 daily dates:
+          daily   obs_date          obs_times
+0    2017-04-03 2017-04-03           10:40:21
+1    2017-04-04        NaT                   
+2    2017-04-05        NaT                   
+3    2017-04-06        NaT                   
+4    2017-04-07        NaT                   
+...         ...        ...                ...
+3190 2025-12-27 2025-12-27           10:44:51
+3191 2025-12-28 2025-12-28           10:14:41
+3192 2025-12-29 2025-12-29  10:33:39,10:45:01
+3193 2025-12-30 2025-12-30           10:14:51
+3194 2025-12-31 2025-12-31           10:24:41
+
+[3195 rows x 3 columns]
+In total: 3195 days, 1160 obs_dates, 1190 obs_times. 
+First dates in newly downloaded:
+  2017-04-03
+  2017-04-04
+  2017-04-05
+  2017-04-06
+  2017-04-07
+  2017-04-08
+  2017-04-09
+  2017-04-10
+  2017-04-11
+  2017-04-12
+Last dates in newly downloaded:
+  2025-12-22
+  2025-12-23
+  2025-12-24
+  2025-12-25
+  2025-12-26
+  2025-12-27
+  2025-12-28
+  2025-12-29
+  2025-12-30
+  2025-12-31
+Newly downloaded dataset:
+<xarray.Dataset> Size: 641MB
+Dimensions:   (date: 3195, pixel: 100000)
+Coordinates:
+  * pixel     (pixel) int32 400kB 0 1 2 3 4 5 ... 99995 99996 99997 99998 99999
+  * date      (date) datetime64[ns] 26kB 2017-04-03 2017-04-04 ... 2025-12-31
+    x_idx     (pixel) int32 400kB dask.array<chunksize=(40000,), meta=np.ndarray>
+    y_idx     (pixel) int32 400kB dask.array<chunksize=(40000,), meta=np.ndarray>
+    x         (pixel) int32 400kB dask.array<chunksize=(40000,), meta=np.ndarray>
+    y         (pixel) int32 400kB dask.array<chunksize=(40000,), meta=np.ndarray>
+    doy       (date) int32 13kB 93 94 95 96 97 98 99 ... 360 361 362 363 364 365
+Data variables:
+    ndvi      (date, pixel) int16 639MB dask.array<chunksize=(1, 40000), meta=np.ndarray>
+    obs_date  (date) bool 3kB True False False False ... True True True True
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:13:08]  Starting Batch 1/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:13:08,543 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 2c280157cec5d165e3f4c4fbb8870d76 initialized by task ('rechunk-merge-rechunk-transfer-f8c09a4dd10029388007c596b5ed13c0', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:37787
+2026-04-07 14:13:09,416 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 2c280157cec5d165e3f4c4fbb8870d76 deactivated due to stimulus 'task-finished-1775571189.409997'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:13:17]  Batch 1/100  pixels 0–1,000  elapsed 0.2min  ETA 15min
+[2026-04-07 14:13:17]  Starting Batch 2/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:13:19,423 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d179d0b49d401428756896cac98efb10 initialized by task ('rechunk-merge-rechunk-transfer-99878c58b883d62f40dec32961772ece', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:37787
+2026-04-07 14:13:26,632 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d179d0b49d401428756896cac98efb10 deactivated due to stimulus 'task-finished-1775571206.6293623'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:13:30]  Batch 2/100  pixels 1,000–2,000  elapsed 0.2min  ETA 11min
+[2026-04-07 14:13:30]  Starting Batch 3/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:13:30,466 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 28c5113312594b4e66b6b978b1131b13 initialized by task ('rechunk-merge-rechunk-transfer-29f0f428da771d72b04c4a1a8b261ebc', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:37787
+2026-04-07 14:13:31,374 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 28c5113312594b4e66b6b978b1131b13 deactivated due to stimulus 'task-finished-1775571211.3662343'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:13:39]  Batch 3/100  pixels 2,000–3,000  elapsed 0.2min  ETA 5min
+[2026-04-07 14:13:39]  Starting Batch 4/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:13:39,599 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle b7b2f532d247336d3077389a8eab382d initialized by task ('rechunk-merge-rechunk-transfer-72d45cd0b3c23c73c239cf87dd7e8924', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:37787
+2026-04-07 14:13:40,534 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle b7b2f532d247336d3077389a8eab382d deactivated due to stimulus 'task-finished-1775571220.5317628'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:13:48]  Batch 4/100  pixels 3,000–4,000  elapsed 0.1min  ETA 4min
+[2026-04-07 14:13:48]  Starting Batch 5/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:13:48,590 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle bb0f997191a234ee0031e11d91ebd9e5 initialized by task ('rechunk-merge-rechunk-transfer-6c9331ab2d623df243c0f3dcb7c44fba', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:13:49,488 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle bb0f997191a234ee0031e11d91ebd9e5 deactivated due to stimulus 'task-finished-1775571229.4860785'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:13:57]  Batch 5/100  pixels 4,000–5,000  elapsed 0.2min  ETA 3min
+[2026-04-07 14:13:57]  Starting Batch 6/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:13:58,274 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 73d71582ca832763081cc17b9ac6c75c initialized by task ('rechunk-merge-rechunk-transfer-8f8cae6dde2b192b080f171922507d4f', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:13:59,227 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 73d71582ca832763081cc17b9ac6c75c deactivated due to stimulus 'task-finished-1775571239.221312'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:14:07]  Batch 6/100  pixels 5,000–6,000  elapsed 0.2min  ETA 2min
+[2026-04-07 14:14:07]  Starting Batch 7/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:14:07,554 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle aa9efc00db5130e7936fd9da9ef807f1 initialized by task ('rechunk-merge-rechunk-transfer-cf84e042216aea2c6f00c018c483a6de', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:14:08,406 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle aa9efc00db5130e7936fd9da9ef807f1 deactivated due to stimulus 'task-finished-1775571248.4023752'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:14:16]  Batch 7/100  pixels 6,000–7,000  elapsed 0.2min  ETA 2min
+[2026-04-07 14:14:16]  Starting Batch 8/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:14:16,916 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 34b5ad610af9d2f78622eb11a11c391a initialized by task ('rechunk-merge-rechunk-transfer-daae6a123a73df0170c334134cf6c445', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:14:17,802 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 34b5ad610af9d2f78622eb11a11c391a deactivated due to stimulus 'task-finished-1775571257.7988963'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:14:28]  Batch 8/100  pixels 7,000–8,000  elapsed 0.2min  ETA 2min
+[2026-04-07 14:14:28]  Starting Batch 9/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:14:28,889 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle dfcf322d18f0f497908b7ef825c5fe24 initialized by task ('rechunk-merge-rechunk-transfer-9b6ea6e85d91601cb143a8719abddcee', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:14:29,704 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle dfcf322d18f0f497908b7ef825c5fe24 deactivated due to stimulus 'task-finished-1775571269.700589'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:14:37]  Batch 9/100  pixels 8,000–9,000  elapsed 0.2min  ETA 2min
+[2026-04-07 14:14:37]  Starting Batch 10/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:14:38,183 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 28a0aba79657ef2c6495739a0faf05dc initialized by task ('rechunk-merge-rechunk-transfer-f11e57e167afcb89efe61ba6b404a249', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:14:39,026 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 28a0aba79657ef2c6495739a0faf05dc deactivated due to stimulus 'task-finished-1775571279.0231018'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:14:47]  Batch 10/100  pixels 9,000–10,000  elapsed 0.2min  ETA 1min
+[2026-04-07 14:14:47]  Starting Batch 11/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:14:47,667 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 24cd3ac15fa6d5d30996b11d359738c5 initialized by task ('rechunk-merge-rechunk-transfer-930e4685fa4ff32f044998648b7c7d97', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:14:48,613 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 24cd3ac15fa6d5d30996b11d359738c5 deactivated due to stimulus 'task-finished-1775571288.6099155'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:14:56]  Batch 11/100  pixels 10,000–11,000  elapsed 0.2min  ETA 1min
+[2026-04-07 14:14:56]  Starting Batch 12/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:14:56,725 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 2c2e1fb219fbc66f88ea2540a4394687 initialized by task ('rechunk-merge-rechunk-transfer-7699dc64d13333d0df5f703fe3445e95', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:15:03,323 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 2c2e1fb219fbc66f88ea2540a4394687 deactivated due to stimulus 'task-finished-1775571303.3213904'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:15:07]  Batch 12/100  pixels 11,000–12,000  elapsed 0.2min  ETA 1min
+[2026-04-07 14:15:07]  Starting Batch 13/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:15:07,555 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e74c575cfe0cd0ed2184aa8cd9e8c5b4 initialized by task ('rechunk-merge-rechunk-transfer-389e203398d3bc6a2c731097e6923348', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:15:08,450 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e74c575cfe0cd0ed2184aa8cd9e8c5b4 deactivated due to stimulus 'task-finished-1775571308.446655'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:15:16]  Batch 13/100  pixels 12,000–13,000  elapsed 0.2min  ETA 1min
+[2026-04-07 14:15:16]  Starting Batch 14/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:15:16,897 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 4539b5c7849f0b3481cb87b46c4c3e63 initialized by task ('rechunk-merge-rechunk-transfer-1d8f059a6cd3805bdd244f6000843b08', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:15:17,774 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 4539b5c7849f0b3481cb87b46c4c3e63 deactivated due to stimulus 'task-finished-1775571317.7515812'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:15:26]  Batch 14/100  pixels 13,000–14,000  elapsed 0.2min  ETA 1min
+[2026-04-07 14:15:26]  Starting Batch 15/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:15:26,493 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle c7b82d819c73b63f65de9a0311c24520 initialized by task ('rechunk-merge-rechunk-transfer-1a748d883b06f4635397e9e8707e7b24', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:15:27,308 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle c7b82d819c73b63f65de9a0311c24520 deactivated due to stimulus 'task-finished-1775571327.3058581'
+2026-04-07 14:15:31,383 - tornado.application - ERROR - Uncaught exception GET /status/ws (127.0.0.1)
+HTTPServerRequest(protocol='http', host='localhost:1235', method='GET', uri='/status/ws', version='HTTP/1.1', remote_ip='127.0.0.1')
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/websocket.py", line 965, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/web.py", line 3375, in wrapper
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/views/ws.py", line 149, in open
+    raise ProtocolError("Token is expired. Configure the app with a larger value for --session-token-expiration if necessary")
+bokeh.protocol.exceptions.ProtocolError: Token is expired. Configure the app with a larger value for --session-token-expiration if necessary
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+2026-04-07 14:15:35,565 - tornado.application - ERROR - Uncaught exception GET /status/ws (127.0.0.1)
+HTTPServerRequest(protocol='http', host='localhost:1235', method='GET', uri='/status/ws', version='HTTP/1.1', remote_ip='127.0.0.1')
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/websocket.py", line 965, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/web.py", line 3375, in wrapper
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/views/ws.py", line 149, in open
+    raise ProtocolError("Token is expired. Configure the app with a larger value for --session-token-expiration if necessary")
+bokeh.protocol.exceptions.ProtocolError: Token is expired. Configure the app with a larger value for --session-token-expiration if necessary
+[2026-04-07 14:15:35]  Batch 15/100  pixels 14,000–15,000  elapsed 0.2min  ETA 1min
+[2026-04-07 14:15:35]  Starting Batch 16/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:15:37,586 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 495f952b3639532deb4fc1b401993473 initialized by task ('rechunk-merge-rechunk-transfer-7efba80af6a8d40de26a2999535ddbfe', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:15:38,442 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 495f952b3639532deb4fc1b401993473 deactivated due to stimulus 'task-finished-1775571338.4285264'
+2026-04-07 14:15:43,720 - tornado.application - ERROR - Uncaught exception GET /status/ws (127.0.0.1)
+HTTPServerRequest(protocol='http', host='localhost:1235', method='GET', uri='/status/ws', version='HTTP/1.1', remote_ip='127.0.0.1')
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/websocket.py", line 965, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/web.py", line 3375, in wrapper
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/views/ws.py", line 149, in open
+    raise ProtocolError("Token is expired. Configure the app with a larger value for --session-token-expiration if necessary")
+bokeh.protocol.exceptions.ProtocolError: Token is expired. Configure the app with a larger value for --session-token-expiration if necessary
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:15:46]  Batch 16/100  pixels 15,000–16,000  elapsed 0.2min  ETA 1min
+[2026-04-07 14:15:46]  Starting Batch 17/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:15:46,655 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle c6376d1b96bb09af28e231570c442f0f initialized by task ('rechunk-merge-rechunk-transfer-a0570b620388eed4a97d1797003ac407', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:15:47,554 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle c6376d1b96bb09af28e231570c442f0f deactivated due to stimulus 'task-finished-1775571347.5507035'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:15:56]  Batch 17/100  pixels 16,000–17,000  elapsed 0.2min  ETA 1min
+[2026-04-07 14:15:56]  Starting Batch 18/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:15:56,712 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 662cd903febb882a89e560a3dd325e72 initialized by task ('rechunk-merge-rechunk-transfer-59781f8d1e3c7fde44556557604172e9', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:15:57,559 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 662cd903febb882a89e560a3dd325e72 deactivated due to stimulus 'task-finished-1775571357.5568125'
+2026-04-07 14:15:59,880 - tornado.application - ERROR - Uncaught exception GET /status/ws (127.0.0.1)
+HTTPServerRequest(protocol='http', host='localhost:1235', method='GET', uri='/status/ws', version='HTTP/1.1', remote_ip='127.0.0.1')
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/websocket.py", line 965, in _accept_connection
+    open_result = handler.open(*handler.open_args, **handler.open_kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/web.py", line 3375, in wrapper
+    return method(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/views/ws.py", line 149, in open
+    raise ProtocolError("Token is expired. Configure the app with a larger value for --session-token-expiration if necessary")
+bokeh.protocol.exceptions.ProtocolError: Token is expired. Configure the app with a larger value for --session-token-expiration if necessary
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:16:05]  Batch 18/100  pixels 17,000–18,000  elapsed 0.1min  ETA 1min
+[2026-04-07 14:16:05]  Starting Batch 19/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:16:05,445 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 7dccd41181d53c91222b5b7b43cb41d1 initialized by task ('rechunk-merge-rechunk-transfer-32ef46dfdcd683797d2331d43156090d', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:16:06,307 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 7dccd41181d53c91222b5b7b43cb41d1 deactivated due to stimulus 'task-finished-1775571366.3055618'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:16:13]  Batch 19/100  pixels 18,000–19,000  elapsed 0.1min  ETA 1min
+[2026-04-07 14:16:13]  Starting Batch 20/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:16:16,209 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 26d62136a8d7a0d4ff1ebf7313e309a1 initialized by task ('rechunk-merge-rechunk-transfer-f5f82582e9580bbc644e9b94990d64e6', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:16:17,031 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 26d62136a8d7a0d4ff1ebf7313e309a1 deactivated due to stimulus 'task-finished-1775571377.020274'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:16:26]  Batch 20/100  pixels 19,000–20,000  elapsed 0.2min  ETA 1min
+[2026-04-07 14:16:26]  Starting Batch 21/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:16:26,485 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle eba8024cf300882080ebefd81d0cfb5c initialized by task ('rechunk-merge-rechunk-transfer-26aaf93411511cb0f0d773e3204f1bf2', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:16:27,359 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle eba8024cf300882080ebefd81d0cfb5c deactivated due to stimulus 'task-finished-1775571387.3565211'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:16:35]  Batch 21/100  pixels 20,000–21,000  elapsed 0.1min  ETA 1min
+[2026-04-07 14:16:35]  Starting Batch 22/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:16:35,429 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 2a19cc3585005b6f445e9866e8220cbd initialized by task ('rechunk-merge-rechunk-transfer-890b018afd6ac812710d659f3af1ae11', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:16:36,303 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 2a19cc3585005b6f445e9866e8220cbd deactivated due to stimulus 'task-finished-1775571396.3014553'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:16:44]  Batch 22/100  pixels 21,000–22,000  elapsed 0.2min  ETA 1min
+[2026-04-07 14:16:44]  Starting Batch 23/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:16:44,863 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e3a08797b36ba3abad0b5b8fb1873b0b initialized by task ('rechunk-merge-rechunk-transfer-b23a84828dc614ac62b1909bca9530af', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:16:45,767 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e3a08797b36ba3abad0b5b8fb1873b0b deactivated due to stimulus 'task-finished-1775571405.7604623'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:16:53]  Batch 23/100  pixels 22,000–23,000  elapsed 0.1min  ETA 0min
+[2026-04-07 14:16:53]  Starting Batch 24/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:16:53,787 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d9791646dc111738b2fd9b95c3f91b6e initialized by task ('rechunk-merge-rechunk-transfer-5d06861da26d3249439dad1396cfa324', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:16:54,766 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d9791646dc111738b2fd9b95c3f91b6e deactivated due to stimulus 'task-finished-1775571414.7531493'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:17:02]  Batch 24/100  pixels 23,000–24,000  elapsed 0.1min  ETA 0min
+[2026-04-07 14:17:02]  Starting Batch 25/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:17:02,722 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 24dfefdbb523116eb0d9e27fb0e7d75d initialized by task ('rechunk-merge-rechunk-transfer-c8af9ae0abbe7e72f54ee088c8b32962', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:17:03,645 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 24dfefdbb523116eb0d9e27fb0e7d75d deactivated due to stimulus 'task-finished-1775571423.6431117'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:17:12]  Batch 25/100  pixels 24,000–25,000  elapsed 0.2min  ETA 1min
+[2026-04-07 14:17:12]  Starting Batch 26/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:17:12,711 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 82218961a02537efdb030cfc9ef0829e initialized by task ('rechunk-merge-rechunk-transfer-089420ef4ae5f65c4734c2d9e8aece99', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:17:13,647 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 82218961a02537efdb030cfc9ef0829e deactivated due to stimulus 'task-finished-1775571433.6435022'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:17:21]  Batch 26/100  pixels 25,000–26,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:17:21]  Starting Batch 27/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:17:22,267 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 3265467aa1a3693ddb47de8ac87c4aa8 initialized by task ('rechunk-merge-rechunk-transfer-0b452a554cdba8c6cdbde301580d12b5', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:17:23,116 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 3265467aa1a3693ddb47de8ac87c4aa8 deactivated due to stimulus 'task-finished-1775571443.1138883'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:17:30]  Batch 27/100  pixels 26,000–27,000  elapsed 0.1min  ETA 0min
+[2026-04-07 14:17:30]  Starting Batch 28/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:17:31,221 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 26298517631134af282001a5fa16d93e initialized by task ('rechunk-merge-rechunk-transfer-09465576bd31dedf5c3c6eecb58f738e', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:17:32,087 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 26298517631134af282001a5fa16d93e deactivated due to stimulus 'task-finished-1775571452.08542'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:17:40]  Batch 28/100  pixels 27,000–28,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:17:40]  Starting Batch 29/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:17:42,867 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle eb3856fcbedb7ed4e88dda302fc3d685 initialized by task ('rechunk-merge-rechunk-transfer-71684aa00ddc42958c17f791cc19a078', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:17:43,780 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle eb3856fcbedb7ed4e88dda302fc3d685 deactivated due to stimulus 'task-finished-1775571463.7770476'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:17:51]  Batch 29/100  pixels 28,000–29,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:17:51]  Starting Batch 30/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:17:51,760 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 1c0a913723a0553691f398f3a5b4440f initialized by task ('rechunk-merge-rechunk-transfer-5bfc6800eb8a8aff385e646571a7a865', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:17:52,658 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 1c0a913723a0553691f398f3a5b4440f deactivated due to stimulus 'task-finished-1775571472.6542962'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:18:00]  Batch 30/100  pixels 29,000–30,000  elapsed 0.1min  ETA 0min
+[2026-04-07 14:18:00]  Starting Batch 31/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:18:00,389 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 3eb98f02bb5351ba02e656e22ac42257 initialized by task ('rechunk-merge-rechunk-transfer-bae8af9342c78c33b4a224ec7ffd5202', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:18:01,301 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 3eb98f02bb5351ba02e656e22ac42257 deactivated due to stimulus 'task-finished-1775571481.2975'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:18:09]  Batch 31/100  pixels 30,000–31,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:18:09]  Starting Batch 32/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:18:10,122 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 6931a2f16d4c5f9813d23777f4c31fc0 initialized by task ('rechunk-merge-rechunk-transfer-9b1e0b69f0a13221b7b8627381736ffe', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:18:11,040 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 6931a2f16d4c5f9813d23777f4c31fc0 deactivated due to stimulus 'task-finished-1775571491.0376608'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:18:18]  Batch 32/100  pixels 31,000–32,000  elapsed 0.1min  ETA 0min
+[2026-04-07 14:18:18]  Starting Batch 33/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:18:19,037 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 00b93c7ffa6de2873190de3500522064 initialized by task ('rechunk-merge-rechunk-transfer-f302f8f3b1285755d55be5bad35930ee', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:18:19,764 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 00b93c7ffa6de2873190de3500522064 deactivated due to stimulus 'task-finished-1775571499.7510955'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:18:29]  Batch 33/100  pixels 32,000–33,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:18:29]  Starting Batch 34/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:18:30,248 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 0d97f723bae218dd7c986052ebaf5e1d initialized by task ('rechunk-merge-rechunk-transfer-c3011f8737bfffd1c32861f96a626880', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:18:31,154 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 0d97f723bae218dd7c986052ebaf5e1d deactivated due to stimulus 'task-finished-1775571511.1502993'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:18:40]  Batch 34/100  pixels 33,000–34,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:18:40]  Starting Batch 35/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:18:40,501 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e1c175b4b7c5e0529274490286238758 initialized by task ('rechunk-merge-rechunk-transfer-138c83e2b88956ed4853743ce10f33af', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:18:41,356 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e1c175b4b7c5e0529274490286238758 deactivated due to stimulus 'task-finished-1775571521.3534312'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:18:48]  Batch 35/100  pixels 34,000–35,000  elapsed 0.1min  ETA 0min
+[2026-04-07 14:18:48]  Starting Batch 36/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:18:48,726 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 744a09ade8c5b4ba697df8f407c3c5c6 initialized by task ('rechunk-merge-rechunk-transfer-0895d296a1634320c8436cbbf3ff9ff1', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:18:49,639 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 744a09ade8c5b4ba697df8f407c3c5c6 deactivated due to stimulus 'task-finished-1775571529.6357834'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:18:57]  Batch 36/100  pixels 35,000–36,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:18:57]  Starting Batch 37/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:18:58,172 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 14a7050806ce71f93b14dcc248ef219a initialized by task ('rechunk-merge-rechunk-transfer-9c1db5baf9d690e1827b28a533e60caf', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:18:59,087 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 14a7050806ce71f93b14dcc248ef219a deactivated due to stimulus 'task-finished-1775571539.084145'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:19:07]  Batch 37/100  pixels 36,000–37,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:19:07]  Starting Batch 38/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:19:08,212 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9673c457fc5fceb205c47b0e8ec83248 initialized by task ('rechunk-merge-rechunk-transfer-4212a1b0e6c6e4f213884b1af85514bb', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:19:09,107 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9673c457fc5fceb205c47b0e8ec83248 deactivated due to stimulus 'task-finished-1775571549.1047227'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:19:18]  Batch 38/100  pixels 37,000–38,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:19:18]  Starting Batch 39/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:19:18,762 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d3f75dd6d29438eca8ea7a80183af248 initialized by task ('rechunk-merge-rechunk-transfer-1a4bb0208710314368517b7ba424f5a0', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:19:19,679 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle d3f75dd6d29438eca8ea7a80183af248 deactivated due to stimulus 'task-finished-1775571559.6772335'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:19:27]  Batch 39/100  pixels 38,000–39,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:19:27]  Starting Batch 40/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:19:27,990 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 4d95171b3d9b768854e7c80f00a27ef8 initialized by task ('rechunk-merge-rechunk-transfer-80fe34a732ff1e6a0414d3bc0c06df82', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:19:28,859 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 4d95171b3d9b768854e7c80f00a27ef8 deactivated due to stimulus 'task-finished-1775571568.8555224'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:19:37]  Batch 40/100  pixels 39,000–40,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:19:37]  Starting Batch 41/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:19:37,829 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 464d7cc118b0e266bfe9e2d1e05f7ce1 initialized by task ('rechunk-merge-rechunk-transfer-af3f948660cf251801b38705e9ad811f', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:19:38,768 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 464d7cc118b0e266bfe9e2d1e05f7ce1 deactivated due to stimulus 'task-finished-1775571578.7645192'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:19:46]  Batch 41/100  pixels 40,000–41,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:19:46]  Starting Batch 42/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:19:47,205 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 79aafb1acc7ceddf93e561299150a7cb initialized by task ('rechunk-merge-rechunk-transfer-9f08534b51e40f8ab320887396463f11', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:19:48,054 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 79aafb1acc7ceddf93e561299150a7cb deactivated due to stimulus 'task-finished-1775571588.0519814'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:19:56]  Batch 42/100  pixels 41,000–42,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:19:56]  Starting Batch 43/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:19:56,392 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 47211bde28d8a58c91e7a12275f647c7 initialized by task ('rechunk-merge-rechunk-transfer-65a8c6a826322a54c33fe6b9625d366f', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:19:57,308 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 47211bde28d8a58c91e7a12275f647c7 deactivated due to stimulus 'task-finished-1775571597.3058639'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:20:05]  Batch 43/100  pixels 42,000–43,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:20:05]  Starting Batch 44/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:20:08,141 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle c2f2ae940f50f1dcec02583f51feaa3c initialized by task ('rechunk-merge-rechunk-transfer-447458d261851bc5a563fd130ab256ba', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:20:09,080 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle c2f2ae940f50f1dcec02583f51feaa3c deactivated due to stimulus 'task-finished-1775571609.076997'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:20:16]  Batch 44/100  pixels 43,000–44,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:20:16]  Starting Batch 45/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:20:16,886 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 1e7107c4d0d19367e125a01ed9dc7f49 initialized by task ('rechunk-merge-rechunk-transfer-4e4a593070a5ec67abf67b9817b23e04', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:20:17,841 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 1e7107c4d0d19367e125a01ed9dc7f49 deactivated due to stimulus 'task-finished-1775571617.8391662'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:20:26]  Batch 45/100  pixels 44,000–45,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:20:26]  Starting Batch 46/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:20:26,758 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 8fdf57f255fba899fb92bd4c6e2c9337 initialized by task ('rechunk-merge-rechunk-transfer-46647c691ea301896f92cf420e79db25', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:20:27,668 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 8fdf57f255fba899fb92bd4c6e2c9337 deactivated due to stimulus 'task-finished-1775571627.6652954'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:20:36]  Batch 46/100  pixels 45,000–46,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:20:36]  Starting Batch 47/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:20:36,445 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 6653e8753c486b45f7ec1232eb705918 initialized by task ('rechunk-merge-rechunk-transfer-32d021a316e3a32d2b28662f38d2b1e5', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:20:37,339 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 6653e8753c486b45f7ec1232eb705918 deactivated due to stimulus 'task-finished-1775571637.3363707'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:20:45]  Batch 47/100  pixels 46,000–47,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:20:45]  Starting Batch 48/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:20:46,281 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle ab34e4dd1d6b9ef46825b536e9beddf2 initialized by task ('rechunk-merge-rechunk-transfer-a6347283eb7ddc6a1ad142115379fc5b', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:20:47,179 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle ab34e4dd1d6b9ef46825b536e9beddf2 deactivated due to stimulus 'task-finished-1775571647.1755917'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:20:55]  Batch 48/100  pixels 47,000–48,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:20:55]  Starting Batch 49/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:20:57,837 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 6a0b6a157ebc57a1602d5c78330b6dfc initialized by task ('rechunk-merge-rechunk-transfer-aba4c3724d9269df7f5477f201297904', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:20:58,708 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 6a0b6a157ebc57a1602d5c78330b6dfc deactivated due to stimulus 'task-finished-1775571658.7059193'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:21:06]  Batch 49/100  pixels 48,000–49,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:21:06]  Starting Batch 50/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:21:07,161 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 6566a25dcf41a833bfc2675156bcd1e2 initialized by task ('rechunk-merge-rechunk-transfer-6b0b7960a0a8c32cef9ecc02222f01c7', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:21:08,115 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 6566a25dcf41a833bfc2675156bcd1e2 deactivated due to stimulus 'task-finished-1775571668.112962'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:21:16]  Batch 50/100  pixels 49,000–50,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:21:16]  Starting Batch 51/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:21:17,086 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 7384a4722a16c872f8a0d428ae453adc initialized by task ('rechunk-merge-rechunk-transfer-0d6ff5ba53eb5b75c63447bf94c6aa29', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:21:18,021 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 7384a4722a16c872f8a0d428ae453adc deactivated due to stimulus 'task-finished-1775571678.0167441'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:21:26]  Batch 51/100  pixels 50,000–51,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:21:26]  Starting Batch 52/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:21:26,643 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 6a37797141e69c562dd0d0b9f7fc2936 initialized by task ('rechunk-merge-rechunk-transfer-db79e45c3c5e300233637c78ede8da63', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:21:27,534 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 6a37797141e69c562dd0d0b9f7fc2936 deactivated due to stimulus 'task-finished-1775571687.532141'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:21:36]  Batch 52/100  pixels 51,000–52,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:21:36]  Starting Batch 53/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:21:37,236 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle c58b6867ecf55adff957c6c0c9a06b61 initialized by task ('rechunk-merge-rechunk-transfer-3c4fd18fabf01e923fd6d0c7636ad658', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:21:38,140 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle c58b6867ecf55adff957c6c0c9a06b61 deactivated due to stimulus 'task-finished-1775571698.137801'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:21:46]  Batch 53/100  pixels 52,000–53,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:21:46]  Starting Batch 54/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:21:47,190 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 12426acad2ee7eeda5b3a0fa47929de4 initialized by task ('rechunk-merge-rechunk-transfer-689346b8756a937293dfaabc10e5f1a5', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:21:48,119 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 12426acad2ee7eeda5b3a0fa47929de4 deactivated due to stimulus 'task-finished-1775571708.1169116'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:21:59]  Batch 54/100  pixels 53,000–54,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:21:59]  Starting Batch 55/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:21:59,538 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle bcba9960270f56d2c09a3abae9c342ed initialized by task ('rechunk-merge-rechunk-transfer-ba587e0e58fa619ca2c830461f2a3a52', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:22:00,437 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle bcba9960270f56d2c09a3abae9c342ed deactivated due to stimulus 'task-finished-1775571720.4231231'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:22:09]  Batch 55/100  pixels 54,000–55,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:22:09]  Starting Batch 56/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:22:09,579 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 2409bdf5d2c8d148ded1c890e4f6c587 initialized by task ('rechunk-merge-rechunk-transfer-6d10d6d63d4baa3e42dbca1b2650e921', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:22:10,459 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 2409bdf5d2c8d148ded1c890e4f6c587 deactivated due to stimulus 'task-finished-1775571730.4559436'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:22:19]  Batch 56/100  pixels 55,000–56,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:22:19]  Starting Batch 57/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:22:19,395 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle c27a7b6b3da33a8e20d79875beebcea0 initialized by task ('rechunk-merge-rechunk-transfer-21bab8f2d2fa2278c3a0306dc8495f57', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:22:20,276 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle c27a7b6b3da33a8e20d79875beebcea0 deactivated due to stimulus 'task-finished-1775571740.264287'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:22:28]  Batch 57/100  pixels 56,000–57,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:22:28]  Starting Batch 58/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:22:29,107 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle ad3ce8a7bff6e32cae876145cdfadbca initialized by task ('rechunk-merge-rechunk-transfer-38760e20328fc31490b8aca804da76f2', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:22:30,029 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle ad3ce8a7bff6e32cae876145cdfadbca deactivated due to stimulus 'task-finished-1775571750.020371'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:22:38]  Batch 58/100  pixels 57,000–58,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:22:38]  Starting Batch 59/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:22:39,132 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 7a4c9c5c03efac82664d712ba45fac51 initialized by task ('rechunk-merge-rechunk-transfer-860da7342de7502522ba56424313b5cb', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:22:40,021 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 7a4c9c5c03efac82664d712ba45fac51 deactivated due to stimulus 'task-finished-1775571760.0181222'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:22:48]  Batch 59/100  pixels 58,000–59,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:22:48]  Starting Batch 60/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:22:50,548 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle b276369c98858708ed5b9825c8b690ca initialized by task ('rechunk-merge-rechunk-transfer-5b907d5e2d67ebe88b6cb31d58065854', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:22:55,359 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle b276369c98858708ed5b9825c8b690ca deactivated due to stimulus 'task-finished-1775571775.3524864'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:22:59]  Batch 60/100  pixels 59,000–60,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:22:59]  Starting Batch 61/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:22:59,334 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle de30cffd0e4fa4f7e3402b9e07dd1226 initialized by task ('rechunk-merge-rechunk-transfer-dc1269840b2e64cc3901bec85e7beabe', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:23:00,265 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle de30cffd0e4fa4f7e3402b9e07dd1226 deactivated due to stimulus 'task-finished-1775571780.2601643'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:23:08]  Batch 61/100  pixels 60,000–61,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:23:08]  Starting Batch 62/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:23:09,043 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle bcfaaaf0b462b038371c346b941292d2 initialized by task ('rechunk-merge-rechunk-transfer-9ef9a8389524b18d4f71f711c3fce9a6', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:23:09,925 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle bcfaaaf0b462b038371c346b941292d2 deactivated due to stimulus 'task-finished-1775571789.9163237'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:23:18]  Batch 62/100  pixels 61,000–62,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:23:18]  Starting Batch 63/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:23:18,776 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 2fe6865cdc14090f00f1257c191cabd3 initialized by task ('rechunk-merge-rechunk-transfer-5de11c60a9000bf0436a0e2da0c7afef', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:23:19,610 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 2fe6865cdc14090f00f1257c191cabd3 deactivated due to stimulus 'task-finished-1775571799.6070654'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:23:27]  Batch 63/100  pixels 62,000–63,000  elapsed 0.1min  ETA 0min
+[2026-04-07 14:23:27]  Starting Batch 64/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:23:27,576 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 5f663a857d30abdc275aaee59479f7c8 initialized by task ('rechunk-merge-rechunk-transfer-eb82661ae627be2633e6b044db743e20', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:23:28,472 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 5f663a857d30abdc275aaee59479f7c8 deactivated due to stimulus 'task-finished-1775571808.469346'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:23:37]  Batch 64/100  pixels 63,000–64,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:23:37]  Starting Batch 65/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:23:37,575 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle b07f9874c48817ab8fb6e26ef21ca45f initialized by task ('rechunk-merge-rechunk-transfer-6d4eb7d75fafda40d54eb26c094d1308', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:23:38,437 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle b07f9874c48817ab8fb6e26ef21ca45f deactivated due to stimulus 'task-finished-1775571818.4247003'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:23:49]  Batch 65/100  pixels 64,000–65,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:23:49]  Starting Batch 66/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:23:50,279 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9d953e5bf1f01d46f4e904a99e482cd6 initialized by task ('rechunk-merge-rechunk-transfer-a245499c3d62b7d53921dd347d59f30a', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:23:51,214 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9d953e5bf1f01d46f4e904a99e482cd6 deactivated due to stimulus 'task-finished-1775571831.2124257'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:23:59]  Batch 66/100  pixels 65,000–66,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:23:59]  Starting Batch 67/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:24:00,034 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e069511d4601a3bcc075cff2784f74b0 initialized by task ('rechunk-merge-rechunk-transfer-c72075e35077f8cfc0979f54bd52a099', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:24:00,934 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e069511d4601a3bcc075cff2784f74b0 deactivated due to stimulus 'task-finished-1775571840.9166968'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:24:08]  Batch 67/100  pixels 66,000–67,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:24:08]  Starting Batch 68/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:24:09,165 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 0654a38d6cbb45dcdc12f807533bf9f3 initialized by task ('rechunk-merge-rechunk-transfer-5988e428d02a68b9408a98a4ca2af0c2', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:24:10,130 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 0654a38d6cbb45dcdc12f807533bf9f3 deactivated due to stimulus 'task-finished-1775571850.1278565'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:24:18]  Batch 68/100  pixels 67,000–68,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:24:18]  Starting Batch 69/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:24:19,043 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 280d472812961bf1118c0e8bffa679f2 initialized by task ('rechunk-merge-rechunk-transfer-1e049f1f6bfdd3cbf32c2408b80d9028', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:24:19,880 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 280d472812961bf1118c0e8bffa679f2 deactivated due to stimulus 'task-finished-1775571859.8791282'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:24:28]  Batch 69/100  pixels 68,000–69,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:24:28]  Starting Batch 70/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:24:28,420 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle df40fa1b061d0515f78b5b7d0403a412 initialized by task ('rechunk-merge-rechunk-transfer-e0f6c5adf42cef5bd58019e7e204432e', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:24:29,306 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle df40fa1b061d0515f78b5b7d0403a412 deactivated due to stimulus 'task-finished-1775571869.3023908'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:24:37]  Batch 70/100  pixels 69,000–70,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:24:37]  Starting Batch 71/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:24:40,457 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e72ef0e78d53db5c2954e9d7cecba019 initialized by task ('rechunk-merge-rechunk-transfer-add37757955dcc0a7f6cdd17621e5ca7', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:24:41,210 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle e72ef0e78d53db5c2954e9d7cecba019 deactivated due to stimulus 'task-finished-1775571881.207712'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:24:49]  Batch 71/100  pixels 70,000–71,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:24:49]  Starting Batch 72/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:24:50,036 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9eae1b670df1f8d46c345216107c3256 initialized by task ('rechunk-merge-rechunk-transfer-bb11d9af67b67203cef18b8f861efb96', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:24:50,975 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9eae1b670df1f8d46c345216107c3256 deactivated due to stimulus 'task-finished-1775571890.970595'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:24:58]  Batch 72/100  pixels 71,000–72,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:24:58]  Starting Batch 73/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:24:59,062 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 281d56005a8b85b02ec5368eeac57c6a initialized by task ('rechunk-merge-rechunk-transfer-b01b81007db92757aa0f19c00bc85cc4', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:24:59,949 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 281d56005a8b85b02ec5368eeac57c6a deactivated due to stimulus 'task-finished-1775571899.9231706'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:25:08]  Batch 73/100  pixels 72,000–73,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:25:08]  Starting Batch 74/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:25:08,738 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle aad9de560ac6d02738a8b082ea52b7ed initialized by task ('rechunk-merge-rechunk-transfer-2127ea3edd24ff6691fe3e2493f29e5c', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:25:09,644 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle aad9de560ac6d02738a8b082ea52b7ed deactivated due to stimulus 'task-finished-1775571909.6418593'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:25:17]  Batch 74/100  pixels 73,000–74,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:25:17]  Starting Batch 75/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:25:18,164 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 5b1ce728aa5775e3a7ea48e03e76607c initialized by task ('rechunk-merge-rechunk-transfer-fe758403ccbccd7dbb9554f4a35106f5', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:25:19,072 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 5b1ce728aa5775e3a7ea48e03e76607c deactivated due to stimulus 'task-finished-1775571919.0692031'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:25:27]  Batch 75/100  pixels 74,000–75,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:25:27]  Starting Batch 76/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:25:27,645 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 47572e46f4c6402980a4346b551bf3f8 initialized by task ('rechunk-merge-rechunk-transfer-62e773284fec208877fa903d88472311', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:25:28,281 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 47572e46f4c6402980a4346b551bf3f8 deactivated due to stimulus 'task-finished-1775571928.261384'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:25:36]  Batch 76/100  pixels 75,000–76,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:25:36]  Starting Batch 77/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:25:36,804 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 4a0ec49980504cf6d6f51467b2032b41 initialized by task ('rechunk-merge-rechunk-transfer-5131a08cad17a95394dcba03386c5f0b', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:25:37,719 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 4a0ec49980504cf6d6f51467b2032b41 deactivated due to stimulus 'task-finished-1775571937.7151957'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:25:47]  Batch 77/100  pixels 76,000–77,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:25:47]  Starting Batch 78/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:25:47,561 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 8ca3a5f1e324735598f936d7c7f7d823 initialized by task ('rechunk-merge-rechunk-transfer-e3f17fafd5c033fe3f08cf2bd7d58349', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:25:48,479 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 8ca3a5f1e324735598f936d7c7f7d823 deactivated due to stimulus 'task-finished-1775571948.4775636'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:25:57]  Batch 78/100  pixels 77,000–78,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:25:57]  Starting Batch 79/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:25:57,554 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9a3ceca88621d22f7cfd72fa217f93ec initialized by task ('rechunk-merge-rechunk-transfer-400125d58604d19be0194895853b673f', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:25:58,407 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9a3ceca88621d22f7cfd72fa217f93ec deactivated due to stimulus 'task-finished-1775571958.4038436'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:26:07]  Batch 79/100  pixels 78,000–79,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:26:07]  Starting Batch 80/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:26:07,475 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fd0a88ec0885fd5517fa6bf83ed06942 initialized by task ('rechunk-merge-rechunk-transfer-be76256a12b9e376d10ff6405c569461', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:26:08,324 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fd0a88ec0885fd5517fa6bf83ed06942 deactivated due to stimulus 'task-finished-1775571968.3212955'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:26:16]  Batch 80/100  pixels 79,000–80,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:26:16]  Starting Batch 81/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:26:16,733 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9844e0935d49ccb82777ccf4c6004d17 initialized by task ('rechunk-merge-rechunk-transfer-0332c10279eea84941de8895123f823b', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:26:17,657 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9844e0935d49ccb82777ccf4c6004d17 deactivated due to stimulus 'task-finished-1775571977.6532857'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:26:26]  Batch 81/100  pixels 80,000–81,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:26:26]  Starting Batch 82/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:26:29,145 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 5942db79c738ff7c99b12cb59e876c99 initialized by task ('rechunk-merge-rechunk-transfer-f44e7dc92a35c7fa26030cb71620547b', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:26:30,067 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 5942db79c738ff7c99b12cb59e876c99 deactivated due to stimulus 'task-finished-1775571990.0640295'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:26:39]  Batch 82/100  pixels 81,000–82,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:26:39]  Starting Batch 83/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:26:39,343 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle cf6ac0699ba02c00fd3a2b6e05358af9 initialized by task ('rechunk-merge-rechunk-transfer-8caf60a5ecccde66228fb78609ac43cb', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:26:40,231 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle cf6ac0699ba02c00fd3a2b6e05358af9 deactivated due to stimulus 'task-finished-1775572000.2283368'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:26:48]  Batch 83/100  pixels 82,000–83,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:26:48]  Starting Batch 84/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:26:48,533 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 31fce2680ba5ff682aa9f555b8f0649e initialized by task ('rechunk-merge-rechunk-transfer-06f1c4a8564ec2b22398e51ce2b7fd97', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:26:49,357 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 31fce2680ba5ff682aa9f555b8f0649e deactivated due to stimulus 'task-finished-1775572009.3523471'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:26:57]  Batch 84/100  pixels 83,000–84,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:26:57]  Starting Batch 85/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:26:58,220 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 161fc815b18d7f544c53b3c1559f54bf initialized by task ('rechunk-merge-rechunk-transfer-eafac845c54306c0612b69e905ec5c5c', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:26:59,135 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 161fc815b18d7f544c53b3c1559f54bf deactivated due to stimulus 'task-finished-1775572019.1336849'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:27:07]  Batch 85/100  pixels 84,000–85,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:27:07]  Starting Batch 86/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:27:08,173 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 8a08da120e292793b608ba389d1c29e0 initialized by task ('rechunk-merge-rechunk-transfer-679818544e3f140d2c2f0d23be337a81', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:27:09,085 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 8a08da120e292793b608ba389d1c29e0 deactivated due to stimulus 'task-finished-1775572029.0819733'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:27:17]  Batch 86/100  pixels 85,000–86,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:27:17]  Starting Batch 87/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:27:17,407 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 3d82b7217e1ee25fcc5655fae56847a6 initialized by task ('rechunk-merge-rechunk-transfer-5b14cfc57142dd127aa81fa7c6b12119', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:27:18,274 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 3d82b7217e1ee25fcc5655fae56847a6 deactivated due to stimulus 'task-finished-1775572038.2606285'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:27:29]  Batch 87/100  pixels 86,000–87,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:27:29]  Starting Batch 88/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:27:29,945 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle a4892d94dc380a28f7114576fca77b49 initialized by task ('rechunk-merge-rechunk-transfer-0f55f4e86fd7451cfc1506e12441d00f', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:27:30,789 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle a4892d94dc380a28f7114576fca77b49 deactivated due to stimulus 'task-finished-1775572050.7858999'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:27:39]  Batch 88/100  pixels 87,000–88,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:27:39]  Starting Batch 89/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:27:39,540 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fa1fa18959d19314bacac7a1d9441f31 initialized by task ('rechunk-merge-rechunk-transfer-8d496aebacd13a81f3de636a56e09671', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:27:40,368 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fa1fa18959d19314bacac7a1d9441f31 deactivated due to stimulus 'task-finished-1775572060.3628783'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:27:49]  Batch 89/100  pixels 88,000–89,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:27:49]  Starting Batch 90/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:27:50,194 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle ada96e5ce45ce6ebe554a4f1d20b4fef initialized by task ('rechunk-merge-rechunk-transfer-34e6a76fb0b49ba9fd5f233d3814a85b', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:27:51,147 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle ada96e5ce45ce6ebe554a4f1d20b4fef deactivated due to stimulus 'task-finished-1775572071.1432688'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:27:59]  Batch 90/100  pixels 89,000–90,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:27:59]  Starting Batch 91/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:27:59,900 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 3f96309d38eb8bbd70339dca34a98ed4 initialized by task ('rechunk-merge-rechunk-transfer-bddf44a551ce81faebbee935f1909b02', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:28:00,814 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 3f96309d38eb8bbd70339dca34a98ed4 deactivated due to stimulus 'task-finished-1775572080.807741'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:28:09]  Batch 91/100  pixels 90,000–91,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:28:09]  Starting Batch 92/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:28:09,537 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9672e2dc71a226ecf00bf3d6f0d28024 initialized by task ('rechunk-merge-rechunk-transfer-827e1caa06a8f4abec64d7a86b56bd16', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:28:10,450 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 9672e2dc71a226ecf00bf3d6f0d28024 deactivated due to stimulus 'task-finished-1775572090.4488728'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:28:18]  Batch 92/100  pixels 91,000–92,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:28:18]  Starting Batch 93/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:28:21,414 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 7ffc06bb674f0084079c019e68205791 initialized by task ('rechunk-merge-rechunk-transfer-a770e62d4be6862eb52b2d5994755978', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:28:22,283 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 7ffc06bb674f0084079c019e68205791 deactivated due to stimulus 'task-finished-1775572102.2732518'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:28:30]  Batch 93/100  pixels 92,000–93,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:28:30]  Starting Batch 94/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:28:31,075 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fab56f587fc15b6b991b25114c96945c initialized by task ('rechunk-merge-rechunk-transfer-1b42fc03887e13787cfde097f035e2ee', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:28:32,189 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle fab56f587fc15b6b991b25114c96945c deactivated due to stimulus 'task-finished-1775572112.1874187'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:28:40]  Batch 94/100  pixels 93,000–94,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:28:40]  Starting Batch 95/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:28:40,912 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 3e4b5141667dca5edcb17fcbfb06cb3b initialized by task ('rechunk-merge-rechunk-transfer-c1eb6d149ee84c79507a78908c73611f', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:28:41,774 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 3e4b5141667dca5edcb17fcbfb06cb3b deactivated due to stimulus 'task-finished-1775572121.771241'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:28:50]  Batch 95/100  pixels 94,000–95,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:28:50]  Starting Batch 96/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:28:50,673 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 5dd1cd1ca746d6db833225a9d17397d7 initialized by task ('rechunk-merge-rechunk-transfer-c289b01a99e0b7588f49bc874f8d6b25', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:28:51,642 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 5dd1cd1ca746d6db833225a9d17397d7 deactivated due to stimulus 'task-finished-1775572131.6390483'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:28:59]  Batch 96/100  pixels 95,000–96,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:28:59]  Starting Batch 97/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:29:00,419 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle f7e9335bb24c2b7f82066c0532766414 initialized by task ('rechunk-merge-rechunk-transfer-d8b36248e8d01560f7c74fbc8aae6044', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:29:01,090 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle f7e9335bb24c2b7f82066c0532766414 deactivated due to stimulus 'task-finished-1775572141.087203'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:29:10]  Batch 97/100  pixels 96,000–97,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:29:10]  Starting Batch 98/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:29:10,376 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 032f19d775fbf1e0b6405b094f3361ff initialized by task ('rechunk-merge-rechunk-transfer-19f55c0d4fc8ea1be069d648a89270d9', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:29:13,463 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 032f19d775fbf1e0b6405b094f3361ff deactivated due to stimulus 'task-finished-1775572153.4356189'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:29:21]  Batch 98/100  pixels 97,000–98,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:29:21]  Starting Batch 99/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:29:21,732 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 4032cd599b58d10c1ec34481e3be572b initialized by task ('rechunk-merge-rechunk-transfer-1453948a9e4988f11e63ad1a0b3787e0', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:44859
+2026-04-07 14:29:22,658 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 4032cd599b58d10c1ec34481e3be572b deactivated due to stimulus 'task-finished-1775572162.6546178'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:29:31]  Batch 99/100  pixels 98,000–99,000  elapsed 0.2min  ETA 0min
+[2026-04-07 14:29:31]  Starting Batch 100/100
+Constructed graph with 38 layers, and 1402 tasks.
+2026-04-07 14:29:31,517 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 81c46acd52b1a4066e91ca0c71a88277 initialized by task ('rechunk-merge-rechunk-transfer-c02fa3e99fa2727a5b398d32f3d937cd', 0, 0, 0, 0) executed on worker tcp://127.0.0.1:41739
+2026-04-07 14:29:32,276 - distributed.shuffle._scheduler_plugin - WARNING - Shuffle 81c46acd52b1a4066e91ca0c71a88277 deactivated due to stimulus 'task-finished-1775572172.2690465'
+Partial writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+[2026-04-07 14:29:40]  Batch 100/100  pixels 99,000–100,000  elapsed 0.2min  ETA 0min
+/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py
+Duration: 00:17:58 (hh:mm:ss)
+Processing script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr

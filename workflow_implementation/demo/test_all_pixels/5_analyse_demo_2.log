@@ -1,0 +1,12 @@
+nohup: ignoring input
+http://127.0.0.1:1234/status
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_francesco.py:213: FutureWarning: zarr_version is deprecated, use zarr_format
+  out_ds.to_zarr(OUT_PATH, mode="w", consolidated=True, compute=True, encoding=encoding, zarr_version=3)
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/group.py:2469: UserWarning: The `compressor` argument is deprecated. Use `compressors` instead.
+  compressors = _parse_deprecated_compressor(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/group.py:2469: UserWarning: The `compressor` argument is deprecated. Use `compressors` instead.
+  compressors = _parse_deprecated_compressor(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+done
+Total runtime: 84.75 seconds

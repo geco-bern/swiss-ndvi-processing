@@ -1,0 +1,200 @@
+nohup: ignoring input
+<xarray.Dataset> Size: 63kB
+Dimensions:         (pixel: 8, date: 1734)
+Coordinates:
+    x_idx           (pixel) int32 32B 18450 18908 11591 ... 17618 2311 15611
+  * date            (date) datetime64[ns] 14kB 2017-04-03 ... 2021-12-31
+    x               (pixel) int32 32B 2694495 2692015 ... 2690025 2689565
+    y_idx           (pixel) int32 32B 22040 21792 28700 ... 17023 21593 21547
+    doy             (date) int32 7kB 93 94 95 96 97 98 ... 361 362 363 364 365
+  * pixel           (pixel) int32 32B 90415334 93677703 ... 427960 73583022
+    y               (pixel) int32 32B 1126025 1121445 ... 1287415 1154415
+Data variables:
+    ndvi_processed  (pixel, date) int16 28kB 5009 5046 5092 ... 3744 3740 3736
+    mask_array      (pixel, date) int8 14kB 1 1 1 1 1 1 1 1 ... 1 1 1 1 1 1 1 1
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+<xarray.Dataset> Size: 38kB
+Dimensions:   (datetime: 1190, pixel: 8)
+Coordinates:
+    x_idx     (pixel) int32 32B 18450 18908 11591 12755 17638 17618 2311 15611
+    y_idx     (pixel) int32 32B 22040 21792 28700 30744 16993 17023 21593 21547
+    x         (pixel) int32 32B 2694495 2692015 2761095 ... 2690025 2689565
+    date      (datetime) datetime64[ns] 10kB 2017-04-03 ... 2025-12-31
+  * pixel     (pixel) int32 32B 90415334 93677703 46053259 ... 427960 73583022
+  * datetime  (datetime) datetime64[ns] 10kB 2017-04-03T10:40:21 ... 2025-12-...
+    y         (pixel) int32 32B 1126025 1121445 1194615 ... 1287415 1154415
+Data variables:
+    ndvi      (datetime, pixel) int16 19kB 32767 32767 32767 ... 8382 5689 3135
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Processed observation for 2022-01-26. Total series length: 1760
+Processed observation for 2022-01-27. Total series length: 1761
+Processed observation for 2022-01-29. Total series length: 1763
+Processed observation for 2022-02-05. Total series length: 1770
+Processed observation for 2022-02-08. Total series length: 1773
+Processed observation for 2022-02-10. Total series length: 1775
+Processed observation for 2022-02-11. Total series length: 1776
+Processed observation for 2022-02-12. Total series length: 1777
+Processed observation for 2022-02-13. Total series length: 1778
+Processed observation for 2022-02-17. Total series length: 1782
+Processed observation for 2022-02-20. Total series length: 1785
+Processed observation for 2022-02-22. Total series length: 1787
+Processed observation for 2022-02-23. Total series length: 1788
+Processed observation for 2022-02-25. Total series length: 1790
+Processed observation for 2022-02-26. Total series length: 1791
+Processed observation for 2022-02-27. Total series length: 1792
+Processed observation for 2022-02-28. Total series length: 1793
+Processed observation for 2022-03-02. Total series length: 1795
+Processed observation for 2022-03-03. Total series length: 1796
+Processed observation for 2022-03-04. Total series length: 1797
+Processed observation for 2022-03-05. Total series length: 1798
+Processed observation for 2022-03-07. Total series length: 1800
+Processed observation for 2022-03-08. Total series length: 1801
+Processed observation for 2022-03-09. Total series length: 1802
+Processed observation for 2022-03-10. Total series length: 1803
+Processed observation for 2022-03-12. Total series length: 1805
+Processed observation for 2022-03-14. Total series length: 1807
+Processed observation for 2022-03-19. Total series length: 1812
+Processed observation for 2022-03-20. Total series length: 1813
+Processed observation for 2022-03-22. Total series length: 1815
+Processed observation for 2022-03-23. Total series length: 1816
+Processed observation for 2022-03-24. Total series length: 1817
+Processed observation for 2022-03-25. Total series length: 1818
+Processed observation for 2022-03-27. Total series length: 1820
+Processed observation for 2022-03-28. Total series length: 1821
+Processed observation for 2022-04-03. Total series length: 1827
+Processed observation for 2022-04-04. Total series length: 1828
+Processed observation for 2022-04-06. Total series length: 1830
+Processed observation for 2022-04-11. Total series length: 1835
+Processed observation for 2022-04-12. Total series length: 1836
+Processed observation for 2022-04-13. Total series length: 1837
+Processed observation for 2022-04-14. Total series length: 1838
+Processed observation for 2022-04-16. Total series length: 1840
+Processed observation for 2022-04-17. Total series length: 1841
+Processed observation for 2022-04-18. Total series length: 1842
+Processed observation for 2022-04-19. Total series length: 1843
+Processed observation for 2022-04-21. Total series length: 1845
+Processed observation for 2022-04-22. Total series length: 1846
+Processed observation for 2022-04-27. Total series length: 1851
+Processed observation for 2022-04-28. Total series length: 1852
+Processed observation for 2022-04-29. Total series length: 1853
+Processed observation for 2022-05-02. Total series length: 1856
+Processed observation for 2022-05-07. Total series length: 1861
+Processed observation for 2022-05-09. Total series length: 1863
+Processed observation for 2022-05-11. Total series length: 1865
+Processed observation for 2022-05-14. Total series length: 1868
+Processed observation for 2022-05-16. Total series length: 1870
+Processed observation for 2022-05-17. Total series length: 1871
+Processed observation for 2022-05-19. Total series length: 1873
+Processed observation for 2022-05-21. Total series length: 1875
+Processed observation for 2022-05-23. Total series length: 1877
+Processed observation for 2022-05-26. Total series length: 1880
+Processed observation for 2022-05-27. Total series length: 1881
+Processed observation for 2022-06-08. Total series length: 1893
+Processed observation for 2022-06-10. Total series length: 1895
+Processed observation for 2022-06-11. Total series length: 1896
+Processed observation for 2022-06-12. Total series length: 1897
+Processed observation for 2022-06-13. Total series length: 1898
+Processed observation for 2022-06-15. Total series length: 1900
+Processed observation for 2022-06-16. Total series length: 1901
+Processed observation for 2022-06-17. Total series length: 1902
+Processed observation for 2022-06-18. Total series length: 1903
+Processed observation for 2022-06-20. Total series length: 1905
+Processed observation for 2022-06-21. Total series length: 1906
+Processed observation for 2022-06-23. Total series length: 1908
+Processed observation for 2022-06-25. Total series length: 1910
+Processed observation for 2022-06-26. Total series length: 1911
+Processed observation for 2022-06-27. Total series length: 1912
+Processed observation for 2022-06-30. Total series length: 1915
+Processed observation for 2022-07-02. Total series length: 1917
+Processed observation for 2022-07-03. Total series length: 1918
+Processed observation for 2022-07-05. Total series length: 1920
+Processed observation for 2022-07-06. Total series length: 1921
+Processed observation for 2022-07-08. Total series length: 1923
+Processed observation for 2022-07-10. Total series length: 1925
+Processed observation for 2022-07-11. Total series length: 1926
+Processed observation for 2022-07-12. Total series length: 1927
+Processed observation for 2022-07-13. Total series length: 1928
+Processed observation for 2022-07-15. Total series length: 1930
+Processed observation for 2022-07-16. Total series length: 1931
+Processed observation for 2022-07-17. Total series length: 1932
+Processed observation for 2022-07-18. Total series length: 1933
+Processed observation for 2022-07-20. Total series length: 1935
+Processed observation for 2022-07-21. Total series length: 1936
+Processed observation for 2022-07-22. Total series length: 1937
+Processed observation for 2022-07-25. Total series length: 1940
+Processed observation for 2022-07-26. Total series length: 1941
+Processed observation for 2022-07-28. Total series length: 1943
+Processed observation for 2022-07-30. Total series length: 1945
+Processed observation for 2022-07-31. Total series length: 1946
+Processed observation for 2022-08-01. Total series length: 1947
+Processed observation for 2022-08-02. Total series length: 1948
+Processed observation for 2022-08-04. Total series length: 1950
+Processed observation for 2022-08-05. Total series length: 1951
+Processed observation for 2022-08-09. Total series length: 1955
+Processed observation for 2022-08-10. Total series length: 1956
+Processed observation for 2022-08-11. Total series length: 1957
+Processed observation for 2022-08-12. Total series length: 1958
+Processed observation for 2022-08-14. Total series length: 1960
+Processed observation for 2022-08-16. Total series length: 1962
+Processed observation for 2022-08-17. Total series length: 1963
+Processed observation for 2022-08-21. Total series length: 1967
+Processed observation for 2022-08-22. Total series length: 1968
+Processed observation for 2022-08-24. Total series length: 1970
+Processed observation for 2022-08-25. Total series length: 1971
+Processed observation for 2022-08-26. Total series length: 1972
+Processed observation for 2022-08-27. Total series length: 1973
+Processed observation for 2022-08-29. Total series length: 1975
+Processed observation for 2022-09-01. Total series length: 1978
+Processed observation for 2022-09-04. Total series length: 1981
+Processed observation for 2022-09-08. Total series length: 1985
+Processed observation for 2022-09-09. Total series length: 1986
+Processed observation for 2022-09-11. Total series length: 1988
+Processed observation for 2022-09-13. Total series length: 1990
+Processed observation for 2022-09-18. Total series length: 1995
+Processed observation for 2022-09-19. Total series length: 1996
+Processed observation for 2022-09-20. Total series length: 1997
+Processed observation for 2022-09-21. Total series length: 1998
+Processed observation for 2022-09-23. Total series length: 2000
+Processed observation for 2022-10-03. Total series length: 2010
+Processed observation for 2022-10-04. Total series length: 2011
+Processed observation for 2022-10-05. Total series length: 2012
+Processed observation for 2022-10-06. Total series length: 2013
+Processed observation for 2022-10-09. Total series length: 2016
+Processed observation for 2022-10-11. Total series length: 2018
+Processed observation for 2022-10-15. Total series length: 2022
+Processed observation for 2022-10-16. Total series length: 2023
+Processed observation for 2022-10-18. Total series length: 2025
+Processed observation for 2022-10-19. Total series length: 2026
+Processed observation for 2022-10-25. Total series length: 2032
+Processed observation for 2022-10-26. Total series length: 2033
+Processed observation for 2022-10-28. Total series length: 2035
+Processed observation for 2022-10-29. Total series length: 2036
+Processed observation for 2022-10-30. Total series length: 2037
+Processed observation for 2022-11-08. Total series length: 2046
+Processed observation for 2022-11-10. Total series length: 2048
+Processed observation for 2022-11-19. Total series length: 2057
+Processed observation for 2022-11-20. Total series length: 2058
+Processed observation for 2022-11-27. Total series length: 2065
+Processed observation for 2022-12-07. Total series length: 2075
+Processed observation for 2022-12-08. Total series length: 2076
+Processed observation for 2022-12-17. Total series length: 2085
+Processed observation for 2022-12-24. Total series length: 2092
+Processed observation for 2022-12-27. Total series length: 2095
+Processed observation for 2022-12-28. Total series length: 2096
+Processed observation for 2022-12-29. Total series length: 2097
+Simulation finished.

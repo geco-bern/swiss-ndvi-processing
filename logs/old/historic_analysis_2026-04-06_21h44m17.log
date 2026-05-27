@@ -1,0 +1,1360 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2017-04-01
+2025-11-30
+Current commit:
+5489b0ee1fee095bf83a9f4bbc5b9240e3c0afd0
+
+Commit details:
+* 5489b0e (HEAD -> setup-tunder-FB) Avoid intermediate storage (it did not improve performance for 1000 pixels)
+* 920ba13 Close client cleanly, by using with Client(...) as client:
+* 8d4a893 Drop NDSI earlier, delay the date=-1 rechunking just before apply_ufunc() and remove dask_gufunc_kwargs allow_rechunk
+* b6101ab (origin/setup-tunder-FB) Stash of untracked changes
+| *-.   127fce5 (refs/stash) On setup-tunder-FB: Stash of untracked changes
+| |\ \  
+| | | * 4cbe2d3 untracked files on setup-tunder-FB: 18c169d cleaning up
+| | * dad8f36 index on setup-tunder-FB: 18c169d cleaning up
+| |/  
+| * 18c169d cleaning up
+|/  
+* 7a9b2db Update historical processing
+* 47a0a36 Streamline historical_ndvi() in 2_historical_ndvi_test.py
+
+Working tree status:
+On branch setup-tunder-FB
+Your branch is ahead of 'origin/setup-tunder-FB' by 3 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   2_historical_ndvi_test.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+============================================================
+Historic processing started at: 2026-04-06 21:44:17
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_2026-04-06_21h44m17.log
+============================================================
+
+Running: with arguments: 2017-04-01 2025-11-30
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Start time: 2026-04-06 21:44:17
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py
+Start time: 2026-04-06 21:44:17
+2026-04-06 21:44:21,075 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,075 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,081 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,081 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,085 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,086 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,091 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,091 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,091 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,091 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,094 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,100 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,128 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,134 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,134 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,133 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,134 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,136 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,141 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,141 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,142 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,144 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,144 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,146 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,147 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,148 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,148 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,149 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,150 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,151 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,153 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,154 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,155 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,173 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,178 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,181 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,191 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,193 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,193 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,193 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,198 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,199 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,200 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,201 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,202 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,202 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,203 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,204 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,211 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,215 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,216 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,217 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,217 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,217 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,228 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,235 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,243 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,250 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,252 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,252 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,253 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,254 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,256 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,256 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,257 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,259 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,259 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,260 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,262 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,263 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,264 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,264 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,266 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,267 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,269 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,269 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,270 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,276 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,280 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,286 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,287 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,287 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,302 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,302 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,303 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,303 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,310 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,311 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,312 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,316 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,317 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,316 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,318 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,319 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,320 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,320 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,321 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,347 - distributed.nanny - ERROR - Failed to initialize worker
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+             ^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,367 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+2026-04-06 21:44:21,368 - distributed.nanny - ERROR - Failed to start process
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+    ^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+    ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 528, in start
+    await wait_for(self.start_unsafe(), timeout=timeout)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils.py", line 1923, in wait_for
+    return await fut
+           ^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 369, in start_unsafe
+    response = await self.instantiate()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 452, in instantiate
+    result = await self.process.start()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 759, in start
+    msg = await self._wait_until_connected(uid)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 905, in _wait_until_connected
+    raise msg["exception"]
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/nanny.py", line 956, in run
+    worker = worker_factory()
+^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 732, in __init__
+    ServerNode.__init__(
+  ^^^^^^^^^^^^^^^^^
+TypeError: Server.__init__() got an unexpected keyword argument 'bokeh_server_kwargs'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py", line 209, in <module>
+    with Client(
+         ^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py", line 1212, in __init__
+    self.start(timeout=timeout)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py", line 1412, in start
+    sync(self.loop, self._start, **kwargs)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils.py", line 452, in sync
+    raise error
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils.py", line 426, in f
+    result = yield future
+             ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/gen.py", line 769, in run
+    value = future.result()
+            ^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py", line 1476, in _start
+    self.cluster = await LocalCluster(
+                   ^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/deploy/spec.py", line 426, in _
+    await self._correct_state()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/deploy/spec.py", line 396, in _correct_state_internal
+    await asyncio.gather(*worker_futs)
+  File "/usr/lib/python3.12/asyncio/tasks.py", line 684, in _wrap_awaitable
+    return await awaitable
+           ^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 536, in start
+    raise RuntimeError(f"{type(self).__name__} failed to start.") from exc
+RuntimeError: Nanny failed to start.
+[ERROR] Script failed: N/A | Time: Mon Apr  6 21:44:21 UTC 2026

@@ -1,0 +1,53 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2017-04-01
+2025-11-30
+Current commit:
+0cc30de97962b1dbabfac4db1f5ea208637803e1
+
+Commit details:
+* 0cc30de (HEAD -> setup-tunder-FB) Switch N_WORKERS = 80
+* 7e74716 Update logging
+* 4cf4e3f (origin/setup-tunder-FB) Fix Batch size to 3*PIXEL_CHUNKS
+* f18e93e perf: Improve performance by manual looping through chunks for apply_ufunc()
+* c456659 docs: Streamline hist_script 2 by removing comments
+* 0bbc09d Attempt to fix: "OSError: [Errno 24] Too many open files"
+* 52c3f15 Update bash script for historic to run only processing (temp. deactivate tiffs)
+* 7acb879 Close dask client cleanly for tiff-generation
+* 5dacadf Update timeseries plot for validation
+* 85df6a0 Make tiff generation loop through all dates
+
+Working tree status:
+On branch setup-tunder-FB
+Your branch is ahead of 'origin/setup-tunder-FB' by 2 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   2_historical_ndvi_test.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+============================================================
+Historic processing started at: 2026-04-08 09:25:13
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_2026-04-08_09h25m13.log
+============================================================
+
+Running: with arguments: 2017-04-01 2025-11-30
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Start time: 2026-04-08 09:25:13
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py
+Start time: 2026-04-08 09:25:13
+<Client: 'tcp://127.0.0.1:38099' processes=80 threads=80, memory=2.91 TiB>
+http://127.0.0.1:1235/status
+dask.distributed

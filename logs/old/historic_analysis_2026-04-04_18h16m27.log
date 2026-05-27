@@ -1,0 +1,58 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2017-04-01
+2025-11-30
+Current commit:
+f211285fcf5ff8c4e4189986b06e2acff5d5e90e
+
+Commit details:
+*   e1e5d4d (refs/stash) WIP on setup-tunder-FB: f211285 Fix download order
+|\  
+| * 0a2e4e1 index on setup-tunder-FB: f211285 Fix download order
+|/  
+* f211285 (HEAD -> setup-tunder-FB) Fix download order
+* 5774759 Historic: add full period 2017-04-01 to 2025-11-30
+* 3a54536 (origin/setup-tunder-FB) Adapt paths on historic analysis for TUNDER
+* 4e1a9f4 On TUNDER: Move to new data2 disk
+* 12680c5 Ensure historic satellite download is ordered in time
+* e6e0603 Use continuous download script for historic
+* d669eb1 Add bash script for historic analysis
+* 9adcd33 Pull in Francescos latest changes from 03.04
+
+Working tree status:
+On branch setup-tunder-FB
+Your branch is ahead of 'origin/setup-tunder-FB' by 2 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   0_1_run_historic_analysis.sh
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	../../../data_for_demo_2/
+	../../../report/fig/prova2/
+	../test.ipynb
+	../../demo/test_all_pixels/0_1_run_pipeline copy.sh
+	../../demo/test_all_pixels/1_extract_swisstopo_dataset_DEBUG.py
+	../../demo/test_all_pixels/5a_debug_historical_ndvi.py.py
+	../../demo/test_all_pixels/6_create_cogtiff copy.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+============================================================
+Historic processing started at: 2026-04-04 18:16:27
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_2026-04-04_18h16m27.log
+============================================================
+
+Running: with arguments: 2017-04-01 2025-11-30
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Start time: 2026-04-04 18:16:27
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Duration: 14:24:42 (hh:mm:ss)
+0_1_run_historic_analysis.sh: line 121: DOWNLOAD_FILE: unbound variable

@@ -1,0 +1,272 @@
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/node.py:187: UserWarning: Port 8347 is already in use.
+Perhaps you already have a cluster running?
+Hosting the HTTP server on port 43199 instead
+  warnings.warn(
+<Client: 'tcp://127.0.0.1:43897' processes=2 threads=2, memory=37.25 GiB>
+http://127.0.0.1:43199/status
+Starting download for:
+2025-05-01_10h40
+2025-05-02_10h10
+2025-05-03_10h37
+2025-05-10_10h15
+2025-05-10_10h30
+2025-05-11_10h36
+2025-05-13_10h25
+2025-05-13_10h40
+2025-05-15_10h16
+2025-05-16_10h36
+2025-05-17_10h17
+2025-05-18_10h26
+2025-05-30_10h15
+2025-05-30_10h30
+2025-05-31_10h40
+2025-06-09_10h15
+2025-06-09_10h27
+2025-06-10_10h36
+2025-06-11_10h10
+2025-06-12_10h25
+2025-06-12_10h37
+2025-06-13_10h07
+2025-06-14_10h16
+2025-06-16_10h20
+2025-06-17_10h26
+2025-06-19_10h15
+2025-06-19_10h30
+2025-06-21_10h06
+2025-06-22_10h25
+2025-06-22_10h40
+2025-06-25_10h36
+2025-06-26_10h05
+2025-06-26_10h17
+2025-06-29_10h27
+2025-06-30_10h40
+2025-07-01_10h10
+2025-07-02_10h25
+2025-07-02_10h37
+2025-07-03_10h07
+2025-07-04_10h20
+2025-07-05_10h36
+2025-07-12_10h25
+2025-07-12_10h40
+2025-07-09_10h15
+2025-07-09_10h30
+2025-07-10_10h40
+2025-07-17_10h30
+2025-07-19_10h15
+2025-07-22_10h25
+2025-07-22_10h37
+2025-08-06_10h26
+2025-08-08_10h15
+2025-08-08_10h27
+2025-08-11_10h25
+2025-08-11_10h37
+2025-08-13_10h20
+2025-08-14_10h36
+2025-08-15_10h05
+2025-08-15_10h20
+2025-08-16_10h30
+2025-08-18_10h15
+2025-08-18_10h30
+2025-08-23_10h20
+2025-08-25_10h05
+2025-08-25_10h17
+2025-08-29_10h40
+2025-08-31_10h25
+2025-08-31_10h37
+2025-09-07_10h15
+2025-09-07_10h30
+2025-09-14_10h17
+2025-09-15_10h30
+2025-09-17_10h20
+2025-09-17_10h27
+2025-09-18_10h40
+2025-09-19_10h10
+2025-09-21_10h07
+2025-09-28_10h38
+2025-09-29_10h08
+2025-09-30_10h40
+2025-10-02_10h18
+2025-10-07_10h18
+2025-10-08_10h39
+2025-10-10_10h40
+2025-10-11_10h09
+2025-10-12_10h20
+2025-10-13_10h39
+2025-10-14_10h09
+2025-10-14_10h20
+2025-10-15_10h30
+2025-10-17_10h19
+2025-10-17_10h30
+2025-10-18_10h40
+2025-10-23_10h40
+2025-10-24_10h21
+2025-10-28_10h41
+2025-10-29_10h11
+2025-11-03_10h22
+2025-11-07_10h42
+2025-11-08_10h12
+2025-11-11_10h23
+2025-11-13_10h11
+2025-11-18_10h13
+2025-11-19_10h32
+2025-11-19_10h43
+2025-11-22_10h42
+2025-11-23_10h12
+2025-11-23_10h24
+2025-11-27_10h44
+2025-11-28_10h14
+2025-11-29_10h33
+2025-12-06_10h23
+2025-12-09_10h33
+2025-12-09_10h44
+2025-12-12_10h43
+2025-12-13_10h13
+2025-12-13_10h24
+2025-12-14_10h34
+2025-12-21_10h24
+2025-12-26_10h23
+2025-12-26_10h35
+2025-12-27_10h44
+2025-12-28_10h14
+2025-12-29_10h33
+2025-12-29_10h45
+2025-12-30_10h14
+2025-12-31_10h24
+Total of global grid used for pixel ID (based on forest mask): 
+Box: BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0) pixels
+Reference raster metadata:
+{'transform': Affine(10.0, 0.0, 2474090.0,
+       0.0, -10.0, 1310530.0), 'crs': CRS.from_wkt('PROJCS["CH1903+ / LV95",GEOGCS["CH1903+",DATUM["CH1903+",SPHEROID["Bessel 1841",6377397.155,299.1528128,AUTHORITY["EPSG","7004"]],AUTHORITY["EPSG","6150"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4150"]],PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],PARAMETER["latitude_of_center",46.9524055555556],PARAMETER["longitude_of_center",7.43958333333333],PARAMETER["azimuth",90],PARAMETER["rectified_grid_angle",90],PARAMETER["scale_factor",1],PARAMETER["false_easting",2600000],PARAMETER["false_northing",1200000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","2056"]]'), 'width': np.float64(37728.0), 'height': np.float64(24542.0)}
+  0%|          | 0/127 [00:00<?, ?it/s]Time step 0 failed: Invalid dataset dimensions : 0 x 1
+  1%|          | 1/127 [00:02<06:14,  2.97s/it]Time step 1 failed: Invalid dataset dimensions : 0 x 1
+  2%|▏         | 2/127 [00:05<06:14,  3.00s/it]Time step 2 failed: Invalid dataset dimensions : 0 x 1
+  2%|▏         | 3/127 [00:08<06:08,  2.97s/it]Time step 3 processed successfully.
+  3%|▎         | 4/127 [00:13<07:11,  3.51s/it]Time step 4 processed successfully.
+  4%|▍         | 5/127 [00:17<07:42,  3.79s/it]Time step 5 failed: Invalid dataset dimensions : 0 x 1
+  5%|▍         | 6/127 [00:20<07:04,  3.51s/it]Time step 6 processed successfully.
+  6%|▌         | 7/127 [00:24<07:22,  3.69s/it]Time step 7 failed: Invalid dataset dimensions : 0 x 1
+  6%|▋         | 8/127 [00:27<06:43,  3.39s/it]Time step 8 processed successfully.
+  7%|▋         | 9/127 [00:31<07:12,  3.66s/it]Time step 9 failed: Invalid dataset dimensions : 0 x 1
+  8%|▊         | 10/127 [00:34<06:38,  3.41s/it]Time step 10 processed successfully.
+  9%|▊         | 11/127 [00:38<06:53,  3.57s/it]Time step 11 processed successfully.
+  9%|▉         | 12/127 [00:42<07:14,  3.78s/it]Time step 12 processed successfully.
+ 10%|█         | 13/127 [00:46<07:28,  3.93s/it]Time step 13 processed successfully.
+ 11%|█         | 14/127 [00:50<07:29,  3.98s/it]Time step 14 failed: Invalid dataset dimensions : 0 x 1
+ 12%|█▏        | 15/127 [00:54<06:54,  3.70s/it]Time step 15 processed successfully.
+ 13%|█▎        | 16/127 [00:58<07:08,  3.86s/it]Time step 16 processed successfully.
+ 13%|█▎        | 17/127 [01:02<07:09,  3.91s/it]Time step 17 failed: Invalid dataset dimensions : 0 x 1
+ 14%|█▍        | 18/127 [01:05<06:32,  3.60s/it]Time step 18 failed: Invalid dataset dimensions : 0 x 1
+ 15%|█▍        | 19/127 [01:08<06:04,  3.38s/it]Time step 19 processed successfully.
+ 16%|█▌        | 20/127 [01:12<06:32,  3.67s/it]Time step 20 failed: Invalid dataset dimensions : 0 x 1
+ 17%|█▋        | 21/127 [01:15<06:01,  3.41s/it]Time step 21 failed: Invalid dataset dimensions : 0 x 1
+ 17%|█▋        | 22/127 [01:18<05:43,  3.27s/it]Time step 22 processed successfully.
+ 18%|█▊        | 23/127 [01:22<06:11,  3.57s/it]Time step 23 processed successfully.
+ 19%|█▉        | 24/127 [01:26<06:33,  3.82s/it]Time step 24 processed successfully.
+ 20%|█▉        | 25/127 [01:30<06:37,  3.90s/it]Time step 25 processed successfully.
+ 20%|██        | 26/127 [01:35<06:45,  4.01s/it]Time step 26 processed successfully.
+ 21%|██▏       | 27/127 [01:39<06:47,  4.08s/it]Time step 27 failed: Invalid dataset dimensions : 0 x 1
+ 22%|██▏       | 28/127 [01:42<06:09,  3.73s/it]Time step 28 processed successfully.
+ 23%|██▎       | 29/127 [01:46<06:24,  3.92s/it]Time step 29 failed: Invalid dataset dimensions : 0 x 1
+ 24%|██▎       | 30/127 [01:49<05:48,  3.59s/it]Time step 30 failed: Invalid dataset dimensions : 0 x 1
+ 24%|██▍       | 31/127 [01:52<05:21,  3.34s/it]Time step 31 failed: Invalid dataset dimensions : 0 x 1
+ 25%|██▌       | 32/127 [01:55<05:02,  3.18s/it]Time step 32 processed successfully.
+ 26%|██▌       | 33/127 [01:59<05:29,  3.51s/it]Time step 33 processed successfully.
+ 27%|██▋       | 34/127 [02:03<05:45,  3.72s/it]Time step 34 failed: Invalid dataset dimensions : 0 x 1
+ 28%|██▊       | 35/127 [02:06<05:27,  3.56s/it]Time step 35 failed: Invalid dataset dimensions : 0 x 1
+ 28%|██▊       | 36/127 [02:09<05:11,  3.43s/it]Time step 36 processed successfully.
+ 29%|██▉       | 37/127 [02:13<05:25,  3.62s/it]Time step 37 failed: Invalid dataset dimensions : 0 x 1
+ 30%|██▉       | 38/127 [02:16<05:04,  3.42s/it]Time step 38 failed: Invalid dataset dimensions : 0 x 1
+ 31%|███       | 39/127 [02:19<04:44,  3.24s/it]Time step 39 processed successfully.
+ 31%|███▏      | 40/127 [02:23<05:04,  3.51s/it]Time step 40 failed: Invalid dataset dimensions : 0 x 1
+ 32%|███▏      | 41/127 [02:26<04:49,  3.36s/it]Time step 41 processed successfully.
+ 33%|███▎      | 42/127 [02:30<05:05,  3.60s/it]Time step 42 failed: Invalid dataset dimensions : 0 x 1
+ 34%|███▍      | 43/127 [02:33<04:42,  3.37s/it]Time step 43 processed successfully.
+ 35%|███▍      | 44/127 [02:37<04:54,  3.55s/it]Time step 44 processed successfully.
+ 35%|███▌      | 45/127 [02:41<05:04,  3.71s/it]Time step 45 failed: Invalid dataset dimensions : 0 x 1
+ 36%|███▌      | 46/127 [02:44<04:39,  3.45s/it]Time step 46 processed successfully.
+ 37%|███▋      | 47/127 [02:48<04:51,  3.65s/it]Time step 47 processed successfully.
+ 38%|███▊      | 48/127 [02:53<05:00,  3.80s/it]Time step 48 processed successfully.
+ 39%|███▊      | 49/127 [02:57<05:09,  3.96s/it]Time step 49 failed: Invalid dataset dimensions : 0 x 1
+ 39%|███▉      | 50/127 [03:00<04:41,  3.66s/it]Time step 50 processed successfully.
+ 40%|████      | 51/127 [03:04<04:52,  3.85s/it]Time step 51 processed successfully.
+ 41%|████      | 52/127 [03:08<04:58,  3.97s/it]Time step 52 processed successfully.
+ 42%|████▏     | 53/127 [03:13<05:00,  4.06s/it]Time step 53 processed successfully.
+ 43%|████▎     | 54/127 [03:17<04:55,  4.04s/it]Time step 54 failed: Invalid dataset dimensions : 0 x 1
+ 43%|████▎     | 55/127 [03:19<04:25,  3.68s/it]Time step 55 processed successfully.
+ 44%|████▍     | 56/127 [03:23<04:28,  3.78s/it]Time step 56 failed: Invalid dataset dimensions : 0 x 1
+ 45%|████▍     | 57/127 [03:26<04:07,  3.53s/it]Time step 57 failed: Invalid dataset dimensions : 0 x 1
+ 46%|████▌     | 58/127 [03:29<03:51,  3.35s/it]Time step 58 processed successfully.
+ 46%|████▋     | 59/127 [03:33<04:03,  3.59s/it]Time step 59 processed successfully.
+ 47%|████▋     | 60/127 [03:38<04:18,  3.86s/it]Time step 60 processed successfully.
+ 48%|████▊     | 61/127 [03:42<04:21,  3.96s/it]Time step 61 processed successfully.
+ 49%|████▉     | 62/127 [03:46<04:18,  3.98s/it]Time step 62 processed successfully.
+ 50%|████▉     | 63/127 [03:50<04:20,  4.07s/it]Time step 63 failed: Invalid dataset dimensions : 0 x 1
+ 50%|█████     | 64/127 [03:53<03:51,  3.67s/it]Time step 64 processed successfully.
+ 51%|█████     | 65/127 [03:57<03:57,  3.83s/it]Time step 65 failed: Invalid dataset dimensions : 0 x 1
+ 52%|█████▏    | 66/127 [04:00<03:37,  3.57s/it]Time step 66 processed successfully.
+ 53%|█████▎    | 67/127 [04:05<03:47,  3.79s/it]Time step 67 failed: Invalid dataset dimensions : 0 x 1
+ 54%|█████▎    | 68/127 [04:08<03:38,  3.71s/it]Time step 68 processed successfully.
+ 54%|█████▍    | 69/127 [04:12<03:38,  3.76s/it]Time step 69 processed successfully.
+ 55%|█████▌    | 70/127 [04:16<03:41,  3.88s/it]Time step 70 processed successfully.
+ 56%|█████▌    | 71/127 [04:20<03:39,  3.93s/it]Time step 71 processed successfully.
+ 57%|█████▋    | 72/127 [04:24<03:36,  3.93s/it]Time step 72 processed successfully.
+ 57%|█████▋    | 73/127 [04:28<03:35,  3.99s/it]Time step 73 processed successfully.
+ 58%|█████▊    | 74/127 [04:32<03:31,  3.98s/it]Time step 74 failed: Invalid dataset dimensions : 0 x 1
+ 59%|█████▉    | 75/127 [04:35<03:08,  3.63s/it]Time step 75 failed: Invalid dataset dimensions : 0 x 1
+ 60%|█████▉    | 76/127 [04:38<02:51,  3.36s/it]Time step 76 failed: Invalid dataset dimensions : 0 x 1
+ 61%|██████    | 77/127 [04:41<02:38,  3.17s/it]Time step 77 failed: Invalid dataset dimensions : 0 x 1
+ 61%|██████▏   | 78/127 [04:43<02:29,  3.05s/it]Time step 78 failed: Invalid dataset dimensions : 0 x 1
+ 62%|██████▏   | 79/127 [04:47<02:28,  3.10s/it]Time step 79 failed: Invalid dataset dimensions : 0 x 1
+ 63%|██████▎   | 80/127 [04:50<02:23,  3.06s/it]Time step 80 processed successfully.
+ 64%|██████▍   | 81/127 [04:54<02:36,  3.40s/it]Time step 81 processed successfully.
+ 65%|██████▍   | 82/127 [04:58<02:44,  3.66s/it]Time step 82 failed: Invalid dataset dimensions : 0 x 1
+ 65%|██████▌   | 83/127 [05:01<02:29,  3.39s/it]Time step 83 failed: Invalid dataset dimensions : 0 x 1
+ 66%|██████▌   | 84/127 [05:04<02:19,  3.23s/it]Time step 84 failed: Invalid dataset dimensions : 0 x 1
+ 67%|██████▋   | 85/127 [05:06<02:10,  3.11s/it]Time step 85 processed successfully.
+ 68%|██████▊   | 86/127 [05:10<02:18,  3.37s/it]Time step 86 failed: Invalid dataset dimensions : 0 x 1
+ 69%|██████▊   | 87/127 [05:13<02:08,  3.21s/it]Time step 87 failed: Invalid dataset dimensions : 0 x 1
+ 69%|██████▉   | 88/127 [05:16<01:59,  3.07s/it]Time step 88 processed successfully.
+ 70%|███████   | 89/127 [05:20<02:08,  3.39s/it]Time step 89 processed successfully.
+ 71%|███████   | 90/127 [05:24<02:12,  3.58s/it]Time step 90 processed successfully.
+ 72%|███████▏  | 91/127 [05:28<02:12,  3.69s/it]Time step 91 processed successfully.
+ 72%|███████▏  | 92/127 [05:32<02:11,  3.75s/it]Time step 92 failed: Invalid dataset dimensions : 0 x 1
+ 73%|███████▎  | 93/127 [05:35<01:57,  3.45s/it]Time step 93 failed: Invalid dataset dimensions : 0 x 1
+ 74%|███████▍  | 94/127 [05:38<01:47,  3.26s/it]Time step 94 processed successfully.
+ 75%|███████▍  | 95/127 [05:41<01:50,  3.44s/it]Time step 95 failed: Invalid dataset dimensions : 0 x 1
+ 76%|███████▌  | 96/127 [05:44<01:40,  3.24s/it]Time step 96 failed: Invalid dataset dimensions : 0 x 1
+ 76%|███████▋  | 97/127 [05:47<01:33,  3.10s/it]Time step 97 processed successfully.
+ 77%|███████▋  | 98/127 [05:51<01:38,  3.40s/it]Time step 98 failed: Invalid dataset dimensions : 0 x 1
+ 78%|███████▊  | 99/127 [05:54<01:30,  3.22s/it]Time step 99 failed: Invalid dataset dimensions : 0 x 1
+ 79%|███████▊  | 100/127 [05:57<01:23,  3.11s/it]Time step 100 processed successfully.
+ 80%|███████▉  | 101/127 [06:01<01:29,  3.45s/it]Time step 101 failed: Invalid dataset dimensions : 0 x 1
+ 80%|████████  | 102/127 [06:04<01:21,  3.25s/it]Time step 102 failed: Invalid dataset dimensions : 0 x 1
+ 81%|████████  | 103/127 [06:07<01:14,  3.10s/it]Time step 103 processed successfully.
+ 82%|████████▏ | 104/127 [06:11<01:17,  3.37s/it]Time step 104 failed: Invalid dataset dimensions : 0 x 1
+ 83%|████████▎ | 105/127 [06:13<01:09,  3.16s/it]Time step 105 failed: Invalid dataset dimensions : 0 x 1
+ 83%|████████▎ | 106/127 [06:16<01:04,  3.07s/it]Time step 106 failed: Invalid dataset dimensions : 0 x 1
+ 84%|████████▍ | 107/127 [06:19<01:00,  3.01s/it]Time step 107 processed successfully.
+ 85%|████████▌ | 108/127 [06:23<01:04,  3.40s/it]Time step 108 failed: Invalid dataset dimensions : 0 x 1
+ 86%|████████▌ | 109/127 [06:26<00:58,  3.27s/it]Time step 109 failed: Invalid dataset dimensions : 0 x 1
+ 87%|████████▋ | 110/127 [06:29<00:53,  3.14s/it]Time step 110 processed successfully.
+ 87%|████████▋ | 111/127 [06:33<00:55,  3.50s/it]Time step 111 processed successfully.
+ 88%|████████▊ | 112/127 [06:38<00:55,  3.70s/it]Time step 112 processed successfully.
+ 89%|████████▉ | 113/127 [06:42<00:54,  3.91s/it]Time step 113 failed: Invalid dataset dimensions : 0 x 1
+ 90%|████████▉ | 114/127 [06:45<00:47,  3.63s/it]Time step 114 failed: Invalid dataset dimensions : 0 x 1
+ 91%|█████████ | 115/127 [06:48<00:40,  3.38s/it]Time step 115 failed: Invalid dataset dimensions : 0 x 1
+ 91%|█████████▏| 116/127 [06:51<00:35,  3.26s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB.py:232: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+Time step 116 processed successfully.
+ 92%|█████████▏| 117/127 [06:55<00:35,  3.50s/it]Time step 117 processed successfully.
+ 93%|█████████▎| 118/127 [06:59<00:33,  3.68s/it]Time step 118 processed successfully.
+ 94%|█████████▎| 119/127 [07:03<00:30,  3.78s/it]Time step 119 processed successfully.
+ 94%|█████████▍| 120/127 [07:07<00:27,  3.92s/it]Time step 120 processed successfully.
+ 95%|█████████▌| 121/127 [07:11<00:23,  3.93s/it]Time step 121 failed: Invalid dataset dimensions : 0 x 1
+ 96%|█████████▌| 122/127 [07:14<00:18,  3.62s/it]Time step 122 failed: Invalid dataset dimensions : 0 x 1
+ 97%|█████████▋| 123/127 [07:17<00:13,  3.35s/it]/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB.py:232: RuntimeWarning: invalid value encountered in divide
+  ndsi = (green - swir_10m) / (green + swir_10m)
+Time step 123 processed successfully.
+ 98%|█████████▊| 124/127 [07:21<00:10,  3.56s/it]Time step 124 failed: Invalid dataset dimensions : 0 x 1
+ 98%|█████████▊| 125/127 [07:24<00:06,  3.36s/it]Time step 125 failed: Invalid dataset dimensions : 0 x 1
+ 99%|█████████▉| 126/127 [07:26<00:03,  3.19s/it]Time step 126 processed successfully.
+100%|██████████| 127/127 [07:30<00:00,  3.17s/it]100%|██████████| 127/127 [07:30<00:00,  3.54s/it]
+All done

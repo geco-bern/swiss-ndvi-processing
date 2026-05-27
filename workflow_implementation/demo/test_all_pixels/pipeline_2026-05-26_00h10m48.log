@@ -1,0 +1,216 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-12-31
+2026-01-06
+============================================================
+Pipeline started at: 2026-05-26 00:10:49
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_2026-05-26_00h10m48.log
+============================================================
+
+Running: with arguments: 2025-12-31 2026-01-06
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-05-26 00:10:49
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Start time: 2026-05-26 00:10:49
+<Client: 'tcp://127.0.0.1:45603' processes=50 threads=50, memory=1.09 TiB>
+http://127.0.0.1:8343/status
+Subsetting downloaded data to spatial extent of historic file:
+/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr
+Subsetting 8 (historic) of 105715396 (downloaded) pixels.
+Initialized n=7 daily dates:
+       daily   obs_date          obs_times
+0 2025-12-31 2025-12-31           10:24:41
+1 2026-01-01 2026-01-01           10:43:39
+2 2026-01-02        NaT                   
+3 2026-01-03 2026-01-03           10:34:41
+4 2026-01-04        NaT                   
+5 2026-01-05 2026-01-05  10:23:29,10:30:41
+6 2026-01-06 2026-01-06           10:44:41
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+All done
+Created file: 
+/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Duration: 00:00:11 (hh:mm:ss)
+Merging script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Start time: 2026-05-26 00:11:00
+<Client: 'tcp://127.0.0.1:43481' processes=30 threads=30, memory=3.27 TiB>
+http://127.0.0.1:8343/status
+Last dates in historic_ds:
+  2025-12-22
+  2025-12-23
+  2025-12-24
+  2025-12-25
+  2025-12-26
+  2025-12-27
+  2025-12-28
+  2025-12-29
+  2025-12-30
+  2025-12-31
+First dates in newly downloaded:
+  2025-12-31
+  2026-01-01
+  2026-01-02
+  2026-01-03
+  2026-01-04
+  2026-01-05
+  2026-01-06
+Current historic dataset:
+<xarray.Dataset> Size: 115kB
+Dimensions:         (pixel: 8, date: 3195)
+Coordinates:
+    y_idx           (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    x_idx           (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    x               (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    doy             (date) int32 13kB dask.array<chunksize=(3195,), meta=np.ndarray>
+    y               (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+  * date            (date) datetime64[ns] 26kB 2017-04-03 ... 2025-12-31
+  * pixel           (pixel) int32 32B 2694495 2692025 ... 2690025 2689565
+Data variables:
+    ndvi_processed  (pixel, date) int16 51kB dask.array<chunksize=(8, 3195), meta=np.ndarray>
+    mask_array      (pixel, date) int8 26kB dask.array<chunksize=(8, 3195), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Newly downloaded dataset:
+<xarray.Dataset> Size: 475B
+Dimensions:   (pixel: 8, date: 7)
+Coordinates:
+    y_idx     (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    x_idx     (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    x         (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+  * date      (date) datetime64[ns] 56B 2025-12-31 2026-01-01 ... 2026-01-06
+    doy       (date) int32 28B dask.array<chunksize=(7,), meta=np.ndarray>
+  * pixel     (pixel) int32 32B 2694495 2692025 2761095 ... 2690025 2689565
+    y         (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+Data variables:
+    obs_date  (date) bool 7B dask.array<chunksize=(7,), meta=np.ndarray>
+    ndsi_obs  (date, pixel) int16 112B dask.array<chunksize=(7, 8), meta=np.ndarray>
+    ndvi_obs  (date, pixel) int16 112B dask.array<chunksize=(7, 8), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Constructed graph with 11 layers, and 11 tasks.
+2026-05-26 00:11:11,376 - distributed.scheduler - WARNING - Detected different `run_spec` for key ('getitem-74f706c2b843572c84fe32fa56cd46bc', 1) between two consecutive calls to `update_graph`. This can cause failures and deadlocks down the line. Please ensure unique key names. If you are using a standard dask collections, consider releasing all the data before resubmitting another computation. More details and help can be found at https://github.com/dask/dask/issues/9888. 
+Debugging information
+---------------------
+old task state: processing
+old run_spec: Alias(('getitem-74f706c2b843572c84fe32fa56cd46bc', 1)->('concatenate-open_dataset-doy-original-getitem-74f706c2b843572c84fe32fa56cd46bc', 1))
+new run_spec: Alias(('getitem-74f706c2b843572c84fe32fa56cd46bc', 1)->('concatenate-getitem-74f706c2b843572c84fe32fa56cd46bc', 1))
+old dependencies: {('concatenate-open_dataset-doy-original-getitem-74f706c2b843572c84fe32fa56cd46bc', 1)}
+new dependencies: frozenset({('concatenate-getitem-74f706c2b843572c84fe32fa56cd46bc', 1)})
+
+writing to new file
+  /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr
+=> /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr.updated_20260526_00h11m11s
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+Backup failed: Destination path '/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr.bkp.zarr/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr' already exists -- continuing to overwrite.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py", line 700, in <module>
+    shutil.move(HISTO_ZARR_INPUT,  HISTO_ZARR_INPUT+".bkp.zarr") # os.remove(HISTO_ZARR_INPUT) # TODO: activate this removal
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/shutil.py", line 884, in move
+    raise Error("Destination path '%s' already exists" % real_dst)
+shutil.Error: Destination path '/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr.bkp.zarr/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr' already exists
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py", line 708, in <module>
+    raise ValueError(msg)
+ValueError: Error updating data storage: Destination path '/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr.bkp.zarr/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr' already exists --
+ABORTED. To recover, please manually delete /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr and manually rename
+/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr.updated_20260526_00h11m11s => /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr.
+2026-05-26 00:11:14,876 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:55052 remote=tcp://127.0.0.1:43481>: Stream is closed
+2026-05-26 00:11:14,877 - distributed.worker - ERROR - Failed to communicate with scheduler during heartbeat.
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1267, in heartbeat
+    response = await retry_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 416, in retry_operation
+    return await retry(
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/utils_comm.py", line 395, in retry
+    return await coro()
+           ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1259, in send_recv_from_rpc
+    return await send_recv(comm=comm, op=key, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/core.py", line 1018, in send_recv
+    response = await comm.read(deserializers=deserializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed) ConnectionPool.heartbeat_worker local=tcp://127.0.0.1:55054 remote=tcp://127.0.0.1:43481>: Stream is closed
+2026-05-26 00:11:14,895 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:37679' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('xarray-y_idx-30b53401806d20a2f674aacfde6bb345', 0)} (stimulus_id='handle-worker-cleanup-1779754274.895276')
+2026-05-26 00:11:14,897 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:34863' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('xarray-x_idx-be5249ea0ef18fe90f295e0265a235b7', 0)} (stimulus_id='handle-worker-cleanup-1779754274.897195')
+2026-05-26 00:11:14,897 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:35559' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('xarray-x-3a83defe9b26b7d295ff9578dc80b1d2', 0)} (stimulus_id='handle-worker-cleanup-1779754274.8975668')
+2026-05-26 00:11:14,899 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:33583' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('rechunk-merge-85619a4939b69ba08e5c762b59309e4f', 0)} (stimulus_id='handle-worker-cleanup-1779754274.8990815')
+2026-05-26 00:11:14,899 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:34645' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('xarray-y-0a4459d0060d822da774bfff69c3eff7', 0)} (stimulus_id='handle-worker-cleanup-1779754274.899727')
+2026-05-26 00:11:14,906 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:39469' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('rechunk-merge-673795937fc2295d20614c5c4248806c', 0, 0), ('rechunk-merge-6c08554e35e61829e95bffd679658d46', 0, 0), ('rechunk-merge-78b2089759c59e686645c5856a358957', 0, 0)} (stimulus_id='handle-worker-cleanup-1779754274.9059055')
+[ERROR] Script failed: N/A | Time: Tue May 26 00:11:17 UTC 2026

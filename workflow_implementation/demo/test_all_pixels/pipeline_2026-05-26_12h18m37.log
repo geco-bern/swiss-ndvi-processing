@@ -1,0 +1,132 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2026-01-06
+2026-01-06
+============================================================
+Pipeline started at: 2026-05-26 12:18:38
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_2026-05-26_12h18m37.log
+============================================================
+
+Running: with arguments: 2026-01-06 2026-01-06
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-05-26 12:18:39
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Start time: 2026-05-26 12:18:39
+<Client: 'tcp://127.0.0.1:39717' processes=50 threads=50, memory=1.09 TiB>
+http://127.0.0.1:8343/status
+Subsetting downloaded data to spatial extent of historic file:
+/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr
+Subsetting 8 (historic) of 105715396 (downloaded) pixels.
+Initialized n=1 daily dates:
+       daily   obs_date obs_times
+0 2026-01-06 2026-01-06  10:44:41
+All done
+4_merge_zarr.py created file: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Duration: 00:00:10 (hh:mm:ss)
+Merging script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Start time: 2026-05-26 12:18:49
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/node.py:187: UserWarning: Port 8342 is already in use.
+Perhaps you already have a cluster running?
+Hosting the HTTP server on port 39003 instead
+  warnings.warn(
+<Client: 'tcp://127.0.0.1:36591' processes=30 threads=30, memory=3.27 TiB>
+http://127.0.0.1:39003/status
+Last dates in historic_ds:
+  2025-12-28
+  2025-12-29
+  2025-12-30
+  2025-12-31
+  2026-01-01
+  2026-01-02
+  2026-01-03
+  2026-01-04
+  2026-01-05
+  2026-01-06
+First dates in newly downloaded:
+  2026-01-06
+Current historic dataset:
+<xarray.Dataset> Size: 115kB
+Dimensions:         (pixel: 8, date: 3201)
+Coordinates:
+    x_idx           (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    x               (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+  * date            (date) datetime64[ns] 26kB 2017-04-03 ... 2026-01-06
+    y_idx           (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    doy             (date) int32 13kB dask.array<chunksize=(3201,), meta=np.ndarray>
+    y               (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+  * pixel           (pixel) int32 32B 2694495 2692025 ... 2690025 2689565
+Data variables:
+    ndvi_processed  (pixel, date) int16 51kB dask.array<chunksize=(8, 3201), meta=np.ndarray>
+    mask_array      (pixel, date) int8 26kB dask.array<chunksize=(8, 3201), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Newly downloaded dataset:
+<xarray.Dataset> Size: 205B
+Dimensions:   (pixel: 8, date: 1)
+Coordinates:
+    y_idx     (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    x_idx     (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    doy       (date) int32 4B dask.array<chunksize=(1,), meta=np.ndarray>
+  * date      (date) datetime64[ns] 8B 2026-01-06
+  * pixel     (pixel) int32 32B 2694495 2692025 2761095 ... 2690025 2689565
+    y         (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    x         (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+Data variables:
+    obs_date  (date) bool 1B dask.array<chunksize=(1,), meta=np.ndarray>
+    ndvi_obs  (date, pixel) int16 16B dask.array<chunksize=(1, 8), meta=np.ndarray>
+    ndsi_obs  (date, pixel) int16 16B dask.array<chunksize=(1, 8), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py", line 461, in <module>
+    plt.savefig(plot_filename)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/matplotlib/pyplot.py", line 1243, in savefig
+    res = fig.savefig(*args, **kwargs)  # type: ignore[func-returns-value]
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/matplotlib/figure.py", line 3490, in savefig
+    self.canvas.print_figure(fname, **kwargs)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/matplotlib/backend_bases.py", line 2184, in print_figure
+    result = print_method(
+             ^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/matplotlib/backend_bases.py", line 2040, in <lambda>
+    print_method = functools.wraps(meth)(lambda *args, **kwargs: meth(
+                                                                 ^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/matplotlib/backends/backend_agg.py", line 481, in print_png
+    self._print_pil(filename_or_obj, "png", pil_kwargs, metadata)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/matplotlib/backends/backend_agg.py", line 430, in _print_pil
+    mpl.image.imsave(
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/matplotlib/image.py", line 1634, in imsave
+    image.save(fname, **pil_kwargs)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/PIL/Image.py", line 2583, in save
+    fp = builtins.open(filename, "w+b")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/data2/UniBe-swiss-ndvi/output_data/ndvi_historic_extended.zarr_update.png'
+[ERROR] Script failed: N/A | Time: Tue May 26 12:19:00 UTC 2026

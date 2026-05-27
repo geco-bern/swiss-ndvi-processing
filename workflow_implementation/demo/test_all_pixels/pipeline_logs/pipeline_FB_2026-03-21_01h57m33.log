@@ -1,0 +1,7 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+rsync: [sender] link_stat "/mnt/data1/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_compr_1kmX1km.zarr_fixedMaskArray_bkp" failed: No such file or directory (2)
+rsync error: some files/attrs were not transferred (see previous errors) (code 23) at main.c(1338) [sender=3.2.7]
+[ERROR] Script failed: N/A | Time: Sat Mar 21 01:57:33 AM UTC 2026

@@ -1,0 +1,173 @@
+============================================================
+Pipeline started at: 2026-03-19 11:36:40
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FB_2026-03-19_11h36m40.log
+============================================================
+
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-11-30
+Running: with arguments: 2025-11-30 2025-12-12
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-03-19 11:36:42
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Start time: 2026-03-19 11:36:42
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Duration: 00:00:00 (hh:mm:ss)
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Start time: 2026-03-19 11:36:42
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/node.py:187: UserWarning: Port 8343 is already in use.
+Perhaps you already have a cluster running?
+Hosting the HTTP server on port 39419 instead
+  warnings.warn(
+http://127.0.0.1:39419/status
+Last dates in historic_ds:
+  2025-11-21
+  2025-11-22
+  2025-11-23
+  2025-11-24
+  2025-11-25
+  2025-11-26
+  2025-11-27
+  2025-11-28
+  2025-11-29
+  2025-11-30
+First dates in newly downloaded:
+  2025-11-30
+  2025-12-01
+  2025-12-02
+  2025-12-03
+  2025-12-04
+  2025-12-05
+  2025-12-06
+  2025-12-07
+  2025-12-08
+  2025-12-09
+Current historic dataset:
+<xarray.Dataset> Size: 40MB
+Dimensions:         (pixel: 4216, date: 3164)
+Coordinates:
+  * pixel           (pixel) int32 17kB 44311103 44311104 ... 45049987 45049988
+    y               (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+  * date            (date) datetime64[ns] 25kB 2017-04-03 ... 2025-11-30
+    x_idx           (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    doy             (date) int32 13kB dask.array<chunksize=(3164,), meta=np.ndarray>
+    x               (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    y_idx           (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+Data variables:
+    ndvi_processed  (pixel, date) int16 27MB dask.array<chunksize=(4216, 3164), meta=np.ndarray>
+    mask_array      (pixel, date) bool 13MB dask.array<chunksize=(4216, 3164), meta=np.ndarray>
+Attributes:
+    note:     \n    # Define grid underlying PixelID and needed transformatio...
+Newly downloaded dataset:
+<xarray.Dataset> Size: 304kB
+Dimensions:   (date: 13, pixel: 4216)
+Coordinates:
+  * date      (date) datetime64[ns] 104B 2025-11-30 2025-12-01 ... 2025-12-12
+    x_idx     (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    doy       (date) int32 52B dask.array<chunksize=(13,), meta=np.ndarray>
+  * pixel     (pixel) int32 17kB 44311103 44311104 ... 45049987 45049988
+    x         (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    y         (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    y_idx     (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+Data variables:
+    ndvi_obs  (date, pixel) int16 110kB dask.array<chunksize=(13, 4216), meta=np.ndarray>
+    ndsi_obs  (date, pixel) int16 110kB dask.array<chunksize=(13, 4216), meta=np.ndarray>
+    obs_date  (date) bool 13B dask.array<chunksize=(13,), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 11.31 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+Constructed graph with 12 layers, and 12 tasks.
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py:341: FutureWarning: zarr_version is deprecated, use zarr_format
+  extended_historic_ds.to_zarr(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/group.py:2469: UserWarning: The `compressor` argument is deprecated. Use `compressors` instead.
+  compressors = _parse_deprecated_compressor(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/group.py:2469: UserWarning: The `compressor` argument is deprecated. Use `compressors` instead.
+  compressors = _parse_deprecated_compressor(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/group.py:2469: UserWarning: The `compressor` argument is deprecated. Use `compressors` instead.
+  compressors = _parse_deprecated_compressor(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/group.py:2469: UserWarning: The `compressor` argument is deprecated. Use `compressors` instead.
+  compressors = _parse_deprecated_compressor(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+2026-03-19 11:37:16,674 - distributed.scheduler - WARNING - Detected different `run_spec` for key ('getitem-ff295f600bd2ba06e5aa470d8cf0463a', 235) between two consecutive calls to `update_graph`. This can cause failures and deadlocks down the line. Please ensure unique key names. If you are using a standard dask collections, consider releasing all the data before resubmitting another computation. More details and help can be found at https://github.com/dask/dask/issues/9888. 
+Debugging information
+---------------------
+old task state: released
+old run_spec: Alias(('getitem-ff295f600bd2ba06e5aa470d8cf0463a', 235)->('where-getitem-ff295f600bd2ba06e5aa470d8cf0463a', 235))
+new run_spec: Alias(('getitem-ff295f600bd2ba06e5aa470d8cf0463a', 235)->('where-a346ee866b48d3f444c27a4c5adab955', 235))
+old dependencies: {('where-getitem-ff295f600bd2ba06e5aa470d8cf0463a', 235)}
+new dependencies: frozenset({('where-a346ee866b48d3f444c27a4c5adab955', 235)})
+
+2026-03-19 11:37:16,674 - distributed.scheduler - WARNING - Detected different `run_spec` for key ('open_dataset-obs_date-310ecce19f0c0f174dbb9308881a2793', 0) between two consecutive calls to `update_graph`. This can cause failures and deadlocks down the line. Please ensure unique key names. If you are using a standard dask collections, consider releasing all the data before resubmitting another computation. More details and help can be found at https://github.com/dask/dask/issues/9888. 
+Debugging information
+---------------------
+old task state: released
+old run_spec: Alias(('open_dataset-obs_date-310ecce19f0c0f174dbb9308881a2793', 0)->('original-open_dataset-obs_date-310ecce19f0c0f174dbb9308881a2793', 0))
+new run_spec: <Task ('open_dataset-obs_date-310ecce19f0c0f174dbb9308881a2793', 0) getter(...)>
+old dependencies: {('original-open_dataset-obs_date-310ecce19f0c0f174dbb9308881a2793', 0)}
+new dependencies: frozenset({'original-open_dataset-obs_date-310ecce19f0c0f174dbb9308881a2793'})
+
+2026-03-19 11:37:16,679 - distributed.scheduler - WARNING - Detected different `run_spec` for key ('getitem-75c408eb530f3b1efbc177f93168b82f', 0, 0) between two consecutive calls to `update_graph`. This can cause failures and deadlocks down the line. Please ensure unique key names. If you are using a standard dask collections, consider releasing all the data before resubmitting another computation. More details and help can be found at https://github.com/dask/dask/issues/9888. 
+Debugging information
+---------------------
+old task state: released
+old run_spec: Alias(('getitem-75c408eb530f3b1efbc177f93168b82f', 0, 0)->('concatenate-open_dataset-original-getitem-75c408eb530f3b1efbc177f93168b82f', 0, 0))
+new run_spec: Alias(('getitem-75c408eb530f3b1efbc177f93168b82f', 0, 0)->('concatenate-5b8e5740b4b4f371be21287cf021e1af', 0, 0))
+old dependencies: {('concatenate-open_dataset-original-getitem-75c408eb530f3b1efbc177f93168b82f', 0, 0)}
+new dependencies: frozenset({('concatenate-5b8e5740b4b4f371be21287cf021e1af', 0, 0)})
+
+2026-03-19 11:37:16,688 - distributed.scheduler - WARNING - Detected different `run_spec` for key ('getitem-aad512581fac8b6278d5ea4f24324e4a', 0) between two consecutive calls to `update_graph`. This can cause failures and deadlocks down the line. Please ensure unique key names. If you are using a standard dask collections, consider releasing all the data before resubmitting another computation. More details and help can be found at https://github.com/dask/dask/issues/9888. 
+Debugging information
+---------------------
+old task state: released
+old run_spec: Alias(('getitem-aad512581fac8b6278d5ea4f24324e4a', 0)->('concatenate-open_dataset-doy-original-getitem-aad512581fac8b6278d5ea4f24324e4a', 0))
+new run_spec: Alias(('getitem-aad512581fac8b6278d5ea4f24324e4a', 0)->('concatenate-dd920d9844037ef5a2a23e3a2adf74cb', 0))
+old dependencies: {('concatenate-open_dataset-doy-original-getitem-aad512581fac8b6278d5ea4f24324e4a', 0)}
+new dependencies: frozenset({('concatenate-dd920d9844037ef5a2a23e3a2adf74cb', 0)})
+
+2026-03-19 11:37:16,689 - distributed.scheduler - WARNING - Detected different `run_spec` for key ('getitem-8b15534a01f7f9ce5be84e172076a0e3', 0, 0) between two consecutive calls to `update_graph`. This can cause failures and deadlocks down the line. Please ensure unique key names. If you are using a standard dask collections, consider releasing all the data before resubmitting another computation. More details and help can be found at https://github.com/dask/dask/issues/9888. 
+Debugging information
+---------------------
+old task state: released
+old run_spec: Alias(('getitem-8b15534a01f7f9ce5be84e172076a0e3', 0, 0)->('astype-concatenate-original-getitem-8b15534a01f7f9ce5be84e172076a0e3', 0, 0))
+new run_spec: Alias(('getitem-8b15534a01f7f9ce5be84e172076a0e3', 0, 0)->('concatenate-610389c0e77708f30ee46f069bf5f403', 0, 0))
+old dependencies: {('astype-concatenate-original-getitem-8b15534a01f7f9ce5be84e172076a0e3', 0, 0)}
+new dependencies: frozenset({('concatenate-610389c0e77708f30ee46f069bf5f403', 0, 0)})
+
+Total runtime: 37.80 seconds
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Duration: 00:00:42 (hh:mm:ss)
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/6_create_cogtiff.py
+Start time: 2026-03-19 11:37:24
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/6_create_cogtiff.py
+Duration: 00:00:00 (hh:mm:ss)
+============================================================
+Pipeline completed successfully
+End time: 2026-03-19 11:37:24
+Total runtime: 00:00:44 (hh:mm:ss)
+============================================================

@@ -1,0 +1,123 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2017-04-01
+2025-11-30
+Current commit:
+5489b0ee1fee095bf83a9f4bbc5b9240e3c0afd0
+
+Commit details:
+* 5489b0e (HEAD -> setup-tunder-FB) Avoid intermediate storage (it did not improve performance for 1000 pixels)
+* 920ba13 Close client cleanly, by using with Client(...) as client:
+* 8d4a893 Drop NDSI earlier, delay the date=-1 rechunking just before apply_ufunc() and remove dask_gufunc_kwargs allow_rechunk
+* b6101ab (origin/setup-tunder-FB) Stash of untracked changes
+| *-.   127fce5 (refs/stash) On setup-tunder-FB: Stash of untracked changes
+| |\ \  
+| | | * 4cbe2d3 untracked files on setup-tunder-FB: 18c169d cleaning up
+| | * dad8f36 index on setup-tunder-FB: 18c169d cleaning up
+| |/  
+| * 18c169d cleaning up
+|/  
+* 7a9b2db Update historical processing
+* 47a0a36 Streamline historical_ndvi() in 2_historical_ndvi_test.py
+
+Working tree status:
+On branch setup-tunder-FB
+Your branch is ahead of 'origin/setup-tunder-FB' by 3 commits.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   2_historical_ndvi_test.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+============================================================
+Historic processing started at: 2026-04-06 21:47:12
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_2026-04-06_21h47m12.log
+============================================================
+
+Running: with arguments: 2017-04-01 2025-11-30
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Start time: 2026-04-06 21:47:12
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py
+Start time: 2026-04-06 21:47:12
+http://127.0.0.1:1239/status
+Initialized n=3195 daily dates:
+          daily   obs_date          obs_times
+0    2017-04-03 2017-04-03           10:40:21
+1    2017-04-04        NaT                   
+2    2017-04-05        NaT                   
+3    2017-04-06        NaT                   
+4    2017-04-07        NaT                   
+...         ...        ...                ...
+3190 2025-12-27 2025-12-27           10:44:51
+3191 2025-12-28 2025-12-28           10:14:41
+3192 2025-12-29 2025-12-29  10:33:39,10:45:01
+3193 2025-12-30 2025-12-30           10:14:51
+3194 2025-12-31 2025-12-31           10:24:41
+
+[3195 rows x 3 columns]
+In total: 3195 days, 1160 obs_dates, 1190 obs_times. 
+First dates in newly downloaded:
+  2017-04-03
+  2017-04-04
+  2017-04-05
+  2017-04-06
+  2017-04-07
+  2017-04-08
+  2017-04-09
+  2017-04-10
+  2017-04-11
+  2017-04-12
+Last dates in newly downloaded:
+  2025-12-22
+  2025-12-23
+  2025-12-24
+  2025-12-25
+  2025-12-26
+  2025-12-27
+  2025-12-28
+  2025-12-29
+  2025-12-30
+  2025-12-31
+Newly downloaded dataset:
+<xarray.Dataset> Size: 683kB
+Dimensions:   (date: 3195, pixel: 100)
+Coordinates:
+  * pixel     (pixel) int32 400B 0 1 2 3 4 5 6 7 8 ... 92 93 94 95 96 97 98 99
+  * date      (date) datetime64[ns] 26kB 2017-04-03 2017-04-04 ... 2025-12-31
+    x_idx     (pixel) int32 400B dask.array<chunksize=(100,), meta=np.ndarray>
+    y_idx     (pixel) int32 400B dask.array<chunksize=(100,), meta=np.ndarray>
+    x         (pixel) int32 400B dask.array<chunksize=(100,), meta=np.ndarray>
+    y         (pixel) int32 400B dask.array<chunksize=(100,), meta=np.ndarray>
+    doy       (date) int32 13kB 93 94 95 96 97 98 99 ... 360 361 362 363 364 365
+Data variables:
+    ndvi      (date, pixel) int16 639kB dask.array<chunksize=(1, 100), meta=np.ndarray>
+    obs_date  (date) bool 3kB True False False False ... True True True True
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Constructed graph with 6 layers, and 6 tasks.
+writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py
+Duration: 00:01:20 (hh:mm:ss)
+Processing script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr

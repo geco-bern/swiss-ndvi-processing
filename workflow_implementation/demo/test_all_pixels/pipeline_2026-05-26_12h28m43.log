@@ -1,0 +1,336 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2026-01-06
+2026-01-06
+============================================================
+Pipeline started at: 2026-05-26 12:28:44
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_2026-05-26_12h28m43.log
+============================================================
+
+Running: with arguments: 2026-01-06 2026-01-06
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-05-26 12:28:44
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Start time: 2026-05-26 12:28:44
+<Client: 'tcp://127.0.0.1:40417' processes=50 threads=50, memory=1.09 TiB>
+http://127.0.0.1:8343/status
+Subsetting downloaded data to spatial extent of historic file:
+/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr
+Subsetting 8 (historic) of 105715396 (downloaded) pixels.
+Initialized n=1 daily dates:
+       daily   obs_date obs_times
+0 2026-01-06 2026-01-06  10:44:41
+All done
+4_merge_zarr.py created file: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Duration: 00:00:11 (hh:mm:ss)
+Merging script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Start time: 2026-05-26 12:28:55
+<Client: 'tcp://127.0.0.1:34015' processes=30 threads=30, memory=838.19 GiB>
+http://127.0.0.1:8341/status
+Last dates in historic_ds:
+  2025-12-28
+  2025-12-29
+  2025-12-30
+  2025-12-31
+  2026-01-01
+  2026-01-02
+  2026-01-03
+  2026-01-04
+  2026-01-05
+  2026-01-06
+First dates in newly downloaded:
+  2026-01-06
+Current historic dataset:
+<xarray.Dataset> Size: 115kB
+Dimensions:         (pixel: 8, date: 3201)
+Coordinates:
+    x_idx           (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    x               (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+  * date            (date) datetime64[ns] 26kB 2017-04-03 ... 2026-01-06
+    y_idx           (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    doy             (date) int32 13kB dask.array<chunksize=(3201,), meta=np.ndarray>
+    y               (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+  * pixel           (pixel) int32 32B 2694495 2692025 ... 2690025 2689565
+Data variables:
+    ndvi_processed  (pixel, date) int16 51kB dask.array<chunksize=(8, 3201), meta=np.ndarray>
+    mask_array      (pixel, date) int8 26kB dask.array<chunksize=(8, 3201), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Newly downloaded dataset:
+<xarray.Dataset> Size: 205B
+Dimensions:   (date: 1, pixel: 8)
+Coordinates:
+    x_idx     (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    y_idx     (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+    x         (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+  * date      (date) datetime64[ns] 8B 2026-01-06
+    doy       (date) int32 4B dask.array<chunksize=(1,), meta=np.ndarray>
+    y         (pixel) int32 32B dask.array<chunksize=(8,), meta=np.ndarray>
+  * pixel     (pixel) int32 32B 2694495 2692025 2761095 ... 2690025 2689565
+Data variables:
+    obs_date  (date) bool 1B dask.array<chunksize=(1,), meta=np.ndarray>
+    ndsi_obs  (date, pixel) int16 16B dask.array<chunksize=(1, 8), meta=np.ndarray>
+    ndvi_obs  (date, pixel) int16 16B dask.array<chunksize=(1, 8), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Created visual overview of update at: /mnt/data2/UniBe-swiss-ndvi/data/ndvi_historic_extended.zarr_update.png
+Constructed graph with 11 layers, and 11 tasks.
+2026-05-26 12:29:10,655 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-doy-80a82aa707104efbaad48d025589362b', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,656 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-doy-80a82aa707104efbaad48d025589362b', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,665 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-x_idx-be5249ea0ef18fe90f295e0265a235b7', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,666 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-y_idx-30b53401806d20a2f674aacfde6bb345', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,666 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-x-3a83defe9b26b7d295ff9578dc80b1d2', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,666 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-doy-80a82aa707104efbaad48d025589362b', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,666 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-y-0a4459d0060d822da774bfff69c3eff7', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,667 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-y-0a4459d0060d822da774bfff69c3eff7', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,667 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-doy-80a82aa707104efbaad48d025589362b', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,667 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-x-3a83defe9b26b7d295ff9578dc80b1d2', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,667 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-y_idx-30b53401806d20a2f674aacfde6bb345', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,667 - distributed.scheduler - CRITICAL - Closed comm <BatchedSend: closed> while trying to write {'op': 'key-in-memory', 'key': ('xarray-x_idx-be5249ea0ef18fe90f295e0265a235b7', 0)}
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/scheduler.py", line 5942, in report
+    c.send(msg)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/batched.py", line 156, in send
+    raise CommClosedError(f"Comm {self.comm!r} already closed.")
+distributed.comm.core.CommClosedError: Comm <TCP (closed) Scheduler->Client local=tcp://127.0.0.1:34015 remote=tcp://127.0.0.1:52390> already closed.
+2026-05-26 12:29:10,679 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,679 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,680 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,680 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,681 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,681 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,681 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,682 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,682 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,682 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('open_dataset-ndvi_processed-af6c9db93153df6db171645c7bae546f', 0, 8))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,682 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,682 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,683 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,683 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,684 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,685 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,684 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,685 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,685 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,687 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,688 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,687 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,688 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,688 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,689 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,689 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,690 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,690 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name='gather_dep(tcp://127.0.0.1:45779, {...})' coro=<Worker.gather_dep() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+2026-05-26 12:29:10,693 - distributed.worker - ERROR - failed during get data with tcp://127.0.0.1:45779 -> tcp://127.0.0.1:33673
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1795, in get_data
+    response = await comm.read(deserializers=serializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed)  local=tcp://127.0.0.1:45779 remote=tcp://127.0.0.1:41804>: Stream is closed
+2026-05-26 12:29:10,701 - distributed.worker - ERROR - failed during get data with tcp://127.0.0.1:45779 -> tcp://127.0.0.1:38603
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1795, in get_data
+    response = await comm.read(deserializers=serializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed)  local=tcp://127.0.0.1:45779 remote=tcp://127.0.0.1:41858>: Stream is closed
+2026-05-26 12:29:10,704 - distributed.worker - ERROR - failed during get data with tcp://127.0.0.1:45779 -> tcp://127.0.0.1:44287
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1795, in get_data
+    response = await comm.read(deserializers=serializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed)  local=tcp://127.0.0.1:45779 remote=tcp://127.0.0.1:41870>: Stream is closed
+2026-05-26 12:29:10,705 - distributed.worker - ERROR - failed during get data with tcp://127.0.0.1:45779 -> tcp://127.0.0.1:41219
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1795, in get_data
+    response = await comm.read(deserializers=serializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed)  local=tcp://127.0.0.1:45779 remote=tcp://127.0.0.1:41878>: Stream is closed
+2026-05-26 12:29:10,706 - distributed.worker - ERROR - failed during get data with tcp://127.0.0.1:45779 -> tcp://127.0.0.1:42799
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1795, in get_data
+    response = await comm.read(deserializers=serializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed)  local=tcp://127.0.0.1:45779 remote=tcp://127.0.0.1:41890>: Stream is closed
+2026-05-26 12:29:10,708 - distributed.worker - ERROR - failed during get data with tcp://127.0.0.1:45779 -> tcp://127.0.0.1:46119
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 226, in read
+    frames_nosplit_nbytes_bin = await stream.read_bytes(fmt_size)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tornado.iostream.StreamClosedError: Stream is closed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker.py", line 1795, in get_data
+    response = await comm.read(deserializers=serializers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 237, in read
+    convert_stream_closed_error(self, e)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/comm/tcp.py", line 137, in convert_stream_closed_error
+    raise CommClosedError(f"in {obj}: {exc}") from exc
+distributed.comm.core.CommClosedError: in <TCP (closed)  local=tcp://127.0.0.1:45779 remote=tcp://127.0.0.1:41906>: Stream is closed
+2026-05-26 12:29:10,717 - distributed.worker.state_machine - WARNING - Async instruction for <Task cancelled name="execute(('open_dataset-median_ndvi-da48da2737be43f29b42ef4b6ae3a90d', 693, 0))" coro=<Worker.execute() done, defined at /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/worker_state_machine.py:3607>> ended with CancelledError
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py", line 586, in <module>
+    dask.visualize(ndvi_processed, filename="ndvi_graph.svg", format="svg", rankdir="LR")
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/base.py", line 778, in visualize
+    return visualize_dsk(
+           ^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/base.py", line 921, in visualize_dsk
+    raise RuntimeError(
+RuntimeError: No visualization engine detected, please install graphviz or ipycytoscape
+[ERROR] Script failed: N/A | Time: Tue May 26 12:29:12 UTC 2026

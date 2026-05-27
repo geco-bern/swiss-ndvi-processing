@@ -1,0 +1,122 @@
+============================================================
+Pipeline started at: 2026-03-19 13:45:31
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FB_2026-03-19_13h45m31.log
+============================================================
+
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-11-30
+Running: with arguments: 2025-11-30 2025-12-12
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-03-19 13:45:33
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Start time: 2026-03-19 13:45:33
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Duration: 00:00:00 (hh:mm:ss)
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Start time: 2026-03-19 13:45:33
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py:210: UserWarning: The specified chunks separate the stored chunks along dimension "pixel" starting at index 10000. This could degrade performance. Instead, consider rechunking after loading.
+  historic_ds  = xr.open_zarr(HISTO_ZARR_IN_OUTPUT, chunks={"pixel": PIXEL_CHUNKS, "date": DATE_CHUNKS})
+http://127.0.0.1:8343/status
+Last dates in historic_ds:
+  2025-11-21
+  2025-11-22
+  2025-11-23
+  2025-11-24
+  2025-11-25
+  2025-11-26
+  2025-11-27
+  2025-11-28
+  2025-11-29
+  2025-11-30
+First dates in newly downloaded:
+  2025-11-30
+  2025-12-01
+  2025-12-02
+  2025-12-03
+  2025-12-04
+  2025-12-05
+  2025-12-06
+  2025-12-07
+  2025-12-08
+  2025-12-09
+Current historic dataset:
+<xarray.Dataset> Size: 6GB
+Dimensions:         (date: 3164, pixel: 586503)
+Coordinates:
+  * date            (date) datetime64[ns] 25kB 2017-04-03 ... 2025-11-30
+  * pixel           (pixel) int32 2MB 100480370 100480371 ... 103515166
+    x_idx           (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    y               (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    doy             (date) int32 13kB dask.array<chunksize=(3164,), meta=np.ndarray>
+    y_idx           (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    x               (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+Data variables:
+    ndvi_processed  (pixel, date) int16 4GB dask.array<chunksize=(10000, 3164), meta=np.ndarray>
+    mask_array      (pixel, date) bool 2GB dask.array<chunksize=(10000, 3164), meta=np.ndarray>
+Attributes:
+    note:     \n    # Define grid underlying PixelID and needed transformatio...
+Newly downloaded dataset:
+<xarray.Dataset> Size: 42MB
+Dimensions:   (date: 13, pixel: 586503)
+Coordinates:
+  * pixel     (pixel) int32 2MB 100480370 100480371 ... 103515165 103515166
+  * date      (date) datetime64[ns] 104B 2025-11-30 2025-12-01 ... 2025-12-12
+    x_idx     (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    doy       (date) int32 52B dask.array<chunksize=(13,), meta=np.ndarray>
+    y_idx     (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    x         (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+    y         (pixel) int32 2MB dask.array<chunksize=(10000,), meta=np.ndarray>
+Data variables:
+    ndvi_obs  (date, pixel) int16 15MB dask.array<chunksize=(13, 10000), meta=np.ndarray>
+    obs_date  (date) bool 13B dask.array<chunksize=(13,), meta=np.ndarray>
+    ndsi_obs  (date, pixel) int16 15MB dask.array<chunksize=(13, 10000), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 23.04 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+Constructed graph with 12 layers, and 592 tasks.
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 10.69 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+Total runtime: 85.65 seconds
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Duration: 00:01:30 (hh:mm:ss)
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/6_create_cogtiff.py
+Start time: 2026-03-19 13:47:03
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/6_create_cogtiff.py
+Duration: 00:00:00 (hh:mm:ss)
+============================================================
+Pipeline completed successfully
+End time: 2026-03-19 13:47:03
+Total runtime: 00:01:32 (hh:mm:ss)
+============================================================

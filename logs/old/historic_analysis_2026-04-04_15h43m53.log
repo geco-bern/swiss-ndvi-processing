@@ -1,0 +1,111 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-04-01
+2025-04-30
+Current commit:
+4e1a9f40a09b1590ec7f4a2ce9cbf7092a1107ab
+
+Commit details:
+* 4e1a9f4 (HEAD -> setup-tunder-FB) On TUNDER: Move to new data2 disk
+* 12680c5 (origin/setup-tunder-FB) Ensure historic satellite download is ordered in time
+* e6e0603 Use continuous download script for historic
+* d669eb1 Add bash script for historic analysis
+* 9adcd33 Pull in Francescos latest changes from 03.04
+| *   6dc59d6 (refs/stash) On setup-tunder: WIP: bd7ab66 Move to new data2 disk
+| |\  
+| | * 96c04c0 index on setup-tunder: 4a492a9 On TUNDER: Move to new data2 disk
+| |/  
+| * 4a492a9 (setup-tunder) On TUNDER: Move to new data2 disk
+|/  
+* 89d0207 (origin/setup-tunder) add script for historical processing
+* 84489dc test new historical processing
+
+Working tree status:
+On branch setup-tunder-FB
+Your branch is ahead of 'origin/setup-tunder-FB' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   ../../../.gitignore
+	modified:   ../../../report/histrocal_processing.md
+	modified:   ../../../report/report_tunder_implementation.ipynb
+	deleted:    ../../../report/workflow_report.md
+	modified:   ../6_append_coords_to_historic_ndvi.py
+	modified:   ../7_create_historic_tiff.py
+	modified:   0_1_run_historic_analysis.sh
+	modified:   1_download_satellite_images.py
+	modified:   ../../demo/test_all_pixels/0_1_run_pipeline.sh
+	modified:   ../../demo/test_all_pixels/1_extract_swisstopo_dataset.py
+	modified:   ../../demo/test_all_pixels/5_analyse_demo_efficient.py
+	modified:   ../../demo/test_all_pixels/6_create_cogtiff.py
+	modified:   ../../demo/test_all_pixels/7_create_png_for_demo.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	../../../data_for_demo_2/
+	../../../report/fig/prova2/
+	../test.ipynb
+	../../demo/test_all_pixels/0_1_run_pipeline copy.sh
+	../../demo/test_all_pixels/1_extract_swisstopo_dataset_DEBUG.py
+	../../demo/test_all_pixels/5a_debug_historical_ndvi.py.py
+	../../demo/test_all_pixels/6_create_cogtiff copy.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+============================================================
+Historic processing started at: 2026-04-04 15:43:53
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_2026-04-04_15h43m53.log
+============================================================
+
+Running: with arguments: 2025-04-01 2025-04-30
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Start time: 2026-04-04 15:43:53
+Starting download for:
+2025-04-01_10h40
+2025-04-02_10h10
+2025-04-03_10h25
+2025-04-04_10h10
+2025-04-05_10h20
+2025-04-06_10h36
+2025-04-07_10h05
+2025-04-07_10h17
+2025-04-08_10h30
+2025-04-12_10h10
+2025-04-22_10h10
+2025-04-23_10h25
+2025-04-26_10h36
+2025-04-28_10h30
+2025-04-30_10h15
+2025-04-30_10h27
+bbox_swisstopo_2056, width_swisstopo, height_swisstopo
+BoundingBox(left=2474090.0, bottom=1065110.0, right=2851370.0, top=1310530.0)
+37728
+24542
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py", line 230, in <module>
+    forest_mask_zarr = zarr.open("/home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr", mode="r")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/_compat.py", line 43, in inner_f
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/synchronous.py", line 193, in open
+    obj = sync(
+          ^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/sync.py", line 163, in sync
+    raise return_result
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/sync.py", line 119, in _runner
+    return await coro
+           ^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py", line 330, in open
+    return await open_group(store=store_path, zarr_format=zarr_format, mode=mode, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py", line 827, in open_group
+    raise FileNotFoundError(f"Unable to find group: {store_path}")
+FileNotFoundError: Unable to find group: file:///home/fabian/GitHub/geco-bern/swiss-ndvi-processing/workflow_implementation/data/forest_mask_bits.zarr
+[ERROR] Script failed: N/A | Time: Sat Apr  4 15:44:00 UTC 2026

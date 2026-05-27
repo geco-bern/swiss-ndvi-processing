@@ -1,0 +1,853 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2017-04-01
+2025-11-30
+Current commit:
+4c96b07a85412c340f96c4d187df96ec1523e548
+
+Commit details:
+* 4c96b07 (HEAD -> setup-tunder-FB) Bring 2_historical_ndvi_test.py close to 5_analyse_demo_efficient.py II
+* 3c35752 (origin/setup-tunder-FB) Bring 2_historical_ndvi_test.py close to 5_analyse_demo_efficient.py
+* 87b369b Activate parallel downloading for historic dataset (download time 14h) and remove NaT
+| * e1e5d4d (refs/stash) WIP on setup-tunder-FB: f211285 Fix download order
+|/| 
+| * 0a2e4e1 index on setup-tunder-FB: f211285 Fix download order
+|/  
+* f211285 Fix download order
+* 5774759 Historic: add full period 2017-04-01 to 2025-11-30
+* 3a54536 Adapt paths on historic analysis for TUNDER
+* 4e1a9f4 On TUNDER: Move to new data2 disk
+* 12680c5 Ensure historic satellite download is ordered in time
+
+Working tree status:
+On branch setup-tunder-FB
+Your branch is ahead of 'origin/setup-tunder-FB' by 1 commit.
+  (use "git push" to publish your local commits)
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   0_1_run_historic_analysis.sh
+	modified:   2_historical_ndvi_test.py
+	modified:   ../../demo/test_all_pixels/4_merge_zarr.py
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	../../../data_for_demo_2/
+	../../../report/fig/prova2/
+	3_check_historical_ndvi.py
+	../test.ipynb
+	../../demo/test_all_pixels/0_1_run_pipeline copy.sh
+	../../demo/test_all_pixels/1_extract_swisstopo_dataset_DEBUG.py
+	../../demo/test_all_pixels/5a_debug_historical_ndvi.py.py
+	../../demo/test_all_pixels/6_create_cogtiff copy.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+============================================================
+Historic processing started at: 2026-04-05 23:16:56
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/logs/historic_analysis_2026-04-05_23h16m56.log
+============================================================
+
+Running: with arguments: 2017-04-01 2025-11-30
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Start time: 2026-04-05 23:16:56
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/1_download_satellite_images.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/historic_data/tmp_2026-04-04_18h16_ndvi_01_downloaded_2017-01-01_2025-12-31.zarr
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_script_for_historical_NDVI/new_historical_processing/2_historical_ndvi_test.py
+Start time: 2026-04-05 23:16:56
+http://127.0.0.1:1234/status
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/array/core.py:4997: PerformanceWarning: Increasing number of chunks by factor of 25
+  result = blockwise(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/dask/array/core.py:4997: PerformanceWarning: Increasing number of chunks by factor of 25
+  result = blockwise(
+Initialized n=3195 daily dates:
+          daily   obs_date          obs_times
+0    2017-04-03 2017-04-03           10:40:21
+1    2017-04-04        NaT                   
+2    2017-04-05        NaT                   
+3    2017-04-06        NaT                   
+4    2017-04-07        NaT                   
+...         ...        ...                ...
+3190 2025-12-27 2025-12-27           10:44:51
+3191 2025-12-28 2025-12-28           10:14:41
+3192 2025-12-29 2025-12-29  10:33:39,10:45:01
+3193 2025-12-30 2025-12-30           10:14:51
+3194 2025-12-31 2025-12-31           10:24:41
+
+[3195 rows x 3 columns]
+In total: 3195 days, 1160 obs_dates, 1190 obs_times. 
+First dates in newly downloaded:
+  2017-04-03
+  2017-04-04
+  2017-04-05
+  2017-04-06
+  2017-04-07
+  2017-04-08
+  2017-04-09
+  2017-04-10
+  2017-04-11
+  2017-04-12
+Last dates in newly downloaded:
+  2025-12-22
+  2025-12-23
+  2025-12-24
+  2025-12-25
+  2025-12-26
+  2025-12-27
+  2025-12-28
+  2025-12-29
+  2025-12-30
+  2025-12-31
+Newly downloaded dataset:
+<xarray.Dataset> Size: 13GB
+Dimensions:   (date: 3195, pixel: 1000000)
+Coordinates:
+  * pixel     (pixel) int32 4MB 0 1 2 3 4 ... 999995 999996 999997 999998 999999
+  * date      (date) datetime64[ns] 26kB 2017-04-03 2017-04-04 ... 2025-12-31
+    x_idx     (pixel) int32 4MB dask.array<chunksize=(40000,), meta=np.ndarray>
+    y_idx     (pixel) int32 4MB dask.array<chunksize=(40000,), meta=np.ndarray>
+    x         (pixel) int32 4MB dask.array<chunksize=(40000,), meta=np.ndarray>
+    y         (pixel) int32 4MB dask.array<chunksize=(40000,), meta=np.ndarray>
+    doy       (date) int32 13kB dask.array<chunksize=(3195,), meta=np.ndarray>
+Data variables:
+    ndsi      (date, pixel) int16 6GB dask.array<chunksize=(3195, 40000), meta=np.ndarray>
+    ndvi      (date, pixel) int16 6GB dask.array<chunksize=(3195, 40000), meta=np.ndarray>
+    obs_date  (date) bool 3kB dask.array<chunksize=(3195,), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 22.55 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+Constructed graph with 18 layers, and 16896 tasks.
+writing to new file: /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/api/asynchronous.py:203: UserWarning: Consolidated metadata is currently not part in the Zarr format 3 specification. It may not be supported by other zarr implementations and may change in the future.
+  warnings.warn(
+2026-04-05 23:57:41,033 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:41,177 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': 2075.5057077407837}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': 14111.857817649841}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:41,324 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': -0.1999999999999993}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': 11.7}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:41,474 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1092'}, 'attr': 'end', 'new': 43.05}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:41,617 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:41,748 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:41,932 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': 1914.4352045059204}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': 7276.530371665955}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:42,152 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': -0.1999999999999993}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': 11.7}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:42,308 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1092'}, 'attr': 'end', 'new': 51.45}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:42,461 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:42,615 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:42,731 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': 1896.6380290985107}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': 6786.464754104614}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:42,883 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': -0.1999999999999993}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': 11.7}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:43,047 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1092'}, 'attr': 'end', 'new': 49.35}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:43,159 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:43,260 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:43,412 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': 1889.5368156433105}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': 7989.955615997314}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:43,582 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': -0.1999999999999993}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': 11.7}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:43,706 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1092'}, 'attr': 'end', 'new': 55.650000000000006}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:43,879 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:44,065 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:44,209 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': 2020.7034215927124}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': 7929.918404579163}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:44,357 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': -0.1999999999999993}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': 11.7}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:44,492 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1092'}, 'attr': 'end', 'new': 59.85}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:44,639 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:44,758 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:44,898 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': 1325.1186628341675}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': 7306.2578020095825}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:45,043 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': -0.1999999999999993}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': 11.7}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:45,181 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1092'}, 'attr': 'end', 'new': 56.7}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:45,314 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:45,488 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:45,629 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': 1677.05419921875}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': 18352.2216796875}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:45,818 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': -0.1999999999999993}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': 11.7}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:46,011 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:46,149 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:46,265 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': 1322.472903251648}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': 6903.000485420227}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:46,461 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': -0.1999999999999993}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': 11.7}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:46,625 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1092'}, 'attr': 'end', 'new': 48.3}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:46,729 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:46,908 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:47,055 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': 1641.1718854904175}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': 6726.0466203689575}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:47,165 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': -0.1999999999999993}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': 11.2}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:47,276 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1092'}, 'attr': 'end', 'new': 56.7}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:47,435 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1359'}, 'attr': 'end', 'new': 2.9000000000000004}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:55,435 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:55,598 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': {'type': 'number', 'value': 'nan'}}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': {'type': 'number', 'value': 'nan'}}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:55,715 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'start', 'new': 1979.5706405639648}, {'kind': 'ModelChanged', 'model': {'id': 'p1293'}, 'attr': 'end', 'new': 7231.106605529785}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:55,871 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'start', 'new': -0.1999999999999993}, {'kind': 'ModelChanged', 'model': {'id': 'p1294'}, 'attr': 'end', 'new': 11.7}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:56,048 - bokeh.server.protocol_handler - ERROR - error handling message
+ message: Message 'PATCH-DOC' content: {'events': [{'kind': 'ModelChanged', 'model': {'id': 'p1092'}, 'attr': 'end', 'new': 52.5}]} 
+ error: AssertionError()
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/protocol_handler.py", line 94, in handle
+    work = await handler(message, connection)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/session.py", line 295, in patch
+    return connection.session._handle_patch(message, connection)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+2026-04-05 23:57:56,087 - tornado.application - ERROR - Uncaught exception GET /status/ws (127.0.0.1)
+HTTPServerRequest(protocol='http', host='localhost:1234', method='GET', uri='/status/ws', version='HTTP/1.1', remote_ip='127.0.0.1')
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/web.py", line 1848, in _execute
+    result = await result
+             ^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/websocket.py", line 277, in get
+    await self.ws_connection.accept_connection(self)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/websocket.py", line 890, in accept_connection
+    await self._accept_connection(handler)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/websocket.py", line 973, in _accept_connection
+    await self._receive_frame_loop()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/websocket.py", line 1130, in _receive_frame_loop
+    self.handler.on_ws_connection_close(self.close_code, self.close_reason)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/websocket.py", line 599, in on_ws_connection_close
+    self.on_connection_close()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/tornado/websocket.py", line 591, in on_connection_close
+    self.on_close()
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/views/ws.py", line 308, in on_close
+    self.connection.session.notify_connection_lost()
+    ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/bokeh/server/connection.py", line 65, in session
+    assert self._session is not None
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

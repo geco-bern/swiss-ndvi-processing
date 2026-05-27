@@ -1,0 +1,137 @@
+============================================================
+Pipeline started at: 2026-03-19 11:12:50
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_FB_2026-03-19_11h12m49.log
+============================================================
+
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-11-30
+Running: with arguments: 2025-11-30 2025-12-12
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-03-19 11:12:51
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data1/UniBe-swiss-ndvi/data/tmp_2026-03-18_17h39_ndvi_01_downloaded_2025-11-30_2025-12-12.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Start time: 2026-03-19 11:12:51
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
+Duration: 00:00:00 (hh:mm:ss)
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
+Start time: 2026-03-19 11:12:51
+http://127.0.0.1:8343/status
+Last dates in historic_ds:
+  2025-11-21
+  2025-11-22
+  2025-11-23
+  2025-11-24
+  2025-11-25
+  2025-11-26
+  2025-11-27
+  2025-11-28
+  2025-11-29
+  2025-11-30
+First dates in newly downloaded:
+  2025-11-30
+  2025-12-01
+  2025-12-02
+  2025-12-03
+  2025-12-04
+  2025-12-05
+  2025-12-06
+  2025-12-07
+  2025-12-08
+  2025-12-09
+Current historic dataset:
+<xarray.Dataset> Size: 40MB
+Dimensions:         (pixel: 4216, date: 3164)
+Coordinates:
+  * pixel           (pixel) int32 17kB 44311103 44311104 ... 45049987 45049988
+    y               (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+  * date            (date) datetime64[ns] 25kB 2017-04-03 ... 2025-11-30
+    x_idx           (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    doy             (date) int32 13kB dask.array<chunksize=(3164,), meta=np.ndarray>
+    x               (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    y_idx           (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+Data variables:
+    ndvi_processed  (pixel, date) int16 27MB dask.array<chunksize=(4216, 3164), meta=np.ndarray>
+    mask_array      (pixel, date) bool 13MB dask.array<chunksize=(4216, 3164), meta=np.ndarray>
+Attributes:
+    note:     \n    # Define grid underlying PixelID and needed transformatio...
+Newly downloaded dataset:
+<xarray.Dataset> Size: 304kB
+Dimensions:   (date: 13, pixel: 4216)
+Coordinates:
+  * date      (date) datetime64[ns] 104B 2025-11-30 2025-12-01 ... 2025-12-12
+    x_idx     (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    doy       (date) int32 52B dask.array<chunksize=(13,), meta=np.ndarray>
+  * pixel     (pixel) int32 17kB 44311103 44311104 ... 45049987 45049988
+    x         (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    y         (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    y_idx     (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+Data variables:
+    ndvi_obs  (date, pixel) int16 110kB dask.array<chunksize=(13, 4216), meta=np.ndarray>
+    ndsi_obs  (date, pixel) int16 110kB dask.array<chunksize=(13, 4216), meta=np.ndarray>
+    obs_date  (date) bool 13B dask.array<chunksize=(13,), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/distributed/client.py:3370: UserWarning: Sending large graph of size 11.31 MiB.
+This may cause some slowdown.
+Consider loading the data with Dask directly
+ or using futures or delayed objects to embed the data into the graph without repetition.
+See also https://docs.dask.org/en/stable/best-practices.html#load-data-with-dask for more information.
+  warnings.warn(
+Constructed graph with 12 layers, and 12 tasks.
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py:343: FutureWarning: zarr_version is deprecated, use zarr_format
+  extended_historic_ds.to_zarr(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/group.py:2469: UserWarning: The `compressor` argument is deprecated. Use `compressors` instead.
+  compressors = _parse_deprecated_compressor(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/group.py:2469: UserWarning: The `compressor` argument is deprecated. Use `compressors` instead.
+  compressors = _parse_deprecated_compressor(
+/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/zarr/core/group.py:2469: UserWarning: The `compressor` argument is deprecated. Use `compressors` instead.
+  compressors = _parse_deprecated_compressor(
+Traceback (most recent call last):
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py", line 343, in <module>
+    extended_historic_ds.to_zarr(
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/core/dataset.py", line 2270, in to_zarr
+    return to_zarr(  # type: ignore[call-overload,misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/api.py", line 2239, in to_zarr
+    dump_to_store(dataset, zstore, writer, encoding=encoding)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/api.py", line 1975, in dump_to_store
+    store.store(variables, attrs, check_encoding, writer, unlimited_dims=unlimited_dims)
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 1052, in store
+    self.set_variables(
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 1216, in set_variables
+    encoding = extract_zarr_variable_encoding(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 491, in extract_zarr_variable_encoding
+    chunks = _determine_zarr_chunks(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/lib/python3.12/site-packages/xarray/backends/zarr.py", line 333, in _determine_zarr_chunks
+    raise ValueError(base_error)
+ValueError: Specified zarr chunks encoding['chunks']=(30,) for variable named 'doy' would overlap multiple dask chunks ((365, 365, 365, 365, 365, 365, 365, 365, 257),) on the region (slice(None, None, None),). Writing this array in parallel with dask could lead to corrupted data. Consider either rechunking using `chunk()`, deleting or modifying `encoding['chunks']`, or specify `safe_chunks=False`.
+2026-03-19 11:13:23,432 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:35877' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('xarray-x_idx-d6034fa4ba18218ade529e5642f4cdf6', 0), ('rechunk-merge-444b8a963c6136a760afd169f783419d', 0)} (stimulus_id='handle-worker-cleanup-1773918803.4327533')
+2026-03-19 11:13:23,447 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:42849' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('xarray-x-4362698a84ef63336b6184c7993f2b5e', 0)} (stimulus_id='handle-worker-cleanup-1773918803.4470649')
+2026-03-19 11:13:23,448 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:41675' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('rechunk-merge-2ba902976b6696ac870fb39d6269e388', 0)} (stimulus_id='handle-worker-cleanup-1773918803.4481142')
+2026-03-19 11:13:23,449 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:45237' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('rechunk-merge-787e93d16413cbf0b275919da413e884', 0, 0)} (stimulus_id='handle-worker-cleanup-1773918803.4492934')
+2026-03-19 11:13:23,449 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:34135' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('rechunk-merge-1e01fc4327368f270d6ad916073b9d66', 0, 0)} (stimulus_id='handle-worker-cleanup-1773918803.4496953')
+2026-03-19 11:13:23,450 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:39057' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('rechunk-merge-f91e774b65faaeac4968a66aba9deb38', 0, 0)} (stimulus_id='handle-worker-cleanup-1773918803.4501164')
+2026-03-19 11:13:23,472 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:46151' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('xarray-y-7ff09c543cac2db9f5e2d4e89d5d0ee1', 0)} (stimulus_id='handle-worker-cleanup-1773918803.4725425')
+2026-03-19 11:13:23,473 - distributed.scheduler - WARNING - Removing worker 'tcp://127.0.0.1:43439' caused the cluster to lose already computed task(s), which will be recomputed elsewhere: {('xarray-y_idx-71b89567b26b64215ed053dee7a09b52', 0)} (stimulus_id='handle-worker-cleanup-1773918803.4736593')
+[ERROR] Script failed: N/A | Time: Thu Mar 19 11:13:27 AM UTC 2026
