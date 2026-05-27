@@ -22,7 +22,7 @@ warnings.filterwarnings(
 if __name__ == "__main__":
 
     # Paths
-    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final"
+    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/MS1_output_data/GeoTIFFs_historic_v7c"
 
     os.makedirs(OUTPUT_TIFF_BASE, exist_ok=True)
 

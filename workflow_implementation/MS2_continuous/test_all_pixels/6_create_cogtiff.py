@@ -95,7 +95,7 @@ dates_tiff_array = np.arange(
 # Load (processed) NDVI data set to output specific dates
 INPUT_BASE = "/mnt/data1/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7.zarr/"
 NDVI_processed = xr.open_zarr(INPUT_BASE)
-OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final/"
+OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/MS1_output_data/GeoTIFFs_historic_v7c/"
 
 
 

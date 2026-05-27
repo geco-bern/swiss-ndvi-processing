@@ -26,7 +26,7 @@ from NDVI_utils.NDVI_plot_utils import NDVI_xarray_to_grid
 if __name__ == '__main__':
 
     # Paths
-    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final"
+    OUTPUT_TIFF_BASE = "/mnt/data1/UniBe-swiss-ndvi/data/MS1_output_data/GeoTIFFs_historic_v7c"
     # DASK_TEMP_DIR    = "/mnt/data1/UniBe-swiss-ndvi/tmp_data2/"
 
     os.makedirs(OUTPUT_TIFF_BASE, exist_ok=True)
@@ -169,6 +169,6 @@ if __name__ == '__main__':
     # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_1000mX1000m/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
     # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v4_1000mX1000m/20240731-nonCOG_historic.tiff ~/Downloads/test/tiffs_historic/
 
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final/20240731_historic_mask.tiff ~/Downloads/test/tiffs_historic/
-    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/tiffs_historic_v7final/ ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/MS1_output_data/GeoTIFFs_historic_v7c/20240731_historic.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/MS1_output_data/GeoTIFFs_historic_v7c/20240731_historic_mask.tiff ~/Downloads/test/tiffs_historic/
+    # rsync -avhz --progress -e 'ssh -p 22' fabian-bernhard@tunder.dev.admin.ch:/mnt/data1/UniBe-swiss-ndvi/data/MS1_output_data/GeoTIFFs_historic_v7c/ ~/Downloads/test/tiffs_historic/
