@@ -57,12 +57,12 @@ HISTO_OUTPUT="/mnt/data2/UniBe-swiss-ndvi/output_data/tmp_out_ndvi_historic_exte
 
 # (OPTIONAL): activate below if you want test overwriting and start with a fresh HISTO_INPUT. (OR RUN ONCE, IF YOUR HISTO_INPUT IS NOT YET EXISTING.)
 # # Workaround creating the working copy from the backup:
-# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr_bkp"          # NOTE: Ensure we have the original untouched
-# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-1kmX1km.zarr_bkp"              # NOTE: Ensure we have the original untouched
-# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-pixels10401-to-10500.zarr_bkp" # NOTE: Ensure we have the original untouched
-# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites_1kmX1km.zarr_bkp"  # NOTE: Ensure we have the original untouched
-# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-10kmX10km.zarr_bkp"            # NOTE: Ensure we have the original untouched
-# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-100kmX100km.zarr_bkp"          # NOTE: Ensure we have the original untouched
+# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr_bkp/"          # NOTE: requires trailing `/` NOTE: Ensure we have the original untouched
+# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-1kmX1km.zarr_bkp/"              # NOTE: requires trailing `/` NOTE: Ensure we have the original untouched
+# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-pixels10401-to-10500.zarr_bkp/" # NOTE: requires trailing `/` NOTE: Ensure we have the original untouched
+# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites_1kmX1km.zarr_bkp/"  # NOTE: requires trailing `/` NOTE: Ensure we have the original untouched
+# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-10kmX10km.zarr_bkp/"            # NOTE: requires trailing `/` NOTE: Ensure we have the original untouched
+# HISTO_BKP="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-100kmX100km.zarr_bkp/"          # NOTE: requires trailing `/` NOTE: Ensure we have the original untouched
 # if [ -d "$HISTO_INPUT" ] && [ -d "$HISTO_BKP" ]; then rm -rf -- "$HISTO_INPUT"; else echo "Error backup file does not exist. Did not delete." >&2; fi  # CAREFUL THIS DELETES HISTO_INPUT (ensure you have a backup)
 # rsync -rltDg --no-perms --chmod=ugo=rwX $HISTO_BKP $HISTO_INPUT # note the important trailing slash in source/
 
