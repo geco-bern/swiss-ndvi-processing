@@ -1,0 +1,183 @@
+Virtual environment activated
+Python executable: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/python
+Python version: Python 3.12.3
+
+2025-12-31
+2026-01-06
+============================================================
+Pipeline started at: 2026-05-27 09:34:39
+Log file: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/pipeline_logs/pipeline_2026-05-27_09h34m38.log
+============================================================
+
+Running: with arguments: 2025-12-31 2026-01-06
+------------------------------------------------------------
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/1_extract_swisstopo_dataset.py
+Start time: 2026-05-27 09:34:39
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/1_extract_swisstopo_dataset.py
+Duration: 00:00:00 (hh:mm:ss)
+Download script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06.zarr
+
+New satellite image download found. Continuing with full pipeline...
+
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/4_merge_zarr.py
+Start time: 2026-05-27 09:34:39
+<Client: 'tcp://127.0.0.1:44793' processes=50 threads=50, memory=1.09 TiB>
+http://127.0.0.1:8343/status
+Subsetting downloaded data to spatial extent of historic file:
+/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-1kmX1km.zarr
+Subsetting 4216 (historic) of 105715396 (downloaded) pixels.
+Initialized n=7 daily dates:
+       daily   obs_date          obs_times
+0 2025-12-31 2025-12-31           10:24:41
+1 2026-01-01 2026-01-01           10:43:39
+2 2026-01-02        NaT                   
+3 2026-01-03 2026-01-03           10:34:41
+4 2026-01-04        NaT                   
+5 2026-01-05 2026-01-05  10:23:29,10:30:41
+6 2026-01-06 2026-01-06           10:44:41
+All done
+4_merge_zarr.py created file: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+/mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/4_merge_zarr.py
+Duration: 00:00:12 (hh:mm:ss)
+Merging script returned value: /mnt/data2/UniBe-swiss-ndvi/data/tmp_2026-05-25_22h36_ndvi_01_downloaded_2025-12-31_2026-01-06_processed.zarr
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/5_analyse_demo_efficient.py
+Start time: 2026-05-27 09:34:51
+<Client: 'tcp://127.0.0.1:41657' processes=80 threads=80, memory=1.16 TiB>
+http://127.0.0.1:8341/status
+Last dates in historic_ds:
+  2025-12-22
+  2025-12-23
+  2025-12-24
+  2025-12-25
+  2025-12-26
+  2025-12-27
+  2025-12-28
+  2025-12-29
+  2025-12-30
+  2025-12-31
+First dates in newly downloaded:
+  2025-12-31
+  2026-01-01
+  2026-01-02
+  2026-01-03
+  2026-01-04
+  2026-01-05
+  2026-01-06
+Current historic dataset:
+<xarray.Dataset> Size: 41MB
+Dimensions:         (pixel: 4216, date: 3195)
+Coordinates:
+    y_idx           (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    x_idx           (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    doy             (date) int32 13kB dask.array<chunksize=(3195,), meta=np.ndarray>
+    x               (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    y               (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+  * pixel           (pixel) int32 17kB 44311103 44311104 ... 45049987 45049988
+  * date            (date) datetime64[ns] 26kB 2017-04-03 ... 2025-12-31
+Data variables:
+    ndvi_processed  (pixel, date) int16 27MB dask.array<chunksize=(4216, 3195), meta=np.ndarray>
+    mask_array      (pixel, date) int8 13MB dask.array<chunksize=(4216, 3195), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Newly downloaded dataset:
+<xarray.Dataset> Size: 202kB
+Dimensions:   (pixel: 4216, date: 7)
+Coordinates:
+    y_idx     (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    x_idx     (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    x         (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    doy       (date) int32 28B dask.array<chunksize=(7,), meta=np.ndarray>
+  * date      (date) datetime64[ns] 56B 2025-12-31 2026-01-01 ... 2026-01-06
+  * pixel     (pixel) int32 17kB 44311103 44311104 ... 45049987 45049988
+    y         (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+Data variables:
+    obs_date  (date) bool 7B dask.array<chunksize=(7,), meta=np.ndarray>
+    ndsi_obs  (date, pixel) int16 59kB dask.array<chunksize=(7, 4216), meta=np.ndarray>
+    ndvi_obs  (date, pixel) int16 59kB dask.array<chunksize=(7, 4216), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    description_ndsi:  NDSI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+Created visual overview of update at: /mnt/data2/UniBe-swiss-ndvi/output_data/tmp_out_ndvi_historic_extended_run-on-20260527-093438.zarr_update.png
+Constructed graph with 11 layers, and 11 tasks.
+writing to new file
+  /mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-1kmX1km.zarr
+=> /mnt/data2/UniBe-swiss-ndvi/output_data/tmp_out_ndvi_historic_extended_run-on-20260527-093438.zarr
+2026-05-27 09:35:04,397 - distributed.scheduler - WARNING - Detected different `run_spec` for key ('getitem-1cff63ecca2067e18e4d4bcb93fdd709', 1) between two consecutive calls to `update_graph`. This can cause failures and deadlocks down the line. Please ensure unique key names. If you are using a standard dask collections, consider releasing all the data before resubmitting another computation. More details and help can be found at https://github.com/dask/dask/issues/9888. 
+Debugging information
+---------------------
+old task state: waiting
+old run_spec: Alias(('getitem-1cff63ecca2067e18e4d4bcb93fdd709', 1)->('concatenate-open_dataset-doy-original-getitem-1cff63ecca2067e18e4d4bcb93fdd709', 1))
+new run_spec: Alias(('getitem-1cff63ecca2067e18e4d4bcb93fdd709', 1)->('concatenate-getitem-1cff63ecca2067e18e4d4bcb93fdd709', 1))
+old dependencies: {('concatenate-open_dataset-doy-original-getitem-1cff63ecca2067e18e4d4bcb93fdd709', 1)}
+new dependencies: frozenset({('concatenate-getitem-1cff63ecca2067e18e4d4bcb93fdd709', 1)})
+
+Constructed graph with 34 layers, and 91 tasks.
+Previously, L2-finalized dates (L2-frac > 0.98) in updated data set:
+  2025-07-06
+  2025-07-07
+  2025-07-08
+  2025-07-09
+  2025-07-10
+  2025-07-11
+Newest, L2-finalized dates (L2-frac > 0.98) in updated data set:
+  2025-07-06
+  2025-07-07
+  2025-07-08
+  2025-07-09
+  2025-07-10
+  2025-07-11
+Updated dataset:
+<xarray.Dataset> Size: 67MB
+Dimensions:         (pixel: 4216, date: 3195)
+Coordinates:
+    y_idx           (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    x_idx           (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    doy             (date) int32 13kB dask.array<chunksize=(3195,), meta=np.ndarray>
+    x               (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+    y               (pixel) int32 17kB dask.array<chunksize=(4216,), meta=np.ndarray>
+  * pixel           (pixel) int32 17kB 44311103 44311104 ... 45049987 45049988
+  * date            (date) datetime64[ns] 26kB 2017-04-03 ... 2025-12-31
+Data variables:
+    ndvi_processed  (pixel, date) int16 27MB dask.array<chunksize=(4216, 3195), meta=np.ndarray>
+    mask_array      (pixel, date) int8 13MB dask.array<chunksize=(4216, 3195), meta=np.ndarray>
+    median_ndvi     (pixel, date) int16 27MB dask.array<chunksize=(4216, 3195), meta=np.ndarray>
+Attributes:
+    transform_note:    | 10.00, 0.00, 2474090.00|\n| 0.00,-10.00, 1310530.00|...
+    transform_coeffs:  [10.0, 0.0, 2474090.0, 0.0, -10.0, 1310530.0, 0.0, 0.0...
+    transform_instr:   from affine import Affine; t = Affine(*ds.attrs['trans...
+    description_ndvi:  NDVI (scaled int16: -10000 to 10000)
+    nodata:            32767
+    cloud_shadow:      -32768
+    pixel_definition:  Total of global grid used for pixel ID (based on fores...
+/mnt/data2/UniBe-swiss-ndvi/output_data/tmp_out_ndvi_historic_extended_run-on-20260527-093438.zarr_update.png
+Total runtime: 572.03 seconds
+Modified/Created file: 
+/mnt/data2/UniBe-swiss-ndvi/output_data/tmp_out_ndvi_historic_extended_run-on-20260527-093438.zarr
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/5_analyse_demo_efficient.py
+Duration: 00:09:35 (hh:mm:ss)
+------------------------------------------------------------
+Running: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/6_create_cogtiff.py
+Start time: 2026-05-27 09:44:26
+Finished: /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/6_create_cogtiff.py
+Duration: 00:00:00 (hh:mm:ss)
+============================================================
+Pipeline completed successfully
+End time: 2026-05-27 09:44:26
+Total runtime: 00:09:47 (hh:mm:ss)
+============================================================
