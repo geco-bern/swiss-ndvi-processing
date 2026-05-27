@@ -36,8 +36,8 @@ warnings.filterwarnings(
 
 # HOW TO RUN FROM BASH:
 # source /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate
-# SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB.py"
-# LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/7_create_png_for_XY_demoFB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
+# SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/7_create_png_for_XY_demoFB.py"
+# LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/7_create_png_for_XY_demoFB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
 # # HISTO_INPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_100kmX100km.zarr"
 # # HISTO_INPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365.zarr_bkp"
 # HISTO_INPUT="/mnt/data2/UniBe-swiss-ndvi/input_data/ndvi_historic_v5_chk_40000_365_100kmX100km.zarr"

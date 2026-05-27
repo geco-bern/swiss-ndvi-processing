@@ -10,7 +10,7 @@ set -Eeuo pipefail
 # Script Configuration
 # ============================================================
 VENV_PATH="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv"
-LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/pipeline_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
+LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/pipeline_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
 
 # Logging setup (terminal + file) -------------------------------
 : > "$LOG_FILE"
@@ -63,16 +63,16 @@ END_DATE="2026-01-06"   # Or hardcode it alternatively
 
 # Start date:
 # Read previous start date from historical NDVI file
-SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/0_2_get_last_date.py"
+SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/0_2_get_last_date.py"
 START_DATE=$(python $SCRIPT_FILE $HISTO_INPUT)
 
 echo $START_DATE
 echo $END_DATE
 
-SCRIPT_0=/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py
-SCRIPT_1=/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/4_merge_zarr.py
-SCRIPT_2=/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/5_analyse_demo_efficient.py
-SCRIPT_3=/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/6_create_cogtiff.py
+SCRIPT_0=/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/1_extract_swisstopo_dataset.py
+SCRIPT_1=/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/4_merge_zarr.py
+SCRIPT_2=/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/5_analyse_demo_efficient.py
+SCRIPT_3=/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/6_create_cogtiff.py
 
 # ============================================================
 # Start pipeline 

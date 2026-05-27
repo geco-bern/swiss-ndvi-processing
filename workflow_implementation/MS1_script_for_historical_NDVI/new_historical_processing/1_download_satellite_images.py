@@ -29,8 +29,8 @@ warnings.filterwarnings(
 
 # HOW TO RUN FROM BASH:
 # source /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/.venv/bin/activate
-# SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset.py"
-# LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/demo/test_all_pixels/1_extract_swisstopo_dataset_FB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
+# SCRIPT_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/1_extract_swisstopo_dataset.py"
+# LOG_FILE="/home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels/1_extract_swisstopo_dataset_FB_$(date "+%Y-%m-%d_%Hh%Mm%S").log"
 # START_DATE="2026-01-01"
 # END_DATE="2026-01-15"
 # python -u $SCRIPT_FILE $START_DATE $END_DATE > $LOG_FILE  2>&1 &
