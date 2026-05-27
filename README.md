@@ -1,120 +1,63 @@
-# Gapfill NDVI
+# Smooth and gap-free NDVI of Swiss forests
 
-The workflow implementation (milestone 2) can be found in [this folder](workflow_implementation/MS2_continuous). The folder contains all the steps to run the continous integration setup for a small subset of pixels (2000).
+## Aim
+Vegetation health and activity can be monitored based on remotely sensed data of the Normalized Difference Vegetation Index (NDVI). Sentinel-2 provides NDVI data at high spatial resolution (10 m) at frequent revisit times (up to 5 days) and an additionally enhanced data product (swissEO S2-SR), covering the area of Switzerland, is made available through swisstopo. However, challenges for data interpretability and usability for operational vegetation health (https://www.swisstopo.admin.ch/de/satellitenbilder-swisseo-vhi) and national drought monitoring (https://www.trockenheit.admin.ch/en) remain. Challenges arise from data gaps, the large scatter, and apparent outliers in the data. The data availability largely depends on the overpass date of the Sentinel-2 satellites, cloud, and snow cover.
 
-## How to Use the Package
+<!-- <figure style="text-align: center;">
+    <img src="illustrations/00_NDVI_availability.png" style="width:60%;">
+    <figcaption>Figure 1: Illustration of data availability of NDVI values during October 2025 in the swissEO S2-SR product (screenshot from https://www.swisstopo.admin.ch/en/satelliteimage-swisseo-s2-sr).</figcaption>
+</figure> -->
 
-To use the package, you have to install the required libraries using pip
+In this project, we create a workflow to process the NDVI data from swissEO S2-SR, creating a smooth and gap-free data product at the daily scale and 10 m resolution, covering forest areas Switzerland. The processing includes:
 
-### Setup with pip
-Follow the steps outlined in `workflow_implementation/MS2_continuous/00_setup.sh`.
-They create a new virtual environment `NDVI` and install the necessary packages
-with `pip`.
+- Filtering of observations based on cloud and snow cover data
+- Identification of outlier observations
+- Smoothing and interpolation of the observations
 
-### Setup with pip
+The workflow is applied to available data from April 2017 to November 2025 (historical processing) and a setup to work with newly incoming data is developed and presented. Accordingly, the project yields two products:
 
+1. **Historical processing (HP)**: A smooth and gap-free daily NDVI product, based on S2-SR, covering past dates (April 2017 to November 2025). These data are made available as Cloud Optimized GeoTIFF files.
+2. **Continuous integration (CI)**: An algorithm to continuously ingest incoming NDVI data from S2-SR and update cleaning, gapfilling, and smoothing in consistency with the _Historical processing_. 
+
+
+Further details are found in the report: `report/method_report_v2.ipynb`
+
+## How to Run HP
+Details how to re-run the historical processing are found in section 3.1 of the report: `report/method_report_v2.ipynb`.
+
+The full workflow is implemented in by the bash script: `0_1_run_historic_analysis.sh`. Log files are created into folder `workflow_implementation/MS2_continuous/logs`. It can all be run e.g. with `ssh tunder; tmux; cd /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_historical/; bash 0_1_run_historic_analysis.sh`
+
+In a nutshell it can be done with:
 ```bash
-python3 -m venv ndvi
-source ndvi/bin/activate
-pip install -r requirements.txt
+ssh tunder
+tmux 
+cd /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS1_historical/
+
+bash 0_1_run_historic_analysis.sh
+# and check progress on the dashboard (for the dashboard link see log files in workflow_implementation/MS2_continuous/test_all_pixels/pipeline_logs)
 ```
 
 
-# Requirements
+## How to Run CI
+Details how to run the continuous integration with example datasets (not contained in this repo, but already provided on tunder) are found in section 3.2.2 and Appendix B of the report: `report/method_report_v2.ipynb`
 
-Big storage capacity are needed to store the intermediate results (see **prerequisites**) section. Using the workstation, (256GB RAM; 80 CPU) each passages expect for the first and last takes a couple of minutes maximum using 10 CPUs.
+To run `0_1_run_pipeline.sh`: 
+- first update following parameters in the script:
+    - `HISTO_INPUT="/mnt/data2/UniBe-swiss-ndvi/historic_data/historical_2026-04-04_18h16_historical_v7c_SUBSET-focus-sites.zarr"`
+    - `END_DATE="2026-01-06"`
+    - `START_DATE`, (optional) uses by default the last date of `HISTO_INPUT`
+    - `HISTO_OUTPUT` if you do not want to extend to the existing `HISTO_INPUT` (ensure the parent directory exists)
+- second run the shell script, e.g. by doing : `ssh tunder; tmux; cd /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels; bash 0_1_run_pipeline.sh`
+- check the log file in folder `workflow_implementation/MS2_continuous/test_all_pixels/pipeline_logs`
+- (optional): for repeated testing, it can be good to outcomment certain steps (e.g. slow downloading)
 
+In a nutshell it can be done with:
+```bash
+ssh tunder
+tmux 
+cd /home/Shared/UniBe-swiss-ndvi/GitHub/swiss-ndvi-processing/workflow_implementation/MS2_continuous/test_all_pixels
 
-# How to process the NDVI data
+bash 0_1_run_pipeline.sh
 
-Here I'll show how to process the NDVI data for a small subset of pixel. The analysis can be already run with this [script](workflow_implementation/MS2_continuous/5_analyse_demo.py) without changing anything. 
-
-If someone wants to try the entire workflow from downloading the satellite images to the NDVI processing, it must follows the script from 1 to 5 in [this folder](workflow_implementation/MS2_continuous).
-
-The script 0 contains the code to generate the means of upper and lower bands using the Samantha's model. In order to reproduce the dataset, is necessary to follows her instruction in [processing folder](processing). We already have generated the lookup table for all doy and pixels, in [lookup_table folder](data_for_demo/lookup_table.zarr) are stored the values for the subset of pixels used in the demo.
-
-## Prerequisites
-
-To process the data, 2 dataset are needed. 
-
-- The historical NDVI processing with all the past observation.
-- The lookup table contains the means upper and lower precomputed per doy for each pixels
-
-Both dataset are already generated and are stored inside the workstation. We upload the dataset for the demo in [data folder](data_for_demo).
-
-Below I'll explain how to use the demo. The intermediate data generated from step 1 to step 3 contains all the pixels (105M) and cannot be uploaded on Github. For this reason the only lines of code to change are the ones used to store the intermediate files. The storage size needed is in order of hundreds of GB.
-
-## Simulate the continuous NDVI processing
-
-To simulate the continuous NDVI processing, the first step is to download the data.
-
-### Download the data
-
-The script [1_extract_swisstopo_dataset.py](workflow_implementation/MS2_continuous/1_extract_swisstopo_dataset.py) download the satellite images from https://data.geo.admin.ch/api/stac/v0.9/ using pystac_client. 
- 
-The script download the forest mask and the satellite bands to compute NDVI and NDSI.
- 
-in [line 124](workflow_implementation/MS2_continuous/1_extract_swisstopo_dataset.py#L124)
- is it possible to select the time window to simulate the continuous ingestion. I select to ingest data from 2018-06-01 to 2018-06-05.
-
-#### Required parameter to modify inside the script
-
-- the output path in [line 30](workflow_implementation/MS2_continuous/1_extract_swisstopo_dataset.py#30)
-- the starting and ending date in [line 124](workflow_implementation/MS2_continuous/1_extract_swisstopo_dataset.py#L124), if needed.
-
-### Transpose the data from time-wise to space-wise chunking
-
-The script step [2_transpose_swisstopo_dataset.py](workflow_implementation/MS2_continuous/2_transpose_swisstopo_dataset.py) transpose the dataset from time-wise chunking to space-wise chunking.
-
-#### Required parameter to modify inside the script
-
-- the input path in [line 11](workflow_implementation/MS2_continuous/2_transpose_swisstopo_dataset.py#L11). !!! IMPORTANT Must be equal to the output path of the previous step.
-- the output path in [line 13](workflow_implementation/MS2_continuous/2_transpose_swisstopo_dataset.py#L13).
-
-### Add the new date
-
-The script (3_add_dates.py)[workflow_implementation/MS2_continuous/3_add_dates.py] will download the new date where an observation in present, extended to be evenly spacing at daily resolution and create the mask of where an observation is found (this mask in used in continuous NDVI setup)
-
-#### Required parameter to modify inside the script
-
-There is nothing to modify here
-
-### Merge the historical dataset with the new data set
-
-To run the analysis, it is necessary to have the historical analysis and the newly acquired data. The script [4_merge_zarr.py](workflow_implementation/MS2_continuous/4_merge_zarr.py) will load both dataset and merged together. The new median NDVI data will be added using the lookup table.
-
-#### Required parameter to modify inside the script
-
-- The path of input new data in [line 15](workflow_implementation/MS2_continuous/4_merge_zarr.py#15). This must be the same path as the output file in the previous script. 
-- The path of temporary output in the following line before the merging.
-
-If the starting end ending dates in [1_extract_swisstopo_dataset.py](workflow_implementation/MS2_continuous/1_extract_swisstopo_dataset.py) have been changed, it is also necessary to change them in line 91, 92, 177, 191
-
-
-### Run the analysis
-
-After the merging, it is possible to run the analysis with the script [5_analyse_demo.py](workflow_implementation/MS2_continuous/5_analyse_demo.py). The analysis can be already run as it is.
-
-The output data will also have a mask map for each pixel and date with the following values:
-
-- **0**: the data is not an observation and is yet to be smoothed
-- **1**: the data is not an observation and is smoothed
-- **2**: the data is an observation and is yet to be smoothed
-- **3**: the data is an observation and is smoothed
-- **4**: the data is an observation and is an outlier
-
-#### Required parameter to modify inside the script
-
-There is nothing to modify here.
-
-### Create COG tiff
-
-The script [6_create_cogtiff.py](workflow_implementation/MS2_continuous/6_create_cogtiff.py) will generate the cogtiff file based on the analysis. To work as it is now, it will read all the file stored [here](data_for_demo/output_cogtiff) which contains the tiff files for each date. 
-
-From them it will select the newest date and it will check all the remaining dates. If for a given date the number masked data have values 1 or 3, as specified above, exceed the threshold specified in [line 21](workflow_implementation/MS2_continuous/6_create_cogtiff.py#L21), the script will generate the tiff of the selected date. Please note that putting the threshold at 1 (100%) will not generate anything because there are some pixels with no observation.
-
-The tiff generation can be run it as it is.
-
-#### Required parameter to modify inside the script
-
-In [line 37](workflow_implementation/MS2_continuous/6_create_cogtiff.py#L37)is it possible to remove the -100 create more tiff files
+# and check progress on the dashboard (for the dashboard link see log files in workflow_implementation/MS2_continuous/test_all_pixels/pipeline_logs)
+```
